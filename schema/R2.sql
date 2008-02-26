@@ -27,12 +27,12 @@ CREATE TABLE "User" (
 
 CREATE TABLE "Account" (
        account_id         SERIAL             PRIMARY KEY,
-       account_name       VARCHAR(255)       UNIQUE  NOT NULL,
+       name               VARCHAR(255)       UNIQUE  NOT NULL,
        primary_user_id    INT8               NOT NULL,
        domain_id          INTEGER            NOT NULL,
        default_timezone   VARCHAR(50)        NOT NULL DEFAULT 'UTC',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       CONSTRAINT valid_account_name CHECK ( account_name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "Domain" (
@@ -79,6 +79,9 @@ CREATE TABLE "PartyHistory" (
        phone_number_id    INT8               NULL,
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       -- something that describes the change to the thing in question
+       -- as a data structure, and provides a way to reverse it,
+       -- presumably a Storable-created data structure
        reversal_blob      BYTEA              NOT NULL
 );
 
@@ -105,14 +108,14 @@ CREATE TABLE "Person" (
 
 CREATE TABLE "Household" (
        household_id       SERIAL8            PRIMARY KEY,
-       household_name     VARCHAR(255)       NOT NULL,
-       CONSTRAINT valid_household_name CHECK ( household_name != '' )
+       name               VARCHAR(255)       NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "Organization" (
        organization_id    INT8               PRIMARY KEY,
-       organization_name  VARCHAR(255)       NOT NULL,
-       CONSTRAINT valid_organization_name CHECK ( organization_name != '' )
+       name               VARCHAR(255)       NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "OrganizationMember" (
@@ -145,12 +148,12 @@ CREATE TABLE "Address" (
 
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
-       type_name          VARCHAR(255)       NOT NULL,
+       name               VARCHAR(255)       NOT NULL,
        account_id         INT8               NOT NULL,
-       CONSTRAINT valid_type_name CHECK ( type_name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
--- Consider a trigger to enforce one phone number address per party?
+-- Consider a trigger to enforce one primar phone number per party?
 CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
        phone_number_type_id   INT8           NOT NULL,
@@ -163,9 +166,26 @@ CREATE TABLE "PhoneNumber" (
 
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
-       type_name             VARCHAR(255)    NOT NULL,
+       name                  VARCHAR(255)    NOT NULL,
        account_id            INT8            NOT NULL,
-       CONSTRAINT valid_type_name CHECK ( type_name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' )
+);
+
+CREATE TABLE "Donation" (
+       donation_id        SERIAL8            PRIMARY KEY,
+       amount             NUMERIC(2)         NOT NULL,
+       donation_date      DATE               NOT NULL,
+       party_id           INT8               NOT NULL,
+       fund_id            INT8               NOT NULL,
+       notes              TEXT               NULL,
+       CONSTRAINT valid_amount CHECK ( amount > 0.0 )
+);
+
+CREATE TABLE "Fund" (
+       fund_id            SERIAL8            PRIMARY KEY,
+       name               VARCHAR(255)       NOT NULL,
+       account_id         INT8               NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 
@@ -262,5 +282,17 @@ ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_phone_number_type_id"
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "PhoneNumberType" ADD CONSTRAINT "PhoneNumberType_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_fund_id"
+  FOREIGN KEY ("fund_id") REFERENCES "Fund" ("fund_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "Fund" ADD CONSTRAINT "Fund_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
