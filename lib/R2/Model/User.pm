@@ -5,6 +5,7 @@ use warnings;
 
 use Digest::SHA qw( sha512_base64 );
 use List::Util qw( first );
+use R2::Model::Party;
 use R2::Model::Person;
 use R2::Model::Schema;
 
