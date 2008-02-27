@@ -14,7 +14,6 @@ CREATE DOMAIN email_address AS VARCHAR(255)
 
 CREATE TABLE "User" (
        user_id            SERIAL8            PRIMARY KEY,
-       email_address      email_address      NOT NULL,
        -- SHA512 in Base64 encoding
        password           VARCHAR(86)        NOT NULL,
        timezone           VARCHAR(50)        NOT NULL DEFAULT 'UTC',
@@ -46,6 +45,9 @@ CREATE TABLE "Domain" (
 
 CREATE TYPE party_type AS ENUM ( 'Person', 'Organiation', 'Household' );
 
+CREATE DOMAIN uri AS VARCHAR(255)
+       CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\w-]+(\.[\w-]+)*\.\w{2,3}' );
+
 CREATE TABLE "Party" (
        party_id           SERIAL8            PRIMARY KEY,
        party_type         party_type         NOT NULL,
@@ -54,7 +56,7 @@ CREATE TABLE "Party" (
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_trade       BOOLEAN            NOT NULL DEFAULT FALSE,
        email_address      email_address      NULL,
-       website            VARCHAR(255)       NULL,
+       website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- an identifier from another app, probably created via an
        -- initial import from something else
