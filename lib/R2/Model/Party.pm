@@ -62,6 +62,13 @@ use Fey::ORM::Table;
         );
 }
 
+sub DelegatableMethods
+{
+    my $class = shift;
+
+    return $class->meta()->get_attribute_list();
+}
+
 before 'update' => sub
 {
     my $self = shift;

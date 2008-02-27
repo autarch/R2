@@ -19,9 +19,9 @@ use Fey::ORM::Table;
     has_one 'person' =>
         ( table   => $schema->table('Person'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       map { $_->name() }
-                       R2::Model::Person->Table()->columns(),
-                       R2::Model::Party->Table()->columns() ],
+                       grep { $_ ne 'person' }
+                       R2::Model::Person->meta()->get_attribute_list(),
+                       R2::Model::Party->DelegatableMethods() ],
         );
 }
 

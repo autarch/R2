@@ -18,8 +18,8 @@ use Fey::ORM::Table;
     has_one 'party' =>
         ( table   => $schema->table('Party'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       map { $_->name() }
-                       R2::Model::Party->Table()->columns() ],
+                       R2::Model::Party->DelegatableMethods(),
+                     ],
         );
 
     has_one 'user' =>
