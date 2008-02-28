@@ -13,6 +13,20 @@ use Fey::ORM::Table;
     has_table( $schema->table('AddressType') );
 }
 
+
+sub CreateDefaultsForAccount
+{
+    my $class   = shift;
+    my $account = shift;
+
+    for my $name ( qw( Home Work Headquarters Branch ) )
+    {
+        $class->insert( name       => $name,
+                        account_id => $account->account_id(),
+                      );
+    }
+}
+
 no Fey::ORM::Table;
 no Moose;
 

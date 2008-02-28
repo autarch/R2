@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use R2::Model::Party;
+use R2::Model::PersonMessaging;
 use R2::Model::Schema;
 
 use Fey::ORM::Table;
@@ -25,6 +26,15 @@ use Fey::ORM::Table;
     has_one 'user' =>
         ( table => $schema->table('User'),
           undef => 1,
+        );
+
+    # XXX - this'd be nicer if it selected the messaging provider in
+    # the same query
+    has_many 'messaging' =>
+        ( table       => $schema->table('PersonMessaging')
+          cache       => 1,
+          select      => __PACKAGE__->_MessagingSelect(),
+          bind_params => sub { $_[0]->person_id() },
         );
 }
 
@@ -52,6 +62,23 @@ around 'insert' => sub
 
     return R2::Model::Schema->RunInTransaction($sub);
 };
+
+sub _MessagingSelect
+{
+    my $class = shift;
+
+    my $select = R2::Model::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Model::Schema->Schema();
+
+    $select->select( $schema->table('PersonMessaging') )
+           ->from( $schema->tables( 'PersonMessaging', 'MessagingProvider' ) )
+           ->where( $schema->table('PersonMessaging')->column('person_id'),
+                    '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' )
+
+    return $select;
+}
 
 no Fey::ORM::Table;
 no Moose;
