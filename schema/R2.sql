@@ -28,17 +28,29 @@ CREATE TABLE "User" (
 CREATE TABLE "Account" (
        account_id         SERIAL             PRIMARY KEY,
        name               VARCHAR(255)       UNIQUE  NOT NULL,
-       primary_user_id    INT8               NOT NULL,
        domain_id          INTEGER            NOT NULL,
        default_timezone   VARCHAR(50)        NOT NULL DEFAULT 'UTC',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
+CREATE TABLE "Role" (
+       role_id            SERIAL             PRIMARY KEY,
+       name               VARCHAR(30)        UNIQUE NOT NULL
+);
+
+CREATE TABLE "AccountUserRole" (
+       account_id         INTEGER            NOT NULL,
+       user_id            INT8               NOT NULL,
+       role_id            INTEGER            NOT NULL,
+       PRIMARY KEY ( account_id, user_id, role_id )
+);
+
 CREATE TABLE "Domain" (
        domain_id          SERIAL             PRIMARY KEY,
        web_hostname       VARCHAR(255)       UNIQUE NOT NULL,
        email_hostname     VARCHAR(255)       UNIQUE NOT NULL,
+       requires_ssl       BOOLEAN            DEFAULT FALSE,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_web_hostname CHECK ( web_hostname != '' ),
        CONSTRAINT valid_email_hostname CHECK ( email_hostname != '' )
@@ -214,12 +226,20 @@ ALTER TABLE "User" ADD CONSTRAINT "User_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "Account" ADD CONSTRAINT "Account_primary_user_id"
-  FOREIGN KEY ("primary_user_id") REFERENCES "User" ("user_id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
 ALTER TABLE "Account" ADD CONSTRAINT "Account_domain_id"
   FOREIGN KEY ("domain_id") REFERENCES "Domain" ("domain_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_role_id"
+  FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "Party" ADD CONSTRAINT "Party_account_id"

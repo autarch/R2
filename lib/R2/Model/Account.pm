@@ -3,16 +3,16 @@ package R2::Model::Account;
 use strict;
 use warnings;
 
+use R2::Model::AccountUserRole;
 use R2::Model::AddressType;
 use R2::Model::Domain;
 use R2::Model::Fund;
 use R2::Model::MessagingProvider;
 use R2::Model::PhoneNumberType;
 use R2::Model::Schema;
-# actually use'ing this module here causes some circular dependency madness
-# use R2::Model::User;
 
 use Fey::ORM::Table;
+use MooseX::Params::Validate qw( validatep );
 
 {
     my $schema = R2::Model::Schema->Schema();
@@ -20,9 +20,6 @@ use Fey::ORM::Table;
     has_table( $schema->table('Account') );
 
     has_one( $schema->table('Domain') );
-
-    has_one 'primary_user' =>
-        ( table => $schema->table('User') );
 
     has_many 'funds' =>
         ( table    => $schema->table('Fund'),
@@ -77,6 +74,23 @@ sub _initialize
     R2::Model::PhoneNumberType->CreateDefaultsForAccount($self);
 
     R2::Model::MessagingProvider->CreateDefaultsForAccount($self);
+}
+
+{
+    my %spec = ( user => { isa => 'R2::Model::User' },
+                 role => { isa => 'R2::Model::Role' },
+               );
+    sub add_user
+    {
+        my $self            = shift;
+        my ( $user, $role ) = validatep( \@_, %spec );
+
+        R2::Model::AccountUserRole->insert
+            ( account_id => $self->account_id(),
+              user_id    => $user->user_id(),
+              role_id    => $role->role_id(),
+            );
+    }
 }
 
 no Fey::ORM::Table;
