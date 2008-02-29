@@ -11,6 +11,14 @@ use Fey::Loader;
 
 my $Schema;
 
+my $source;
+if ($R2::Model::Schema::TestSchema)
+{
+    $Schema = $R2::Model::Schema::TestSchema;
+
+    has_schema $Schema;
+}
+else
 {
     my $source =
         Fey::DBIManager::Source->new( dsn          => 'dbi:Pg:dbname=R2',

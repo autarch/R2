@@ -31,7 +31,7 @@ use Fey::ORM::Table;
     # XXX - this'd be nicer if it selected the messaging provider in
     # the same query
     has_many 'messaging' =>
-        ( table       => $schema->table('PersonMessaging')
+        ( table       => $schema->table('PersonMessaging'),
           cache       => 1,
           select      => __PACKAGE__->_MessagingSelect(),
           bind_params => sub { $_[0]->person_id() },
@@ -75,7 +75,7 @@ sub _MessagingSelect
            ->from( $schema->tables( 'PersonMessaging', 'MessagingProvider' ) )
            ->where( $schema->table('PersonMessaging')->column('person_id'),
                     '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' )
+           ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' );
 
     return $select;
 }

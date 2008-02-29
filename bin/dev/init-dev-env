@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+
+system( 'psql', 'template1', '-f', './schema/R2.sql' )
+    and die 'Cannot create R2 database with psql';

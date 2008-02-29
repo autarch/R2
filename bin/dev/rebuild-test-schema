@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './lib';
+
+use MIME::Base64 qw( encode_base64 );
+use Storable qw( nfreeze );
+
+system( './bin/dev/init-dev-env' )
+    and die $!;
+
+require R2::Model::Schema;
+
+
+open my $fh, '>', 't/lib/R2/Test/Schema.pm'
+    or die $!;
+
+print {$fh} sprintf( <<'EOF', encode_base64( nfreeze( R2::Model::Schema->Schema() ) ) );
+package R2::Test::Schema;
+
+use strict;
+use warnings;
+
+use MIME::Base64 qw( decode_base64 );
+use Storable qw( thaw );
+
+
+$R2::Model::Schema::TestSchema = thaw( decode_base64( '%s' ) );
+
+1;
+EOF

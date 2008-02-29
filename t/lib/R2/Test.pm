@@ -8,6 +8,8 @@ use Exporter qw(import);
 our @EXPORT_OK = qw( mock_dbh );
 
 use DBD::Mock 1.36;
+use R2::Test::Schema;
+use R2::Model::Schema;
 
 
 sub mock_dbh

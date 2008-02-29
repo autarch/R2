@@ -3,10 +3,10 @@ use warnings;
 
 use Test::More tests => 6;
 
-use R2::Model::Person;
-
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
+
+use R2::Model::Person;
 
 
 my $dbh = mock_dbh();
