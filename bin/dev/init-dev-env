@@ -4,10 +4,95 @@ use strict;
 use warnings;
 
 use FindBin;
+use lib "$FindBin::Bin/../../lib";
+use Sys::Hostname qw( hostname );
 
 
 system( "$FindBin::Bin/rebuild-schema" )
     and die $!;
 
-require R2::Model::Account;
 
+{
+    my $domain = make_domain();
+    make_accounts($domain);
+}
+
+sub make_domain
+{
+    require R2::Model::Domain;
+
+    my $domain =
+        R2::Model::Domain->insert( web_hostname   => hostname(),
+                                   email_hostname => hostname(),
+                                 );
+
+    my $hostname = $domain->web_hostname();
+
+    print <<"EOF";
+
+  Made a new domain: $hostname
+
+EOF
+
+    return $domain
+}
+
+sub make_accounts
+{
+    my $domain = shift;
+
+    require R2::Model::User;
+    require R2::Model::Account;
+
+    for my $names ( [ q{People's Front of Judea}, q{John Cleese} ],
+                    [ q{Judean People's Front}, q{Eric Idle} ],
+                 )
+    {
+        make_account( $domain, @{ $names } );
+    }
+}
+
+sub make_account
+{
+    my $domain       = shift;
+    my $account_name = shift;
+    my $user_name    = shift;
+
+    my $account =
+        R2::Model::Account->insert( name      => $account_name,
+                                    domain_id => $domain->domain_id(),
+                                  );
+
+    my ( $first_name, $last_name ) = split / /, $user_name;
+    ( my $email = lc $user_name ) =~ s/ /_/g;
+    $email .= '@example.com';
+
+    my $password = 'password';
+
+    my $user =
+        R2::Model::User->insert
+            ( password        => $password,
+              is_system_admin =>
+              ( R2::Model::User->Count() ? 0 : 1 ),
+              email_address   => $email,
+              first_name      => $first_name,
+              last_name       => $last_name,
+              gender          => 'male',
+              account_id      => $account->account_id(),
+            );
+
+    $account->add_user( user => $user,
+                        role => R2::Model::Role->Admin(),
+                      );
+
+    print <<"EOF";
+
+  Created a new account: $account_name
+
+  Admin is $user_name
+
+    email:    $email
+    password: $password
+
+EOF
+}
