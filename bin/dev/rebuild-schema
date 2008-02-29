@@ -1,0 +1,3 @@
+#!/bin/bash
+
+psql template1 -f ./schema/R2.sql

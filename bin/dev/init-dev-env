@@ -3,6 +3,11 @@
 use strict;
 use warnings;
 
+use FindBin;
 
-system( 'psql', 'template1', '-f', './schema/R2.sql' )
-    and die 'Cannot create R2 database with psql';
+
+system( "$FindBin::Bin/rebuild-schema" )
+    and die $!;
+
+require R2::Model::Account;
+

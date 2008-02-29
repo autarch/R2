@@ -5,10 +5,12 @@ use warnings;
 
 use lib './lib';
 
+use FindBin;
 use MIME::Base64 qw( encode_base64 );
 use Storable qw( nfreeze );
 
-system( './bin/dev/init-dev-env' )
+
+system( "$FindBin::Bin/rebuild-schema" )
     and die $!;
 
 require R2::Model::Schema;

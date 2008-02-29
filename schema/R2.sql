@@ -20,6 +20,7 @@ CREATE TABLE "User" (
        date_format        VARCHAR(12)        NOT NULL DEFAULT '%m/%d/%Y',
        time_format        VARCHAR(12)        NOT NULL DEFAULT '%I:%M %P',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       is_system_admin    BOOLEAN            DEFAULT FALSE,
        person_id          INT8               NOT NULL,
        CONSTRAINT valid_password CHECK ( password != '' )
 );
