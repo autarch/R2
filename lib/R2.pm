@@ -3,34 +3,29 @@ package R2;
 use strict;
 use warnings;
 
+use Catalyst;
 use Catalyst::Runtime '5.70';
 
-# Set flags and add plugins for the application
-#
-#         -Debug: activates the debug mode for very useful log messages
-#   ConfigLoader: will load the configuration from a YAML file in the
-#                 application's home directory
-# Static::Simple: will serve static files from the application's root 
-#                 directory
+use R2::Config;
 
-use Catalyst qw/-Debug ConfigLoader Static::Simple/;
 
-our $VERSION = '0.01';
+BEGIN
+{
+    Catalyst->import( R2::Config->CatalystImports() );
+}
 
-# Configure the application. 
-#
-# Note that settings in r2.yml (or other external
-# configuration file that you set up manually) take precedence
-# over this when using ConfigLoader. Thus configuration
-# details given here can function as a default configuration,
-# with a external configuration file acting as an override for
-# local deployment.
+__PACKAGE__->config( name => 'R2',
+                     R2::Config->CatalystConfig(),
+                   );
 
-__PACKAGE__->config( name => 'R2' );
+__PACKAGE__->request_class( 'R2::Request' );
+#__PACKAGE__->response_class( 'R2::Response' );
 
-# Start the application
-__PACKAGE__->setup;
+__PACKAGE__->setup();
 
+1;
+
+__END__
 
 =head1 NAME
 
@@ -58,5 +53,3 @@ This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
-1;
