@@ -9,7 +9,6 @@ use Path::Class;
 use R2::Util qw( string_is_empty );
 use Sys::Hostname qw( hostname );
 
-use Moose;
 use MooseX::Singleton;
 
 has 'is_production' =>
@@ -103,6 +102,8 @@ has 'static_path_prefix' =>
       isa     => 'Maybe[Str]',
       lazy    => 1,
       builder => '_static_path_prefix',
+      # for testing
+      writer  => '_set_static_path_prefix',
     );
 
 has 'forgot_pw_secret' =>
@@ -418,5 +419,8 @@ sub _authen_secret
     return $self->_config_hash()->{secrets}{authen};
 }
 
+make_immutable();
+
+no Moose;
 
 1;
