@@ -6,7 +6,9 @@ use warnings;
 use R2::Model::Account;
 use R2::Model::Role;
 use R2::Model::Schema;
-use R2::Model::User;
+
+# loading causes circular dep issue
+#use R2::Model::User;
 
 use Fey::ORM::Table;
 
