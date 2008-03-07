@@ -12,9 +12,6 @@ sub import
     my $dir = tempdir( CLEANUP => 1 );
 
     my $etc     = tempdir( CLEANUP => 1 );
-
-    write_file( "$etc/revision", '12982' );
-
     my $var_lib = tempdir( CLEANUP => 1 );
 
     my $config = <<"EOF";

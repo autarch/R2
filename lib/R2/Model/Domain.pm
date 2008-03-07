@@ -3,10 +3,15 @@ package R2::Model::Domain;
 use strict;
 use warnings;
 
+use Moose::Util::TypeConstraints;
+use R2::Config;
 use R2::Model::Account;
 use R2::Model::Schema;
+use R2::Util qw( string_is_empty );
+use URI::FromHash ();
 
 use Fey::ORM::Table;
+use MooseX::Params::Validate qw( validate );
 
 {
     my $schema = R2::Model::Schema->Schema();
@@ -17,10 +22,58 @@ use Fey::ORM::Table;
         ( table => $schema->table('Account') );
 }
 
+has '_uri_scheme' =>
+    ( is      => 'ro',
+      isa     => 'Str',
+      lazy    => 1,
+      default => sub { $_[0]->requires_ssl() ? 'https' : 'http' },
+    );
+
+
+{
+    subtype 'R2::Type::URIPath'
+        => as 'Str'
+        => where { defined $_ && length $_ && $_ =~ m{^/} }
+        => message { my $path = defined $_ ? $_ : '';
+                     "This path ($path) is either empty or does not start with a slash (/)" };
+
+    my %spec = ( path     => { isa      => 'R2::Type::URIPath' },
+                 query    => { isa      => 'HashRef',
+                               default  => {},
+                             },
+                 fragment => { isa      => 'Str',
+                               optional => 1,
+                             },
+               );
+    sub uri
+    {
+        my ( $self, %p ) = validate( \@_, %spec );
+
+        return URI::FromHash::uri( scheme => $self->_uri_scheme(),
+                                   host   => $self->web_hostname(),
+                                   %p,
+                                 );
+    }
+}
+
+sub static_uri
+{
+    my $self = shift;
+    my %p    = @_;
+
+    my $prefix = R2::Config->new()->static_path_prefix();
+
+    $p{path} = q{/} . $prefix . $p{path}
+        if $prefix && ! string_is_empty( $p{path} );
+
+    return $self->uri(%p);
+}
+
+make_immutable;
+
 no Fey::ORM::Table;
 no Moose;
-
-__PACKAGE__->meta()->make_immutable();
+no Moose::Util::TypeConstraints;
 
 1;
 
