@@ -3,6 +3,8 @@ package R2;
 use strict;
 use warnings;
 
+our $VERSION = '0.01';
+
 use Catalyst;
 use Catalyst::Runtime '5.70';
 

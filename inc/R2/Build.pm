@@ -1,4 +1,4 @@
-package VegGuide::Build;
+package R2::Build;
 
 use strict;
 use warnings;
@@ -58,10 +58,10 @@ sub new
     my $class = shift;
 
     return $class->SUPER::new
-	( license            => 'perl',
-	  module_name        => 'VegGuide',
-	  requires           => \%Requires,
-	  script_files       => [ glob('bin/*') ],
-	  test_files         => [ glob('t/*.t'), glob('t/*/*.t') ]
+	( license         => 'perl',
+	  module_name     => 'R2',
+	  requires        => \%Requires,
+	  script_files    => [ glob('bin/*') ],
+          recursive_tests => 1,
 	);
 }
