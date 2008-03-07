@@ -5,6 +5,7 @@ use warnings;
 
 use CSS::Minifier qw( minify );
 use Path::Class;
+use R2::Config;
 
 use MooseX::Singleton;
 
@@ -13,7 +14,7 @@ extends 'R2::Web::CombinedStaticFiles';
 
 sub _files
 {
-    my $dir = dir( R2::Config->ShareDir(), 'css-source' );
+    my $dir = dir( R2::Config->new()->share_dir(), 'css-source' );
 
     return [ sort
              grep { $_->isa('Path::Class::File') && $_->basename() =~ /\.css$/ }
@@ -22,7 +23,7 @@ sub _files
 
 sub _target_file
 {
-    my $css_dir = File::Spec->catdir( R2::Config->VarLibDir(), 'css' );
+    my $css_dir = File::Spec->catdir( R2::Config->new()->var_lib_dir(), 'css' );
     File::Path::mkpath( $css_dir, 0, 0755 )
         unless -d $css_dir;
 

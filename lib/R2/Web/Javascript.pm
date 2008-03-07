@@ -6,6 +6,7 @@ use warnings;
 use JavaScript::Squish;
 use JSAN::ServerSide 0.04;
 use Path::Class;
+use R2::Config;
 
 use MooseX::Singleton;
 
@@ -14,7 +15,7 @@ extends 'R2::Web::CombinedStaticFiles';
 
 sub _files
 {
-    my $dir = dir( R2::Config->ShareDir(), 'js-source' );
+    my $dir = dir( R2::Config->new()->share_dir(), 'js-source' );
 
     my $js =
         JSAN::ServerSide->new( js_dir     => $dir->stringify(),
@@ -30,7 +31,7 @@ sub _files
 
 sub _target_file
 {
-    my $js_dir = File::Spec->catdir( R2::Config->VarLibDir(), 'js' );
+    my $js_dir = File::Spec->catdir( R2::Config->new()->var_lib_dir(), 'js' );
     File::Path::mkpath( $js_dir, 0, 0755 )
         unless -d $js_dir;
 

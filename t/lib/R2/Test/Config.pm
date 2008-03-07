@@ -1,25 +1,33 @@
-package R2::Config; # intentionally not R2::Test::Config
+package R2::Test::Config;
 
 use strict;
 use warnings;
 
-$INC{'R2/Config.pm'} = 1;
-
+use File::Slurp qw( write_file );
 use File::Temp qw( tempdir );
 
 
-sub ShareDir
+sub import
 {
-    return 't/R2/Web/share';
-}
+    my $dir = tempdir( CLEANUP => 1 );
 
-{
-    my $VarLibDir = tempdir( CLEANUP => 1 );
+    my $etc     = tempdir( CLEANUP => 1 );
 
-    sub VarLibDir
-    {
-        return $VarLibDir;
-    }
+    write_file( "$etc/revision", '12982' );
+
+    my $var_lib = tempdir( CLEANUP => 1 );
+
+    my $config = <<"EOF";
+[dirs]
+etc     = $etc
+share   = t/R2/Web/share
+var_lib = $var_lib
+EOF
+
+    my $conf_file = "$dir/r2.conf";
+    write_file( $conf_file, $config );
+
+    $ENV{R2_CONFIG} = $conf_file;
 }
 
 1;
