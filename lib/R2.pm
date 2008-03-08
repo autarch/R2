@@ -11,16 +11,19 @@ use Catalyst::Runtime '5.70';
 use R2::Config;
 
 
+my $Config;
 BEGIN
 {
-    Catalyst->import( R2::Config->CatalystImports() );
+    $Config = R2::Config->new();
+
+    Catalyst->import( @{ $Config->catalyst_imports() } );
 }
 
 __PACKAGE__->config( name => 'R2',
-                     R2::Config->CatalystConfig(),
+                     %{ $Config->catalyst_config() },
                    );
 
-__PACKAGE__->request_class( 'R2::Request' );
+#__PACKAGE__->request_class( 'R2::Request' );
 #__PACKAGE__->response_class( 'R2::Response' );
 
 __PACKAGE__->setup();
