@@ -21,7 +21,7 @@
     <div id="yui-main">
       <div class="yui-b">
         <div class="yui-g">
-          <& $m->call_next() &>
+% $m->call_next();
 	</div>
       </div>
     </div>
