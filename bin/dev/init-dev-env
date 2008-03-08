@@ -5,6 +5,9 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
+
+use File::HomeDir;
+use Path::Class;
 use Sys::Hostname qw( hostname );
 
 
@@ -15,6 +18,8 @@ system( "$FindBin::Bin/rebuild-schema" )
 {
     my $domain = make_domain();
     make_accounts($domain);
+
+    make_config_file();
 }
 
 sub make_domain
@@ -96,3 +101,18 @@ sub make_account
 
 EOF
 }
+
+sub make_config_file
+{
+    my $dir = dir( File::HomeDir->my_home(), '.r2', 'etc' );
+
+    $dir->mkpath( 1, 0755 );
+
+    my $file = $dir->file('r2.conf');
+
+    my $fh = $file->openw()
+        or die "Cannot write to $file: $!";
+
+    close $fh;
+}
+
