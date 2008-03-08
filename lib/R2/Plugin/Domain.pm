@@ -18,7 +18,7 @@ sub _domain_for_request
     my $self = shift;
 
     my $host = $self->request()->uri()->host();
-    my $domain = R2::Domain->new( web_hostname => $host )
+    my $domain = R2::Schema::Domain->new( web_hostname => $host )
         or die "No domain found for hostname ($host)\n";
 
     return $domain;
