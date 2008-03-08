@@ -6,6 +6,7 @@ use warnings;
 our $VERSION = '0.01';
 
 use Catalyst;
+use Catalyst::Request::REST::ForBrowsers;
 use Catalyst::Runtime '5.70';
 
 use R2::Config;
@@ -23,7 +24,7 @@ __PACKAGE__->config( name => 'R2',
                      %{ $Config->catalyst_config() },
                    );
 
-#__PACKAGE__->request_class( 'R2::Request' );
+__PACKAGE__->request_class( 'Catalyst::Request::REST::ForBrowsers' );
 #__PACKAGE__->response_class( 'R2::Response' );
 
 __PACKAGE__->setup();

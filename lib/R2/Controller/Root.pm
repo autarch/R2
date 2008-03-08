@@ -2,54 +2,35 @@ package R2::Controller::Root;
 
 use strict;
 use warnings;
-use base 'Catalyst::Controller';
 
-#
-# Sets the actions in this controller to be registered with no prefix
-# so they function identically to actions created in MyApp.pm
-#
-__PACKAGE__->config->{namespace} = '';
+use base 'R2::Controller::Base';
 
-=head1 NAME
+use R2::Config;
+use R2::Exceptions;
 
-R2::Controller::Root - Root Controller for R2
+__PACKAGE__->config()->{namespace} = '';
 
-=head1 DESCRIPTION
 
-[enter your description here]
 
-=head1 METHODS
+sub index : Path('/') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
 
-=cut
-
-=head2 default
-
-=cut
-
-sub default : Private {
-    my ( $self, $c ) = @_;
-
-    # Hello World
-    $c->response->body( $c->welcome_message );
+    $c->stash()->{template} = '/index';
 }
 
-=head2 end
+sub exit : Path('/exit') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
 
-Attempt to render a view, if needed.
+    R2::Exception->throw( 'Naughty attempt to kill VegGuide server' )
+        if R2::Config->new()->is_production();
 
-=cut 
-
-sub end : ActionClass('RenderView') {}
-
-=head1 AUTHOR
-
-Dave Rolsky,,,
-
-=head1 LICENSE
-
-This library is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
+    exit 0;
+}
 
 1;
+
+__END__
