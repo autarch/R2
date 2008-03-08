@@ -5,12 +5,12 @@ use warnings;
 
 use R2::Model::Party;
 use R2::Model::PersonMessaging;
-use R2::Model::Schema;
+use R2::Schema;
 
 use Fey::ORM::Table;
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     my $user_t = $schema->table('Person');
 
@@ -60,16 +60,16 @@ around 'insert' => sub
                     return $person;
                   };
 
-    return R2::Model::Schema->RunInTransaction($sub);
+    return R2::Schema->RunInTransaction($sub);
 };
 
 sub _MessagingSelect
 {
     my $class = shift;
 
-    my $select = R2::Model::Schema->SQLFactoryClass()->new_select();
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     $select->select( $schema->table('PersonMessaging') )
            ->from( $schema->tables( 'PersonMessaging', 'MessagingProvider' ) )

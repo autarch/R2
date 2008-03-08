@@ -5,7 +5,7 @@ use warnings;
 
 use R2::Model::Account;
 use R2::Model::Role;
-use R2::Model::Schema;
+use R2::Schema;
 
 # loading causes circular dep issue
 #use R2::Model::User;
@@ -13,7 +13,7 @@ use R2::Model::Schema;
 use Fey::ORM::Table;
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('AccountUserRole') );
 

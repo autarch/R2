@@ -6,7 +6,7 @@ use warnings;
 use Moose::Util::TypeConstraints;
 use R2::Config;
 use R2::Model::Account;
-use R2::Model::Schema;
+use R2::Schema;
 use R2::Util qw( string_is_empty );
 use URI::FromHash ();
 
@@ -14,7 +14,7 @@ use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validate );
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Domain') );
 

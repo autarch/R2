@@ -9,14 +9,14 @@ our @EXPORT_OK = qw( mock_dbh );
 
 use DBD::Mock 1.36;
 use R2::Test::Schema;
-use R2::Model::Schema;
+use R2::Schema;
 
 
 sub mock_dbh
 {
-    require R2::Model::Schema;
+    require R2::Schema;
 
-    my $man = R2::Model::Schema->DBIManager();
+    my $man = R2::Schema->DBIManager();
 
     $man->remove_source('default');
     $man->add_source( name => 'default', dsn => 'dbi:Mock:' );

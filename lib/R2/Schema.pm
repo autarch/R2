@@ -1,4 +1,4 @@
-package R2::Model::Schema;
+package R2::Schema;
 
 use strict;
 use warnings;
@@ -11,9 +11,9 @@ use R2::Config;
 
 
 my $source;
-if ($R2::Model::Schema::TestSchema)
+if ($R2::Schema::TestSchema)
 {
-    has_schema $R2::Model::Schema::TestSchema
+    has_schema $R2::Schema::TestSchema
 }
 else
 {

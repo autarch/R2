@@ -7,12 +7,12 @@ use Digest::SHA qw( sha512_base64 );
 use List::Util qw( first );
 use R2::Model::Party;
 use R2::Model::Person;
-use R2::Model::Schema;
+use R2::Schema;
 
 use Fey::ORM::Table;
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('User') );
 
@@ -69,7 +69,7 @@ around 'insert' => sub
                   };
 
 
-    return R2::Model::Schema->RunInTransaction($sub);
+    return R2::Schema->RunInTransaction($sub);
 };
 
 no Fey::ORM::Table;

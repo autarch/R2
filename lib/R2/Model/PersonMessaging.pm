@@ -5,12 +5,12 @@ use warnings;
 
 use R2::Model::MessagingProvider;
 use R2::Model::Person;
-use R2::Model::Schema;
+use R2::Schema;
 
 use Fey::ORM::Table;
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('PersonMessaging') );
 

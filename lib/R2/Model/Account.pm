@@ -9,13 +9,13 @@ use R2::Model::Domain;
 use R2::Model::Fund;
 use R2::Model::MessagingProvider;
 use R2::Model::PhoneNumberType;
-use R2::Model::Schema;
+use R2::Schema;
 
 use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validatep );
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Account') );
 
@@ -60,7 +60,7 @@ around 'insert' => sub
                     return $account;
                   };
 
-    return R2::Model::Schema->RunInTransaction($sub);
+    return R2::Schema->RunInTransaction($sub);
 };
 
 sub _initialize

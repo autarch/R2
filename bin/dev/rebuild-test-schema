@@ -13,13 +13,13 @@ use Storable qw( nfreeze );
 system( "$FindBin::Bin/rebuild-schema" )
     and die $!;
 
-require R2::Model::Schema;
+require R2::Schema;
 
 
 open my $fh, '>', 't/lib/R2/Test/Schema.pm'
     or die $!;
 
-print {$fh} sprintf( <<'EOF', encode_base64( nfreeze( R2::Model::Schema->Schema() ) ) );
+print {$fh} sprintf( <<'EOF', encode_base64( nfreeze( R2::Schema->Schema() ) ) );
 package R2::Test::Schema;
 
 use strict;
@@ -29,7 +29,7 @@ use MIME::Base64 qw( decode_base64 );
 use Storable qw( thaw );
 
 
-$R2::Model::Schema::TestSchema = thaw( decode_base64( '%s' ) );
+$R2::Schema::TestSchema = thaw( decode_base64( '%s' ) );
 
 1;
 EOF

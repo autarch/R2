@@ -8,7 +8,7 @@ use Fey::Placeholder;
 use R2::Model::Account;
 use R2::Model::Address;
 use R2::Model::PhoneNumber;
-use R2::Model::Schema;
+use R2::Schema;
 
 # cannot load these because of circular dependency problems
 #use R2::Model::Household;
@@ -18,7 +18,7 @@ use R2::Model::Schema;
 use Fey::ORM::Table;
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Party') );
 
@@ -87,9 +87,9 @@ sub _PrimaryAddressSelect
 {
     my $class = shift;
 
-    my $select = R2::Model::Schema->SQLFactoryClass()->new_select();
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     $select->select( $schema->table('Address') )
            ->from( $schema->table('Address') )
@@ -106,9 +106,9 @@ sub _PrimaryPhoneNumberSelect
 {
     my $class = shift;
 
-    my $select = R2::Model::Schema->SQLFactoryClass()->new_select();
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     $select->select( $schema->table('PhoneNumber') )
            ->from( $schema->table('PhoneNumber') )

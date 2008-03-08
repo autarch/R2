@@ -3,14 +3,14 @@ package R2::Model::Role;
 use strict;
 use warnings;
 
-use R2::Model::Schema;
+use R2::Schema;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
 
 {
-    my $schema = R2::Model::Schema->Schema();
+    my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Role') );
 
