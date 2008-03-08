@@ -17,9 +17,9 @@ use Fey::ORM::Table;
 
     has_table( $schema->table('AccountUserRole') );
 
-    has_one ( $schema->table('Account') );
-    has_one ( $schema->table('User') );
-    has_one ( $schema->table('Role') );
+    has_one( $schema->table('Account') );
+    has_one( $schema->table('User') );
+    has_one( $schema->table('Role') );
 }
 
 no Fey::ORM::Table;
