@@ -7,27 +7,26 @@ use DBI;
 use Fey::ORM::Schema;
 use Fey::DBIManager::Source;
 use Fey::Loader;
+use R2::Config;
 
-
-my $Schema;
 
 my $source;
 if ($R2::Model::Schema::TestSchema)
 {
-    $Schema = $R2::Model::Schema::TestSchema;
-
-    has_schema $Schema;
+    has_schema $R2::Model::Schema::TestSchema
 }
 else
 {
+    my $dbi_config = R2::Config->new()->dbi_config();
+
     my $source =
-        Fey::DBIManager::Source->new( dsn          => 'dbi:Pg:dbname=R2',
+        Fey::DBIManager::Source->new( %{ $dbi_config },
                                       post_connect => \&_set_dbh_attributes,
                                     );
 
-    $Schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
+    my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
 
-    has_schema $Schema;
+    has_schema $schema;
 
     __PACKAGE__->DBIManager()->add_source($source);
 }
