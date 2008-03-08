@@ -221,6 +221,12 @@ CREATE TABLE "Fund" (
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
+CREATE TABLE "Session" (
+       id                 CHAR(72)           PRIMARY KEY,
+       session_data       BYTEA              NOT NULL,
+       expires            INT                NOT NULL
+);
+
 
 ALTER TABLE "User" ADD CONSTRAINT "User_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
