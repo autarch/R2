@@ -154,7 +154,12 @@ sub _find_config_file
     }
 
     my @looked;
-    for my $dir ( dir( '/etc/r2' ), $self->_home_dir()->subdir('.r2') )
+
+    my @dirs = dir( '/etc/r2' );
+    push @dirs, $self->_home_dir()->subdir('.r2')
+        if $>;
+
+    for my $dir (@dirs)
     {
         my $file = $dir->file('r2.conf');
 
@@ -170,6 +175,7 @@ sub _find_config_file
 #            +R2::Plugin::Session::Store::R2
     my @StandardImports =
         qw( AuthenCookie
+            +R2::Plugin::Domain
             +R2::Plugin::ErrorHandling
             DR::Session
             DR::Session::State::URI
