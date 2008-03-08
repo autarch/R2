@@ -29,7 +29,7 @@ has 'is_test' =>
       writer  => '_set_is_test',
     );
 
-has '_is_profiling' =>
+has 'is_profiling' =>
     ( is      => 'rw',
       isa     => 'Bool',
       lazy    => 1,
@@ -74,6 +74,13 @@ has 'dbi_config' =>
       isa     => 'HashRef',
       lazy    => 1,
       builder => '_dbi_config',
+    );
+
+has 'mason_config' =>
+    ( is      => 'ro',
+      isa     => 'HashRef',
+      lazy    => 1,
+      builder => '_mason_config',
     );
 
 has '_home_dir' =>
@@ -191,6 +198,7 @@ sub _find_config_file
     my @StandardImports =
         qw( AuthenCookie
             +R2::Plugin::Domain
+            +R2::Plugin::User
             +R2::Plugin::ErrorHandling
             DR::Session
             DR::Session::State::URI
@@ -206,10 +214,10 @@ sub _find_config_file
 
         my @imports = @StandardImports;
         push @imports, 'Static::Simple'
-            unless $ENV{MOD_PERL} || $self->_is_profiling();
+            unless $ENV{MOD_PERL} || $self->is_profiling();
 
         push @imports, 'StackTrace'
-            unless $self->is_production() ||$self->_is_profiling();
+            unless $self->is_production() ||$self->is_profiling();
 
         return \@imports;
     }
