@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use File::Slurp qw( write_file );
 use File::Temp qw( tempdir );
@@ -70,4 +70,27 @@ EOF
     is( $config->_dir( [ 'foo', 'bar' ], '/prod/default' ),
         '/my/home/.r2/foo/bar',
         '_dir() returns dir under $HOME/.r2 as final fallback' );
+}
+
+{
+    write_file( $file->stringify(), <<'EOF' );
+[db]
+name = Foo
+user = Bar
+password = baz
+host = example.com
+port = 42
+EOF
+
+    local $ENV{R2_CONFIG} = $file->stringify();
+
+    $config->_clear_config_hash();
+
+    is_deeply( $config->dbi_config(),
+               { dsn      => 'dbi:Pg:dbname=Foo;host=example.com;port=42',
+                 user     => 'Bar',
+                 password => 'baz',
+               },
+               'dbi_config() from config file'
+             );
 }

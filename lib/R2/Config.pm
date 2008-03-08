@@ -45,6 +45,7 @@ has '_config_hash' =>
       builder => '_read_config_file',
       # for testing
       writer  => '_set_config_hash',
+      clearer => '_clear_config_hash',
     );
 
 has '_config_file' =>
@@ -56,9 +57,23 @@ has '_config_file' =>
 
 has 'catalyst_imports' =>
     ( is      => 'ro',
-      isa     => 'ArrayRef[ClassName]',
+      isa     => 'ArrayRef[Str]',
       lazy    => 1,
       builder => '_catalyst_imports',
+    );
+
+has 'catalyst_config' =>
+    ( is      => 'ro',
+      isa     => 'HashRef',
+      lazy    => 1,
+      builder => '_catalyst_config',
+    );
+
+has 'dbi_config' =>
+    ( is      => 'ro',
+      isa     => 'HashRef',
+      lazy    => 1,
+      builder => '_dbi_config',
     );
 
 has '_home_dir' =>
@@ -156,7 +171,7 @@ sub _find_config_file
     my @looked;
 
     my @dirs = dir( '/etc/r2' );
-    push @dirs, $self->_home_dir()->subdir('.r2')
+    push @dirs, $self->_home_dir()->subdir( '.r2', 'etc' )
         if $>;
 
     for my $dir (@dirs)
@@ -179,6 +194,7 @@ sub _find_config_file
             +R2::Plugin::ErrorHandling
             DR::Session
             DR::Session::State::URI
+            +R2::Plugin::Session::Store::R2
             Log::Dispatch
             RedirectAndDetach
             SubRequest
@@ -373,7 +389,22 @@ sub _catalyst_config
 
 sub _dbi_config
 {
-    return { user => 'root' };
+    my $self = shift;
+
+    my $db_config = $self->_config_hash()->{db};
+
+    my $dsn = 'dbi:Pg:dbname=' . ( $db_config->{name} || 'R2' );
+
+    $dsn .= ';host=' . $db_config->{host}
+        if $db_config->{host};
+
+    $dsn .= ';port=' . $db_config->{port}
+        if $db_config->{port};
+
+    return { dsn      => $dsn,
+             user     => ( $db_config->{user} || '' ),
+             password => ( $db_config->{password} || '' ),
+           };
 }
 
 sub _mason_config
