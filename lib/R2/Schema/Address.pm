@@ -1,10 +1,10 @@
-package R2::Model::PhoneNumber;
+package R2::Schema::Address;
 
 use strict;
 use warnings;
 
-use R2::Model::Party;
-use R2::Model::PhoneNumberType;
+use R2::Schema::AddressType;
+use R2::Schema::Party;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -12,12 +12,12 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('PhoneNumber') );
+    has_table( $schema->table('Address') );
 
     has_one( $schema->table('Party') );
 
     has_one 'type' =>
-        ( table => $schema->table('PhoneNumberType') );
+        ( table => $schema->table('AddressType') );
 }
 
 no Fey::ORM::Table;

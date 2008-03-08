@@ -1,10 +1,10 @@
-package R2::Model::PersonMessaging;
+package R2::Schema::PersonMessaging;
 
 use strict;
 use warnings;
 
-use R2::Model::MessagingProvider;
-use R2::Model::Person;
+use R2::Schema::MessagingProvider;
+use R2::Schema::Person;
 use R2::Schema;
 
 use Fey::ORM::Table;

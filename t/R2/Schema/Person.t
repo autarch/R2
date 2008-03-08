@@ -6,14 +6,14 @@ use Test::More tests => 6;
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
-use R2::Model::Person;
+use R2::Schema::Person;
 
 
 my $dbh = mock_dbh();
 
 {
     my $person =
-        R2::Model::Person->insert( first_name    => 'Joe',
+        R2::Schema::Person->insert( first_name    => 'Joe',
                                    last_name     => 'Smith',
                                    email_address => 'joe.smith@example.com',
                                    website       => 'http://example.com',

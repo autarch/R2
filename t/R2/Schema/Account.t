@@ -6,14 +6,14 @@ use Test::More tests => 4;
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
-use R2::Model::Account;
+use R2::Schema::Account;
 
 
 my $dbh = mock_dbh();
 
 {
     my $account =
-        R2::Model::Account->insert( name      => 'The Account',
+        R2::Schema::Account->insert( name      => 'The Account',
                                     domain_id => 1,
                                   );
 

@@ -1,10 +1,9 @@
-package R2::Model::Address;
+package R2::Schema::Donation;
 
 use strict;
 use warnings;
 
-use R2::Model::AddressType;
-use R2::Model::Party;
+use R2::Schema::Fund;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -12,12 +11,12 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Address') );
+    has_table( $schema->table('Donation') );
+
+    has_one( $schema->table('Fund') );
 
     has_one( $schema->table('Party') );
 
-    has_one 'type' =>
-        ( table => $schema->table('AddressType') );
 }
 
 no Fey::ORM::Table;

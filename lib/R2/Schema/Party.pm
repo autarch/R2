@@ -1,19 +1,19 @@
-package R2::Model::Party;
+package R2::Schema::Party;
 
 use strict;
 use warnings;
 
 use Fey::Literal::String;
 use Fey::Placeholder;
-use R2::Model::Account;
-use R2::Model::Address;
-use R2::Model::PhoneNumber;
+use R2::Schema::Account;
+use R2::Schema::Address;
+use R2::Schema::PhoneNumber;
 use R2::Schema;
 
 # cannot load these because of circular dependency problems
-#use R2::Model::Household;
-#use R2::Model::Organization;
-#use R2::Model::Person;
+#use R2::Schema::Household;
+#use R2::Schema::Organization;
+#use R2::Schema::Person;
 
 use Fey::ORM::Table;
 

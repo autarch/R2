@@ -1,14 +1,14 @@
-package R2::Model::AccountUserRole;
+package R2::Schema::AccountUserRole;
 
 use strict;
 use warnings;
 
-use R2::Model::Account;
-use R2::Model::Role;
+use R2::Schema::Account;
+use R2::Schema::Role;
 use R2::Schema;
 
 # loading causes circular dep issue
-#use R2::Model::User;
+#use R2::Schema::User;
 
 use Fey::ORM::Table;
 

@@ -1,11 +1,11 @@
-package R2::Model::Domain;
+package R2::Schema::Domain;
 
 use strict;
 use warnings;
 
 use Moose::Util::TypeConstraints;
 use R2::Config;
-use R2::Model::Account;
+use R2::Schema::Account;
 use R2::Schema;
 use R2::Util qw( string_is_empty );
 use URI::FromHash ();

@@ -3,7 +3,7 @@ package R2::Plugin::Domain;
 use strict;
 use warnings;
 
-use R2::Model::Domain;
+use R2::Schema::Domain;
 
 
 sub domain

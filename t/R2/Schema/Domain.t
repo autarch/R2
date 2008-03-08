@@ -8,14 +8,14 @@ use R2::Test qw( mock_dbh );
 
 use R2::Test::Config;
 use R2::Config;
-use R2::Model::Domain;
+use R2::Schema::Domain;
 
 
 mock_dbh();
 
 {
     my $domain =
-        R2::Model::Domain->insert( web_hostname   => 'www.example.com',
+        R2::Schema::Domain->insert( web_hostname   => 'www.example.com',
                                    email_hostname => 'www.example.com',
                                    requires_ssl   => 0,
                                  );
@@ -33,7 +33,7 @@ mock_dbh();
 
 {
     my $domain =
-        R2::Model::Domain->insert( web_hostname   => 'www.example.com',
+        R2::Schema::Domain->insert( web_hostname   => 'www.example.com',
                                    email_hostname => 'www.example.com',
                                    requires_ssl   => 1,
                                  );

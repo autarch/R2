@@ -1,4 +1,4 @@
-package R2::Model::Role;
+package R2::Schema::Role;
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ use MooseX::ClassAttribute;
     {
         class_has $role =>
             ( is      => 'ro',
-              isa     => 'R2::Model::Role',
+              isa     => 'R2::Schema::Role',
               lazy    => 1,
               default => sub { __PACKAGE__->_CreateOrFindRole($role) },
             );

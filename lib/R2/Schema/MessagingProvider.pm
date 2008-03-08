@@ -1,4 +1,4 @@
-package R2::Model::MessagingProvider;
+package R2::Schema::MessagingProvider;
 
 use strict;
 use warnings;

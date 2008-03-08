@@ -1,10 +1,10 @@
-package R2::Model::Fund;
+package R2::Schema::Fund;
 
 use strict;
 use warnings;
 
-use R2::Model::Account;
-use R2::Model::Donation;
+use R2::Schema::Account;
+use R2::Schema::Donation;
 use R2::Schema;
 
 use Fey::ORM::Table;

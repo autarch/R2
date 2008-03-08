@@ -24,10 +24,10 @@ system( "$FindBin::Bin/rebuild-schema" )
 
 sub make_domain
 {
-    require R2::Model::Domain;
+    require R2::Schema::Domain;
 
     my $domain =
-        R2::Model::Domain->insert( web_hostname   => hostname(),
+        R2::Schema::Domain->insert( web_hostname   => hostname(),
                                    email_hostname => hostname(),
                                  );
 
@@ -46,8 +46,8 @@ sub make_accounts
 {
     my $domain = shift;
 
-    require R2::Model::User;
-    require R2::Model::Account;
+    require R2::Schema::User;
+    require R2::Schema::Account;
 
     for my $names ( [ q{People's Front of Judea}, q{John Cleese} ],
                     [ q{Judean People's Front}, q{Eric Idle} ],
@@ -64,7 +64,7 @@ sub make_account
     my $user_name    = shift;
 
     my $account =
-        R2::Model::Account->insert( name      => $account_name,
+        R2::Schema::Account->insert( name      => $account_name,
                                     domain_id => $domain->domain_id(),
                                   );
 
@@ -75,10 +75,10 @@ sub make_account
     my $password = 'password';
 
     my $user =
-        R2::Model::User->insert
+        R2::Schema::User->insert
             ( password        => $password,
               is_system_admin =>
-              ( R2::Model::User->Count() ? 0 : 1 ),
+              ( R2::Schema::User->Count() ? 0 : 1 ),
               email_address   => $email,
               first_name      => $first_name,
               last_name       => $last_name,
@@ -87,7 +87,7 @@ sub make_account
             );
 
     $account->add_user( user => $user,
-                        role => R2::Model::Role->Admin(),
+                        role => R2::Schema::Role->Admin(),
                       );
 
     print <<"EOF";

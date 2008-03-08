@@ -1,12 +1,12 @@
-package R2::Model::User;
+package R2::Schema::User;
 
 use strict;
 use warnings;
 
 use Digest::SHA qw( sha512_base64 );
 use List::Util qw( first );
-use R2::Model::Party;
-use R2::Model::Person;
+use R2::Schema::Party;
+use R2::Schema::Person;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -20,8 +20,8 @@ use Fey::ORM::Table;
         ( table   => $schema->table('Person'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
                        grep { $_ ne 'person' }
-                       R2::Model::Person->meta()->get_attribute_list(),
-                       R2::Model::Party->DelegatableMethods() ],
+                       R2::Schema::Person->meta()->get_attribute_list(),
+                       R2::Schema::Party->DelegatableMethods() ],
         );
 }
 
@@ -56,7 +56,7 @@ around 'insert' => sub
     my %user_p =
         map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
 
-    my $sub = sub { my $person = R2::Model::Person->insert(%p);
+    my $sub = sub { my $person = R2::Schema::Person->insert(%p);
 
                     my $user = $class->$orig( %user_p,
                                               password  => $password,

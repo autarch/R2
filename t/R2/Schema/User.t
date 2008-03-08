@@ -6,14 +6,14 @@ use Test::More tests => 8;
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
-use R2::Model::User;
+use R2::Schema::User;
 
 
 my $dbh = mock_dbh();
 
 {
     my $user =
-        R2::Model::User->insert( first_name    => 'Joe',
+        R2::Schema::User->insert( first_name    => 'Joe',
                                  last_name     => 'Smith',
                                  email_address => 'joe.smith@example.com',
                                  password      => 'password',
@@ -34,7 +34,7 @@ my $dbh = mock_dbh();
 
 {
     my $user =
-        R2::Model::User->insert( first_name    => 'Bubba',
+        R2::Schema::User->insert( first_name    => 'Bubba',
                                  last_name     => 'Smith',
                                  email_address => 'bubba.smith@example.com',
                                  website       => 'http://example.com',
@@ -49,7 +49,7 @@ my $dbh = mock_dbh();
 {
     eval
     {
-        R2::Model::User->insert( first_name => 'Bubba',
+        R2::Schema::User->insert( first_name => 'Bubba',
                                  last_name  => 'Smith',
                                  website    => 'http://example.com',
                                  password   => 'whatever',
@@ -62,7 +62,7 @@ my $dbh = mock_dbh();
 
 {
     my $user =
-        R2::Model::User->insert( first_name    => 'Bubba',
+        R2::Schema::User->insert( first_name    => 'Bubba',
                                  last_name     => 'Smith',
                                  email_address => 'bubba.smith@example.com',
                                  website       => 'http://example.com',
@@ -76,7 +76,7 @@ my $dbh = mock_dbh();
 
     # simpler than mucking about with mock data
     no warnings 'redefine';
-    local *R2::Model::Person::user = sub { 1 };
+    local *R2::Schema::Person::user = sub { 1 };
 
     eval { $user->person()->party()->update( email_address => undef ) };
 

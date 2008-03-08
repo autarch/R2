@@ -1,10 +1,10 @@
-package R2::Model::Person;
+package R2::Schema::Person;
 
 use strict;
 use warnings;
 
-use R2::Model::Party;
-use R2::Model::PersonMessaging;
+use R2::Schema::Party;
+use R2::Schema::PersonMessaging;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -19,7 +19,7 @@ use Fey::ORM::Table;
     has_one 'party' =>
         ( table   => $schema->table('Party'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Model::Party->DelegatableMethods(),
+                       R2::Schema::Party->DelegatableMethods(),
                      ],
         );
 
@@ -48,7 +48,7 @@ around 'insert' => sub
     my %person_p =
         map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
 
-    my $sub = sub { my $party = R2::Model::Party->insert( %p, party_type => 'Person' );
+    my $sub = sub { my $party = R2::Schema::Party->insert( %p, party_type => 'Person' );
 
                     my $person =
                         $class->$orig( %person_p,

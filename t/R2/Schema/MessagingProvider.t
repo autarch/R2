@@ -6,12 +6,12 @@ use Test::More tests => 7;
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
-use R2::Model::MessagingProvider;
+use R2::Schema::MessagingProvider;
 
 
 {
     my $provider =
-        R2::Model::MessagingProvider->new
+        R2::Schema::MessagingProvider->new
             ( messaging_provider_id => 1,
               name                  => 'Windows Live Messenger',
               add_uri_template      => 'msnim:add?contact={screen_name}',
@@ -31,7 +31,7 @@ use R2::Model::MessagingProvider;
 
 {
     my $provider =
-        R2::Model::MessagingProvider->new
+        R2::Schema::MessagingProvider->new
             ( messaging_provider_id => 1,
               name                  => 'Windows Live Messenger',
               add_uri_template      => undef,
@@ -52,7 +52,7 @@ use R2::Model::MessagingProvider;
 
 {
     my $provider =
-        R2::Model::MessagingProvider->new
+        R2::Schema::MessagingProvider->new
             ( messaging_provider_id => 1,
               name                  => 'AIM',
               status_uri_template   => 'http://api.oscar.aol.com/presence/icon?k={Config->AIMKey}&t={screen_name}',
@@ -66,7 +66,7 @@ use R2::Model::MessagingProvider;
 
 {
     my $provider =
-        R2::Model::MessagingProvider->new
+        R2::Schema::MessagingProvider->new
             ( messaging_provider_id => 1,
               name                  => 'AIM',
               status_uri_template   => 'http://api.oscar.aol.com/presence/icon?k={Config->AIMKey}&t={screen_name}',

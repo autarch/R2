@@ -1,14 +1,14 @@
-package R2::Model::Account;
+package R2::Schema::Account;
 
 use strict;
 use warnings;
 
-use R2::Model::AccountUserRole;
-use R2::Model::AddressType;
-use R2::Model::Domain;
-use R2::Model::Fund;
-use R2::Model::MessagingProvider;
-use R2::Model::PhoneNumberType;
+use R2::Schema::AccountUserRole;
+use R2::Schema::AddressType;
+use R2::Schema::Domain;
+use R2::Schema::Fund;
+use R2::Schema::MessagingProvider;
+use R2::Schema::PhoneNumberType;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -67,25 +67,25 @@ sub _initialize
 {
     my $self = shift;
 
-    R2::Model::Fund->CreateDefaultsForAccount($self);
+    R2::Schema::Fund->CreateDefaultsForAccount($self);
 
-    R2::Model::AddressType->CreateDefaultsForAccount($self);
+    R2::Schema::AddressType->CreateDefaultsForAccount($self);
 
-    R2::Model::PhoneNumberType->CreateDefaultsForAccount($self);
+    R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
 
-    R2::Model::MessagingProvider->CreateDefaultsForAccount($self);
+    R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
 }
 
 {
-    my %spec = ( user => { isa => 'R2::Model::User' },
-                 role => { isa => 'R2::Model::Role' },
+    my %spec = ( user => { isa => 'R2::Schema::User' },
+                 role => { isa => 'R2::Schema::Role' },
                );
     sub add_user
     {
         my $self            = shift;
         my ( $user, $role ) = validatep( \@_, %spec );
 
-        R2::Model::AccountUserRole->insert
+        R2::Schema::AccountUserRole->insert
             ( account_id => $self->account_id(),
               user_id    => $user->user_id(),
               role_id    => $role->role_id(),

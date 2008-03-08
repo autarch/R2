@@ -1,4 +1,4 @@
-package R2::Model::AddressType;
+package R2::Schema::PhoneNumberType;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('AddressType') );
+    has_table( $schema->table('PhoneNumberType') );
 }
 
 
@@ -19,7 +19,7 @@ sub CreateDefaultsForAccount
     my $class   = shift;
     my $account = shift;
 
-    for my $name ( qw( Home Work Headquarters Branch ) )
+    for my $name ( qw( Home Office Cell ) )
     {
         $class->insert( name       => $name,
                         account_id => $account->account_id(),

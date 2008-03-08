@@ -1,9 +1,9 @@
-package R2::Model::Household;
+package R2::Schema::Organization;
 
 use strict;
 use warnings;
 
-use R2::Model::Party;
+use R2::Schema::Party;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -11,12 +11,12 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Household') );
+    has_table( $schema->table('Organization') );
 
     has_one 'party' =>
         ( table   => $schema->table('Party'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Model::Party->DelegatableMethods(),
+                       R2::Schema::Party->DelegatableMethods(),
                      ],
         );
 }
