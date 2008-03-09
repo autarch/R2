@@ -72,10 +72,10 @@ around 'insert' => sub
     return R2::Schema->RunInTransaction($sub);
 };
 
+make_immutable;
+
 no Fey::ORM::Table;
 no Moose;
-
-__PACKAGE__->meta()->make_immutable();
 
 1;
 
