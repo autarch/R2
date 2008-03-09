@@ -149,9 +149,7 @@ sub _read_config_file
 
     my $hash = Config::INI::Reader->read_file( $self->_config_file() );
 
-    my $is_prod = $hash->{R2}{is_production};
-
-    if ( $is_prod )
+    if ( $hash->{R2}{is_production} )
     {
         die "If is_production is true, you must supply a value for [secrets] - forgot_pw"
             if string_is_empty( $hash->{secrets}{forgot_pw} );
