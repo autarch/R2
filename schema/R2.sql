@@ -56,7 +56,7 @@ CREATE TABLE "Domain" (
        CONSTRAINT valid_email_hostname CHECK ( email_hostname != '' )
 );
 
-CREATE TYPE party_type AS ENUM ( 'Person', 'Organiation', 'Household' );
+CREATE TYPE party_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
 CREATE DOMAIN uri AS VARCHAR(255)
        CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\w-]+(\.[\w-]+)*\.\w{2,3}' );
@@ -75,6 +75,117 @@ CREATE TABLE "Party" (
        -- initial import from something else
        external_id        VARCHAR(255)       UNIQUE NULL,
        account_id         INTEGER            NOT NULL
+);
+
+CREATE DOMAIN pos_int AS INTEGER
+       CONSTRAINT is_positive CHECK ( VALUE > 0 );
+
+CREATE TYPE party_type_or_all AS ENUM ( 'All', 'Person', 'Organization', 'Household' );
+
+CREATE TABLE "PartyCustomFieldGroup" (
+       party_custom_field_group_id    SERIAL8      PRIMARY KEY,
+       name                           VARCHAR(255) NOT NULL,
+       description                    TEXT         NULL,
+       display_order                  pos_int      NOT NULL,
+       applies_to                     party_type_or_all  NOT NULL  DEFAULT 'Person',
+       account_id                     INT8         NOT NULL
+-- unique constraints are not deferrable
+--       CONSTRAINT account_id_display_order_ck
+--                  UNIQUE ( account_id, display_order )
+--                  INITIALLY DEFERRED
+);
+
+CREATE TABLE "PartyCustomField" (
+       party_custom_field_id    SERIAL8      PRIMARY KEY,
+       label                    VARCHAR(255) NOT NULL,
+       description              TEXT         NULL,
+       custom_field_type_id     INTEGER      NOT NULL,
+       account_id               INT8         NOT NULL,
+       is_required              BOOLEAN      DEFAULT FALSE,
+       html_widget_type_id      INTEGER      NOT NULL,
+       display_order            pos_int      NOT NULL,
+       party_custom_field_group_id  INT8     NOT NULL
+--       CONSTRAINT party_custom_field_group_id_display_order_ck
+--                  UNIQUE ( party_custom_field_group_id, display_order )
+--                  INITIALLY DEFERRED
+);
+
+CREATE TABLE "HTMLWidgetType" (
+       html_widget_type_id      SERIAL       PRIMARY KEY,
+       name                     VARCHAR(255) NOT NULL,
+       description              VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE "CustomFieldType" (
+       custom_field_type_id     SERIAL8      PRIMARY KEY,
+       -- something like Integer, Float, Select, etc
+       name                     VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE "PartyCustomFieldIntegerValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    INT8         NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldFloatValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    FLOAT8       NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldDateValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    DATE         NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldDateTimeValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    TIMESTAMP WITHOUT TIME ZONE  NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldTextValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    TEXT         NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldBinaryValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       value                    BYTEA        NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+
+CREATE TABLE "PartyCustomFieldSelectOption" (
+       party_custom_field_select_option_id INT8 PRIMARY KEY,
+       party_custom_field_id    INT8         NOT NULL,
+       display_order            pos_int      NOT NULL,
+       value                    VARCHAR(255) NOT NULL
+--       CONSTRAINT party_custom_field_id_display_order_ck
+--                  UNIQUE ( party_custom_field_id, display_order )
+--                  INITIALLY DEFERRED
+);
+
+CREATE TABLE "PartyCustomFieldSingleSelectValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       party_custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id )
+);
+       
+CREATE TABLE "PartyCustomFieldMultiSelectValue" (
+       party_custom_field_id    INT8         NOT NULL,
+       party_id                 INT8         NOT NULL,
+       party_custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( party_custom_field_id, party_id, party_custom_field_select_option_id )
 );
 
 CREATE TABLE "PartyNote" (
@@ -105,6 +216,21 @@ CREATE TABLE "PartyHistoryType" (
        description        VARCHAR(255)       NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' )
+);
+
+CREATE TABLE "PartyTag" (
+       party_id         INT8            NOT NULL,
+       tag_id           INT8            NOT NULL
+);
+
+CREATE DOMAIN tag AS VARCHAR(255)
+       CONSTRAINT valid_tag CHECK ( VALUE ~ E'^\S+$' );
+
+CREATE TABLE "Tag" (
+       tag_id           SERIAL8         PRIMARY KEY,
+       tag              tag             NOT NULL,
+       account_id       INT8            NOT NULL,
+       CONSTRAINT value_account_id_ck UNIQUE ( tag, account_id )
 );
 
 CREATE TYPE gender AS ENUM ( 'male', 'female', 'transgender' );
@@ -186,7 +312,7 @@ CREATE TABLE "AddressType" (
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
--- Consider a trigger to enforce one primar phone number per party?
+-- Consider a trigger to enforce one primary phone number per party?
 CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
        phone_number_type_id   INT8           NOT NULL,
@@ -252,6 +378,90 @@ ALTER TABLE "Party" ADD CONSTRAINT "Party_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "PartyCustomFieldGroup" ADD CONSTRAINT "PartyCustomFieldGroup_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_party_custom_field_group_id"
+  FOREIGN KEY ("party_custom_field_group_id") REFERENCES "PartyCustomFieldGroup" ("party_custom_field_group_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_html_widget_type_id"
+  FOREIGN KEY ("html_widget_type_id") REFERENCES "HTMLWidgetType" ("html_widget_type_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_custom_field_type_id"
+  FOREIGN KEY ("custom_field_type_id") REFERENCES "CustomFieldType" ("custom_field_type_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldIntegerValue" ADD CONSTRAINT "PartyCustomFieldIntegerValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldIntegerValue" ADD CONSTRAINT "PartyCustomFieldIntegerValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldFloatValue" ADD CONSTRAINT "PartyCustomFieldFloatValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldFloatValue" ADD CONSTRAINT "PartyCustomFieldFloatValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldDateValue" ADD CONSTRAINT "PartyCustomFieldDateValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldDateValue" ADD CONSTRAINT "PartyCustomFieldDateValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldTextValue" ADD CONSTRAINT "PartyCustomFieldTextValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldTextValue" ADD CONSTRAINT "PartyCustomFieldTextValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldBinaryValue" ADD CONSTRAINT "PartyCustomFieldBinaryValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldBinaryValue" ADD CONSTRAINT "PartyCustomFieldBinaryValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldSelectOption" ADD CONSTRAINT "PartyCustomFieldSelectOption_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_custom_field_select_option_id"
+  FOREIGN KEY ("party_custom_field_select_option_id") REFERENCES "PartyCustomFieldSelectOption" ("party_custom_field_select_option_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_custom_field_id"
+  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_custom_field_select_option_id"
+  FOREIGN KEY ("party_custom_field_select_option_id") REFERENCES "PartyCustomFieldSelectOption" ("party_custom_field_select_option_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "PartyNote" ADD CONSTRAINT "PartyNote_party_id"
   FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
@@ -283,6 +493,14 @@ ALTER TABLE "PartyHistoryType" ADD CONSTRAINT "PartyHistoryType_account_id"
 ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_phone_number_id"
   FOREIGN KEY ("phone_number_id") REFERENCES "PhoneNumber" ("phone_number_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "PartyTag" ADD CONSTRAINT "PartyTag_party_id"
+  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "PartyTag" ADD CONSTRAINT "PartyTag_tag_id"
+  FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Party" ("party_id")
