@@ -65,8 +65,8 @@ sub make_account
 
     my $account =
         R2::Schema::Account->insert( name      => $account_name,
-                                    domain_id => $domain->domain_id(),
-                                  );
+                                     domain_id => $domain->domain_id(),
+                                   );
 
     my ( $first_name, $last_name ) = split / /, $user_name;
     ( my $email = lc $user_name ) =~ s/ /_/g;
