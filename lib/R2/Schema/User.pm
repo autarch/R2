@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw( sha512_base64 );
 use List::Util qw( first );
-use R2::Schema::Party;
+use R2::Schema::Contact;
 use R2::Schema::Person;
 use R2::Schema;
 
@@ -21,7 +21,7 @@ use Fey::ORM::Table;
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
                        grep { $_ ne 'person' }
                        R2::Schema::Person->meta()->get_attribute_list(),
-                       R2::Schema::Party->DelegatableMethods() ],
+                       R2::Schema::Contact->DelegatableMethods() ],
         );
 }
 

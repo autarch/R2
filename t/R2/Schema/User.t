@@ -78,7 +78,7 @@ my $dbh = mock_dbh();
     no warnings 'redefine';
     local *R2::Schema::Person::user = sub { 1 };
 
-    eval { $user->person()->party()->update( email_address => undef ) };
+    eval { $user->person()->contact()->update( email_address => undef ) };
 
     like( $@, qr/remove an email address for a user/,
           'cannot remove an email address for a person associated with a user' );

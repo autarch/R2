@@ -15,7 +15,7 @@ use Fey::ORM::Table;
 
     has_one( $schema->table('Fund') );
 
-    has_one( $schema->table('Party') );
+    has_one( $schema->table('Contact') );
 
 }
 

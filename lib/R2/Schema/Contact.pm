@@ -1,4 +1,4 @@
-package R2::Schema::Party;
+package R2::Schema::Contact;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Party') );
+    has_table( $schema->table('Contact') );
 
     has_one( $schema->table('Account') );
 
@@ -47,7 +47,7 @@ use Fey::ORM::Table;
     has_one 'primary_address' =>
         ( table       => $schema->table('Address'),
           select      => __PACKAGE__->_PrimaryAddressSelect(),
-          bind_params => sub { $_[0]->party_id() }
+          bind_params => sub { $_[0]->contact_id() }
         );
 
     has_many 'phone_numbers' =>
@@ -58,7 +58,7 @@ use Fey::ORM::Table;
     has_one 'primary_phone_number' =>
         ( table       => $schema->table('PhoneNumber'),
           select      => __PACKAGE__->_PrimaryPhoneNumberSelect(),
-          bind_params => sub { $_[0]->party_id() }
+          bind_params => sub { $_[0]->contact_id() }
         );
 }
 
@@ -93,7 +93,7 @@ sub _PrimaryAddressSelect
 
     $select->select( $schema->table('Address') )
            ->from( $schema->table('Address') )
-           ->where( $schema->table('Address')->column('party_id'),
+           ->where( $schema->table('Address')->column('contact_id'),
                     '=', Fey::Placeholder->new() )
            ->and( $schema->table('Address')->column('is_primary'),
                   '=', Fey::Literal::String->new('t') )
@@ -112,7 +112,7 @@ sub _PrimaryPhoneNumberSelect
 
     $select->select( $schema->table('PhoneNumber') )
            ->from( $schema->table('PhoneNumber') )
-           ->where( $schema->table('PhoneNumber')->column('party_id'),
+           ->where( $schema->table('PhoneNumber')->column('contact_id'),
                     '=', Fey::Placeholder->new() )
            ->and( $schema->table('PhoneNumber')->column('is_primary'),
                   '=', Fey::Literal::String->new('t') )

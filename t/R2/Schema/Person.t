@@ -19,14 +19,14 @@ my $dbh = mock_dbh();
                                    website       => 'http://example.com',
                                  );
 
-    ok( $person->party(), 'newly created person has a party' );
-    is( $person->party()->party_id(), 1, 'party_id == 1' );
-    is( $person->person_id(), $person->party()->party_id(), 'person_id == party_id' );
+    ok( $person->contact(), 'newly created person has a contact' );
+    is( $person->contact()->contact_id(), 1, 'contact_id == 1' );
+    is( $person->person_id(), $person->contact()->contact_id(), 'person_id == contact_id' );
 
-    is( $person->party()->email_address(), 'joe.smith@example.com',
-        'data for party is passed through on person insert' );
+    is( $person->contact()->email_address(), 'joe.smith@example.com',
+        'data for contact is passed through on person insert' );
     is( $person->email_address(), 'joe.smith@example.com',
-        'attributes of party are available as person methods' );
+        'attributes of contact are available as person methods' );
 
     is( $person->first_name, 'Joe',
         'first_name == Joe' );

@@ -56,14 +56,14 @@ CREATE TABLE "Domain" (
        CONSTRAINT valid_email_hostname CHECK ( email_hostname != '' )
 );
 
-CREATE TYPE party_type AS ENUM ( 'Person', 'Organization', 'Household' );
+CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
 CREATE DOMAIN uri AS VARCHAR(255)
        CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\w-]+(\.[\w-]+)*\.\w{2,3}' );
 
-CREATE TABLE "Party" (
-       party_id           SERIAL8            PRIMARY KEY,
-       party_type         party_type         NOT NULL,
+CREATE TABLE "Contact" (
+       contact_id         SERIAL8            PRIMARY KEY,
+       contact_type       contact_type         NOT NULL,
        allows_email       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
@@ -80,14 +80,14 @@ CREATE TABLE "Party" (
 CREATE DOMAIN pos_int AS INTEGER
        CONSTRAINT is_positive CHECK ( VALUE > 0 );
 
-CREATE TYPE party_type_or_all AS ENUM ( 'All', 'Person', 'Organization', 'Household' );
+CREATE TYPE contact_type_or_all AS ENUM ( 'All', 'Person', 'Organization', 'Household' );
 
-CREATE TABLE "PartyCustomFieldGroup" (
-       party_custom_field_group_id    SERIAL8      PRIMARY KEY,
+CREATE TABLE "ContactCustomFieldGroup" (
+       contact_custom_field_group_id    SERIAL8      PRIMARY KEY,
        name                           VARCHAR(255) NOT NULL,
        description                    TEXT         NULL,
        display_order                  pos_int      NOT NULL,
-       applies_to                     party_type_or_all  NOT NULL  DEFAULT 'Person',
+       applies_to                     contact_type_or_all  NOT NULL  DEFAULT 'Person',
        account_id                     INT8         NOT NULL
 -- unique constraints are not deferrable
 --       CONSTRAINT account_id_display_order_ck
@@ -95,8 +95,8 @@ CREATE TABLE "PartyCustomFieldGroup" (
 --                  INITIALLY DEFERRED
 );
 
-CREATE TABLE "PartyCustomField" (
-       party_custom_field_id    SERIAL8      PRIMARY KEY,
+CREATE TABLE "ContactCustomField" (
+       contact_custom_field_id    SERIAL8      PRIMARY KEY,
        label                    VARCHAR(255) NOT NULL,
        description              TEXT         NULL,
        custom_field_type_id     INTEGER      NOT NULL,
@@ -104,9 +104,9 @@ CREATE TABLE "PartyCustomField" (
        is_required              BOOLEAN      DEFAULT FALSE,
        html_widget_type_id      INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
-       party_custom_field_group_id  INT8     NOT NULL
---       CONSTRAINT party_custom_field_group_id_display_order_ck
---                  UNIQUE ( party_custom_field_group_id, display_order )
+       contact_custom_field_group_id  INT8     NOT NULL
+--       CONSTRAINT contact_custom_field_group_id_display_order_ck
+--                  UNIQUE ( contact_custom_field_group_id, display_order )
 --                  INITIALLY DEFERRED
 );
 
@@ -122,84 +122,84 @@ CREATE TABLE "CustomFieldType" (
        name                     VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE "PartyCustomFieldIntegerValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldIntegerValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    INT8         NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldFloatValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldFloatValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    FLOAT8       NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldDateValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldDateValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    DATE         NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldDateTimeValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldDateTimeValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    TIMESTAMP WITHOUT TIME ZONE  NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldTextValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldTextValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    TEXT         NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldBinaryValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldBinaryValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
        value                    BYTEA        NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
-CREATE TABLE "PartyCustomFieldSelectOption" (
-       party_custom_field_select_option_id INT8 PRIMARY KEY,
-       party_custom_field_id    INT8         NOT NULL,
+CREATE TABLE "ContactCustomFieldSelectOption" (
+       contact_custom_field_select_option_id INT8 PRIMARY KEY,
+       contact_custom_field_id    INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    VARCHAR(255) NOT NULL
---       CONSTRAINT party_custom_field_id_display_order_ck
---                  UNIQUE ( party_custom_field_id, display_order )
+--       CONSTRAINT contact_custom_field_id_display_order_ck
+--                  UNIQUE ( contact_custom_field_id, display_order )
 --                  INITIALLY DEFERRED
 );
 
-CREATE TABLE "PartyCustomFieldSingleSelectValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
-       party_custom_field_select_option_id  INT8  NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id )
+CREATE TABLE "ContactCustomFieldSingleSelectValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id                 INT8         NOT NULL,
+       contact_custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
        
-CREATE TABLE "PartyCustomFieldMultiSelectValue" (
-       party_custom_field_id    INT8         NOT NULL,
-       party_id                 INT8         NOT NULL,
-       party_custom_field_select_option_id  INT8  NOT NULL,
-       PRIMARY KEY ( party_custom_field_id, party_id, party_custom_field_select_option_id )
+CREATE TABLE "ContactCustomFieldMultiSelectValue" (
+       contact_custom_field_id    INT8         NOT NULL,
+       contact_id                 INT8         NOT NULL,
+       contact_custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( contact_custom_field_id, contact_id, contact_custom_field_select_option_id )
 );
 
-CREATE TABLE "PartyNote" (
-       party_note_id      SERIAL8            PRIMARY KEY,
-       party_id           INT8               NOT NULL,
+CREATE TABLE "ContactNote" (
+       contact_note_id    SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
        notes              TEXT               NOT NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        user_id            INT8               NOT NULL
 );
 
-CREATE TABLE "PartyHistory" (
-       party_history_id   SERIAL8            PRIMARY KEY,
-       party_id           INT8               NOT NULL,
-       party_history_type_id  INT            NOT NULL,
+CREATE TABLE "ContactHistory" (
+       contact_history_id   SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       contact_history_type_id  INT            NOT NULL,
        user_id            INT8               NOT NULL,
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
@@ -211,15 +211,15 @@ CREATE TABLE "PartyHistory" (
        reversal_blob      BYTEA              NOT NULL
 );
 
-CREATE TABLE "PartyHistoryType" (
-       party_history_type_id  SERIAL         PRIMARY KEY,
+CREATE TABLE "ContactHistoryType" (
+       contact_history_type_id  SERIAL         PRIMARY KEY,
        description        VARCHAR(255)       NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' )
 );
 
-CREATE TABLE "PartyTag" (
-       party_id         INT8            NOT NULL,
+CREATE TABLE "ContactTag" (
+       contact_id       INT8            NOT NULL,
        tag_id           INT8            NOT NULL
 );
 
@@ -285,7 +285,7 @@ CREATE TABLE "OrganizationMember" (
        PRIMARY KEY ( organization_id, person_id )
 );
 
--- Consider a trigger to enforce one primary address per party?
+-- Consider a trigger to enforce one primary address per contact?
 CREATE TABLE "Address" (
        address_id         SERIAL8            PRIMARY KEY,
        address_type_id    INTEGER            NOT NULL,
@@ -302,7 +302,7 @@ CREATE TABLE "Address" (
        is_primary         BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       party_id           INTEGER            NULL
+       contact_id         INTEGER            NULL
 );
 
 CREATE TABLE "AddressType" (
@@ -312,7 +312,7 @@ CREATE TABLE "AddressType" (
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
--- Consider a trigger to enforce one primary phone number per party?
+-- Consider a trigger to enforce one primary phone number per contact?
 CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
        phone_number_type_id   INT8           NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE "PhoneNumber" (
        is_primary         BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       party_id           INTEGER            NULL
+       contact_id         INTEGER            NULL
 );
 
 CREATE TABLE "PhoneNumberType" (
@@ -334,7 +334,7 @@ CREATE TABLE "Donation" (
        donation_id        SERIAL8            PRIMARY KEY,
        amount             NUMERIC(2)         NOT NULL,
        donation_date      DATE               NOT NULL,
-       party_id           INT8               NOT NULL,
+       contact_id         INT8               NOT NULL,
        fund_id            INT8               NOT NULL,
        notes              TEXT               NULL,
        CONSTRAINT valid_amount CHECK ( amount > 0.0 )
@@ -374,136 +374,136 @@ ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_role_id"
   FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "Party" ADD CONSTRAINT "Party_account_id"
+ALTER TABLE "Contact" ADD CONSTRAINT "Contact_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldGroup" ADD CONSTRAINT "PartyCustomFieldGroup_account_id"
+ALTER TABLE "ContactCustomFieldGroup" ADD CONSTRAINT "ContactCustomFieldGroup_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_party_custom_field_group_id"
-  FOREIGN KEY ("party_custom_field_group_id") REFERENCES "PartyCustomFieldGroup" ("party_custom_field_group_id")
+ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_contact_custom_field_group_id"
+  FOREIGN KEY ("contact_custom_field_group_id") REFERENCES "ContactCustomFieldGroup" ("contact_custom_field_group_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_html_widget_type_id"
+ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_html_widget_type_id"
   FOREIGN KEY ("html_widget_type_id") REFERENCES "HTMLWidgetType" ("html_widget_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomField" ADD CONSTRAINT "PartyCustomField_custom_field_type_id"
+ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_custom_field_type_id"
   FOREIGN KEY ("custom_field_type_id") REFERENCES "CustomFieldType" ("custom_field_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldIntegerValue" ADD CONSTRAINT "PartyCustomFieldIntegerValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldIntegerValue" ADD CONSTRAINT "ContactCustomFieldIntegerValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldIntegerValue" ADD CONSTRAINT "PartyCustomFieldIntegerValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldIntegerValue" ADD CONSTRAINT "ContactCustomFieldIntegerValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldFloatValue" ADD CONSTRAINT "PartyCustomFieldFloatValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldFloatValue" ADD CONSTRAINT "ContactCustomFieldFloatValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldFloatValue" ADD CONSTRAINT "PartyCustomFieldFloatValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldFloatValue" ADD CONSTRAINT "ContactCustomFieldFloatValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldDateValue" ADD CONSTRAINT "PartyCustomFieldDateValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldDateValue" ADD CONSTRAINT "ContactCustomFieldDateValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldDateValue" ADD CONSTRAINT "PartyCustomFieldDateValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldDateValue" ADD CONSTRAINT "ContactCustomFieldDateValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldTextValue" ADD CONSTRAINT "PartyCustomFieldTextValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldTextValue" ADD CONSTRAINT "ContactCustomFieldTextValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldTextValue" ADD CONSTRAINT "PartyCustomFieldTextValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldTextValue" ADD CONSTRAINT "ContactCustomFieldTextValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldBinaryValue" ADD CONSTRAINT "PartyCustomFieldBinaryValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldBinaryValue" ADD CONSTRAINT "ContactCustomFieldBinaryValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldBinaryValue" ADD CONSTRAINT "PartyCustomFieldBinaryValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldBinaryValue" ADD CONSTRAINT "ContactCustomFieldBinaryValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldSelectOption" ADD CONSTRAINT "PartyCustomFieldSelectOption_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldSelectOption" ADD CONSTRAINT "ContactCustomFieldSelectOption_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldSingleSelectValue" ADD CONSTRAINT "PartyCustomFieldSingleSelectValue_party_custom_field_select_option_id"
-  FOREIGN KEY ("party_custom_field_select_option_id") REFERENCES "PartyCustomFieldSelectOption" ("party_custom_field_select_option_id")
+ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_custom_field_select_option_id"
+  FOREIGN KEY ("contact_custom_field_select_option_id") REFERENCES "ContactCustomFieldSelectOption" ("contact_custom_field_select_option_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_custom_field_id"
-  FOREIGN KEY ("party_custom_field_id") REFERENCES "PartyCustomField" ("party_custom_field_id")
+ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_custom_field_id"
+  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyCustomFieldMultiSelectValue" ADD CONSTRAINT "PartyCustomFieldMultiSelectValue_party_custom_field_select_option_id"
-  FOREIGN KEY ("party_custom_field_select_option_id") REFERENCES "PartyCustomFieldSelectOption" ("party_custom_field_select_option_id")
+ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_custom_field_select_option_id"
+  FOREIGN KEY ("contact_custom_field_select_option_id") REFERENCES "ContactCustomFieldSelectOption" ("contact_custom_field_select_option_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyNote" ADD CONSTRAINT "PartyNote_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyNote" ADD CONSTRAINT "PartyNote_user_id"
+ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_user_id"
   FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_user_id"
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_user_id"
   FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_party_history_type_id"
-  FOREIGN KEY ("party_history_type_id") REFERENCES "PartyHistoryType" ("party_history_type_id")
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_contact_history_type_id"
+  FOREIGN KEY ("contact_history_type_id") REFERENCES "ContactHistoryType" ("contact_history_type_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_address_id"
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_address_id"
   FOREIGN KEY ("address_id") REFERENCES "Address" ("address_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistoryType" ADD CONSTRAINT "PartyHistoryType_account_id"
+ALTER TABLE "ContactHistoryType" ADD CONSTRAINT "ContactHistoryType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyHistory" ADD CONSTRAINT "PartyHistory_phone_number_id"
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_phone_number_id"
   FOREIGN KEY ("phone_number_id") REFERENCES "PhoneNumber" ("phone_number_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "PartyTag" ADD CONSTRAINT "PartyTag_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PartyTag" ADD CONSTRAINT "PartyTag_tag_id"
+ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_tag_id"
   FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
-  FOREIGN KEY ("person_id") REFERENCES "Party" ("party_id")
+  FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Person" ADD CONSTRAINT "Person_household_id"
@@ -523,11 +523,11 @@ ALTER TABLE "MessagingProvider" ADD CONSTRAINT "MessagingProvider_account_id"
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "Household" ADD CONSTRAINT "Household_household_id"
-  FOREIGN KEY ("household_id") REFERENCES "Party" ("party_id")
+  FOREIGN KEY ("household_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Organization" ADD CONSTRAINT "Organization_organization_id"
-  FOREIGN KEY ("organization_id") REFERENCES "Party" ("party_id")
+  FOREIGN KEY ("organization_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_organization_id"
@@ -538,8 +538,8 @@ ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "Address" ADD CONSTRAINT "Address_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "Address" ADD CONSTRAINT "Address_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Address" ADD CONSTRAINT "Address_address_type_id"
@@ -550,8 +550,8 @@ ALTER TABLE "AddressType" ADD CONSTRAINT "AddressType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_phone_number_type_id"
@@ -562,8 +562,8 @@ ALTER TABLE "PhoneNumberType" ADD CONSTRAINT "PhoneNumberType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "Donation" ADD CONSTRAINT "Donation_party_id"
-  FOREIGN KEY ("party_id") REFERENCES "Party" ("party_id")
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_fund_id"

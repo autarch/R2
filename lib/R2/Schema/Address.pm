@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema::AddressType;
-use R2::Schema::Party;
+use R2::Schema::Contact;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -14,7 +14,7 @@ use Fey::ORM::Table;
 
     has_table( $schema->table('Address') );
 
-    has_one( $schema->table('Party') );
+    has_one( $schema->table('Contact') );
 
     has_one 'type' =>
         ( table => $schema->table('AddressType') );

@@ -3,7 +3,7 @@ package R2::Schema::Person;
 use strict;
 use warnings;
 
-use R2::Schema::Party;
+use R2::Schema::Contact;
 use R2::Schema::PersonMessaging;
 use R2::Schema;
 
@@ -16,10 +16,10 @@ use Fey::ORM::Table;
 
     has_table $user_t;
 
-    has_one 'party' =>
-        ( table   => $schema->table('Party'),
+    has_one 'contact' =>
+        ( table   => $schema->table('Contact'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Schema::Party->DelegatableMethods(),
+                       R2::Schema::Contact->DelegatableMethods(),
                      ],
         );
 
@@ -48,14 +48,14 @@ around 'insert' => sub
     my %person_p =
         map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
 
-    my $sub = sub { my $party = R2::Schema::Party->insert( %p, party_type => 'Person' );
+    my $sub = sub { my $contact = R2::Schema::Contact->insert( %p, contact_type => 'Person' );
 
                     my $person =
                         $class->$orig( %person_p,
-                                       person_id => $party->party_id(),
+                                       person_id => $contact->contact_id(),
                                      );
 
-                    $person->_set_party($party);
+                    $person->_set_contact($contact);
 
                     return $person;
                   };
