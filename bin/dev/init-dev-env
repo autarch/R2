@@ -28,8 +28,8 @@ sub make_domain
 
     my $domain =
         R2::Schema::Domain->insert( web_hostname   => hostname(),
-                                   email_hostname => hostname(),
-                                 );
+                                    email_hostname => hostname(),
+                                  );
 
     my $hostname = $domain->web_hostname();
 
