@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -23,12 +23,6 @@ mock_dbh();
     is( $domain->uri( path => '/foo' ),
         'http://www.example.com/foo',
         'uri() for /foo' );
-
-    R2::Config->new()->_set_static_path_prefix( '12982' );
-
-    is( $domain->static_uri( path => '/css/base.css' ),
-        'http://www.example.com/12982/css/base.css',
-        'static_uri()' );
 }
 
 {

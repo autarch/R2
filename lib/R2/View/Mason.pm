@@ -7,6 +7,8 @@ use base 'Catalyst::View::Mason';
 
 {
     package R2::Mason;
+
+    use R2::Web::URI qw( static_uri );
 }
 
 # used in templates

@@ -215,7 +215,7 @@ sub _find_config_file
             unless $ENV{MOD_PERL} || $self->is_profiling();
 
         push @imports, 'StackTrace'
-            unless $self->is_production() ||$self->is_profiling();
+            unless $self->is_production() || $self->is_profiling();
 
         return \@imports;
     }
@@ -328,8 +328,8 @@ sub _catalyst_config
     unless ( $self->is_production() )
     {
         $config{static} = { dirs         => [ qw( images js css static w3c ) ],
-                            include_path => [ __PACKAGE__->var_lib_dir(),
-                                              __PACKAGE__->share_dir(),
+                            include_path => [ __PACKAGE__->var_lib_dir()->stringify(),
+                                              __PACKAGE__->share_dir()->stringify(),
                                             ],
                             debug => 1,
                           };

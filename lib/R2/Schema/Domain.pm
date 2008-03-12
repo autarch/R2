@@ -56,19 +56,6 @@ has '_uri_scheme' =>
     }
 }
 
-sub static_uri
-{
-    my $self = shift;
-    my %p    = @_;
-
-    my $prefix = R2::Config->new()->static_path_prefix();
-
-    $p{path} = q{/} . $prefix . $p{path}
-        if $prefix && ! string_is_empty( $p{path} );
-
-    return $self->uri(%p);
-}
-
 make_immutable;
 
 no Fey::ORM::Table;
