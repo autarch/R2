@@ -39,7 +39,7 @@ sub begin : Private
 
     for my $class ( qw( R2::Web::CSS R2::Web::Javascript ) )
     {
-        $class->CreateSingleFile()
+        $class->new()->create_single_file()
             unless $config->is_production() || $config->is_profiling();
     }
 
@@ -63,6 +63,18 @@ sub end : Private
     }
 
     return;
+}
+
+sub _require_authen
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $user = $c->user();
+
+    return if $user;
+
+    $c->redirect_and_detach( '/user/login_form' );
 }
 
 # XXX - belongs in request?
