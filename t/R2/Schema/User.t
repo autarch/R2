@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
+use Digest::SHA qw( sha512_base64 );
 use R2::Schema::User;
 
 
@@ -82,4 +83,60 @@ my $dbh = mock_dbh();
 
     like( $@, qr/remove an email address for a user/,
           'cannot remove an email address for a person associated with a user' );
+}
+
+{
+    my $pw = 'testing';
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( contact_id email_address contact_type  ) ],
+          [ 1, 'bubba.smith@example.com', 'Person' ],
+        ];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( person_id first_name last_name  ) ],
+          [ 1, 'Bubba', 'Smith' ],
+        ];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( user_id password ) ],
+          [ 1, sha512_base64($pw) ],
+        ];
+
+    my $user =
+        R2::Schema::User->new( email_address => 'bubba.smith@example.com',
+                               password      => $pw,
+                             );
+
+    ok( $user, 'got a user for email & password' );
+}
+
+{
+    my $pw = 'testing';
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( contact_id email_address contact_type  ) ],
+          [ 1, 'bubba.smith@example.com', 'Person' ],
+        ];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( person_id first_name last_name  ) ],
+          [ 1, 'Bubba', 'Smith' ],
+        ];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( user_id password ) ],
+          [ 1, sha512_base64($pw) ],
+        ];
+
+    my $user =
+        R2::Schema::User->new( email_address => 'bubba.smith@example.com',
+                               password      => $pw . 'bad',
+                             );
+
+    ok( ! $user, 'did not get a user when the password is wrong' );
 }
