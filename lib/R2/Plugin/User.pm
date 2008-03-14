@@ -20,7 +20,7 @@ sub _user_for_request
     my $cookie = $self->authen_cookie_value();
 
     my $user;
-    $user = R2::User->new( user_id => $cookie->{user_id} )
+    $user = R2::Schema::User->new( user_id => $cookie->{user_id} )
         if $cookie;
 
     return $user;
