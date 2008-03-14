@@ -1,0 +1,131 @@
+/* color scheme - http://www.wellstyled.com/tools/colorscheme2/index-en.html?analog;28;0;144;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0 */
+
+html {
+    background-color: #A1BA6C;
+}
+
+body {
+    line-height: 1.3em;
+}
+
+#doc4 {
+    background-color: white;
+}
+
+#hd, #bd, #ft {
+    /* yui base defaults to relatively small fonts, putting this in
+       the body or #doc4 selector destroys the yui layout */
+    font-size: 120%;
+    padding: 0.5em;
+}
+
+#ft {
+    font-size: 80%;
+    padding-bottom: 2em;
+}
+
+fieldset {
+    border: 1px solid black;
+    padding: 0.5em;
+    margin-right: 2em;
+    background-color: #F6FFE4;
+}
+
+fieldset legend {
+    border: 1px solid black;
+    padding: 0.4em;
+    background-color: #A1BA6C;
+    color: white;
+    font-weight: bold;
+}
+
+div.form-item {
+    margin-bottom: 0.4em;
+}
+
+div.form-item p {
+    font-size: 85%;
+    margin-bottom: 0;
+}
+
+div.form-error {
+    margin-top: 0.3em;
+    padding: 0.1em;
+    border: 1px solid #08B000;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+}
+
+label.inline {
+    display: inline;
+    margin-right: 0.2em;
+}
+
+input.text,
+input.file,
+textarea,
+select {
+  padding: 0.2em;
+  font-weight: bold;
+
+  color: #5B824C;
+  border: 1px solid ;
+}
+
+input.error,
+textarea.error,
+select.error,
+p.error {
+  background-color: #FFCC66;
+}
+
+input.disabled,
+textarea.disabled,
+select.disabled {
+  background-color: #CCC;
+  border-color: #333;
+}
+
+.short {
+  width: 15em;
+}
+
+.medium {
+  width: 30em;
+}
+
+.long {
+  width: 42em;
+}
+
+.high {
+  height: 10em;
+}
+
+textarea {
+  height: 7em;
+}
+
+textarea.medium {
+  height: 3em;
+}
+
+input.submit {
+  padding: 0.1em;
+
+  color: white;
+
+  font-weight: bold;
+
+  background-color: #5B824C;
+
+  border-top: 1px solid #D9FFCA;
+  border-left: 1px solid #D9FFCA;
+  border-bottom: 2px solid #39602A;
+  border-right: 2px solid #39602A;
+
+  margin-top: 0.5em;
+}
