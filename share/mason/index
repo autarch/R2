@@ -1,4 +1,8 @@
-Index!
+Welcome, <% $user->first_name() %>.
+
+<%args>
+$user
+</%args>
 
 <%method title>
 R2: Index
