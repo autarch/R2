@@ -21,6 +21,13 @@ use Fey::ORM::Table;
         );
 }
 
+sub friendly_name
+{
+    my $self = shift;
+
+    return $self->name();
+}
+
 no Fey::ORM::Table;
 no Moose;
 

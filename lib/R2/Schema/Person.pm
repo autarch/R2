@@ -80,6 +80,13 @@ sub _MessagingSelect
     return $select;
 }
 
+sub friendly_name
+{
+    my $self = shift;
+
+    return $self->first_name();
+}
+
 no Fey::ORM::Table;
 no Moose;
 
