@@ -101,6 +101,10 @@ sub _load_from_dbms
         no_such_row 'Person is not a user';
     }
 
+    # Without this, everything gets very confused, because the object
+    # has no PK
+    $self->_set_user_id( $person->person_id() );
+
     no_such_row 'Invalid password'
         unless $self->password() eq sha512_base64( $p->{password} );
 }
