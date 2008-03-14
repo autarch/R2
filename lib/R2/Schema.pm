@@ -42,6 +42,21 @@ sub _set_dbh_attributes
     return;
 }
 
+sub LoadAllClasses
+{
+    my $class = shift;
+
+    for my $table ( $class->Schema()->tables() )
+    {
+        my $class = 'R2::Schema::' . $table->name();
+
+        ( my $path = $class ) =~ s{::}{/}g;
+
+        eval "use $class";
+        die $@ if $@ && $@ !~ /\Qcan't locate $path/i;
+    }
+}
+
 no Fey::ORM::Schema;
 no Moose;
 
