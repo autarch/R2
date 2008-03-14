@@ -30,7 +30,7 @@ use Fey::ORM::Table;
         );
 
     has_one 'organization' =>
-        ( table    => $schema->table('Organization'),
+        ( table => $schema->table('Organization'),
           undef => 1,
         );
 
