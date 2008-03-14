@@ -13,7 +13,8 @@ CREATE DOMAIN email_address AS VARCHAR(255)
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
 CREATE TABLE "User" (
-       user_id            SERIAL8            PRIMARY KEY,
+       -- will be the same as a person_id
+       user_id            INT8               PRIMARY KEY,
        -- SHA512 in Base64 encoding
        password           VARCHAR(86)        NOT NULL,
        timezone           VARCHAR(50)        NOT NULL DEFAULT 'UTC',
@@ -21,7 +22,6 @@ CREATE TABLE "User" (
        time_format        VARCHAR(12)        NOT NULL DEFAULT '%I:%M %P',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin    BOOLEAN            DEFAULT FALSE,
-       person_id          INT8               UNIQUE NOT NULL,
        CONSTRAINT valid_password CHECK ( password != '' )
 );
 
@@ -354,8 +354,8 @@ CREATE TABLE "Session" (
 );
 
 
-ALTER TABLE "User" ADD CONSTRAINT "User_person_id"
-  FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
+ALTER TABLE "User" ADD CONSTRAINT "User_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "Person" ("person_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "Account" ADD CONSTRAINT "Account_domain_id"
