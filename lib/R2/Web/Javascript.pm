@@ -8,7 +8,7 @@ use JSAN::ServerSide 0.04;
 use Path::Class;
 use R2::Config;
 
-use MooseX::Singleton;
+use Moose;
 
 extends 'R2::Web::CombinedStaticFiles';
 

@@ -16,7 +16,7 @@ use Path::Class;
 use R2::Config;
 use Time::HiRes;
 
-use MooseX::Singleton;
+use Moose;
 
 has 'files' =>
     ( is      => 'ro',
@@ -32,7 +32,7 @@ has 'target_file' =>
       builder => '_target_file',
     );
 
-sub CreateSingleFile
+sub create_single_file
 {
     my $self = shift;
 
