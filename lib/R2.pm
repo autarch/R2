@@ -10,6 +10,8 @@ use Catalyst::Request::REST::ForBrowsers;
 use Catalyst::Runtime '5.70';
 
 use R2::Config;
+use R2::Schema;
+BEGIN { R2::Schema->LoadAllClasses() }
 
 
 my $Config;
@@ -26,6 +28,8 @@ __PACKAGE__->config( name => 'R2',
 
 __PACKAGE__->request_class( 'Catalyst::Request::REST::ForBrowsers' );
 #__PACKAGE__->response_class( 'R2::Response' );
+
+R2::Schema->EnableObjectCaches();
 
 __PACKAGE__->setup();
 
