@@ -21,7 +21,7 @@ CREATE TABLE "User" (
        time_format        VARCHAR(12)        NOT NULL DEFAULT '%I:%M %P',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin    BOOLEAN            DEFAULT FALSE,
-       person_id          INT8               NOT NULL,
+       person_id          INT8               UNIQUE NOT NULL,
        CONSTRAINT valid_password CHECK ( password != '' )
 );
 
