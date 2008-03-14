@@ -69,7 +69,7 @@ sub make_account
                                    );
 
     my ( $first_name, $last_name ) = split / /, $user_name;
-    ( my $email = lc $user_name ) =~ s/ /_/g;
+    ( my $email = lc $user_name ) =~ s/ /./g;
     $email .= '@example.com';
 
     my $password = 'password';
