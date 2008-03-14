@@ -89,28 +89,28 @@ select.disabled {
   border-color: #333;
 }
 
-.short {
+input.short {
   width: 15em;
 }
 
-.medium {
+input.medium {
   width: 30em;
 }
 
-.long {
+input.wide {
   width: 42em;
-}
-
-.high {
-  height: 10em;
 }
 
 textarea {
   height: 7em;
 }
 
-textarea.medium {
+textarea.small {
   height: 3em;
+}
+
+textarea.high {
+  height: 10em;
 }
 
 input.submit {
