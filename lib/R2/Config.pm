@@ -307,7 +307,8 @@ sub _catalyst_config
 
           session        =>
           { expires        => ( 60 * 5 ),
-            dbi_table      => 'Session',
+            # Need to quote it for Pg
+            dbi_table      => q{"Session"},
             dbi_dbh        => 'R2::Plugin::Session::Store::R2',
           },
 
