@@ -9,9 +9,6 @@ CREATE DATABASE "R2"
 
 SET CLIENT_MIN_MESSAGES = ERROR;
 
-CREATE DOMAIN email_address AS VARCHAR(255)
-       CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
-
 CREATE TABLE "User" (
        -- will be the same as a person_id
        user_id            INT8               PRIMARY KEY,
@@ -58,6 +55,9 @@ CREATE TABLE "Domain" (
 
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
+CREATE DOMAIN email_address AS VARCHAR(255)
+       CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
+
 CREATE DOMAIN uri AS VARCHAR(255)
        CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\w-]+(\.[\w-]+)*\.\w{2,3}' );
 
@@ -68,7 +68,7 @@ CREATE TABLE "Contact" (
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_trade       BOOLEAN            NOT NULL DEFAULT FALSE,
-       email_address      email_address      NULL,
+       email_address      email_address      UNIQUE NULL,
        website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- an identifier from another app, probably created via an
