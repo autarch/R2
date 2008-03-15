@@ -7,5 +7,5 @@ $user
 </%args>
 
 <%method title>
-Rapport | Dashboard: <% $m->caller_args(-1)->{user}->account()->name() %>
+Rapport | Dashboard: <% $c->user()->account()->name() %>
 </%method>
