@@ -19,8 +19,6 @@ sub index : Path('/') : Args(0)
 
     $self->_require_authen($c);
 
-    $c->stash()->{user} = $c->user();
-
     $c->stash()->{template} = '/index';
 }
 
