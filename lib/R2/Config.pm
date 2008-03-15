@@ -419,11 +419,12 @@ sub _mason_config
     my $self = shift;
 
     my %config =
-        ( comp_root  => $self->share_dir()->subdir( 'mason' ),
-          data_dir   => $self->cache_dir()->subdir( 'mason', 'web' ),
-          error_mode => 'fatal',
-          in_package => 'R2::Mason',
-          use_match  => 0,
+        ( comp_root            => $self->share_dir()->subdir('mason')->stringify(),
+          data_dir             => $self->cache_dir()->subdir( 'mason', 'web' )->stringify(),
+          error_mode           => 'fatal',
+          in_package           => 'R2::Mason',
+          use_match            => 0,
+          default_escape_flags => 'h',
         );
 
     if ( $self->is_production() )
