@@ -1,0 +1,14 @@
+  <div id="hd">
+    <ul id="global-nav">
+% if ( $c->user() ) {
+      <li><a href="<% $c->uri_for('/user/settings') %>" title="Application settings">Settings</a></li>
+      <li><a href="<% $c->uri_for( '/user/authentication', { 'x-tunneled-method' => 'DELETE' } ) %>"
+             title="Log Out of Rapport">Log Out</a></li>
+% }
+      <li><a href="<% $c->uri_for( '/application/help' ) %>"
+             title="Help Using Rapport">Help</a></li>
+    </ul>
+
+    <a href="<% $c->uri_for('/') %>"><img src="<% static_uri('/images/rapport-logo.jpg') %>"
+                                          width="115" height="57" /></a>
+  </div>

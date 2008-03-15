@@ -21,30 +21,28 @@
 
 <div id="doc4" class="yui-t2">
 
-  <div id="hd">
-    <h1>Page Title</h1>
-  </div>
+<& header.mas, %ARGS &>
 
   <div id="bd">
     <div id="yui-main">
       <div class="yui-b">
-        <div class="yui-g">
 % $m->call_next();
-	</div>
       </div>
     </div>
 
-    <div class="yui-b">
-      Navigation
-    </div>
+% if ( $m->request_comp()->attr('show_local_nav') ) {
+<& local-nav.mas, %ARGS &>
+% }
 	
   </div>
 
-  <div id="ft">
-    Rapport is copyright 2008 by Dave Rolsky. All Rights Reserved.
-  </div>
+<& footer.mas, %ARGS &>
 
 </div>
 
 </body>
 </html>
+
+<%attr>
+show_local_nav => 1
+</%attr>

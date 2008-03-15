@@ -1,7 +1,7 @@
 /* color scheme - http://www.wellstyled.com/tools/colorscheme2/index-en.html?analog;28;0;144;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0 */
 
 html {
-    background-color: #A1BA6C;
+    background-color: #EEFFCA;
 }
 
 body {
@@ -16,12 +16,43 @@ body {
     /* yui base defaults to relatively small fonts, putting this in
        the body or #doc4 selector destroys the yui layout */
     font-size: 120%;
-    padding: 0.5em;
+}
+
+#hd {
+    background-color: #A1BA6C;
+}
+
+#global-nav {
+    display: inline;
+    float: right;
+    font-size: 80%;
+}
+
+#global-nav li {
+    display: inline;
+    list-style: none;
+}
+
+#global-nav li a {
+    color: white;
+    padding-left: 0.5em;
+}
+
+#local-nav {
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 2em;
+    background-color: #A1BA6C;
+}
+
+#bd {
+    padding-top: 5px;
 }
 
 #ft {
+    text-align: center;
     font-size: 80%;
-    padding-bottom: 2em;
+    padding: 2em 0.5em;
 }
 
 fieldset {

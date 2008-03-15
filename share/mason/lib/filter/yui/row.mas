@@ -1,0 +1,3 @@
+        <div class="yui-g">
+<% $m->content() | n %>
+        </div>

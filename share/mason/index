@@ -1,9 +1,11 @@
-Welcome, <% $user->first_name() %>.
+        <div class="yui-g">
+<h1>Dashboard: <% $m->caller_args(-1)->{user}->account()->name() %></h1>
+        </div>
 
 <%args>
 $user
 </%args>
 
 <%method title>
-R2: Index
+Rapport | Dashboard: <% $m->caller_args(-1)->{user}->account()->name() %>
 </%method>
