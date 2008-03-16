@@ -87,6 +87,7 @@ div.form-error {
 
 label {
     display: block;
+    margin-bottom: 0.2em;
     font-weight: bold;
 }
 
@@ -103,7 +104,7 @@ select {
   font-weight: bold;
 
   color: #5B824C;
-  border: 1px solid ;
+  border: 1px solid black;
 }
 
 input.error,

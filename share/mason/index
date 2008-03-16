@@ -1,10 +1,6 @@
         <div class="yui-g">
-<h1>Dashboard: <% $m->caller_args(-1)->{user}->account()->name() %></h1>
+<h1>Dashboard: <% $c->user()->account()->name() %></h1>
         </div>
-
-<%args>
-$user
-</%args>
 
 <%method title>
 Rapport | Dashboard: <% $c->user()->account()->name() %>
