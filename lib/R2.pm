@@ -33,6 +33,32 @@ R2::Schema->EnableObjectCaches();
 
 __PACKAGE__->setup();
 
+{
+package Catalyst::Engine::HTTP::Restarter::Watcher;
+
+use IPC::Run3 qw( run3 );
+
+# The existing test attempts to reload the file in the current
+# process, which blows up for Moose classes made immutable, and all
+# sorts of other things.
+no warnings 'redefine';
+sub _test {
+    my ( $self, $file ) = @_;
+
+    my @inc = map { ( '-I', $_ ) } @INC;
+
+    my $err;
+
+    run3( [ $^X, @inc, '-c', $file ],
+          undef,
+          undef,
+          \$err,
+        );
+
+    return $err =~ /syntax OK/ ? 0 : $err;
+}
+}
+
 1;
 
 __END__
