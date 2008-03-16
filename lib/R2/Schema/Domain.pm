@@ -3,10 +3,10 @@ package R2::Schema::Domain;
 use strict;
 use warnings;
 
-use Moose::Util::TypeConstraints;
 use R2::Config;
 use R2::Schema::Account;
 use R2::Schema;
+use R2::Types;
 use R2::Util qw( string_is_empty );
 use URI::FromHash ();
 
@@ -31,12 +31,6 @@ has '_uri_scheme' =>
 
 
 {
-    subtype 'R2::Type::URIPath'
-        => as 'Str'
-        => where { defined $_ && length $_ && $_ =~ m{^/} }
-        => message { my $path = defined $_ ? $_ : '';
-                     "This path ($path) is either empty or does not start with a slash (/)" };
-
     my %spec = ( path     => { isa      => 'R2::Type::URIPath' },
                  query    => { isa      => 'HashRef',
                                default  => {},
@@ -56,11 +50,10 @@ has '_uri_scheme' =>
     }
 }
 
-make_immutable;
-
 no Fey::ORM::Table;
 no Moose;
-no Moose::Util::TypeConstraints;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 

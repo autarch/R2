@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-  <title><& SELF:title, %ARGS &></title>
+  <title>Rapport | <& SELF:title, %ARGS &></title>
   <link rel="stylesheet"
         href="<% static_uri('/css/r2-combined.css') %>"
         type="text/css">

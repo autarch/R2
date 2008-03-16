@@ -109,10 +109,10 @@ sub _load_from_dbms
         unless $self->password() eq sha512_base64( $p->{password} );
 }
 
-make_immutable;
-
 no Fey::ORM::Table;
 no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 

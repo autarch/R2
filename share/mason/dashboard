@@ -1,7 +1,15 @@
         <div class="yui-g">
-<h1>Dashboard: <% $c->user()->account()->name() %></h1>
+
+<div id="summary">
+<h1><% $title %></h1>
+</div>
+
         </div>
 
+<%shared>
+my $title = 'Dashboard: ' . $c->user()->account()->name();
+</%shared>
+
 <%method title>
-Rapport | Dashboard: <% $c->user()->account()->name() %>
+<% $title %>
 </%method>

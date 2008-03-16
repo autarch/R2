@@ -60,9 +60,8 @@ sub create_single_file
         or die "Cannot move $tempfile => $target: $!";
 }
 
-make_immutable;
-
 no Moose;
-no MooseX::Singleton;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
