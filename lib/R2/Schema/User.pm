@@ -23,7 +23,7 @@ use Fey::ORM::Table;
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
                        grep { $_ ne 'person' }
                        R2::Schema::Person->meta()->get_attribute_list(),
-                       R2::Schema::Contact->DelegatableMethods() ],
+                       R2::Schema::Contact->meta()->get_attribute_list() ],
         );
 }
 

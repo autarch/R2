@@ -19,7 +19,7 @@ use Fey::ORM::Table;
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Schema::Contact->DelegatableMethods(),
+                       R2::Schema::Contact->meta()->get_attribute_list(),
                      ],
         );
 
