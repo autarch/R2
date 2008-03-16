@@ -17,3 +17,8 @@ subtype 'R2::Type::URIPath'
     => where { defined $_ && length $_ && $_ =~ m{^/} }
     => message { my $path = defined $_ ? $_ : '';
                  "This path ($path) is either empty or does not start with a slash (/)" };
+
+no Moose::Util::TypeConstraints;
+
+1;
+
