@@ -12,14 +12,14 @@ __PACKAGE__->config()->{namespace} = '';
 
 
 
-sub index : Path('/') : Args(0)
+sub dashboard : Path('/') : Args(0)
 {
     my $self = shift;
     my $c    = shift;
 
     $self->_require_authen($c);
 
-    $c->stash()->{template} = '/index';
+    $c->stash()->{template} = '/dashboard';
 }
 
 sub exit : Path('/exit') : Args(0)
