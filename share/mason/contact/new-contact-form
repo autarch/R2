@@ -1,0 +1,22 @@
+<&| /lib/filter/yui/row.mas &>
+<&| /lib/filter/fill-in-form.mas &>
+<div id="summary">
+<h1><% $title %></h1>
+</div>
+
+<form action="/user/authentication" method="post">
+    <div class="form-item">
+      <input class="submit" type="submit" value="Submit" />
+    </div>
+
+</form>
+</&>
+</&>
+
+<%shared>
+my $title = 'Add a new contact';
+</%shared>
+
+<%method title>
+<% $title %>
+</%method>

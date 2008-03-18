@@ -24,7 +24,7 @@ my $title = 'Dashboard: ' . $c->user()->account()->name();
 my $user = $c->user();
 my $account = $user->account();
 
-my $authz = $c->model('AuthzChecker');
+my $authz = $c->model('Authz');
 </%init>
 
 <%method title>
