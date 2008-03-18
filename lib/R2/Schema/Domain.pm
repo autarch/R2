@@ -3,7 +3,6 @@ package R2::Schema::Domain;
 use strict;
 use warnings;
 
-use R2::Config;
 use R2::Schema::Account;
 use R2::Schema;
 use R2::Types;
