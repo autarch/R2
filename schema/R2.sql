@@ -40,7 +40,7 @@ CREATE TABLE "AccountUserRole" (
        account_id         INTEGER            NOT NULL,
        user_id            INT8               NOT NULL,
        role_id            INTEGER            NOT NULL,
-       PRIMARY KEY ( account_id, user_id, role_id )
+       PRIMARY KEY ( account_id, user_id )
 );
 
 CREATE TABLE "Domain" (
