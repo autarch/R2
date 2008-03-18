@@ -16,10 +16,10 @@ system( "$FindBin::Bin/rebuild-schema" )
 
 
 {
+    make_config_file();
+
     my $domain = make_domain();
     make_accounts($domain);
-
-    make_config_file();
 }
 
 sub make_domain
