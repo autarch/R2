@@ -1,14 +1,31 @@
-        <div class="yui-g">
+<&| /lib/filter/yui/row.mas &>
 
 <div id="summary">
 <h1><% $title %></h1>
+
+% if ( $authz->user_can_edit_account( user => $user, account => $account ) ) {
+<a href="<% $c->uri_for( '/account/' . $account->account_id() . '/edit_form' ) %>"
+   title="Edit account settings">Edit this account</a>
+% }
+
+% if ( $authz->user_can_add_contact( user => $user, account => $account ) ) {
+<a href="<% $c->uri_for( '/contact/new_contact_form'  ) %>"
+   title="Add a new contact">Add a contact</a>
+% }
 </div>
 
-        </div>
+</&>
 
 <%shared>
 my $title = 'Dashboard: ' . $c->user()->account()->name();
 </%shared>
+
+<%init>
+my $user = $c->user();
+my $account = $user->account();
+
+my $authz = $c->model('AuthzChecker');
+</%init>
 
 <%method title>
 <% $title %>
