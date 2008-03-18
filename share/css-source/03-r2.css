@@ -45,6 +45,15 @@ body {
     background-color: #A1BA6C;
 }
 
+#summary {
+    background-color: #FAFFCA;
+}
+
+#summary h1 {
+    margin: 0;
+    padding-top: 0.5em;
+}
+
 #bd {
     padding-top: 5px;
 }
