@@ -6,7 +6,7 @@ use warnings;
 use base 'R2::Controller::Base';
 
 
-sub new_contact_form : Local
+sub new_person_form : Local
 {
     my $self = shift;
     my $c    = shift;
@@ -21,7 +21,7 @@ sub new_contact_form : Local
             );
     }
 
-    $c->stash()->{template} = '/contact/new-contact-form';
+    $c->stash()->{template} = '/contact/new-person-form';
 }
 
 1;

@@ -1,0 +1,83 @@
+<&| /lib/filter/yui/row.mas &>
+<&| /lib/filter/fill-in-form.mas &>
+<div id="summary">
+  <h1><% $title %></h1>
+</div>
+
+<form class="one-line-fields" action="/user/authentication" method="post">
+
+  <fieldset>
+    <legend>Basic Info</legend>
+
+    <div class="form-item">
+      <label for="first_name">First name:</label>
+      <input type="text" class="text" name="first_name" id="first_name" />
+    </div>
+
+    <div class="form-item">
+      <label for="middle_name">Middle name:</label>
+      <input type="text" class="text" name="middle_name" id="middle_name" />
+    </div>
+
+    <div class="form-item">
+      <label for="last_name">Last name:</label>
+      <input type="text" class="text" name="last_name" id="last_name" />
+    </div>
+
+    <div class="form-item">
+      <label for="birth_date">Birth date:</label>
+      <input type="text" class="text narrow date" name="birth_date" id="birth_date" />
+    </div>
+
+    <div class="form-item">
+      <label for="allows_trade">Trading is ok:</label>
+      <input type="checkbox" class="checkbox" name="allows_trade" id="allows_trade" />
+      <div class="help-text">
+        <p>
+          Can this contact be traded to other organizations?
+        </p>
+      </div>
+    </div>
+
+  </fieldset>
+
+  <fieldset>
+    <legend>Email & Website</legend>
+
+    <div class="form-item">
+      <label for="email_address">Email address:</label>
+      <input type="text" class="text medium" name="email_address" id="email_address" />
+    </div>
+
+    <div class="form-item">
+      <label for="allows_email">Email is ok:</label>
+      <input type="checkbox" class="checkbox" name="allows_email" id="allows_email" checked="checked" />
+      <div class="help-text">
+        <p>
+          If email is not allowed, this contact will never be emailed by Rapport.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label for="website">Website:</label>
+      <input type="text" class="text medium" name="website" id="website" />
+    </div>
+
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+</&>
+
+<%shared>
+my $title = 'Add a new contact';
+</%shared>
+
+<%method title>
+<% $title %>
+</%method>

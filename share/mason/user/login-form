@@ -1,6 +1,6 @@
 <&| /lib/filter/yui/row.mas &>
 <&| /lib/filter/fill-in-form.mas &>
-<form action="/user/authentication" method="post">
+<form class="two-line-fields" action="/user/authentication" method="post">
   <input type="hidden" name="return_to" value="<% $return_to | h %>" />
 
   <& /lib/form/errors.mas &>
@@ -9,12 +9,12 @@
 
     <div class="form-item">
       <label for="email_address">Email:</label>
-      <input id="email_address" class="text short" type="text" name="email_address" value="" />
+      <input id="email_address" class="text medium" type="text" name="email_address" value="" />
     </div>
 
     <div class="form-item">
       <label for="password">Password:</label>
-      <input id="password" class="text short" type="password" name="password" />
+      <input id="password" class="text" type="password" name="password" />
     </div>
 
   </fieldset>

@@ -87,11 +87,6 @@ div.form-item {
     margin-bottom: 0.4em;
 }
 
-div.form-item p {
-    font-size: 85%;
-    margin-bottom: 0;
-}
-
 div.form-error {
     margin-top: 0.3em;
     padding: 0.1em;
@@ -99,14 +94,48 @@ div.form-error {
 }
 
 label {
-    display: block;
-    margin-bottom: 0.2em;
     font-weight: bold;
 }
 
-label.inline {
-    display: inline;
-    margin-right: 0.2em;
+form.two-line-fields label, label.block {
+    display: block;
+    margin-bottom: 0.2em;
+}
+
+form.one-line-fields fieldset {
+    padding-bottom: 1.5em;
+}
+
+form.one-line-fields div.form-item { 
+    clear: both;
+    padding: 0.1em 0;
+}
+
+/* Having the help-text div allows us to set the margin in ems, to
+   match the width of the label tag. Without the div, we'd have to set
+   the margin on the p tag, but this has a different font-size than
+   the label, so the em size is not the same. */
+form.one-line-fields div.form-item div.help-text { 
+    margin-top: 0.1em;
+    margin-left: 9.5em;
+}
+
+form.one-line-fields div.form-item div.help-text p {
+    font-size: 85%;
+    margin-bottom: 0em;
+}
+
+form.one-line-fields label {
+    display: block;
+    float: left;
+    text-align: right;
+    margin-right: 0.5em;
+    margin-top: 0.3em;
+    width: 9em;
+}
+
+form.one-line-fields input.checkbox {
+    margin-top: 0.4em;
 }
 
 input.text,
@@ -117,7 +146,7 @@ select {
   font-weight: bold;
 
   color: #5B824C;
-  border: 1px solid black;
+  border: 1px solid #5B824C;
 }
 
 input.error,
@@ -134,16 +163,23 @@ select.disabled {
   border-color: #333;
 }
 
-input.short {
-  width: 15em;
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: black;
+  background-color: #FAFFCA;
+}
+
+input.narrow {
+  width: 7em;
 }
 
 input.medium {
-  width: 30em;
+  width: 18em;
 }
 
 input.wide {
-  width: 42em;
+  width: 30em;
 }
 
 textarea {
