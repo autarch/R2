@@ -17,7 +17,9 @@ sub _files
     my $dir = dir( R2::Config->new()->share_dir(), 'css-source' );
 
     return [ sort
-             grep { $_->isa('Path::Class::File') && $_->basename() =~ /\.css$/ }
+             grep { ! $_->is_dir()
+                    && $_->basename() =~ /^\d+/
+                    && $_->basename() =~ /\.css$/ }
              $dir->children() ];
 }
 
