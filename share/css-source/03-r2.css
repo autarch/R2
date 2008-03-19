@@ -47,11 +47,13 @@ body {
 
 #summary {
     background-color: #FAFFCA;
+    padding: 1em;
+    margin-bottom: 0.5em;
+    margin-right: 2em;
 }
 
 #summary h1 {
     margin: 0;
-    padding-top: 0.5em;
 }
 
 #bd {
