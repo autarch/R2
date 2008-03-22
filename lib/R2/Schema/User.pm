@@ -109,6 +109,20 @@ sub _load_from_dbms
         unless $self->password() eq sha512_base64( $p->{password} );
 }
 
+sub date_format_for_display
+{
+    my $self = shift;
+
+    my $format = $self->date_format();
+
+    $format =~ s{/}{-}g;
+    $format =~ s/%m/MM/;
+    $format =~ s/%d/DD/;
+    $format =~ s/%Y/YYYY/;
+
+    return $format;
+}
+
 no Fey::ORM::Table;
 no Moose;
 

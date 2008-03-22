@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -139,4 +139,28 @@ my $dbh = mock_dbh();
                              );
 
     ok( ! $user, 'did not get a user when the password is wrong' );
+}
+
+{
+    my $user =
+        R2::Schema::User->insert( first_name    => 'Joe',
+                                  last_name     => 'Smith',
+                                  email_address => 'joe.smith@example.com',
+                                  password      => 'password',
+                                  date_format   => '%m/%d/%Y',
+                                );
+
+    is( $user->date_format_for_display(), 'MM-DD-YYYY',
+        'date_format_for_display()' );
+
+    my $user =
+        R2::Schema::User->insert( first_name    => 'Joe',
+                                  last_name     => 'Smith',
+                                  email_address => 'joe.smith@example.com',
+                                  password      => 'password',
+                                  date_format   => '%d/%m/%Y',
+                                );
+
+    is( $user->date_format_for_display(), 'DD-MM-YYYY',
+        'date_format_for_display()' );
 }
