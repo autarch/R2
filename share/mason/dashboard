@@ -10,7 +10,7 @@
 
 % if ( $authz->user_can_add_contact( user => $user, account => $account ) ) {
 <a href="<% $c->uri_for( '/contact/new_person_form'  ) %>"
-   title="Add a new contact">Add a contact</a>
+   title="Add a new person">Add a person</a>
 % }
 </div>
 

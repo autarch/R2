@@ -93,20 +93,11 @@ div.form-error {
     border: 1px solid #08B000;
 }
 
-label {
-    font-weight: bold;
-}
-
-form.two-line-fields label, label.block {
-    display: block;
-    margin-bottom: 0.2em;
-}
-
-form.one-line-fields fieldset {
+form fieldset {
     padding-bottom: 1.5em;
 }
 
-form.one-line-fields div.form-item { 
+form div.form-item { 
     clear: both;
     padding: 0.1em 0;
 }
@@ -115,26 +106,35 @@ form.one-line-fields div.form-item {
    match the width of the label tag. Without the div, we'd have to set
    the margin on the p tag, but this has a different font-size than
    the label, so the em size is not the same. */
-form.one-line-fields div.form-item div.help-text { 
+form div.form-item div.help-text { 
     margin-top: 0.1em;
     margin-left: 9.5em;
 }
 
-form.one-line-fields div.form-item div.help-text p {
+form div.form-item div.help-text p {
     font-size: 85%;
     margin-bottom: 0em;
 }
 
-form.one-line-fields label {
+form label.for-field {
     display: block;
     float: left;
+    font-weight: bold;
     text-align: right;
     margin-right: 0.5em;
     margin-top: 0.3em;
     width: 9em;
 }
 
-form.one-line-fields input.checkbox {
+form .no-label {
+    margin-left: 9.5em;
+}
+
+form input.checkbox {
+    margin-top: 0.4em;
+}
+
+div.radio-group {
     margin-top: 0.4em;
 }
 

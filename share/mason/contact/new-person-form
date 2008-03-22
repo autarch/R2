@@ -4,34 +4,55 @@
   <h1><% $title %></h1>
 </div>
 
-<form class="one-line-fields" action="/user/authentication" method="post">
+<form action="/user/authentication" method="post">
 
   <fieldset>
     <legend>Basic Info</legend>
 
     <div class="form-item">
-      <label for="first_name">First name:</label>
+      <label class="for-field" for="first_name">First name:</label>
       <input type="text" class="text" name="first_name" id="first_name" />
     </div>
 
     <div class="form-item">
-      <label for="middle_name">Middle name:</label>
+      <label class="for-field" for="middle_name">Middle name:</label>
       <input type="text" class="text" name="middle_name" id="middle_name" />
     </div>
 
     <div class="form-item">
-      <label for="last_name">Last name:</label>
+      <label class="for-field" for="last_name">Last name:</label>
       <input type="text" class="text" name="last_name" id="last_name" />
     </div>
 
     <div class="form-item">
-      <label for="birth_date">Birth date:</label>
+      <label class="for-field" for="birth_date">Birth date:</label>
       <input type="text" class="text narrow date" name="birth_date" id="birth_date" />
+      <div class="help-text">
+        <p>
+          <% $c->user()->date_format_for_display() %>
+        </p>
+      </div>
     </div>
 
     <div class="form-item">
-      <label for="allows_trade">Trading is ok:</label>
-      <input type="checkbox" class="checkbox" name="allows_trade" id="allows_trade" />
+      <label class="for-field" for="last_name">Gender:</label>
+      <select name="gender">
+        <option value="">&nbsp;-- pick a gender --&nbsp;</option>
+% for my $value ( @{ R2::Schema::Person->GenderValues() } ) {
+        <option value="<% $value %>"><% $value %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" >Trading is ok:</label>
+      <div class="radio-group">
+        <input type="radio" class="radio" name="allows_trade" id="allows_trade-yes" value="1" />
+        <label class="for-radio" for="allows_trade-yes">Yes</label>
+        <input type="radio" class="radio" name="allows_trade" id="allows_trade-no" value="0" checked="checked" />
+        <label class="for-radio" for="allows_trade-no">No</label>
+      </div>
+
       <div class="help-text">
         <p>
           Can this contact be traded to other organizations?
@@ -45,13 +66,20 @@
     <legend>Email & Website</legend>
 
     <div class="form-item">
-      <label for="email_address">Email address:</label>
+      <label class="for-field" for="email_address">Email address:</label>
       <input type="text" class="text medium" name="email_address" id="email_address" />
     </div>
 
     <div class="form-item">
-      <label for="allows_email">Email is ok:</label>
-      <input type="checkbox" class="checkbox" name="allows_email" id="allows_email" checked="checked" />
+      <label class="for-field" for="allows_email">Email is ok:</label>
+
+      <div class="radio-group">
+        <input type="radio" class="radio" name="allows_email" id="allows_email-yes" value="1" checked="checked" />
+        <label class="for-radio" for="allows_email-yes">Yes</label>
+        <input type="radio" class="radio" name="allows_email" id="allows_email-no" value="0" />
+        <label class="for-radio" for="allows_email-no">No</label>
+      </div>
+
       <div class="help-text">
         <p>
           If email is not allowed, this contact will never be emailed by Rapport.
@@ -60,7 +88,7 @@
     </div>
 
     <div class="form-item">
-      <label for="website">Website:</label>
+      <label class="for-field" for="website">Website:</label>
       <input type="text" class="text medium" name="website" id="website" />
     </div>
 
@@ -75,7 +103,7 @@
 </&>
 
 <%shared>
-my $title = 'Add a new contact';
+my $title = 'Add a new person';
 </%shared>
 
 <%method title>
