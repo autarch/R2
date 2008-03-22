@@ -7,6 +7,7 @@ use R2::Schema::Contact;
 use R2::Schema::PersonMessaging;
 use R2::Schema;
 
+use MooseX::ClassAttribute;
 use Fey::ORM::Table;
 
 {
@@ -36,8 +37,27 @@ use Fey::ORM::Table;
           select      => __PACKAGE__->_MessagingSelect(),
           bind_params => sub { $_[0]->person_id() },
         );
+
+    class_has 'GenderValues' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef',
+          lazy    => 1,
+          default => \&_GetGenderValues,
+        );
 }
 
+sub _GetGenderValues
+{
+    my $class = shift;
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    my $sth = $dbh->column_info( '', '', 'Person', 'gender' );
+
+    my $col_info = $sth->fetchall_arrayref({})->[0];
+
+    return $col_info->{pg_enum_values} || [];
+}
 
 around 'insert' => sub
 {
@@ -89,6 +109,7 @@ sub friendly_name
 
 no Fey::ORM::Table;
 no Moose;
+no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 
