@@ -237,7 +237,7 @@ CREATE TYPE gender AS ENUM ( 'male', 'female', 'transgender' );
 
 CREATE TABLE "Person" (
        person_id          INT8               PRIMARY KEY,
-       salutation         VARCHAR(5)         NOT NULL DEFAULT '',
+       salutation         VARCHAR(20)        NOT NULL DEFAULT '',
        first_name         VARCHAR(255)       NOT NULL DEFAULT '',
        middle_name        VARCHAR(255)       NOT NULL DEFAULT '',
        last_name          VARCHAR(255)       NOT NULL DEFAULT '',
