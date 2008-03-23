@@ -10,7 +10,7 @@ use File::Slurp qw( read_file );
 use R2::Web::CSS;
 
 
-R2::Web::CSS->CreateSingleFile();
+R2::Web::CSS->new()->create_single_file();
 my $css = read_file( R2::Web::CSS->_target_file()->stringify() );
 
 

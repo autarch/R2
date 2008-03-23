@@ -49,6 +49,9 @@ sub _target_file
         my $self = shift;
         my $code = shift;
 
+        return $code
+            unless R2::Config->new()->is_production();
+
         return JavaScript::Squish->squish( \$code,
                                            remove_comments_exceptions => \@Exceptions,
                                          );
