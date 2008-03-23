@@ -5,16 +5,13 @@
 <head>
 
   <title>Rapport | <& SELF:title, %ARGS &></title>
+
   <link rel="stylesheet"
         href="<% static_uri('/css/r2-combined.css') %>"
         type="text/css">
 
-  <script type="text/javascript">
-    var JSAN = { "use": function () {} };
-  </script>
-
- <script src="<% static_uri( '/js/r2-combined.js' ) %>"
-         type="text/javascript"></script>
+  <script src="<% static_uri( '/js/r2-combined.js' ) %>"
+          type="text/javascript"></script>
 
 </head>
 <body>
