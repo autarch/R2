@@ -27,6 +27,7 @@ my %Requires =
       'CSS::Minifier'                            => 0,
       'Cwd'                                      => 0,
       'DateTime'                                 => 0,
+      'DBD::Pg'                                  => '2.5.0',
       'DBI'                                      => 0,
       'Digest::SHA'                              => 0,
       'Exporter'                                 => 0,
