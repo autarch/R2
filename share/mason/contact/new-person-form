@@ -1,13 +1,23 @@
 <&| /lib/filter/yui/row.mas &>
-<&| /lib/filter/fill-in-form.mas &>
 <div id="summary">
   <h1><% $title %></h1>
 </div>
 
-<form action="/user/authentication" method="post">
+<&| /lib/filter/fill-in-form.mas &>
+<form class="JS-standard-form" action="/user/authentication" method="post">
 
   <fieldset>
-    <legend>Basic Info</legend>
+    <legend>The Basics</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="salutation">Salutation:</label>
+      <input type="text" class="text narrow" name="salutation" id="salutation" />
+      <div class="help-text">
+        <p>
+          Mr., Ms., Dr., etc.
+        </p>
+      </div>
+    </div>
 
     <div class="form-item">
       <label class="for-field" for="first_name">First name:</label>
@@ -25,6 +35,16 @@
     </div>
 
     <div class="form-item">
+      <label class="for-field" for="suffix">Name suffix:</label>
+      <input type="text" class="text narrow" name="suffix" id="suffix" />
+      <div class="help-text">
+        <p>
+          Jr., Esq., etc.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
       <label class="for-field" for="birth_date">Birth date:</label>
       <input type="text" class="text narrow date" name="birth_date" id="birth_date" />
       <div class="help-text">
@@ -37,7 +57,7 @@
     <div class="form-item">
       <label class="for-field" for="last_name">Gender:</label>
       <select name="gender">
-        <option value="">&nbsp;-- pick a gender --&nbsp;</option>
+        <option value="">-- pick a gender --</option>
 % for my $value ( @{ R2::Schema::Person->GenderValues() } ) {
         <option value="<% $value %>"><% $value %></option>
 % }
@@ -45,12 +65,12 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" >Trading is ok:</label>
+      <label class="for-field" >Trading is ok?</label>
       <div class="radio-group">
         <input type="radio" class="radio" name="allows_trade" id="allows_trade-yes" value="1" />
-        <label class="for-radio" for="allows_trade-yes">Yes</label>
+        <label class="for-radio" for="allows_trade-yes" id="for-allows_trade-yes">Yes</label>
         <input type="radio" class="radio" name="allows_trade" id="allows_trade-no" value="0" checked="checked" />
-        <label class="for-radio" for="allows_trade-no">No</label>
+        <label class="for-radio" for="allows_trade-no" id="for-allows_trade-no">No</label>
       </div>
 
       <div class="help-text">
@@ -71,13 +91,13 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="allows_email">Email is ok:</label>
+      <label class="for-field" for="allows_email">Email is ok?</label>
 
       <div class="radio-group">
         <input type="radio" class="radio" name="allows_email" id="allows_email-yes" value="1" checked="checked" />
-        <label class="for-radio" for="allows_email-yes">Yes</label>
+        <label class="for-radio" for="allows_email-yes" id="for-allows_email-yes">Yes</label>
         <input type="radio" class="radio" name="allows_email" id="allows_email-no" value="0" />
-        <label class="for-radio" for="allows_email-no">No</label>
+        <label class="for-radio" for="allows_email-no" id="for-allows_email-no">No</label>
       </div>
 
       <div class="help-text">
@@ -94,6 +114,36 @@
 
   </fieldset>
 
+  <fieldset>
+    <legend>Phone Numbers</legend>
+
+% for my $num (1..2) {
+    <div class="form-item">
+      <label class="for-field" for="phone_number-<% $num %>">Phone number:</label>
+      <select name="phone_number_type_id-<% $num %>">
+%   for my $type (@phone_number_types) {
+        <option value="<% $type->phone_number_type_id() %>"><% $type->name() %></option>
+%   }
+      </select>
+      <input type="text" class="text" name="phone_number-<% $num %>" id="phone_number-<% $num %>" />
+
+      <div class="form-item">
+        <label class="secondary" for="phone_number_notes-<% $num %>">notes:</label>
+        <input type="text" class="text wide" name="phone_number_notes-<% $num %>" id="phone_number_notes-<% $num %>" />
+      </div>
+
+      <div class="form-item">
+        <div class="no-label">
+          <input type="radio" name="is_preferred" value="<% $num %>" checked="checked" id="is_preferred-<% $num %>" />
+          <label class="for-radio" for="is_preferred-<% $num %>"
+                 id="for-is_preferred-<% $num %>">This is the preferred number</label>
+        </div>
+      </div>
+    </div>
+% }
+    <a href="#" class="add-another">Add another phone number</a>
+  </fieldset>
+
   <div class="form-item">
     <input class="submit" type="submit" value="Submit" />
   </div>
@@ -105,6 +155,10 @@
 <%shared>
 my $title = 'Add a new person';
 </%shared>
+
+<%init>
+my @phone_number_types = $c->user()->account()->phone_number_types()->all();
+</%init>
 
 <%method title>
 <% $title %>

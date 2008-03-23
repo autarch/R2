@@ -299,7 +299,7 @@ CREATE TABLE "Address" (
        -- The address as returned by a geocoding service like Google
        -- Maps.
        canonical_address  TEXT               NULL,
-       is_primary         BOOLEAN            DEFAULT FALSE,
+       is_preferred       BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        contact_id         INTEGER            NULL
@@ -317,7 +317,7 @@ CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
        phone_number_type_id   INT8           NOT NULL,
        phone_number       VARCHAR(30)        DEFAULT '',
-       is_primary         BOOLEAN            DEFAULT FALSE,
+       is_preferred       BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        contact_id         INTEGER            NULL
