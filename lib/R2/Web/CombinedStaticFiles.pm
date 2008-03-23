@@ -14,6 +14,7 @@ use JSAN::ServerSide 0.04;
 use List::MoreUtils qw( all );
 use Path::Class;
 use R2::Config;
+use R2::Util qw( string_is_empty );
 use Time::HiRes;
 
 use Moose;
@@ -32,6 +33,12 @@ has 'target_file' =>
       builder => '_target_file',
     );
 
+has 'header' =>
+    ( is      => 'ro',
+      isa     => 'Str',
+      default => '',
+    );
+
 sub create_single_file
 {
     my $self = shift;
@@ -46,6 +53,10 @@ sub create_single_file
                 ->strftime( '%Y-%m-%d %H:%M:%S.%{nanosecond} %{time_zone_long_name}' );
 
     print {$fh} "/* Generated at $now */\n\n";
+
+    my $header = $self->header();
+    print {$fh} $header
+        unless string_is_empty($header);
 
     for my $file ( @{ $self->files() } )
     {

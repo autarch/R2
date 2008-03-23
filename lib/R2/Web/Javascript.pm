@@ -13,6 +13,11 @@ use Moose;
 extends 'R2::Web::CombinedStaticFiles';
 
 
+has '+header' =>
+    ( default => q[var JSAN = { "use": function () {} };] . "\n",
+    );
+
+
 sub _files
 {
     my $dir = dir( R2::Config->new()->share_dir(), 'js-source' );
