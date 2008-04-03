@@ -10,8 +10,11 @@ use MIME::Base64 qw( encode_base64 );
 use Storable qw( nfreeze );
 
 
-system( "$FindBin::Bin/rebuild-schema" )
-    and die $!;
+unless ( grep { $_ eq '--existing' } @ARGV )
+{
+    system( "$FindBin::Bin/rebuild-schema" )
+        and die $!;
+}
 
 require R2::Schema;
 
