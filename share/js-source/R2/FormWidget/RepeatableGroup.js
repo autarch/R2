@@ -2,6 +2,7 @@ JSAN.use('Animation.Fade');
 JSAN.use('DOM.Events');
 JSAN.use('DOM.Find');
 JSAN.use('DOM.Utils');
+JSAN.use('R2.Element');
 
 
 if ( typeof R2 == "undefined" ) {
@@ -65,6 +66,9 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
     this.repeater.parentNode.insertBefore( div, this.repeater );
 
     this.form.instrumentRadioButtons();
+
+    var pos = R2.Element.realPosition( e.currentTarget );
+    window.scrollTo( 0, pos.top );
 
     Animation.Fade.fade( { elementId: div.id, targetOpacity: 1 } );
 }
