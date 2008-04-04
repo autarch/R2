@@ -1,6 +1,7 @@
 JSAN.use('DOM.Find');
 JSAN.use('DOM.Utils');
 JSAN.use('R2.FormWidget.LabeledRadioButton');
+JSAN.use('R2.FormWidget.RepeatableGroup');
 
 
 if ( typeof R2 == "undefined" ) {
@@ -10,7 +11,8 @@ if ( typeof R2 == "undefined" ) {
 R2.Form = function (form) {
     this.form = form;
 
-    this._instrumentRadioButtons();
+    this.instrumentRadioButtons();
+    this._instrumentRepeatableGroups();
 };
 
 R2.Form.instrumentAllForms = function () {
@@ -22,7 +24,7 @@ R2.Form.instrumentAllForms = function () {
     }
 };
 
-R2.Form.prototype._instrumentRadioButtons = function () {
+R2.Form.prototype.instrumentRadioButtons = function () {
     var radios = DOM.Find.getElementsByAttributes( { tagName: "INPUT",
                                                      type:    "radio" }, this.form );
 
@@ -33,7 +35,15 @@ R2.Form.prototype._instrumentRadioButtons = function () {
             continue;
         }
 
-        var lbr = new R2.FormWidget.LabeledRadioButton( radios[i], label );
-        lbr.instrument();
+        new R2.FormWidget.LabeledRadioButton( radios[i], label );
+    }
+};
+
+R2.Form.prototype._instrumentRepeatableGroups = function () {
+    var divs = DOM.Find.getElementsByAttributes( { tagName:   "DIV",
+                                                   className: /JS-repeatable-group/ }, this.form );
+
+    for ( var i = 0; i < divs.length; i++ ) {
+        new R2.FormWidget.RepeatableGroup( divs[i], this );
     }
 };

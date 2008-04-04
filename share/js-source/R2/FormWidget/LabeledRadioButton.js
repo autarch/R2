@@ -7,7 +7,7 @@ if ( typeof R2 == "undefined" ) {
     R2 = {};
 }
 
-if ( typeof R2.Form == "undefined" ) {
+if ( typeof R2.FormWidget == "undefined" ) {
     R2.FormWidget = {};
 }
 
@@ -35,9 +35,7 @@ R2.FormWidget.LabeledRadioButton = function ( radio, label ) {
 
         this.other_labels.push(other_label);
     }
-};
 
-R2.FormWidget.LabeledRadioButton.prototype.instrument = function () {
     DOM.Events.addListener( this.radio, "click",
                             this._makeRadioClickListener() );
 
