@@ -126,6 +126,7 @@
 % }
         </select>
         <input type="text" class="text" name="phone_number-new1" id="phone_number-new1" />
+        <a class="delete-repeated-group" style="display: none" href="#" title="delete this phone number">X</a>
       </div>
 
       <div class="form-item">

@@ -48,13 +48,15 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
 
     this.repeat_count++;
 
-    /* replacing checked="checked" is super-hacky, but doing it via
+    /* this HTML regexing is super-hacky, but doing it via
        DOM manipulation does not seem to end up reflected in the
        innerHTML */
 
     var html = this.html.replace( /new1/g, "new" + this.repeat_count )
-                        .replace( /checked="checked"/g, "" );
-
+                        .replace( /checked="checked"/g, "" )
+                        .replace( /class="for-radio selected"/g, "class=\"for-radio\"" )
+                        /* this is for the "delete this group" piece */
+                        .replace( /display: none/g, "" );
 
     var div = document.createElement("div");
     div.id = "R2-RepeatableGroup-" + R2.FormWidget._idSequence++;
@@ -63,6 +65,8 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
 
     div.style.opacity = 0;
 
+    this._instrumentDeleter(div);
+
     this.repeater.parentNode.insertBefore( div, this.repeater );
 
     this.form.instrumentRadioButtons();
@@ -70,5 +74,36 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
     var pos = R2.Element.realPosition( e.currentTarget );
     window.scrollTo( 0, pos.top );
 
-    Animation.Fade.fade( { elementId: div.id, targetOpacity: 1 } );
+    Animation.Fade.fade( { "elementId":     div.id,
+                           "targetOpacity": 1 } );
 }
+
+R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
+    var deleter = DOM.Find.getElementsByAttributes( { tagName:   "A",
+                                                      className: "delete-repeated-group",
+                                                    }, div )[0];
+
+    DOM.Events.addListener( deleter,
+                            "click",
+                            this._makeGroupDeleter(div)
+                          );
+};
+
+R2.FormWidget.RepeatableGroup.prototype._makeGroupDeleter = function (div) {
+    var func = function (e) {
+        e.preventDefault();
+        if ( e.stopPropogation ) {
+            e.stopPropagation();
+        }
+
+        Animation.Fade.fade( { "elementId":     div.id,
+                               "targetOpacity": 0 ,
+                               onFinish:        function () {
+                                   div.parentNode.removeChild(div);
+                               }
+                             }
+                           );
+    };
+
+    return func;
+};

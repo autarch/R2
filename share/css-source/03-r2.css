@@ -112,7 +112,7 @@ form div.form-item div.help-text p {
     margin-bottom: 0em;
 }
 
-form label.for-field {
+form .for-field {
     display: block;
     float: left;
     font-weight: bold;

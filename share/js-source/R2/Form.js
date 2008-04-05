@@ -10,6 +10,7 @@ if ( typeof R2 == "undefined" ) {
 
 R2.Form = function (form) {
     this.form = form;
+    this.seen = {};
 
     this.instrumentRadioButtons();
     this._instrumentRepeatableGroups();
@@ -29,6 +30,10 @@ R2.Form.prototype.instrumentRadioButtons = function () {
                                                      type:    "radio" }, this.form );
 
     for ( var i = 0; i < radios.length; i++ ) {
+        if ( this.seen[ radios[i].id ] ) {
+            continue;
+        }
+
         var label = $( "for-" + radios[i].id );
 
         if ( ! label ) {
@@ -36,6 +41,8 @@ R2.Form.prototype.instrumentRadioButtons = function () {
         }
 
         new R2.FormWidget.LabeledRadioButton( radios[i], label );
+
+        this.seen[ radios[i].id ] = 1;
     }
 };
 

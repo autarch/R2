@@ -14,6 +14,7 @@ if ( typeof R2.FormWidget == "undefined" ) {
 R2.FormWidget.LabeledRadioButton = function ( radio, label ) {
     this.radio = radio;
     this.label = label;
+    this.seen  = {};
 
     this.other_labels = [];
 
