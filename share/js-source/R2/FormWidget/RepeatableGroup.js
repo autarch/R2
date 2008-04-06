@@ -72,7 +72,20 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
     this.form.instrumentRadioButtons();
 
     var pos = R2.Element.realPosition( e.currentTarget );
-    window.scrollTo( 0, pos.top );
+
+    /* This puts the repeater link at the bottom of the screen */
+    var to = pos.top - document.documentElement.clientHeight;
+    to += e.currentTarget.offsetHeight;
+
+    var current = window.pageYOffset;
+    /* damn you, IE */
+    if ( typeof "current" == undefined ) {
+        current = document.body.scrollTop;
+    }
+
+    if ( to > current ) {
+        window.scrollTo( 0, to );
+    }
 
     Animation.Fade.fade( { "elementId":     div.id,
                            "targetOpacity": 1 } );
