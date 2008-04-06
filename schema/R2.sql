@@ -199,7 +199,7 @@ CREATE TABLE "ContactNote" (
 CREATE TABLE "ContactHistory" (
        contact_history_id SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
-       contact_history_type_id  INT            NOT NULL,
+       contact_history_type_id  INT          NOT NULL,
        user_id            INT8               NOT NULL,
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
