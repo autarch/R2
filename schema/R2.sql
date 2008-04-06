@@ -63,7 +63,7 @@ CREATE DOMAIN uri AS VARCHAR(255)
 
 CREATE TABLE "Contact" (
        contact_id         SERIAL8            PRIMARY KEY,
-       contact_type       contact_type         NOT NULL,
+       contact_type       contact_type       NOT NULL,
        allows_email       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
@@ -96,7 +96,7 @@ CREATE TABLE "ContactCustomFieldGroup" (
 );
 
 CREATE TABLE "ContactCustomField" (
-       contact_custom_field_id    SERIAL8      PRIMARY KEY,
+       contact_custom_field_id  SERIAL8      PRIMARY KEY,
        label                    VARCHAR(255) NOT NULL,
        description              TEXT         NULL,
        custom_field_type_id     INTEGER      NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE "ContactCustomField" (
        is_required              BOOLEAN      DEFAULT FALSE,
        html_widget_type_id      INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
-       contact_custom_field_group_id  INT8     NOT NULL
+       contact_custom_field_group_id  INT8   NOT NULL
 --       CONSTRAINT contact_custom_field_group_id_display_order_ck
 --                  UNIQUE ( contact_custom_field_group_id, display_order )
 --                  INITIALLY DEFERRED
@@ -123,42 +123,42 @@ CREATE TABLE "CustomFieldType" (
 );
 
 CREATE TABLE "ContactCustomFieldIntegerValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    INT8         NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
 CREATE TABLE "ContactCustomFieldFloatValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    FLOAT8       NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
 CREATE TABLE "ContactCustomFieldDateValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    DATE         NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
 CREATE TABLE "ContactCustomFieldDateTimeValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    TIMESTAMP WITHOUT TIME ZONE  NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
 CREATE TABLE "ContactCustomFieldTextValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    TEXT         NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
 );
 
 CREATE TABLE "ContactCustomFieldBinaryValue" (
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    BYTEA        NOT NULL,
        PRIMARY KEY ( contact_custom_field_id, contact_id )
@@ -166,7 +166,7 @@ CREATE TABLE "ContactCustomFieldBinaryValue" (
 
 CREATE TABLE "ContactCustomFieldSelectOption" (
        contact_custom_field_select_option_id INT8 PRIMARY KEY,
-       contact_custom_field_id    INT8         NOT NULL,
+       contact_custom_field_id  INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    VARCHAR(255) NOT NULL
 --       CONSTRAINT contact_custom_field_id_display_order_ck
@@ -197,7 +197,7 @@ CREATE TABLE "ContactNote" (
 );
 
 CREATE TABLE "ContactHistory" (
-       contact_history_id   SERIAL8            PRIMARY KEY,
+       contact_history_id SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
        contact_history_type_id  INT            NOT NULL,
        user_id            INT8               NOT NULL,
