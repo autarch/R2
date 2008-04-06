@@ -3,8 +3,10 @@ package R2::Schema::Account;
 use strict;
 use warnings;
 
+use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
+use R2::Schema::Country;
 use R2::Schema::Domain;
 use R2::Schema::Fund;
 use R2::Schema::MessagingProvider;
@@ -44,6 +46,13 @@ use MooseX::Params::Validate qw( validatep );
           cache    => 1,
           order_by => [ $schema->table('MessagingProvider')->column('name') ],
         );
+
+    has_many 'countries' =>
+        ( table       => $schema->table('Country'),
+          select      => __PACKAGE__->_CountriesSelect(),
+          bind_params => sub { $_[0]->account_id() },
+          cache       => 1,
+        );
 }
 
 
@@ -74,6 +83,8 @@ sub _initialize
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
 
     R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
+
+    $self->add_country( country => R2::Schema::Country->new( iso_code => 'us' ) );
 }
 
 {
@@ -91,6 +102,37 @@ sub _initialize
               role_id    => $role->role_id(),
             );
     }
+}
+
+{
+    my %spec = ( country => { isa => 'R2::Schema::Country' } );
+    sub add_country
+    {
+        my $self      = shift;
+        my ($country) = validatep( \@_, %spec );
+
+        R2::Schema::AccountCountry->insert
+            ( account_id => $self->account_id(),
+              iso_code   => $country->iso_code(),
+            );
+    }
+}
+
+sub _CountriesSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->table('Country') )
+           ->from( $schema->tables( 'AccountCountry', 'Country' ) )
+           ->where( $schema->table('AccountCountry')->column('account_id'),
+                    '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('Country')->column('name') );
+
+    return $select;
 }
 
 no Fey::ORM::Table;

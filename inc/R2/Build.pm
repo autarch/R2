@@ -44,6 +44,7 @@ my %Requires =
       'JSON::XS'                                 => 0,
       'List::MoreUtils'                          => 0,
       'List::Util'                               => 0,
+      'Locale::Country'                          => 0,
       'LWPx::ParanoidAgent'                      => 0,
       'Moose'                                    => 0,
       'MooseX::ClassAttribute'                   => 0,

@@ -293,7 +293,7 @@ CREATE TABLE "Address" (
        street_2           VARCHAR(255)       NULL,
        city               VARCHAR(255)       NOT NULL DEFAULT '',
        region             VARCHAR(255)       NOT NULL DEFAULT '',
-       country_id         INTEGER            NOT NULL,
+       iso_code           CHAR(2)            NOT NULL,
        latitude           FLOAT              NULL,
        longitude          FLOAT              NULL,
        -- The address as returned by a geocoding service like Google
@@ -303,6 +303,19 @@ CREATE TABLE "Address" (
        notes              TEXT               NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        contact_id         INTEGER            NULL
+);
+
+CREATE TABLE "AccountCountry" (
+       account_id         INT8               NOT NULL,
+       iso_code           CHAR(2)            NOT NULL,
+       PRIMARY KEY (account_id, iso_code)
+);
+
+CREATE TABLE "Country" (
+       iso_code           CHAR(2)            PRIMARY KEY,
+       name               VARCHAR(255)       UNIQUE  NOT NULL,
+       CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
+       CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "AddressType" (
@@ -372,6 +385,14 @@ ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_user_id"
 
 ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_role_id"
   FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_iso_code"
+  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_account_id"
@@ -540,6 +561,10 @@ ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_person_id"
 
 ALTER TABLE "Address" ADD CONSTRAINT "Address_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Address" ADD CONSTRAINT "Address_iso_code"
+  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Address" ADD CONSTRAINT "Address_address_type_id"
