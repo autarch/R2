@@ -26,6 +26,7 @@ my %Requires =
       'Config::INI'                              => 0,
       'CSS::Minifier'                            => 0,
       'Cwd'                                      => 0,
+      'Data::Validate::Domain'                   => 0,
       'DateTime'                                 => 0,
       'DBD::Pg'                                  => '2.5.0',
       'DBI'                                      => 0,
