@@ -3,19 +3,25 @@ package R2::Schema::Contact;
 use strict;
 use warnings;
 
+use Data::Validate::Domain qw( is_domain );
 use Fey::Literal::String;
 use Fey::Placeholder;
+use R2::Schema;
 use R2::Schema::Account;
 use R2::Schema::Address;
 use R2::Schema::PhoneNumber;
-use R2::Schema;
+use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems
 #use R2::Schema::Household;
 #use R2::Schema::Organization;
 #use R2::Schema::Person;
 
+use MooseX::ClassAttribute;
 use Fey::ORM::Table;
+
+with 'R2::Role::DataValidator';
+
 
 {
     my $schema = R2::Schema->Schema();
@@ -60,6 +66,13 @@ use Fey::ORM::Table;
           select      => __PACKAGE__->_PrimaryPhoneNumberSelect(),
           bind_params => sub { $_[0]->contact_id() }
         );
+
+    class_has '_ValidationSteps' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef[Str]',
+          lazy    => 1,
+          default => sub { [ qw( _valid_email_address ) ] },
+        );
 }
 
 before 'update' => sub
@@ -75,6 +88,27 @@ before 'update' => sub
            && ! defined $p{email_address}
            && $person->user();
 };
+
+sub _valid_email_address
+{
+    my $self      = shift;
+    my $p         = shift;
+
+    return if string_is_empty( $p->{email_address} );
+
+    my ( $name, $domain ) = split /\@/, $p->{email_address};
+
+    return
+        if ( ! string_is_empty($name)
+             && $name =~ /^[^@]+$/
+             && ! string_is_empty($domain)
+             && is_domain($domain)
+           );
+
+    return { message => qq{"$p->{email_address}" is not a valid email address},
+             field   => 'email_address',
+           };
+}
 
 sub _PrimaryAddressSelect
 {

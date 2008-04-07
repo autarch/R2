@@ -3,12 +3,16 @@ package R2::Schema::Person;
 use strict;
 use warnings;
 
+use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::PersonMessaging;
-use R2::Schema;
+use R2::Util qw( string_is_empty );
 
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
+
+with 'R2::Role::DataValidator';
+
 
 {
     my $schema = R2::Schema->Schema();
@@ -44,6 +48,13 @@ use Fey::ORM::Table;
           lazy    => 1,
           default => \&_GetGenderValues,
         );
+
+    class_has '_ValidationSteps' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef[Str]',
+          lazy    => 1,
+          default => sub { [ qw( _require_some_name ) ] },
+        );
 }
 
 sub _GetGenderValues
@@ -59,9 +70,8 @@ sub _GetGenderValues
     return $col_info->{pg_enum_values} || [];
 }
 
-around 'insert' => sub
+sub insert
 {
-    my $orig  = shift;
     my $class = shift;
     my %p     = @_;
 
@@ -71,9 +81,9 @@ around 'insert' => sub
     my $sub = sub { my $contact = R2::Schema::Contact->insert( %p, contact_type => 'Person' );
 
                     my $person =
-                        $class->$orig( %person_p,
-                                       person_id => $contact->contact_id(),
-                                     );
+                        $class->SUPER::insert( %person_p,
+                                               person_id => $contact->contact_id(),
+                                             );
 
                     $person->_set_contact($contact);
 
@@ -81,7 +91,29 @@ around 'insert' => sub
                   };
 
     return R2::Schema->RunInTransaction($sub);
-};
+}
+
+sub _require_some_name
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    if ($is_insert)
+    {
+        return unless
+            string_is_empty( $p->{first_name} ) && string_is_empty( $p->{last_name} );
+    }
+    else
+    {
+        return unless
+            exists $p->{first_name} && exists $p->{last_name}
+            && string_is_empty( $p->{first_name} ) && string_is_empty( $p->{last_name} );
+
+    }
+
+    return { message => 'A person requires either a first or last name.' };
+}
 
 sub _MessagingSelect
 {

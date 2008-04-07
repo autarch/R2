@@ -24,4 +24,16 @@ sub new_person_form : Local
     $c->stash()->{template} = '/contact/new-person-form';
 }
 
+sub new_contact : Path('/contact') : ActionClass('+R2::Action::REST') { }
+
+sub new_contact_POST
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my %p = $c->request()->person_params();
+    use Data::Dumper; warn Dumper \%p;
+}
+
+
 1;
