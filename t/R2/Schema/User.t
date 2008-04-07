@@ -152,7 +152,9 @@ my $dbh = mock_dbh();
 
     is( $user->date_format_for_display(), 'MM-DD-YYYY',
         'date_format_for_display()' );
+}
 
+{
     my $user =
         R2::Schema::User->insert( first_name    => 'Joe',
                                   last_name     => 'Smith',
