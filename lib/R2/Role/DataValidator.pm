@@ -16,7 +16,8 @@ around 'insert' => sub
     my $class = shift;
     my %p     = @_;
 
-    $class->_clean_and_validate_data( \%p, 'is insert' );
+    $class->_clean_and_validate_data( \%p, 'is insert' )
+        if $class->can('_ValidationSteps');
 
     return $class->$orig(%p);
 };
@@ -27,7 +28,8 @@ around 'update' => sub
     my $self = shift;
     my %p    = @_;
 
-    $self->_clean_and_validate_data(\%p);
+    $self->_clean_and_validate_data(\%p)
+        if $self->can('_ValidationSteps');
 
     return $self->$orig(%p);
 };
