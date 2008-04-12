@@ -49,6 +49,18 @@ sub user_can_add_contact
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Editor' );
 }
 
+sub user_can_view_contact
+{
+    my $self = shift;
+    my ( $user, $contact ) =
+        validatep( \@_,
+                   user    => { isa => 'R2::Schema::User' },
+                   contact => { isa => 'R2::Schema::Contact' },
+                 );
+
+    return $self->_require_at_least( $user->user_id(), $contact->account_id(), 'Member' );
+}
+
 {
     # This could go in the DBMS, but I'm uncomfortable with making
     # this a formal part of the data model. There could be additional
