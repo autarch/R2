@@ -83,7 +83,7 @@ sub _fill_errors
     return unless @{ $errors };
 
     my $error_div = $self->_dom()->createElement('div');
-    $error_div->className('error');
+    $error_div->className('form-error');
 
     for my $error ( @{ $errors } )
     {

@@ -73,7 +73,7 @@ EOF
 
     ok( ( ! any { $_->can('tagName')
                   && lc $_->tagName() eq 'div'
-                  && $_->className eq 'error' } $form->childNodes() ),
+                  && $_->className eq 'form-error' } $form->childNodes() ),
         'form does not have a generic error div' );
 
     text1_error_div_tests($form);
@@ -147,7 +147,7 @@ sub generic_error_div_tests
     my $error_div =
         first { $_->can('tagName')
                 && lc $_->tagName() eq 'div'
-                && $_->className eq 'error' } $form->childNodes();
+                && $_->className eq 'form-error' } $form->childNodes();
 
     ok( $error_div, 'form has an error div as a child node' );
 
