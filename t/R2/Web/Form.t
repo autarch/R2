@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 33;
 
 use HTML::DOM;
 use List::MoreUtils qw( any );
@@ -61,6 +61,13 @@ EOF
 
 {
     my $form = form_elt_for( errors => [ { message => 'A generic error' } ],
+                           );
+
+    generic_error_div_tests($form);
+}
+
+{
+    my $form = form_elt_for( errors => [ 'A generic error' ],
                            );
 
     generic_error_div_tests($form);

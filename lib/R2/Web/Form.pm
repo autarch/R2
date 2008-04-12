@@ -27,7 +27,7 @@ has '_dom' =>
 
 has 'errors' =>
     ( is      => 'ro',
-      isa     => 'ArrayRef[HashRef]',
+      isa     => 'ArrayRef[HashRef|Str]',
       default => sub { [] },
     );
 
@@ -87,7 +87,7 @@ sub _fill_errors
 
     for my $error ( @{ $errors } )
     {
-        if ( $error->{field} )
+        if ( ref $error && $error->{field} )
         {
             my $div = $self->_get_div_for_field( $error->{field} );
             $div->className( $div->className() . ' error' );
@@ -97,7 +97,7 @@ sub _fill_errors
         }
         else
         {
-            my $p = $self->_create_error_para( $error->{message} );
+            my $p = $self->_create_error_para( ref $error ? $error->{message} : $error );
 
             $error_div->appendChild($p);
         }
