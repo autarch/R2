@@ -39,21 +39,8 @@ sub _params_for_classes
 
             $params{$name} = $params->{$name};
 
-            if ( defined $params{$name} && $params{$name} eq '' )
-            {
-                my $generic_type = $col->generic_type();
-
-                if ( $generic_type eq 'float'
-                     || $generic_type eq 'integer'
-                   )
-                {
-                    $params{$name} = 0;
-                }
-                else
-                {
-                    $params{$name} = undef;
-                }
-            }
+            delete $params{$name}
+                if defined $params{$name} && $params{$name} eq '';
         }
     }
 
