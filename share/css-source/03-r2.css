@@ -87,19 +87,32 @@ fieldset legend {
     font-weight: bold;
 }
 
-div.form-item {
-    margin-bottom: 0.4em;
+form div.form-error {
+    margin: 0.3em 2em 0.3em 0;
+    padding: 0.3em;
+    border: 1px solid black;
 }
 
-div.form-error {
-    margin-top: 0.3em;
-    padding: 0.1em;
-    border: 1px solid #08B000;
+form div.form-error p {
+    margin: 0.1em 0;
+}
+
+form div.form-error, form div.error {
+    background-color: #FCC841;
+}
+
+form div.error p {
+    margin-left: 9.5em;
+    margin-bottom: 0.1em;
+}
+
+form div.error p span {
+    font-size: 85%;
 }
 
 form div.form-item { 
     clear: both;
-    padding: 0.1em 0;
+    padding: 0.1em 0 0.4em 0;
 }
 
 /* Having the help-text div allows us to set the margin in ems, to
@@ -156,7 +169,7 @@ form a.add-another {
     font-size: 90%;
 }
 
-div.radio-group {
+form div.radio-group {
     margin-top: 0.4em;
 }
 

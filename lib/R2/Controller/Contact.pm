@@ -5,6 +5,9 @@ use warnings;
 
 use base 'R2::Controller::Base';
 
+use R2::Schema;
+use R2::Schema::Person;
+
 
 sub new_person_form : Local
 {
@@ -32,7 +35,25 @@ sub new_contact_POST
     my $c    = shift;
 
     my %p = $c->request()->person_params();
-    use Data::Dumper; warn Dumper \%p;
+
+    my $person;
+    my $insert_sub =
+        sub
+        {
+            $person = R2::Schema::Person->insert(%p);
+        };
+
+    eval { R2::Schema->RunInTransaction($insert_sub) };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error( error  => $e,
+                                  uri    => '/contact/new_person_form',
+                                  params => $c->request()->params(),
+                                );
+    }
+
+    $c->redirect_and_detach( $c->uri_for( '/contact/' . $person->contact_id() ) );
 }
 
 

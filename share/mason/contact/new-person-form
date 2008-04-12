@@ -3,8 +3,11 @@
   <h1><% $title %></h1>
 </div>
 
-<&| /lib/filter/fill-in-form.mas &>
-<form class="JS-standard-form" action="/user/authentication" method="post">
+<&| /lib/filter/form.mas &>
+<form class="JS-standard-form" action="/contact" method="post"
+      enctype="multipart/form-data">
+
+  <input type="hidden" name="contact_type" value="person" />
 
   <fieldset>
     <legend>The Basics</legend>
@@ -65,6 +68,26 @@
     </div>
 
     <div class="form-item">
+      <label class="for-field" >Mail is ok?</label>
+      <div class="radio-group">
+        <input type="radio" class="radio" name="allows_mail" id="allows_mail-yes" value="1" checked="checked" />
+        <label class="for-radio selected" for="allows_mail-yes" id="for-allows_mail-yes">Yes</label>
+        <input type="radio" class="radio" name="allows_mail" id="allows_mail-no" value="0" />
+        <label class="for-radio" for="allows_mail-no" id="for-allows_mail-no">No</label>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" >Calls are ok?</label>
+      <div class="radio-group">
+        <input type="radio" class="radio" name="allows_phone" id="allows_phone-yes" value="1" checked="checked" />
+        <label class="for-radio selected" for="allows_phone-yes" id="for-allows_phone-yes">Yes</label>
+        <input type="radio" class="radio" name="allows_phone" id="allows_phone-no" value="0" />
+        <label class="for-radio" for="allows_phone-no" id="for-allows_phone-no">No</label>
+      </div>
+    </div>
+
+    <div class="form-item">
       <label class="for-field" >Trading is ok?</label>
       <div class="radio-group">
         <input type="radio" class="radio" name="allows_trade" id="allows_trade-yes" value="1" />
@@ -81,23 +104,19 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" >Mail is ok?</label>
-      <div class="radio-group">
-        <input type="radio" class="radio" name="allows_mail" id="allows_mail-yes" value="1" checked="checked" />
-        <label class="for-radio" for="allows_mail-yes" id="for-allows_mail-yes">Yes</label>
-        <input type="radio" class="radio" name="allows_mail" id="allows_mail-no" value="0" />
-        <label class="for-radio selected" for="allows_mail-no" id="for-allows_mail-no">No</label>
+      <label class="for-field" for="image">Image:</label>
+      <input type="file" class="file" name="image" id="image" />
+
+      <div class="help-text">
+        <p>
+          Images will be resized so they are no greater than 100x100.
+        </p>
       </div>
     </div>
 
     <div class="form-item">
-      <label class="for-field" >Calls are ok?</label>
-      <div class="radio-group">
-        <input type="radio" class="radio" name="allows_phone" id="allows_phone-yes" value="1" checked="checked" />
-        <label class="for-radio" for="allows_phone-yes" id="for-allows_phone-yes">Yes</label>
-        <input type="radio" class="radio" name="allows_phone" id="allows_phone-no" value="0" />
-        <label class="for-radio selected" for="allows_phone-no" id="for-allows_phone-no">No</label>
-      </div>
+      <label class="for-field" for="note">Note:</label>
+      <textarea class="short wide"></textarea>
     </div>
 
   </fieldset>
@@ -167,7 +186,7 @@
 
   </fieldset>
 
-  <fieldset>
+  <fieldset class="last">
     <legend>Addresses</legend>
 
     <div class="JS-repeatable-group JS-repeatable-group-address">
@@ -197,21 +216,27 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="state-new">State:</label>
-        <input type="text" class="text" name="state-new1" id="state-new1" />
+        <label class="secondary" for="region-new">State/Region:</label>
+        <input type="text" class="text" name="region-new1" id="region-new1" />
       </div>
 
-% if ( @countries > 1 )  {
+      <div class="form-item">
+        <label class="secondary" for="postal_code-new">Postal code:</label>
+        <input type="text" class="text" name="postal_code-new1" id="postal_code-new1" />
+      </div>
+
       <div class="form-item">
         <label class="secondary" for="country-new">Country:</label>
+% if ( @countries > 1 )  {
         <select name="country-new1" id="country-new1" />
 %   for my $country (@countries) {
           <option value="<% $country->iso_code() %>"><% $country->name() %></option>
 %   }
-      </div>
 % } else {
-      <input type="hidden" name="iso_code" value="<% $countries[0]->iso_code() %>" />
+        <div class="text-for-hidden"><% $countries[0]->name() %></div>
+        <input type="hidden" name="iso_code" value="<% $countries[0]->iso_code() %>" />
 % }
+      </div>
 
       <div class="form-item">
         <label class="secondary" for="address_notes-new1">notes:</label>
