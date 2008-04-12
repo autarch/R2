@@ -154,7 +154,7 @@ sub generic_error_div_tests
     my $error_p = $error_div->getElementsByTagName('p')->[0];
 
     ok( $error_p, 'error div has a P element as a child' );
-    is( $error_p->firstChild()->data(),
+    is( $error_p->firstChild()->firstChild()->data(),
         'A generic error',
         'text of p is expected error message' );
 }
@@ -173,7 +173,7 @@ sub text1_error_div_tests
     my $error_p = $error_div->getElementsByTagName('p')->[0];
 
     ok( $error_p, 'error div has a P element as a child' );
-    is( $error_p->firstChild()->data(),
+    is( $error_p->firstChild()->firstChild()->data(),
         'Error in text1',
         'text of p is expected error message' );
 }
