@@ -71,6 +71,7 @@ CREATE TABLE "Contact" (
        email_address      email_address      UNIQUE NULL,
        website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       image              BYTEA              NULL,
        -- an identifier from another app, probably created via an
        -- initial import from something else
        external_id        VARCHAR(255)       UNIQUE NULL,
@@ -293,6 +294,7 @@ CREATE TABLE "Address" (
        street_2           VARCHAR(255)       NULL,
        city               VARCHAR(255)       NOT NULL DEFAULT '',
        region             VARCHAR(255)       NOT NULL DEFAULT '',
+       postal_code        VARCHAR(20)        NOT NULL DEFAULT '',
        iso_code           CHAR(2)            NOT NULL,
        latitude           FLOAT              NULL,
        longitude          FLOAT              NULL,
