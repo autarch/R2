@@ -125,9 +125,12 @@ sub _create_error_para
     my $self = shift;
     my $text = shift;
 
-    my $p = $self->_dom()->createElement('p');
+    # The extra span is for the benefit of CSS, so we can set the left margin of the paragraph
+    my $span = $self->_dom()->createElement('span');
+    $span->appendChild( $self->_dom()->createTextNode($text) );
 
-    $p->appendChild( $self->_dom()->createTextNode($text) );
+    my $p = $self->_dom()->createElement('p');
+    $p->appendChild($span);
 
     return $p;
 }
