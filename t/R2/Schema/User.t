@@ -75,7 +75,7 @@ my $dbh = mock_dbh();
           [ 1, 'Bubba', 'Smith' ],
         ];
 
-    # simpler than mucking about with mock data
+    # simpler than mucking about with more mock data
     no warnings 'redefine';
     local *R2::Schema::Person::user = sub { 1 };
 
