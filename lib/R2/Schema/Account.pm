@@ -56,13 +56,12 @@ use MooseX::Params::Validate qw( validatep );
 }
 
 
-around 'insert' => sub
+sub insert
 {
-    my $orig  = shift;
     my $class = shift;
     my %p     = @_;
 
-    my $sub = sub { my $account = $class->$orig(%p);
+    my $sub = sub { my $account = $class->SUPER::insert(%p);
 
                     $account->_initialize();
 
