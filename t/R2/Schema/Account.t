@@ -12,10 +12,17 @@ use R2::Schema::Account;
 my $dbh = mock_dbh();
 
 {
+    $dbh->{mock_add_resultset} =
+        { sql     => q{SELECT "Country"."name" FROM "Country" WHERE "Country"."iso_code" = ?},
+          results => [ [ qw( name ) ],
+                       [ 'United States' ],
+                     ],
+        };
+
     my $account =
         R2::Schema::Account->insert( name      => 'The Account',
-                                    domain_id => 1,
-                                  );
+                                     domain_id => 1,
+                                   );
 
     my @inserts =
         grep { /^INSERT/ }
