@@ -84,7 +84,10 @@ sub _initialize
 
     R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
 
-    $self->add_country( country => R2::Schema::Country->new( iso_code => 'us' ) );
+    for my $code( qw( us ca ) )
+    {
+        $self->add_country( country => R2::Schema::Country->new( iso_code => $code ) );
+    }
 }
 
 {

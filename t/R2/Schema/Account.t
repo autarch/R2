@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -16,6 +16,8 @@ my $dbh = mock_dbh();
         { sql     => q{SELECT "Country"."name" FROM "Country" WHERE "Country"."iso_code" = ?},
           results => [ [ qw( name ) ],
                        [ 'United States' ],
+                       [ qw( name ) ],
+                       [ 'Canada' ],
                      ],
         };
 
@@ -37,4 +39,6 @@ my $dbh = mock_dbh();
         'at least one PhoneNumberType was inserted for a new account' );
     ok( ( grep { $_ =~ /INSERT INTO "MessagingProvider"/ } @inserts ),
         'at least one MessagingProvider was inserted for a new account' );
+    ok( ( grep { $_ =~ /INSERT INTO "AccountCountry"/ } @inserts ),
+        'at least one AccountCountry was inserted for a new account' );
 }
