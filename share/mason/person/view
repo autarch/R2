@@ -1,0 +1,19 @@
+<&| /lib/filter/yui/row.mas &>
+<div id="summary">
+  <h1><% $title %></h1>
+</div>
+
+</&>
+
+
+<%shared>
+my $title = $m->caller_args(-1)->{person}->full_name();
+</%shared>
+
+<%args>
+$person
+</%args>
+
+<%method title>
+<% $title %>
+</%method>
