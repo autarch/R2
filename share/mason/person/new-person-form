@@ -109,7 +109,7 @@
 
       <div class="help-text">
         <p>
-          Images will be resized so they are no greater than 100x100.
+          Images will be resized so they are no larger than 100x100.
         </p>
       </div>
     </div>
@@ -141,7 +141,7 @@
 
       <div class="help-text">
         <p>
-          If email is not allowed, this contact will never be emailed by Rapport.
+          If set to "No", then you will not be able to send mail to this contact via Rapport.
         </p>
       </div>
     </div>
