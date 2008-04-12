@@ -139,6 +139,19 @@ sub friendly_name
     return $self->first_name();
 }
 
+sub full_name
+{
+    my $self = shift;
+
+    return
+        ( join ' ',
+          grep { ! string_is_empty($_) }
+          map { $self->$_() }
+          qw( salutation first_name middle_name last_name suffix )
+        );
+
+}
+
 no Fey::ORM::Table;
 no Moose;
 no MooseX::ClassAttribute;

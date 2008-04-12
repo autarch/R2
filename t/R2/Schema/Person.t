@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -13,8 +13,11 @@ my $dbh = mock_dbh();
 
 {
     my $person =
-        R2::Schema::Person->insert( first_name    => 'Joe',
+        R2::Schema::Person->insert( salutation    => '',
+                                    first_name    => 'Joe',
+                                    middle_name   => '',
                                     last_name     => 'Smith',
+                                    suffix        => '',
                                     email_address => 'joe.smith@example.com',
                                     website       => 'http://example.com',
                                   );
@@ -32,6 +35,21 @@ my $dbh = mock_dbh();
         'first_name == Joe' );
     is( $person->friendly_name(), 'Joe',
         'friendly_name == Joe' );
+    is( $person->full_name(), 'Joe Smith',
+        'full_name == Joe Smith' );
+}
+
+{
+    my $person =
+        R2::Schema::Person->insert( salutation  => 'Sir',
+                                    first_name  => 'Joe',
+                                    middle_name => 'J.',
+                                    last_name   => 'Smith',
+                                    suffix      => 'the 23rd',
+                                  );
+
+    is( $person->full_name(), 'Sir Joe J. Smith the 23rd',
+        'full_name == Sir Joe J. Smith the 23rd' );
 }
 
 {
