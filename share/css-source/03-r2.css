@@ -76,6 +76,10 @@ fieldset {
     background-color: #F6FFE4;
 }
 
+fieldset.last {
+    padding-bottom: 0;
+}
+
 fieldset legend {
     padding: 0.4em;
     background-color: #A1BA6C;
@@ -167,6 +171,14 @@ select {
   border: 1px solid #5B824C;
 }
 
+div.text-for-hidden {
+    padding: 0.2em;
+    font-weight: bold;
+    color: #5B824C;
+
+    line-height: 1.2em;
+}
+
 input.error,
 textarea.error,
 select.error,
@@ -196,7 +208,7 @@ input.medium {
   width: 18em;
 }
 
-input.wide {
+input.wide, textarea.wide {
   width: 30em;
 }
 
@@ -204,11 +216,11 @@ textarea {
   height: 7em;
 }
 
-textarea.small {
-  height: 3em;
+textarea.short {
+  height: 3.7em;
 }
 
-textarea.high {
+textarea.tall {
   height: 10em;
 }
 
