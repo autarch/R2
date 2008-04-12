@@ -15,7 +15,8 @@ use base 'Catalyst::View::Mason';
 use HTML::FillInForm;
 use Path::Class;
 use R2::Config;
-#use R2::FillInFormBridge;
+use R2::Web::Form;
+use R2::Web::FormData;
 use R2::Util qw( string_is_empty );
 
 __PACKAGE__->config( R2::Config->new()->mason_config() );
