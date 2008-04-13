@@ -11,7 +11,7 @@ use R2::Util qw( string_is_empty );
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::ActsAsContact';
 
 
 {
@@ -68,29 +68,6 @@ sub _GetGenderValues
     my $col_info = $sth->fetchall_arrayref({})->[0];
 
     return $col_info->{pg_enum_values} || [];
-}
-
-sub insert
-{
-    my $class = shift;
-    my %p     = @_;
-
-    my %person_p =
-        map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
-
-    my $sub = sub { my $contact = R2::Schema::Contact->insert( %p, contact_type => 'Person' );
-
-                    my $person =
-                        $class->SUPER::insert( %person_p,
-                                               person_id => $contact->contact_id(),
-                                             );
-
-                    $person->_set_contact($contact);
-
-                    return $person;
-                  };
-
-    return R2::Schema->RunInTransaction($sub);
 }
 
 sub _require_some_name

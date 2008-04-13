@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 19;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -53,6 +53,36 @@ my $dbh = mock_dbh();
 }
 
 {
+    my @errors =
+        R2::Schema::Person->ValidateForInsert( email_address => 'joe.smith@example.com',
+                                               website       => 'http://example.com',
+                                             );
+
+    is( scalar @errors, 1, 'got one validation error' );
+    is( $errors[0]->{message}, 'A person requires either a first or last name.',
+        'got expected error message' );
+}
+
+{
+    my $person =
+        R2::Schema::Person->insert( salutation  => 'Sir',
+                                    first_name  => 'Joe',
+                                    middle_name => 'J.',
+                                    last_name   => 'Smith',
+                                    suffix      => 'the 23rd',
+                                  );
+
+    my @errors =
+        $person->validate_for_update( first_name => '',
+                                      last_name  => '',
+                                    );
+
+    is( scalar @errors, 1, 'got one validation error' );
+    is( $errors[0]->{message}, 'A person requires either a first or last name.',
+        'got expected error message' );
+}
+
+{
     eval
     {
         R2::Schema::Person->insert( email_address => 'joe.smith@example.com',
@@ -65,5 +95,21 @@ my $dbh = mock_dbh();
 
     my @e = @{ $@->errors() };
     is( $e[0]->{message}, 'A person requires either a first or last name.',
+        'got expected error message' );
+}
+
+{
+    eval
+    {
+        R2::Schema::Person->insert( first_name    => 'Joe',
+                                    email_address => 'joe.smith@',
+                                  );
+    };
+
+    ok( $@, 'cannot create a new person with an invalid email address' );
+    can_ok( $@, 'errors' );
+
+    my @e = @{ $@->errors() };
+    is( $e[0]->{message}, q{"joe.smith@" is not a valid email address},
         'got expected error message' );
 }
