@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 25;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -110,6 +110,44 @@ my $dbh = mock_dbh();
     can_ok( $@, 'errors' );
 
     my @e = @{ $@->errors() };
-    is( $e[0]->{message}, q{"joe.smith@" is not a valid email address},
+    is( $e[0]->{message}, q{"joe.smith@" is not a valid email address.},
+        'got expected error message' );
+}
+
+{
+    my $dt = DateTime->today()->add( days => 10 );
+
+    eval
+    {
+        R2::Schema::Person->insert( first_name  => 'Dave',
+                                    birth_date  => $dt->strftime( '%Y-%m-%d' ),
+                                    date_format => '%Y-%m-%d',
+                                  );
+    };
+
+    ok( $@, 'cannot create a new person with a future birth date' );
+    can_ok( $@, 'errors' );
+
+    my @e = @{ $@->errors() };
+    is( $e[0]->{message}, q{Birth date cannot be in the future.},
+        'got expected error message' );
+}
+
+{
+    my $dt = DateTime->today()->add( days => 10 );
+
+    eval
+    {
+        R2::Schema::Person->insert( first_name  => 'Dave',
+                                    birth_date  => '01-03-1973',
+                                    date_format => '%Y-%m-%d',
+                                  );
+    };
+
+    ok( $@, 'cannot create a new person with an unparseable birth date' );
+    can_ok( $@, 'errors' );
+
+    my @e = @{ $@->errors() };
+    is( $e[0]->{message}, q{Birth date does not seem to be a valid date.},
         'got expected error message' );
 }

@@ -3,10 +3,14 @@ package R2::Schema::Person;
 use strict;
 use warnings;
 
+use DateTime::Format::Pg;
+use DateTime::Format::Strptime;
+use R2::Image;
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::PersonMessaging;
 use R2::Util qw( string_is_empty );
+use Scalar::Util qw( blessed );
 
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
@@ -20,6 +24,10 @@ with 'R2::Role::ActsAsContact';
     my $user_t = $schema->table('Person');
 
     has_table $user_t;
+
+    transform 'birth_date' =>
+        deflate { blessed $_[0] ? DateTime::Format::Pg->format_date( $_[0] ) : $_[0] },
+        inflate { defined $_[0] ? DateTime::Format::Pg->parse_date( $_[0] ) : $_[0] };
 
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
@@ -53,7 +61,7 @@ with 'R2::Role::ActsAsContact';
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _require_some_name ) ] },
+          default => sub { [ qw( _require_some_name _valid_birth_date ) ] },
         );
 }
 
@@ -90,6 +98,42 @@ sub _require_some_name
     }
 
     return { message => 'A person requires either a first or last name.' };
+}
+
+sub _valid_birth_date
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    my $format = delete $p->{date_format};
+
+    return if string_is_empty( $p->{birth_date} );
+
+    my $dt;
+    if ( blessed $p->{birth_date} )
+    {
+        $dt = $p->{birth_date};
+    }
+    else
+    {
+        my $parser = DateTime::Format::Strptime->new( pattern   => $format,
+                                                      time_zone => 'floating',
+                                                    );
+
+        $dt = $parser->parse_datetime( $p->{birth_date} );
+
+        return { field   => 'birth_date',
+                 message => 'Birth date does not seem to be a valid date.',
+               }
+            unless $dt;
+    }
+
+    return if DateTime->today( time_zone => 'floating' ) >= $dt;
+
+    return { field   => 'birth_date',
+             message => 'Birth date cannot be in the future.',
+           };
 }
 
 sub _MessagingSelect
