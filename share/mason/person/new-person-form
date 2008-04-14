@@ -50,6 +50,7 @@
     <div class="form-item">
       <label class="for-field" for="birth_date">Birth date:</label>
       <input type="text" class="text narrow date" name="birth_date" id="birth_date" />
+      <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
       <div class="help-text">
         <p>
           <% $c->user()->date_format_for_display() %>

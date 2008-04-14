@@ -101,7 +101,7 @@ form div.form-error, form div.error {
     background-color: #FCC841;
 }
 
-form div.error p {
+form div.error p.error-message {
     margin-left: 9.5em;
     margin-bottom: 0.1em;
 }
@@ -122,6 +122,7 @@ form div.form-item {
 form div.form-item div.help-text { 
     margin-top: 0.1em;
     margin-left: 9.5em;
+    clear: both;
 }
 
 form div.form-item div.help-text p {
