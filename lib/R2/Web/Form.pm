@@ -130,6 +130,7 @@ sub _create_error_para
     $span->appendChild( $self->_dom()->createTextNode($text) );
 
     my $p = $self->_dom()->createElement('p');
+    $p->className('error-message');
     $p->appendChild($span);
 
     return $p;

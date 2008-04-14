@@ -47,6 +47,17 @@ sub new_contact_POST
 
     my %p = $c->request()->person_params();
     $p{account_id} = $c->user()->account_id();
+    $p{date_format} = $c->request()->params()->{date_format};
+
+    if ( my @errors = R2::Schema::Person->ValidateForInsert(%p) )
+    {
+        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+
+        $c->_redirect_with_error( error  => $e,
+                                  uri    => '/contact/new_person_form',
+                                  params => $c->request()->params(),
+                                );
+    }
 
     my $person;
     my $insert_sub =
@@ -55,19 +66,7 @@ sub new_contact_POST
             $person = R2::Schema::Person->insert(%p);
         };
 
-    eval { R2::Schema->RunInTransaction($insert_sub) };
-
-    if ( my $e = R2::Exception::DataValidation->caught() )
-    {
-        $c->_redirect_with_error( error  => $e,
-                                  uri    => '/contact/new_person_form',
-                                  params => $c->request()->params(),
-                                );
-    }
-    elsif ($@)
-    {
-        die $@;
-    }
+    R2::Schema->RunInTransaction($insert_sub);
 
     $c->redirect_and_detach( $c->uri_for( '/contact/' . $person->contact_id() ) );
 }
