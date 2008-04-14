@@ -3,6 +3,8 @@ package R2::Role::ActsAsContact;
 use strict;
 use warnings;
 
+use R2::Schema::Contact;
+
 use Moose::Role;
 
 with 'R2::Role::DataValidator' => { excludes => '_validation_errors' };
@@ -43,10 +45,10 @@ sub _filter_contact_parameters
     my $self = shift;
     my %p    = @_;
 
-    my %my_p =
-        map { $_ => delete $p{$_} } grep { $self->Table()->column($_) } keys %p;
+    my %contact_p =
+        map { $_ => delete $p{$_} } grep { R2::Schema::Contact->Table()->column($_) } keys %p;
 
-    return ( \%p, \%my_p );
+    return ( \%contact_p, \%p );
 }
 
 around 'insert' => sub
