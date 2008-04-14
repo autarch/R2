@@ -21,7 +21,7 @@ use R2::Schema::Contact;
     can_ok( $@, 'errors' );
 
     my @e = @{ $@->errors() };
-    is( $e[0]->{message}, q{"@example.com" is not a valid email address},
+    is( $e[0]->{message}, q{"@example.com" is not a valid email address.},
         'got expected error message' );
 }
 
@@ -37,6 +37,6 @@ use R2::Schema::Contact;
     can_ok( $@, 'errors' );
 
     my @e = @{ $@->errors() };
-    is( $e[0]->{message}, q{"bob@not a domain.com" is not a valid email address},
+    is( $e[0]->{message}, q{"bob@not a domain.com" is not a valid email address.},
         'got expected error message' );
 }
