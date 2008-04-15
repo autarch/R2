@@ -17,8 +17,6 @@ sub dashboard : Path('/') : Args(0)
     my $self = shift;
     my $c    = shift;
 
-    $self->_require_authen($c);
-
     $c->stash()->{template} = '/dashboard';
 }
 
