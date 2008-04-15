@@ -60,7 +60,8 @@ sub authentication_POST
 
     push @errors, 'You must provide an email address or an OpenID URL.'
         if string_is_empty($email);
-    push @errors, 'You must provide a password.'
+    push @errors, { field   => 'password',
+                    message => 'You must provide a password.' }
         if string_is_empty($pw);
 
     unless (@errors)
@@ -78,8 +79,10 @@ sub authentication_POST
 
     if (@errors)
     {
+        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+
         $c->_redirect_with_error
-            ( error  => \@errors,
+            ( error  => $e,
               uri    => '/user/login_form',
               params => { email_address => $email,
                           return_to     => $c->request()->parameters()->{return_to},
