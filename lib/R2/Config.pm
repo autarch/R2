@@ -464,7 +464,7 @@ sub _authen_secret
     return $self->_config_hash()->{secrets}{authen};
 }
 
-make_immutable();
+__PACKAGE__->meta()->make_immutable();
 
 no Moose;
 
