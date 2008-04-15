@@ -1,9 +1,8 @@
 <&| /lib/filter/yui/row.mas &>
-<&| /lib/filter/fill-in-form.mas &>
+<&| /lib/filter/form.mas &>
 <form action="/user/authentication" method="post">
   <input type="hidden" name="return_to" value="<% $return_to | h %>" />
 
-  <& /lib/form/errors.mas &>
   <fieldset>
     <legend>Your login info</legend>
 
