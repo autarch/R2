@@ -115,7 +115,6 @@ sub date_format_for_display
 
     my $format = $self->date_format();
 
-    $format =~ s{/}{-}g;
     $format =~ s/%m/MM/;
     $format =~ s/%d/DD/;
     $format =~ s/%Y/YYYY/;
