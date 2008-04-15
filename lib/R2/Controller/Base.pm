@@ -33,6 +33,9 @@ sub begin : Private
 
     R2::Schema->ClearObjectCaches();
 
+    $self->_require_authen($c)
+        if $self->_uri_requires_authen( $c->request()->uri() );
+
     return unless $c->request()->looks_like_browser();
 
     my $config = R2::Config->new();
@@ -42,6 +45,17 @@ sub begin : Private
         $class->new()->create_single_file()
             unless $config->is_production() || $config->is_profiling();
     }
+
+    return 1;
+}
+
+sub _uri_requires_authen
+{
+    my $self = shift;
+    my $uri  = shift;
+
+    return 0
+        if $uri->path() =~ m{^/user/(?:login_form|forgot_password_form|authentication)};
 
     return 1;
 }
