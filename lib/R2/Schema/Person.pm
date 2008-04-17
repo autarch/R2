@@ -15,7 +15,7 @@ use Scalar::Util qw( blessed );
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
 
-with 'R2::Role::ActsAsContact';
+with 'R2::Role::DVAAC';
 
 
 {

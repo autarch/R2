@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -150,4 +150,14 @@ my $dbh = mock_dbh();
     my @e = @{ $@->errors() };
     is( $e[0]->{message}, q{Birth date does not seem to be a valid date.},
         'got expected error message' );
+}
+
+{
+    my $person =
+        R2::Schema::Person->insert( first_name  => 'Dave',
+                                    birth_date  => '1973-06-23',
+                                    date_format => '%Y-%m-%d',
+                                  );
+
+    ok( $person, 'date_format gets removed from insert parameters' );
 }

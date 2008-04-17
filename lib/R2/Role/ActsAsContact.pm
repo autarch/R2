@@ -7,8 +7,6 @@ use R2::Schema::Contact;
 
 use Moose::Role;
 
-with 'R2::Role::DataValidator' => { excludes => '_validation_errors' };
-
 # Can't use Fey::ORM::Table in a role yet
 #
 # has_one 'contact' => ...
@@ -36,6 +34,10 @@ sub _validation_errors
     {
         push @errors, R2::Schema::Contact->$step( $contact_p, $is_insert );
     }
+
+    # The validation steps may have altered the data. It will get
+    # filtered again for the actual insert.
+    %{ $p } = ( %{ $contact_p }, %{ $my_p } );
 
     return @errors;
 }

@@ -16,8 +16,7 @@ around 'insert' => sub
     my $class = shift;
     my %p     = @_;
 
-    $class->_clean_and_validate_data( \%p, 'is insert' )
-        if $class->can('_ValidationSteps');
+    $class->_clean_and_validate_data( \%p, 'is insert' );
 
     return $class->$orig(%p);
 };
@@ -28,8 +27,7 @@ around 'update' => sub
     my $self = shift;
     my %p    = @_;
 
-    $self->_clean_and_validate_data(\%p)
-        if $self->can('_ValidationSteps');
+    $self->_clean_and_validate_data(\%p);
 
     return $self->$orig(%p);
 };
@@ -51,6 +49,8 @@ sub _validation_errors
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
+
+    my @steps = @{$self->_ValidationSteps};
 
     my @errors;
     for my $step ( @{ $self->_ValidationSteps() } )
