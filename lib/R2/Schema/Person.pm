@@ -5,7 +5,6 @@ use warnings;
 
 use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
-use R2::Image;
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::PersonMessaging;
