@@ -68,14 +68,15 @@ CREATE TABLE "Contact" (
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_trade       BOOLEAN            NOT NULL DEFAULT FALSE,
-       email_address      email_address      UNIQUE NULL,
+       email_address      email_address      NULL,
        website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        image              BYTEA              NULL,
        -- an identifier from another app, probably created via an
        -- initial import from something else
        external_id        VARCHAR(255)       UNIQUE NULL,
-       account_id         INTEGER            NOT NULL
+       account_id         INTEGER            NOT NULL,
+       CONSTRAINT email_address_account_id_ck UNIQUE ( email_address, account_id )
 );
 
 CREATE DOMAIN pos_int AS INTEGER
@@ -231,7 +232,7 @@ CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
        tag              tag             NOT NULL,
        account_id       INT8            NOT NULL,
-       CONSTRAINT value_account_id_ck UNIQUE ( tag, account_id )
+       CONSTRAINT tag_account_id_ck UNIQUE ( tag, account_id )
 );
 
 CREATE TYPE gender AS ENUM ( 'male', 'female', 'transgender' );
