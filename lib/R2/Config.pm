@@ -33,7 +33,7 @@ has 'is_profiling' =>
     ( is      => 'rw',
       isa     => 'Bool',
       lazy    => 1,
-      builder => '_profiler_loaded',
+      builder => '_builder_is_profiling',
       # for testing
       writer  => '_set_is_profiling',
     );
@@ -42,7 +42,7 @@ has '_config_hash' =>
     ( is      => 'rw',
       isa     => 'HashRef',
       lazy    => 1,
-      builder => '_read_config_file',
+      builder => '_build_config_hash',
       # for testing
       writer  => '_set_config_hash',
       clearer => '_clear_config_hash',
@@ -52,35 +52,35 @@ has '_config_file' =>
     ( is      => 'ro',
       isa     => 'Path::Class::File',
       lazy    => 1,
-      builder => '_find_config_file',
+      builder => '_build_config_file',
     );
 
 has 'catalyst_imports' =>
     ( is      => 'ro',
       isa     => 'ArrayRef[Str]',
       lazy    => 1,
-      builder => '_catalyst_imports',
+      builder => '_build_catalyst_imports',
     );
 
 has 'catalyst_config' =>
     ( is      => 'ro',
       isa     => 'HashRef',
       lazy    => 1,
-      builder => '_catalyst_config',
+      builder => '_build_catalyst_config',
     );
 
 has 'dbi_config' =>
     ( is      => 'ro',
       isa     => 'HashRef',
       lazy    => 1,
-      builder => '_dbi_config',
+      builder => '_build_dbi_config',
     );
 
 has 'mason_config' =>
     ( is      => 'ro',
       isa     => 'HashRef',
       lazy    => 1,
-      builder => '_mason_config',
+      builder => '_build_mason_config',
     );
 
 has '_home_dir' =>
@@ -95,55 +95,50 @@ has 'var_lib_dir' =>
     ( is      => 'ro',
       isa     => 'Path::Class::Dir',
       lazy    => 1,
-      builder => '_var_lib_dir',
+      builder => '_build_var_lib_dir',
     );
 
 has 'share_dir' =>
     ( is      => 'ro',
       isa     => 'Path::Class::Dir',
       lazy    => 1,
-      builder => '_share_dir',
+      builder => '_build_share_dir',
     );
 
 has 'etc_dir' =>
     ( is      => 'ro',
       isa     => 'Path::Class::Dir',
       lazy    => 1,
-      builder => '_etc_dir',
+      builder => '_build_etc_dir',
     );
 
 has 'cache_dir' =>
     ( is      => 'ro',
       isa     => 'Path::Class::Dir',
       lazy    => 1,
-      builder => '_cache_dir',
+      builder => '_build_cache_dir',
     );
 
 has 'static_path_prefix' =>
     ( is      => 'ro',
       isa     => 'Maybe[Str]',
       lazy    => 1,
-      builder => '_static_path_prefix',
+      builder => '_build_static_path_prefix',
       # for testing
       writer  => '_set_static_path_prefix',
     );
 
-has 'forgot_pw_secret' =>
+has 'secret' =>
     ( is      => 'ro',
       isa     => 'Str',
       lazy    => 1,
-      builder => '_forgot_pw_secret',
-    );
-
-has 'authen_secret' =>
-    ( is      => 'ro',
-      isa     => 'Str',
-      lazy    => 1,
-      builder => '_authen_secret',
+      builder => '_build_secret',
+      # for testing
+      writer  => '_set_secret',
     );
 
 
-sub _read_config_file
+sub _build_config_hash
 {
     my $self = shift;
 
@@ -161,7 +156,7 @@ sub _read_config_file
     return $hash;
 }
 
-sub _find_config_file
+sub _build_config_file
 {
     my $self = shift;
 
@@ -206,7 +201,7 @@ sub _find_config_file
             SubRequest
           );
 
-    sub _catalyst_imports
+    sub _build_catalyst_imports
     {
         my $self = shift;
 
@@ -231,14 +226,14 @@ sub _find_config_file
             Devel/SmallProf.pm
           );
 
-    sub _profiler_loaded
+    sub _build_is_profiling
     {
         return 1 if grep { $INC{$_} } @Profilers;
         return 0;
     }
 }
 
-sub _var_lib_dir
+sub _build_var_lib_dir
 {
     my $self = shift;
 
@@ -247,7 +242,7 @@ sub _var_lib_dir
                       );
 }
 
-sub _share_dir
+sub _build_share_dir
 {
     my $self = shift;
 
@@ -257,7 +252,7 @@ sub _share_dir
                       );
 }
 
-sub _etc_dir
+sub _build_etc_dir
 {
     my $self = shift;
 
@@ -266,7 +261,7 @@ sub _etc_dir
                       );
 }
 
-sub _cache_dir
+sub _build_cache_dir
 {
     my $self = shift;
 
@@ -298,7 +293,7 @@ sub _dir
     return dir( $self->_home_dir(), '.r2', @{ $pieces } );
 }
 
-sub _catalyst_config
+sub _build_catalyst_config
 {
     my $self = shift;
 
@@ -394,7 +389,7 @@ sub _catalyst_config
     }
 }
 
-sub _dbi_config
+sub _build_dbi_config
 {
     my $self = shift;
 
@@ -414,7 +409,7 @@ sub _dbi_config
            };
 }
 
-sub _mason_config
+sub _build_mason_config
 {
     my $self = shift;
 
@@ -437,7 +432,7 @@ sub _mason_config
     return \%config;
 }
 
-sub _static_path_prefix
+sub _build_static_path_prefix
 {
     my $self = shift;
 
@@ -446,22 +441,13 @@ sub _static_path_prefix
     return read_file( $self->etc_dir()->file('revision')->stringify() );
 }
 
-sub _forgot_pw_secret
+sub _build_secret
 {
     my $self = shift;
 
     return 'a big secret' unless $self->is_production();
 
-    return $self->_config_hash()->{secrets}{forgot_pw};
-}
-
-sub _authen_secret
-{
-    my $self = shift;
-
-    return 'a bigger secret' unless $self->is_production();
-
-    return $self->_config_hash()->{secrets}{authen};
+    return $self->_config_hash()->{R2}{secret};
 }
 
 __PACKAGE__->meta()->make_immutable();

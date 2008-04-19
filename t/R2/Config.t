@@ -15,7 +15,7 @@ my $file = file( tempdir( CLEANUP => 1 ), 'r2.conf' );
 {
     local $ENV{R2_CONFIG} = '/ this best not be a real / path';
 
-    eval { $config->_find_config_file() };
+    eval { $config->_build_config_file() };
 
     like( $@, qr/nonexistent config file/i,
           'bad value for R2_CONFIG throws an error' );
@@ -25,7 +25,7 @@ my $file = file( tempdir( CLEANUP => 1 ), 'r2.conf' );
     no warnings 'redefine';
     local *Path::Class::File::stringify = sub { '/ also should not / exist' };
 
-    eval { $config->_find_config_file() };
+    eval { $config->_build_config_file() };
 
     like( $@, qr/cannot find a config file/i,
           'error is thrown when we no config file can be found' );
@@ -39,7 +39,7 @@ EOF
 
     local $ENV{R2_CONFIG} = $file->stringify();
 
-    eval { $config->_read_config_file() };
+    eval { $config->_build_config_hash() };
 
     like( $@, qr/must supply a value for .+ forgot_pw/,
           'if [R2] - is_production is true, then [secrets] forgot_pw is required' );
