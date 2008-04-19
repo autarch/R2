@@ -89,35 +89,34 @@ sub _initialize
     }
 }
 
+sub add_user
 {
-    my %spec = ( user => { isa => 'R2::Schema::User' },
-                 role => { isa => 'R2::Schema::Role' },
-               );
-    sub add_user
-    {
-        my $self            = shift;
-        my ( $user, $role ) = validatep( \@_, %spec );
+    my $self            = shift;
+    my ( $user, $role ) =
+        validatep( \@_,
+                   user => { isa => 'R2::Schema::User' },
+                   role => { isa => 'R2::Schema::Role' },
+                 );
 
-        R2::Schema::AccountUserRole->insert
-            ( account_id => $self->account_id(),
-              user_id    => $user->user_id(),
-              role_id    => $role->role_id(),
-            );
-    }
+    R2::Schema::AccountUserRole->insert
+        ( account_id => $self->account_id(),
+          user_id    => $user->user_id(),
+          role_id    => $role->role_id(),
+        );
 }
 
+sub add_country
 {
-    my %spec = ( country => { isa => 'R2::Schema::Country' } );
-    sub add_country
-    {
-        my $self      = shift;
-        my ($country) = validatep( \@_, %spec );
+    my $self      = shift;
+    my ($country) =
+        validatep( \@_,
+                   country => { isa => 'R2::Schema::Country' },
+                 );
 
-        R2::Schema::AccountCountry->insert
-            ( account_id => $self->account_id(),
-              iso_code   => $country->iso_code(),
-            );
-    }
+    R2::Schema::AccountCountry->insert
+        ( account_id => $self->account_id(),
+          iso_code   => $country->iso_code(),
+        );
 }
 
 sub _CountriesSelect
