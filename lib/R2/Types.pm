@@ -14,9 +14,13 @@ subtype 'R2::Type::EmailAddress'
 
 subtype 'R2::Type::URIPath'
     => as 'Str'
-    => where { defined $_ && length $_ && $_ =~ m{^/} }
-    => message { my $path = defined $_ ? $_ : '';
-                 "This path ($path) is either empty or does not start with a slash (/)" };
+    => where { length $_ && $_ =~ m{^/} }
+    => message { "This path ($_) is either empty or does not start with a slash (/)" };
+
+subtype 'R2::Type::FileIsImage'
+    => as class_type('R2::Schema::File')
+    => where { $_->is_image() }
+    => message { 'This file is not an image' };
 
 no Moose::Util::TypeConstraints;
 

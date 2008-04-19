@@ -53,6 +53,13 @@ CREATE TABLE "Domain" (
        CONSTRAINT valid_email_hostname CHECK ( email_hostname != '' )
 );
 
+CREATE TABLE "File" (
+       file_id            SERIAL8            PRIMARY KEY,
+       mime_type          VARCHAR(100)       NOT NULL,
+       file_name          TEXT               NOT NULL,
+       file_contents      BYTEA              NOT NULL
+);
+
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
 CREATE DOMAIN email_address AS VARCHAR(255)
@@ -71,7 +78,7 @@ CREATE TABLE "Contact" (
        email_address      email_address      NULL,
        website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       image              BYTEA              NULL,
+       image_file_id      INT8               NULL,
        -- an identifier from another app, probably created via an
        -- initial import from something else
        external_id        VARCHAR(255)       UNIQUE NULL,
@@ -401,6 +408,10 @@ ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_iso_code"
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Contact" ADD CONSTRAINT "Contact_image_file_id"
+  FOREIGN KEY ("image_file_id") REFERENCES "File" ("file_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "ContactCustomFieldGroup" ADD CONSTRAINT "ContactCustomFieldGroup_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")

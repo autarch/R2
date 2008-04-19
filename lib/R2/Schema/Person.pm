@@ -20,9 +20,9 @@ with 'R2::Role::DVAAC';
 {
     my $schema = R2::Schema->Schema();
 
-    my $user_t = $schema->table('Person');
+    my $person_t = $schema->table('Person');
 
-    has_table $user_t;
+    has_table $person_t;
 
     transform 'birth_date' =>
         deflate { blessed $_[0] ? DateTime::Format::Pg->format_date( $_[0] ) : $_[0] },
@@ -39,6 +39,9 @@ with 'R2::Role::DVAAC';
         ( table => $schema->table('User'),
           undef => 1,
         );
+
+    has_one 'image' =>
+        ( table => $schema->table('File') );
 
     # XXX - this'd be nicer if it selected the messaging provider in
     # the same query
