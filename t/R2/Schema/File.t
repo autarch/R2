@@ -6,8 +6,6 @@ use Test::More tests => 3;
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
-use File::Slurp qw( read_file );
-
 use R2::Test::Config;
 use R2::Config;
 use R2::Schema::File;
