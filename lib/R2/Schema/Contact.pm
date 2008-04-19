@@ -6,6 +6,7 @@ use warnings;
 use Data::Validate::Domain qw( is_domain );
 use Fey::Literal::String;
 use Fey::Placeholder;
+use R2::Image;
 use R2::Schema;
 use R2::Schema::Account;
 use R2::Schema::Address;
@@ -46,8 +47,17 @@ with 'R2::Role::DataValidator';
           undef => 1,
         );
 
-    has_one 'image' =>
+    has_one '_file' =>
         ( table => $schema->table('File') );
+
+    has 'image' =>
+        ( is  => 'ro',
+          isa => 'R2::Image',
+          lazy => 1,
+          default => sub { my $file = $self->_file
+                               or return;
+                           return R2::Image->new( file => $file ) },
+        );
 
     has_many 'addresses' =>
         ( table => $schema->table('Address'),
