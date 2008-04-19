@@ -48,7 +48,23 @@ sub _build_path
 {
     my $self = shift;
 
-    return file( $self->_cache_dir(), $self->file_name() );
+    my $path = file( $self->_cache_dir(), $self->file_name() );
+
+    return $path
+        if -f $path;
+
+    $path->dir()->mkpath( 0, 0755 );
+
+    open my $fh, '>', $path
+        or die "Cannot write to $path: $!";
+
+    print {$fh} $self->file_contents()
+        or die "Cannot write to $path: $!";
+
+    close $fh
+        or die "Cannot write to $path: $!";
+
+    return $path;
 }
 
 sub _build_cache_dir
