@@ -9,6 +9,7 @@ use Fey::Placeholder;
 use R2::Schema;
 use R2::Schema::Account;
 use R2::Schema::Address;
+use R2::Schema::File;
 use R2::Schema::PhoneNumber;
 use R2::Util qw( string_is_empty );
 
@@ -44,6 +45,9 @@ with 'R2::Role::DataValidator';
         ( table => $schema->table('Household'),
           undef => 1,
         );
+
+    has_one 'image' =>
+        ( table => $schema->table('File') );
 
     has_many 'addresses' =>
         ( table => $schema->table('Address'),

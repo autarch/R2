@@ -40,9 +40,6 @@ with 'R2::Role::DVAAC';
           undef => 1,
         );
 
-    has_one 'image' =>
-        ( table => $schema->table('File') );
-
     # XXX - this'd be nicer if it selected the messaging provider in
     # the same query
     has_many 'messaging' =>
