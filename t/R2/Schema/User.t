@@ -147,7 +147,7 @@ my $dbh = mock_dbh();
                                   last_name     => 'Smith',
                                   email_address => 'joe.smith@example.com',
                                   password      => 'password',
-                                  date_format   => '%m/%d/%Y',
+                                  date_format   => '%m-%d-%Y',
                                 );
 
     is( $user->date_format_for_display(), 'MM-DD-YYYY',
@@ -160,7 +160,7 @@ my $dbh = mock_dbh();
                                   last_name     => 'Smith',
                                   email_address => 'joe.smith@example.com',
                                   password      => 'password',
-                                  date_format   => '%d/%m/%Y',
+                                  date_format   => '%d-%m-%Y',
                                 );
 
     is( $user->date_format_for_display(), 'DD-MM-YYYY',
