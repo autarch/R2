@@ -1,6 +1,11 @@
 <&| /lib/filter/yui/row.mas &>
 <div id="summary">
   <h1><% $title %></h1>
+
+% if ($image ) {
+  <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" class="contact-image" />
+% }
+
 </div>
 
 </&>
@@ -13,6 +18,14 @@ my $title = $m->caller_args(-1)->{person}->full_name();
 <%args>
 $person
 </%args>
+
+<%init>
+my $image;
+if ( my $i = $person->image() )
+{
+    $image = $i->resize( height => 100, width => 100 );
+}
+</%init>
 
 <%method title>
 <% $title %>

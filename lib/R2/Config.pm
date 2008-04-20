@@ -320,8 +320,9 @@ sub _build_catalyst_config
 
     unless ( $self->is_production() )
     {
-        $config{static} = { dirs         => [ qw( images js css static w3c ) ],
-                            include_path => [ __PACKAGE__->var_lib_dir()->stringify(),
+        $config{static} = { dirs         => [ qw( files images js css static w3c ) ],
+                            include_path => [ __PACKAGE__->cache_dir()->stringify(),
+                                              __PACKAGE__->var_lib_dir()->stringify(),
                                               __PACKAGE__->share_dir()->stringify(),
                                             ],
                             debug => 1,

@@ -76,12 +76,15 @@ sub new_contact_POST
         {
             if ($image)
             {
-                my $file = R2::Schema::File->insert( file_name     => $image->basename(),
-                                                     file_contents => $image->slurp(),
-                                                     mime_type     => $image->type(),
-                                                   );
+                my $file =
+                    R2::Schema::File->insert
+                        ( filename   => $image->basename(),
+                          contents   => scalar $image->slurp(),
+                          mime_type  => $image->type(),
+                          account_id => $p{account_id},
+                        );
 
-                $p{file_id} = $file->file_id();
+                $p{image_file_id} = $file->file_id();
             }
 
             $person = R2::Schema::Person->insert(%p);

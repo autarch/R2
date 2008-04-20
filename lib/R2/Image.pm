@@ -16,7 +16,7 @@ has 'file' =>
     ( is       => 'ro',
       isa      => 'R2::Type::FileIsImage',
       required => 1,
-      handles  => [ 'path' ],
+      handles  => [ 'path', 'uri' ],
     );
 
 sub resize
