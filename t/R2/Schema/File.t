@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -30,6 +30,10 @@ my $dbh = mock_dbh();
 
     ok( -e $file->path(),
         'calling path() has side effect of writing the file to disk' );
+
+    is( $file->uri(),
+        q{/files/f0/f0075278acf7e8dc8d64ae8a801626c92c487cb831d21e1798bf344956d7c81d1ed6d5dc7f4d713b84dd29c52213da26d5f9ca6d5aa67379a9d5bba0b0b3a2ff/foo.txt},
+        'uri has expected value' );
 
     is( scalar read_file( $file->path()->stringify() ), $data,
         'file contents on disk are identical to those passed to constructor' );

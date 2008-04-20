@@ -19,24 +19,35 @@ use Fey::ORM::Table;
     has_table $file_t;
 
     has 'path' =>
-        ( is      => 'ro',
-          isa     => 'Path::Class::File',
-          lazy    => 1,
-          builder => '_build_path',
+        ( is       => 'ro',
+          isa      => 'Path::Class::File',
+          lazy     => 1,
+          builder  => '_build_path',
+          init_arg => undef,
+        );
+
+    has 'uri' =>
+        ( is       => 'ro',
+          isa      => 'Str',
+          lazy     => 1,
+          builder  => '_build_uri',
+          init_arg => undef,
         );
 
     has '_cache_dir' =>
-        ( is      => 'ro',
-          isa     => 'Path::Class::Dir',
-          lazy    => 1,
-          builder => '_build_cache_dir',
+        ( is       => 'ro',
+          isa      => 'Path::Class::Dir',
+          lazy     => 1,
+          builder  => '_build_cache_dir',
+          init_arg => undef,
         );
 
     has 'is_image' =>
-        ( is      => 'ro',
-          isa     => 'Bool',
-          lazy    => 1,
-          builder => '_build_is_image',
+        ( is       => 'ro',
+          isa      => 'Bool',
+          lazy     => 1,
+          builder  => '_build_is_image',
+          init_arg => undef,
         );
 
     class_has '_FileMagic' =>
@@ -84,6 +95,19 @@ sub _build_path
     return $path;
 }
 
+sub _build_uri
+{
+    my $self = shift;
+
+    my $path = $self->path();
+
+    my $cache_dir = R2::Config->new()->cache_dir();
+
+    ( my $uri = $path->stringify() ) =~ s{^\Q$cache_dir}{};
+
+    return $uri;
+}
+
 sub _build_cache_dir
 {
     my $self = shift;
@@ -106,6 +130,14 @@ sub _build_cache_dir
         my $type = $self->mime_type();
 
         return $ImageType{ $self->mime_type() };
+    }
+
+    sub TypeIsImage
+    {
+        my $class = shift;
+        my $type  = shift;
+
+        return $ImageType{$type};
     }
 }
 
