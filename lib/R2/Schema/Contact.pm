@@ -51,9 +51,9 @@ with 'R2::Role::DataValidator';
         ( table => $schema->table('File') );
 
     has 'image' =>
-        ( is  => 'ro',
-          isa => 'R2::Image',
-          lazy => 1,
+        ( is      => 'ro',
+          isa     => 'R2::Image|Undef',
+          lazy    => 1,
           default => sub { my $file = $_[0]->_file
                                or return;
                            return R2::Image->new( file => $file ) },
