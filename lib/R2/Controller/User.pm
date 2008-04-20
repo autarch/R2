@@ -44,9 +44,9 @@ sub authentication_POST
     my $self = shift;
     my $c    = shift;
 
-    my $uri   = $c->request()->param('openid_uri');
-    my $email = $c->request()->param('email_address');
-    my $pw    = $c->request()->param('password');
+    my $uri      = $c->request()->param('openid_uri');
+    my $username = $c->request()->param('username');
+    my $pw       = $c->request()->param('password');
 
     my $user;
 
@@ -59,15 +59,15 @@ sub authentication_POST
     my @errors;
 
     push @errors, 'You must provide an email address or an OpenID URL.'
-        if string_is_empty($email);
+        if string_is_empty($username);
     push @errors, { field   => 'password',
                     message => 'You must provide a password.' }
         if string_is_empty($pw);
 
     unless (@errors)
     {
-        $user = R2::Schema::User->new( email_address => $email,
-                                       password      => $pw,
+        $user = R2::Schema::User->new( username => $username,
+                                       password => $pw,
                                      );
 
         unless ($user)
@@ -84,7 +84,7 @@ sub authentication_POST
         $c->_redirect_with_error
             ( error  => $e,
               uri    => '/user/login_form',
-              params => { email_address => $email,
+              params => { email_address => $username,
                           return_to     => $c->request()->parameters()->{return_to},
                         },
             );

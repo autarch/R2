@@ -12,6 +12,7 @@ SET CLIENT_MIN_MESSAGES = ERROR;
 CREATE TABLE "User" (
        -- will be the same as a person_id
        user_id            INT8               PRIMARY KEY,
+       username           VARCHAR(255)       UNIQUE NOT NULL,
        -- SHA512 in Base64 encoding
        password           VARCHAR(86)        NOT NULL,
        timezone           VARCHAR(50)        NOT NULL DEFAULT 'UTC',
@@ -19,6 +20,7 @@ CREATE TABLE "User" (
        time_format        VARCHAR(12)        NOT NULL DEFAULT '%I:%M %P',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin    BOOLEAN            DEFAULT FALSE,
+       CONSTRAINT valid_username CHECK ( username != '' ),
        CONSTRAINT valid_password CHECK ( password != '' )
 );
 

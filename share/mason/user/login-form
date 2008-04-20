@@ -7,12 +7,12 @@
     <legend>Your login info</legend>
 
     <div class="form-item">
-      <label class="for-field"  for="email_address">Email:</label>
-      <input id="email_address" class="text medium" type="text" name="email_address" value="" />
+      <label class="for-field" for="username">Email:</label>
+      <input id="email_address" class="text medium" type="text" name="username" value="" />
     </div>
 
     <div class="form-item">
-      <label class="for-field"  for="password">Password:</label>
+      <label class="for-field" for="password">Password:</label>
       <input id="password" class="text" type="password" name="password" />
     </div>
 
@@ -23,7 +23,7 @@
     <legend>Or your OpenID</legend>
 
     <div class="form-item">
-      <label class="for-field"  for="openid_url">OpenID URL:</label>
+      <label class="for-field" for="openid_url">OpenID URL:</label>
       <input id="openid_url" class="text medium" type="text" name="openid_uri" value="" size="40" />
       <div class="help-text">
         <p>
@@ -38,7 +38,7 @@
     <legend>Log In</legend>
 
     <div class="form-item">
-      <label class="for-field"  for="remember" class="inline">Remember me:</label>
+      <label class="for-field" for="remember" class="inline">Remember me:</label>
       <input id="remember" class="checkbox" type="checkbox" name="remember" />
     </div>
 

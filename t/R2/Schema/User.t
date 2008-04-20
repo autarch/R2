@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -24,6 +24,8 @@ my $dbh = mock_dbh();
     ok( $user->person(), 'newly created user has a person' );
     is( $user->person()->person_id(), 1, 'person_id == 1' );
 
+    is( $user->username(), 'joe.smith@example.com',
+        'username is same as email address' );
     is( $user->person()->email_address(), 'joe.smith@example.com',
         'data for person is passed through on user insert' );
     is( $user->email_address(), 'joe.smith@example.com',
@@ -91,26 +93,16 @@ my $dbh = mock_dbh();
     $dbh->{mock_clear_history} = 1;
 
     $dbh->{mock_add_resultset} =
-        [ [ qw( contact_id email_address contact_type  ) ],
-          [ 1, 'bubba.smith@example.com', 'Person' ],
-        ];
-
-    $dbh->{mock_add_resultset} =
-        [ [ qw( person_id first_name last_name  ) ],
-          [ 1, 'Bubba', 'Smith' ],
-        ];
-
-    $dbh->{mock_add_resultset} =
         [ [ qw( user_id password ) ],
           [ 1, sha512_base64($pw) ],
         ];
 
     my $user =
-        R2::Schema::User->new( email_address => 'bubba.smith@example.com',
-                               password      => $pw,
+        R2::Schema::User->new( username => 'bubba.smith@example.com',
+                               password => $pw,
                              );
 
-    ok( $user, 'got a user for email & password' );
+    ok( $user, 'got a user for username & password' );
 }
 
 {
@@ -119,23 +111,13 @@ my $dbh = mock_dbh();
     $dbh->{mock_clear_history} = 1;
 
     $dbh->{mock_add_resultset} =
-        [ [ qw( contact_id email_address contact_type  ) ],
-          [ 1, 'bubba.smith@example.com', 'Person' ],
-        ];
-
-    $dbh->{mock_add_resultset} =
-        [ [ qw( person_id first_name last_name  ) ],
-          [ 1, 'Bubba', 'Smith' ],
-        ];
-
-    $dbh->{mock_add_resultset} =
         [ [ qw( user_id password ) ],
           [ 1, sha512_base64($pw) ],
         ];
 
     my $user =
-        R2::Schema::User->new( email_address => 'bubba.smith@example.com',
-                               password      => $pw . 'bad',
+        R2::Schema::User->new( username => 'bubba.smith@example.com',
+                               password => $pw . 'bad',
                              );
 
     ok( ! $user, 'did not get a user when the password is wrong' );

@@ -58,6 +58,8 @@ around 'insert' => sub
     my %user_p =
         map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
 
+    $user_p{username} ||= $p{email_address};
+
     my $sub = sub { my $person = R2::Schema::Person->insert(%p);
 
                     my $user = $class->$orig( %user_p,
@@ -79,31 +81,12 @@ sub _load_from_dbms
     my $self = shift;
     my $p    = shift;
 
-    return $self->SUPER::_load_from_dbms($p)
-        if string_is_empty( $p->{email_address} )
-        || string_is_empty( $p->{password} );
-
-    my $email = delete $p->{email_address};
-
     # This gets set to the unhashed value in the constructor
     $self->_clear_password();
 
-    my $contact = R2::Schema::Contact->new( email_address => $email )
-        or no_such_row "No contact with the email_address = $email";
+    $self->SUPER::_load_from_dbms($p);
 
-    my $person = $contact->person()
-        or no_such_row 'Contact is not a person';
-
-    unless ( $self->_load_from_key( [ $self->Table()->primary_key() ],
-                                    [ $person->person_id() ],
-                                  ) )
-    {
-        no_such_row 'Person is not a user';
-    }
-
-    # Without this, everything gets very confused, because the object
-    # has no PK
-    $self->_set_user_id( $person->person_id() );
+    return unless $p->{password};
 
     no_such_row 'Invalid password'
         unless $self->password() eq sha512_base64( $p->{password} );
