@@ -58,8 +58,8 @@ CREATE TABLE "Domain" (
 CREATE TABLE "File" (
        file_id            SERIAL8            PRIMARY KEY,
        mime_type          VARCHAR(100)       NOT NULL,
-       file_name          TEXT               NOT NULL,
-       file_contents      BYTEA              NOT NULL
+       filename           TEXT               NOT NULL,
+       contents           BYTEA              NOT NULL
 );
 
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );

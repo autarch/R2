@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 14;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -17,11 +17,11 @@ my $dbh = mock_dbh();
 
 {
     my $data = 'some text';
-    my $file = R2::Schema::File->new( file_id       => 1,
-                                      mime_type     => 'text/plain',
-                                      file_name     => 'foo.txt',
-                                      file_contents => $data,
-                                      _from_query   => 1,
+    my $file = R2::Schema::File->new( file_id     => 1,
+                                      mime_type   => 'text/plain',
+                                      filename    => 'foo.txt',
+                                      contents    => $data,
+                                      _from_query => 1,
                                     );
 
     like( $file->path(),
@@ -43,14 +43,39 @@ my $dbh = mock_dbh();
 }
 
 {
-    my $file = R2::Schema::File->new( file_id       => 1,
-                                      mime_type     => 'image/jpeg',
-                                      file_name     => '8th.jpg',
-                                      file_contents => '12345',
-                                      _from_query   => 1,
+    my $file = R2::Schema::File->new( file_id     => 1,
+                                      mime_type   => 'image/jpeg',
+                                      filename    => '8th.jpg',
+                                      contents    => '12345',
+                                      _from_query => 1,
                                     );
 
     ok( $file->is_image(), 'file is an image' );
+}
+
+{
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( file_id filename ) ],
+          [ 1, 'test.txt' ],
+          [ 2, 'test.txt' ],
+        ];
+
+    ok ( ! R2::Schema::File->new( filename => 'test.txt' ),
+         'cannot load a file by filename when the filename is not unique' );
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( file_id filename ) ],
+          [ 2, 'test2.txt' ],
+        ];
+
+    my $file = R2::Schema::File->new( filename => 'test2.txt' );
+    ok( $file, 'loaded file by unique filename' );
+    is( $file->file_id(), 2, 'file_id is expected value' );
 }
 
 {

@@ -7,6 +7,7 @@ use Digest::SHA qw( sha512_hex );
 use File::LibMagic ();
 use File::Slurp qw( read_file );
 use Path::Class qw( dir file );
+use R2::Util qw( string_is_empty );
 
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
@@ -56,14 +57,68 @@ use Fey::ORM::Table;
           lazy    => 1,
           default => sub { File::LibMagic->new() },
         );
+
+    class_has '_SelectByFilename' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          lazy    => 1,
+          default => \&_build_SelectByFilename,
+        );
 }
 
+
+sub _load_from_dbms
+{
+    my $self = shift;
+    my $p    = shift;
+
+    if ( ! string_is_empty( $p->{filename} ) )
+    {
+        return if $self->_load_by_filename( $p->{filename} );
+    }
+
+    return $self->SUPER::_load_from_dbms($p);
+}
+
+sub _load_by_filename
+{
+    my $self     = shift;
+    my $filename = shift;
+
+    my $select = $self->_SelectByFilename();
+
+    my $dbh = $self->_dbh($select);
+
+    my $rows = $dbh->selectall_arrayref( $select->sql($dbh), { Slice => {} }, $filename );
+
+    return unless @{ $rows } == 1;
+
+    $self->_set_column_values_from_hashref( $rows->[0] );
+
+    return 1;
+}
+
+sub _build_SelectByFilename
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->table('File') )
+           ->from( $schema->tables( 'File' ) )
+           ->where( $schema->table('File')->column('filename'),
+                    '=', Fey::Placeholder->new() );
+
+    return $select;
+}
 
 sub _build_path
 {
     my $self = shift;
 
-    my $path = file( $self->_cache_dir(), $self->file_name() );
+    my $path = file( $self->_cache_dir(), $self->filename() );
 
     return $path
         if -f $path;
@@ -73,7 +128,7 @@ sub _build_path
     open my $fh, '>', $path
         or die "Cannot write to $path: $!";
 
-    print {$fh} $self->file_contents()
+    print {$fh} $self->contents()
         or die "Cannot write to $path: $!";
 
     close $fh
