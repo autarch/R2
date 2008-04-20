@@ -25,9 +25,9 @@ sub _files
 
 sub _target_file
 {
-    my $css_dir = File::Spec->catdir( R2::Config->new()->var_lib_dir(), 'css' );
-    File::Path::mkpath( $css_dir, 0, 0755 )
-        unless -d $css_dir;
+    my $css_dir = dir( R2::Config->new()->var_lib_dir(), 'css' );
+
+    $css_dir->mkpath( 0, 0755 );
 
     return file( $css_dir, 'r2-combined.css' );
 }
