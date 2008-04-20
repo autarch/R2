@@ -5,9 +5,7 @@ use warnings;
 
 use DateTime;
 use File::Copy qw( move );
-use File::Path ();
 use File::Slurp qw( read_file );
-use File::Spec;
 use File::Temp qw( tempfile );
 use JavaScript::Squish;
 use JSAN::ServerSide 0.04;
