@@ -9,11 +9,10 @@ use File::Temp qw( tempdir );
 
 sub import
 {
-    my $dir = tempdir( CLEANUP => 1 );
-
-    my $etc       = tempdir( CLEANUP => 1 );
-    my $var_lib   = tempdir( CLEANUP => 1 );
-    my $cache = tempdir( CLEANUP => 1 );
+    my $dir     = tempdir( CLEANUP => 1 );
+    my $etc     = tempdir( CLEANUP => 1 );
+    my $var_lib = tempdir( CLEANUP => 1 );
+    my $cache   = tempdir( CLEANUP => 1 );
 
     my $config = <<"EOF";
 [dirs]
