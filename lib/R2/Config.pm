@@ -146,11 +146,8 @@ sub _build_config_hash
 
     if ( $hash->{R2}{is_production} )
     {
-        die "If is_production is true, you must supply a value for [secrets] - forgot_pw"
-            if string_is_empty( $hash->{secrets}{forgot_pw} );
-
-        die "If is_production is true, you must supply a value for [secrets] - authen"
-            if string_is_empty( $hash->{secrets}{authen} );
+        die "If is_production is true, you must supply a value for [R2] - secret"
+            if string_is_empty( $hash->{R2}{secret} );
     }
 
     return $hash;
@@ -313,7 +310,7 @@ sub _build_catalyst_config
           authen_cookie =>
           { name       => 'VegGuide-user',
             path       => '/',
-            mac_secret => $self->authen_secret(),
+            mac_secret => $self->secret(),
           },
 
           'Log::Dispatch' => $self->_log_config(),
