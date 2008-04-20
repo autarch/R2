@@ -66,6 +66,7 @@ sub resize
                  type     => 'Palette',
                );
 
+    my $fake_file = R2::Schema::File->new( file_id => );
     return $resized_file;
 }
 

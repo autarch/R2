@@ -59,19 +59,6 @@ use Fey::ORM::Table;
 }
 
 
-sub insert_from_file
-{
-    my $class = shift;
-    my $file  = file(shift);
-
-    my $type = $class->_FileMagic()->checktype_filename( $file->stringify() );
-
-    $class->insert( file_name     => $file->basename(),
-                    mime_type     => $type,
-                    file_contents => scalar read_file( $file->stringify() ),
-                  );
-}
-
 sub _build_path
 {
     my $self = shift;

@@ -49,7 +49,18 @@ sub new_contact_POST
     $p{account_id} = $c->user()->account_id();
     $p{date_format} = $c->request()->params()->{date_format};
 
-    if ( my @errors = R2::Schema::Person->ValidateForInsert(%p) )
+    my $image = $c->request()->upload('image');
+
+    my @errors = R2::Schema::Person->ValidateForInsert(%p);
+
+    if ( $image && ! R2::Schema::File->TypeIsImage( $image->type() ) )
+    {
+        push @errors, { field   => 'image',
+                        message => 'The image you provided is not a GIF, JPG, or PNG.',
+                      };
+    }
+
+    if (@errors)
     {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
 
@@ -63,6 +74,16 @@ sub new_contact_POST
     my $insert_sub =
         sub
         {
+            if ($image)
+            {
+                my $file = R2::Schema::File->insert( file_name     => $image->basename(),
+                                                     file_contents => $image->slurp(),
+                                                     mime_type     => $image->type(),
+                                                   );
+
+                $p{file_id} = $file->file_id();
+            }
+
             $person = R2::Schema::Person->insert(%p);
         };
 

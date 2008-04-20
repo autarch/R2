@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 11;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -51,22 +51,6 @@ my $dbh = mock_dbh();
                                     );
 
     ok( $file->is_image(), 'file is an image' );
-}
-
-{
-    $dbh->{mock_insert_id} = 1;
-
-    my $file = R2::Schema::File->insert_from_file( 't/files/8th.jpg' );
-
-    is( $file->file_name(), '8th.jpg',
-        'file_name() returns expected value' );
-
-    is( $file->mime_type(), 'image/jpeg',
-        'mime_type() returns expected value' );
-
-    is( Digest::SHA->new()->add_bits( $file->file_contents() )->b64digest(),
-        'XOUbMGBOe5Wvq6mjl/VILSuHJSU',
-        'file contents hash to expected digest value' );
 }
 
 {

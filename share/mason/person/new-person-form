@@ -110,7 +110,7 @@
 
       <div class="help-text">
         <p>
-          Images will be resized so they are no larger than 100x100.
+          A GIF, JPG, or PNG. Images will be resized so they are no larger than 100x100.
         </p>
       </div>
     </div>
