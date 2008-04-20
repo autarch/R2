@@ -85,7 +85,7 @@ sub _load_from_dbms
 
     my $email = delete $p->{email_address};
 
-    # This gets set in the constructor to the unhashed value
+    # This gets set to the unhashed value in the constructor
     $self->_clear_password();
 
     my $contact = R2::Schema::Contact->new( email_address => $email )
