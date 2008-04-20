@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 14;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -68,3 +68,19 @@ my $dbh = mock_dbh();
         'XOUbMGBOe5Wvq6mjl/VILSuHJSU',
         'file contents hash to expected digest value' );
 }
+
+{
+    for my $type ( qw( text/plain image/tiff ) )
+    {
+        ok( ! R2::Schema::File->TypeIsImage($type),
+            "$type is not an image type" );
+    }
+
+    for my $type ( qw( image/gif image/jpeg image/png ) )
+    {
+        ok( R2::Schema::File->TypeIsImage($type),
+            "$type is an image type" );
+    }
+}
+
+
