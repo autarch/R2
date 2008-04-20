@@ -36,9 +36,9 @@ sub _files
 
 sub _target_file
 {
-    my $js_dir = File::Spec->catdir( R2::Config->new()->var_lib_dir(), 'js' );
-    File::Path::mkpath( $js_dir, 0, 0755 )
-        unless -d $js_dir;
+    my $js_dir = dir( R2::Config->new()->var_lib_dir(), 'js' );
+
+    $js_dir->mkpath( 0, 0755 );
 
     return file( $js_dir, 'r2-combined.js' );
 }
