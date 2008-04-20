@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Digest::SHA qw( sha512_hex );
-use MIME::Types;
+use File::LibMagic ();
+use File::Slurp qw( read_file );
 use Path::Class qw( dir file );
 
+use MooseX::ClassAttribute;
 use Fey::ORM::Table;
 
 {
@@ -37,12 +39,27 @@ use Fey::ORM::Table;
           builder => '_build_is_image',
         );
 
-    my $types = MIME::Types->new();
-    transform 'mime_type' =>
-        inflate { $types->type( $_[1] ) },
-        deflate { ref $_[0] ? $_[0]->type() : $_[0] };
+    class_has '_FileMagic' =>
+        ( is      => 'ro',
+          isa     => 'File::LibMagic',
+          lazy    => 1,
+          default => sub { File::LibMagic->new() },
+        );
 }
 
+
+sub insert_from_file
+{
+    my $class = shift;
+    my $file  = file(shift);
+
+    my $type = $class->_FileMagic()->checktype_filename( $file->stringify() );
+
+    $class->insert( file_name     => $file->basename(),
+                    mime_type     => $type,
+                    file_contents => scalar read_file( $file->stringify() ),
+                  );
+}
 
 sub _build_path
 {
@@ -88,11 +105,12 @@ sub _build_cache_dir
 
         my $type = $self->mime_type();
 
-        return $ImageType{ $type->type() };
+        return $ImageType{ $self->mime_type() };
     }
 }
 
 no Fey::ORM::Table;
+no MooseX::ClassAttribute;
 no Moose;
 
 __PACKAGE__->meta()->make_immutable();
