@@ -33,7 +33,7 @@ has 'is_profiling' =>
     ( is      => 'rw',
       isa     => 'Bool',
       lazy    => 1,
-      builder => '_builder_is_profiling',
+      builder => '_build_is_profiling',
       # for testing
       writer  => '_set_is_profiling',
     );
