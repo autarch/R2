@@ -59,7 +59,8 @@ CREATE TABLE "File" (
        file_id            SERIAL8            PRIMARY KEY,
        mime_type          VARCHAR(100)       NOT NULL,
        filename           TEXT               NOT NULL,
-       contents           BYTEA              NOT NULL
+       contents           BYTEA              NOT NULL,
+       account_id         INT8               NOT NULL
 );
 
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
@@ -406,6 +407,10 @@ ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_account_id"
 ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_iso_code"
   FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "File" ADD CONSTRAINT "File_accont_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
