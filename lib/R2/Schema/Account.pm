@@ -53,6 +53,12 @@ use MooseX::Params::Validate qw( validatep );
           bind_params => sub { $_[0]->account_id() },
           cache       => 1,
         );
+
+    has_many 'people' =>
+        ( table       => $schema->table('Person'),
+          select      => __PACKAGE__->_PeopleSelect(),
+          bind_params => sub { $_[0]->account_id() },
+        );
 }
 
 
@@ -132,6 +138,26 @@ sub _CountriesSelect
            ->where( $schema->table('AccountCountry')->column('account_id'),
                     '=', Fey::Placeholder->new() )
            ->order_by( $schema->table('Country')->column('name') );
+
+    return $select;
+}
+
+sub _PeopleSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->table('Person') )
+           ->from( $schema->tables( 'Contact', 'Person' ) )
+           ->where( $schema->table('Contact')->column('account_id'),
+                    '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('Person')->column('last_name'),
+                       $schema->table('Person')->column('first_name'),
+                       $schema->table('Person')->column('middle_name'),
+                     );
 
     return $select;
 }
