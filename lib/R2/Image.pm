@@ -37,8 +37,10 @@ sub resize
 
     my $resized_file = Path::Class::file( $dir, $resized_name );
 
-    return $resized_file
-        if -f $resized_file;
+    my $file = R2::Schema::File->new( filename => $resized_file->basename() );
+
+    return R2::Image->new( file => $file )
+        if $file;
 
     my $img = Image::Magick->new();
     $img->read( filename => $path );
@@ -66,8 +68,15 @@ sub resize
                  type     => 'Palette',
                );
 
-    my $fake_file = R2::Schema::File->new( file_id => );
-    return $resized_file;
+    $file =
+        R2::Schema::File->insert
+            ( filename   => $resized_file->basename(),
+              contents   => scalar $resized_file->slurp(),
+              mime_type  => $self->file()->mime_type(),
+              account_id => $self->file()->account_id(),
+            );
+
+    return (ref $self)->new( file => $file );
 }
 
 __PACKAGE__->meta()->make_immutable();
