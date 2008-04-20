@@ -54,7 +54,7 @@ with 'R2::Role::DataValidator';
         ( is  => 'ro',
           isa => 'R2::Image',
           lazy => 1,
-          default => sub { my $file = $self->_file
+          default => sub { my $file = $_[0]->_file
                                or return;
                            return R2::Image->new( file => $file ) },
         );
