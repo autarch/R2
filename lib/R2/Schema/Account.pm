@@ -89,9 +89,11 @@ sub _initialize
 
     R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
 
-    for my $code( qw( us ca ) )
+    for my $code ( qw( us ca ) )
     {
-        $self->add_country( country => R2::Schema::Country->new( iso_code => $code ) );
+        $self->add_country( country    => R2::Schema::Country->new( iso_code => $code ),
+                            is_default => ( $code eq 'us' ? 1 : 0 ),
+                          );
     }
 }
 
@@ -114,14 +116,16 @@ sub add_user
 sub add_country
 {
     my $self      = shift;
-    my ($country) =
+    my ( $country, $is_default ) =
         validatep( \@_,
-                   country => { isa => 'R2::Schema::Country' },
+                   country    => { isa => 'R2::Schema::Country' },
+                   is_default => { isa => 'Bool' },
                  );
 
     R2::Schema::AccountCountry->insert
         ( account_id => $self->account_id(),
           iso_code   => $country->iso_code(),
+          is_default => $is_default,
         );
 }
 

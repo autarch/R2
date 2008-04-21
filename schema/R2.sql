@@ -321,6 +321,7 @@ CREATE TABLE "Address" (
 CREATE TABLE "AccountCountry" (
        account_id         INT8               NOT NULL,
        iso_code           CHAR(2)            NOT NULL,
+       is_default         BOOLEAN            NOT NULL DEFAULT FALSE,
        PRIMARY KEY (account_id, iso_code)
 );
 
