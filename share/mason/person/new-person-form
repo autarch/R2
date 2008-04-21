@@ -227,9 +227,9 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="country-new">Country:</label>
+        <label class="secondary" for="iso_code-new1">Country:</label>
 % if ( @countries > 1 )  {
-        <select name="country-new1" id="country-new1" />
+        <select name="iso_code-new1" id="iso_code-new1" />
 %   for my $country (@countries) {
           <option value="<% $country->iso_code() %>"><% $country->name() %></option>
 %   }
@@ -270,8 +270,8 @@ my $title = 'Add a new person';
 </%shared>
 
 <%init>
-my @phone_number_types = $c->user()->account()->phone_number_types()->all();
-my @address_types = $c->user()->account()->address_types()->all();
+my @phone_number_types = grep { $_->applies_to_person() } $c->user()->account()->phone_number_types()->all();
+my @address_types = grep { $_->applies_to_person() } $c->user()->account()->address_types()->all();
 my @countries = $c->user()->account()->countries()->all();
 </%init>
 
