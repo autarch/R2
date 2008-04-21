@@ -254,3 +254,11 @@ input.submit {
 
   margin-top: 0.5em;
 }
+
+#summary.has-image {
+    min-height: 110px;
+}
+
+#contact-image {
+    float: right;
+}
