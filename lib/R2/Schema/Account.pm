@@ -141,7 +141,11 @@ sub _CountriesSelect
            ->from( $schema->tables( 'AccountCountry', 'Country' ) )
            ->where( $schema->table('AccountCountry')->column('account_id'),
                     '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('Country')->column('name') );
+           ->order_by( $schema->table('AccountCountry')->column('is_default'),
+                       'DESC',
+                       $schema->table('Country')->column('name'),
+                       'ASC',
+                     );
 
     return $select;
 }
