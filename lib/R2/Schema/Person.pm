@@ -30,8 +30,10 @@ with 'R2::Role::DVAAC';
 
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
-          handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Schema::Contact->meta()->get_attribute_list(),
+          handles => [ qw( addresses phone_numbers ),
+                       ( grep { ! __PACKAGE__->meta()->has_attribute($_) }
+                         R2::Schema::Contact->meta()->get_attribute_list(),
+                       )
                      ],
         );
 
