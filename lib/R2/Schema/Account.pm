@@ -41,6 +41,27 @@ use MooseX::Params::Validate qw( validatep );
           order_by => [ $schema->table('PhoneNumberType')->column('name') ],
         );
 
+    for my $type ( qw( person household organization ) )
+    {
+        my $applies_meth = 'applies_to_' . $type;
+
+        has $type . '_address_types' =>
+            ( is      => 'ro',
+              isa     => 'ArrayRef[R2::Schema::AddressType]',
+              lazy    => 1,
+              default => sub { [ grep { $_->$applies_meth() }
+                                 $_[0]->address_types()->all() ] },
+            );
+
+        has $type . '_phone_number_types' =>
+            ( is      => 'ro',
+              isa     => 'ArrayRef[R2::Schema::PhoneNumberType]',
+              lazy    => 1,
+              default => sub { [ grep { $_->$applies_meth() }
+                                 $_[0]->phone_number_types()->all() ] },
+            );
+    }
+
     has_many 'messaging_providers' =>
         ( table    => $schema->table('MessagingProvider'),
           cache    => 1,
