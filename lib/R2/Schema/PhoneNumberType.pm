@@ -33,7 +33,7 @@ sub CreateDefaultsForAccount
                     account_id              => $account->account_id(),
                   );
 
-    $class->insert( name                    => 'cell',
+    $class->insert( name                    => 'Cell',
                     applies_to_person       => 1,
                     applies_to_household    => 0,
                     applies_to_organization => 0,
