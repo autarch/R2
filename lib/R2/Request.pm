@@ -5,25 +5,27 @@ use warnings;
 
 use base 'Catalyst::Request::REST::ForBrowsers';
 
+use R2::Util qw( string_is_empty );
+
 
 sub person_params
 {
     my $self = shift;
 
-    return $self->_params_for_classes( 'R2::Schema::Person', 'R2::Schema::Contact' );
+    return $self->_params_for_classes( [ 'R2::Schema::Person', 'R2::Schema::Contact' ] );
 }
-
 
 sub _params_for_classes
 {
     my $self    = shift;
-    my @classes = @_;
+    my $classes = shift;
+    my $suffix  = shift || '';
 
     my $params = $self->params();
 
-    my %params;
+    my %found;
 
-    for my $class (@classes)
+    for my $class ( @{ $classes } )
     {
         my $table = $class->Table();
 
@@ -35,19 +37,55 @@ sub _params_for_classes
 
             next if $pk{$name};
 
-            next unless exists $params->{$name};
+            my $key = $name;
+            $key .= q{-} . $suffix
+                if $suffix;
 
-            $params{$name} = $params->{$name};
+            next unless exists $params->{$key};
 
-            delete $params{$name}
-                if defined $params{$name} && $params{$name} eq '';
+            next if defined $params->{$key} && $params->{$key} eq '';
+
+            $found{$name} = $params->{$key};
         }
     }
 
-    return %params;
+    return %found;
+}
+
+sub new_address_param_sets
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my @addresses;
+
+    my $x = 1;
+    while (1)
+    {
+        my $suffix = 'new' . $x++;
+
+        last unless exists $params->{ 'address_type_id' . q{-} . $suffix };
+
+        my %address =
+            $self->_params_for_classes( [ 'R2::Schema::Address' ], $suffix );
+
+        $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
+
+        if ( ! string_is_empty( $params->{ 'address_notes' . q{-} . $suffix } ) )
+        {
+            $address{notes} = $params->{ 'address_notes' . q{-} . $suffix }
+        }
+
+        # The user can create an address field set but not fill in any
+        # of the parameters besides type and country.
+        next unless keys %address > 2;
+
+        push @addresses, \%address;
+    }
+
+    return @addresses;
 }
 
 
-
 1;
-
