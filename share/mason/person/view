@@ -1,15 +1,21 @@
 <&| /lib/filter/yui/row.mas &>
-<div id="summary">
-  <h1><% $title %></h1>
-
+<div id="summary" class="<% $image ? 'has-image' : '' %>">
 % if ($image ) {
-  <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" class="contact-image" />
+  <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" id="contact-image" />
 % }
+
+  <h1><% $title %></h1>
 
 </div>
 
-</&>
+% if (@addresses) {
+<h2><% PL_N( 'Address', scalar @addresses ) %></h2>
 
+%   for my $address (@addresses) {
+<& /lib/contact-view/address.mas, address => $address &>
+%   }
+% }
+</&>
 
 <%shared>
 my $title = $m->caller_args(-1)->{person}->full_name();
@@ -25,6 +31,8 @@ if ( my $i = $person->image() )
 {
     $image = $i->resize( height => 100, width => 100 );
 }
+
+my @addresses = $person->addresses()->all();
 </%init>
 
 <%method title>

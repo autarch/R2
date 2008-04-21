@@ -1,0 +1,26 @@
+<h3><% $address->type()->name() %></h3>
+
+<address>
+<% $address->street_1() %>
+
+% if ( ! string_is_empty( $address->street_2() ) ) {
+<br />
+<% $address->street_2() %>
+% }
+% if ( ! string_is_empty( $address->city_region_postal_code() ) ) {
+<br />
+<% $address->city_region_postal_code() %>
+% }
+<br />
+<% $address->country()->name() %>
+</address>
+
+% if ( ! string_is_empty( $address->notes() ) ) {
+<p class="address-notes">
+<% $address->notes() %>
+</p>
+% }
+
+<%args>
+$address
+</%args>
