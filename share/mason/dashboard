@@ -14,6 +14,14 @@
 % }
 </div>
 
+<ul>
+% while ( my $person = $people->next() ) {
+ <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
+        title="View <% $person->full_name() %>"><% $person->full_name() %></a>
+ </li>
+% }
+</ul>
+
 </&>
 
 <%shared>
@@ -25,6 +33,8 @@ my $user = $c->user();
 my $account = $user->account();
 
 my $authz = $c->model('Authz');
+
+my $people = $account->people();
 </%init>
 
 <%method title>
