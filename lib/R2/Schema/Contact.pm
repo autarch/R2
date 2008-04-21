@@ -60,8 +60,17 @@ with 'R2::Role::DataValidator';
         );
 
     has_many 'addresses' =>
-        ( table => $schema->table('Address'),
-          cache => 1,
+        ( table    => $schema->table('Address'),
+          order_by => [ $schema->table('Address')->column('is_preferred'),
+                        'DESC',
+                        $schema->table('Address')->column('iso_code'),
+                        'ASC',
+                        $schema->table('Address')->column('region'),
+                        'ASC',
+                        $schema->table('Address')->column('city'),
+                        'ASC',
+                      ],
+          cache    => 1,
         );
 
     has_one 'primary_address' =>
