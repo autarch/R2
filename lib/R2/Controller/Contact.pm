@@ -60,6 +60,8 @@ sub new_contact_POST
                       };
     }
 
+    my @addresses = $c->request()->new_address_param_sets();
+
     if (@errors)
     {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
@@ -88,6 +90,13 @@ sub new_contact_POST
             }
 
             $person = R2::Schema::Person->insert(%p);
+
+            for my $address (@addresses)
+            {
+                R2::Schema::Address->insert( %{ $address },
+                                             contact_id => $person->contact_id(),
+                                           );
+            }
         };
 
     R2::Schema->RunInTransaction($insert_sub);
