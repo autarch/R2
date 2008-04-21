@@ -19,12 +19,26 @@ sub CreateDefaultsForAccount
     my $class   = shift;
     my $account = shift;
 
-    for my $name ( qw( Home Office Cell ) )
-    {
-        $class->insert( name       => $name,
-                        account_id => $account->account_id(),
-                      );
-    }
+    $class->insert( name                    => 'Home',
+                    applies_to_person       => 1,
+                    applies_to_household    => 1,
+                    applies_to_organization => 0,
+                    account_id              => $account->account_id(),
+                  );
+
+    $class->insert( name                    => 'Office',
+                    applies_to_person       => 1,
+                    applies_to_household    => 0,
+                    applies_to_organization => 1,
+                    account_id              => $account->account_id(),
+                  );
+
+    $class->insert( name                    => 'cell',
+                    applies_to_person       => 1,
+                    applies_to_household    => 0,
+                    applies_to_organization => 0,
+                    account_id              => $account->account_id(),
+                  );
 }
 
 no Fey::ORM::Table;

@@ -335,6 +335,9 @@ CREATE TABLE "Country" (
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
        name               VARCHAR(255)       NOT NULL,
+       applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
+       applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
+       applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
@@ -353,6 +356,9 @@ CREATE TABLE "PhoneNumber" (
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
        name                  VARCHAR(255)    NOT NULL,
+       applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
+       applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
+       applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id            INT8            NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
