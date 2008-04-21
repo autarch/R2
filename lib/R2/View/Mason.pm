@@ -8,6 +8,8 @@ use base 'Catalyst::View::Mason';
 {
     package R2::Mason;
 
+    use Lingua::EN::Inflect qw( PL_N );
+    use R2::Util qw( string_is_empty );
     use R2::Web::URI qw( static_uri );
 }
 
