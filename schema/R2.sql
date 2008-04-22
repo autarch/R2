@@ -92,8 +92,8 @@ CREATE TABLE "Contact" (
 CREATE DOMAIN pos_int AS INTEGER
        CONSTRAINT is_positive CHECK ( VALUE > 0 );
 
-CREATE TABLE "ContactCustomFieldGroup" (
-       contact_custom_field_group_id  SERIAL8      PRIMARY KEY,
+CREATE TABLE "CustomFieldGroup" (
+       custom_field_group_id          SERIAL8      PRIMARY KEY,
        name                           VARCHAR(255) NOT NULL,
        description                    TEXT         NULL,
        display_order                  pos_int      NOT NULL,
@@ -107,8 +107,8 @@ CREATE TABLE "ContactCustomFieldGroup" (
 --                  INITIALLY DEFERRED
 );
 
-CREATE TABLE "ContactCustomField" (
-       contact_custom_field_id  SERIAL8      PRIMARY KEY,
+CREATE TABLE "CustomField" (
+       custom_field_id          SERIAL8      PRIMARY KEY,
        label                    VARCHAR(255) NOT NULL,
        description              TEXT         NULL,
        custom_field_type_id     INTEGER      NOT NULL,
@@ -116,9 +116,9 @@ CREATE TABLE "ContactCustomField" (
        is_required              BOOLEAN      DEFAULT FALSE,
        html_widget_type_id      INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
-       contact_custom_field_group_id  INT8   NOT NULL
---       CONSTRAINT contact_custom_field_group_id_display_order_ck
---                  UNIQUE ( contact_custom_field_group_id, display_order )
+       custom_field_group_id  INT8   NOT NULL
+--       CONSTRAINT custom_field_group_id_display_order_ck
+--                  UNIQUE ( custom_field_group_id, display_order )
 --                  INITIALLY DEFERRED
 );
 
@@ -134,70 +134,70 @@ CREATE TABLE "CustomFieldType" (
        name                     VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE "ContactCustomFieldIntegerValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldIntegerValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    INT8         NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldFloatValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldFloatValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    FLOAT8       NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldDateValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldDateValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    DATE         NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldDateTimeValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldDateTimeValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    TIMESTAMP WITHOUT TIME ZONE  NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldTextValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldTextValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    TEXT         NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldBinaryValue" (
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldBinaryValue" (
+       custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    BYTEA        NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "ContactCustomFieldSelectOption" (
-       contact_custom_field_select_option_id INT8 PRIMARY KEY,
-       contact_custom_field_id  INT8         NOT NULL,
+CREATE TABLE "CustomFieldSelectOption" (
+       custom_field_select_option_id INT8 PRIMARY KEY,
+       custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    VARCHAR(255) NOT NULL
---       CONSTRAINT contact_custom_field_id_display_order_ck
---                  UNIQUE ( contact_custom_field_id, display_order )
+--       CONSTRAINT custom_field_id_display_order_ck
+--                  UNIQUE ( custom_field_id, display_order )
 --                  INITIALLY DEFERRED
 );
 
-CREATE TABLE "ContactCustomFieldSingleSelectValue" (
-       contact_custom_field_id    INT8         NOT NULL,
-       contact_id                 INT8         NOT NULL,
-       contact_custom_field_select_option_id  INT8  NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id )
+CREATE TABLE "CustomFieldSingleSelectValue" (
+       custom_field_id          INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
+       custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( custom_field_id, contact_id )
 );
        
-CREATE TABLE "ContactCustomFieldMultiSelectValue" (
-       contact_custom_field_id    INT8         NOT NULL,
-       contact_id                 INT8         NOT NULL,
-       contact_custom_field_select_option_id  INT8  NOT NULL,
-       PRIMARY KEY ( contact_custom_field_id, contact_id, contact_custom_field_select_option_id )
+CREATE TABLE "CustomFieldMultiSelectValue" (
+       custom_field_id          INT8         NOT NULL,
+       contact_id               INT8         NOT NULL,
+       custom_field_select_option_id  INT8  NOT NULL,
+       PRIMARY KEY ( custom_field_id, contact_id, custom_field_select_option_id )
 );
 
 CREATE TABLE "ContactNote" (
@@ -427,88 +427,88 @@ ALTER TABLE "Contact" ADD CONSTRAINT "Contact_image_file_id"
   FOREIGN KEY ("image_file_id") REFERENCES "File" ("file_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldGroup" ADD CONSTRAINT "ContactCustomFieldGroup_account_id"
+ALTER TABLE "CustomFieldGroup" ADD CONSTRAINT "CustomFieldGroup_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_contact_custom_field_group_id"
-  FOREIGN KEY ("contact_custom_field_group_id") REFERENCES "ContactCustomFieldGroup" ("contact_custom_field_group_id")
+ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_custom_field_group_id"
+  FOREIGN KEY ("custom_field_group_id") REFERENCES "CustomFieldGroup" ("custom_field_group_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_html_widget_type_id"
+ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_html_widget_type_id"
   FOREIGN KEY ("html_widget_type_id") REFERENCES "HTMLWidgetType" ("html_widget_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomField" ADD CONSTRAINT "ContactCustomField_custom_field_type_id"
+ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_custom_field_type_id"
   FOREIGN KEY ("custom_field_type_id") REFERENCES "CustomFieldType" ("custom_field_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldIntegerValue" ADD CONSTRAINT "ContactCustomFieldIntegerValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldIntegerValue" ADD CONSTRAINT "CustomFieldIntegerValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldIntegerValue" ADD CONSTRAINT "ContactCustomFieldIntegerValue_contact_id"
+ALTER TABLE "CustomFieldIntegerValue" ADD CONSTRAINT "CustomFieldIntegerValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldFloatValue" ADD CONSTRAINT "ContactCustomFieldFloatValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldFloatValue" ADD CONSTRAINT "CustomFieldFloatValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldFloatValue" ADD CONSTRAINT "ContactCustomFieldFloatValue_contact_id"
+ALTER TABLE "CustomFieldFloatValue" ADD CONSTRAINT "CustomFieldFloatValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldDateValue" ADD CONSTRAINT "ContactCustomFieldDateValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldDateValue" ADD CONSTRAINT "CustomFieldDateValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldDateValue" ADD CONSTRAINT "ContactCustomFieldDateValue_contact_id"
+ALTER TABLE "CustomFieldDateValue" ADD CONSTRAINT "CustomFieldDateValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldTextValue" ADD CONSTRAINT "ContactCustomFieldTextValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldTextValue" ADD CONSTRAINT "CustomFieldTextValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldTextValue" ADD CONSTRAINT "ContactCustomFieldTextValue_contact_id"
+ALTER TABLE "CustomFieldTextValue" ADD CONSTRAINT "CustomFieldTextValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldBinaryValue" ADD CONSTRAINT "ContactCustomFieldBinaryValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldBinaryValue" ADD CONSTRAINT "CustomFieldBinaryValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldBinaryValue" ADD CONSTRAINT "ContactCustomFieldBinaryValue_contact_id"
+ALTER TABLE "CustomFieldBinaryValue" ADD CONSTRAINT "CustomFieldBinaryValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldSelectOption" ADD CONSTRAINT "ContactCustomFieldSelectOption_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldSelectOption" ADD CONSTRAINT "CustomFieldSelectOption_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldSingleSelectValue" ADD CONSTRAINT "CustomFieldSingleSelectValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_id"
+ALTER TABLE "CustomFieldSingleSelectValue" ADD CONSTRAINT "CustomFieldSingleSelectValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldSingleSelectValue" ADD CONSTRAINT "ContactCustomFieldSingleSelectValue_contact_custom_field_select_option_id"
-  FOREIGN KEY ("contact_custom_field_select_option_id") REFERENCES "ContactCustomFieldSelectOption" ("contact_custom_field_select_option_id")
+ALTER TABLE "CustomFieldSingleSelectValue" ADD CONSTRAINT "CustomFieldSingleSelectValue_custom_field_select_option_id"
+  FOREIGN KEY ("custom_field_select_option_id") REFERENCES "CustomFieldSelectOption" ("custom_field_select_option_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_custom_field_id"
-  FOREIGN KEY ("contact_custom_field_id") REFERENCES "ContactCustomField" ("contact_custom_field_id")
+ALTER TABLE "CustomFieldMultiSelectValue" ADD CONSTRAINT "CustomFieldMultiSelectValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_id"
+ALTER TABLE "CustomFieldMultiSelectValue" ADD CONSTRAINT "CustomFieldMultiSelectValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactCustomFieldMultiSelectValue" ADD CONSTRAINT "ContactCustomFieldMultiSelectValue_contact_custom_field_select_option_id"
-  FOREIGN KEY ("contact_custom_field_select_option_id") REFERENCES "ContactCustomFieldSelectOption" ("contact_custom_field_select_option_id")
+ALTER TABLE "CustomFieldMultiSelectValue" ADD CONSTRAINT "CustomFieldMultiSelectValue_custom_field_select_option_id"
+  FOREIGN KEY ("custom_field_select_option_id") REFERENCES "CustomFieldSelectOption" ("custom_field_select_option_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_id"
