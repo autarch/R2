@@ -92,14 +92,14 @@ CREATE TABLE "Contact" (
 CREATE DOMAIN pos_int AS INTEGER
        CONSTRAINT is_positive CHECK ( VALUE > 0 );
 
-CREATE TYPE contact_type_or_all AS ENUM ( 'All', 'Person', 'Organization', 'Household' );
-
 CREATE TABLE "ContactCustomFieldGroup" (
-       contact_custom_field_group_id    SERIAL8      PRIMARY KEY,
+       contact_custom_field_group_id  SERIAL8      PRIMARY KEY,
        name                           VARCHAR(255) NOT NULL,
        description                    TEXT         NULL,
        display_order                  pos_int      NOT NULL,
-       applies_to                     contact_type_or_all  NOT NULL  DEFAULT 'Person',
+       applies_to_person              BOOLEAN      NOT NULL DEFAULT TRUE,
+       applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
+       applies_to_organization        BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id                     INT8         NOT NULL
 -- unique constraints are not deferrable
 --       CONSTRAINT account_id_display_order_ck
