@@ -65,5 +65,5 @@ Log In
 </%method>
 
 <%attr>
-show_local_nav => 0
+show_side_nav => 0
 </%attr>

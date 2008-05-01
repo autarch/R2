@@ -1,5 +1,0 @@
-    <div id="local-nav" class="yui-b">
-      <form action="/contact/search" method="GET">
-        <input name="search" type="text" class="text" value="Quick Search" />
-      </form>
-    </div>

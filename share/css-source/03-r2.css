@@ -45,15 +45,8 @@ body {
     background-color: #A1BA6C;
 }
 
-#summary {
-    background-color: #FAFFCA;
-    padding: 1em;
-    margin-bottom: 0.5em;
-    margin-right: 2em;
-}
-
 #summary h1 {
-    margin: 0;
+    margin: 0.2em 0 1em 0;
 }
 
 #bd {

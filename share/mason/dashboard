@@ -8,10 +8,6 @@
    title="Edit account settings">Edit this account</a>
 % }
 
-% if ( $authz->user_can_add_contact( user => $user, account => $account ) ) {
-<a href="<% $c->uri_for( '/contact/new_person_form'  ) %>"
-   title="Add a new person">Add a person</a>
-% }
 </div>
 
 <ul>

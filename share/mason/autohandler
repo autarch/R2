@@ -27,8 +27,8 @@
       </div>
     </div>
 
-% if ( $m->request_comp()->attr('show_local_nav') ) {
-<& local-nav.mas, %ARGS &>
+% if ( $m->request_comp()->attr('show_side_nav') ) {
+<& side-nav.mas, %ARGS &>
 % }
 	
   </div>
@@ -41,5 +41,5 @@
 </html>
 
 <%attr>
-show_local_nav => 1
+show_side_nav => 1
 </%attr>
