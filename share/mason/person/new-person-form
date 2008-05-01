@@ -202,27 +202,27 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="street_1-new">Line 1:</label>
+        <label class="secondary" for="street_1-new1">Line 1:</label>
         <input type="text" class="text" name="street_1-new1" id="street_1-new1" />
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="street_2-new">Line 2:</label>
+        <label class="secondary" for="street_2-new1">Line 2:</label>
         <input type="text" class="text" name="street_2-new1" id="street_2-new1" />
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="city-new">City:</label>
+        <label class="secondary" for="city-new1">City:</label>
         <input type="text" class="text" name="city-new1" id="city-new1" />
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="region-new">State/Region:</label>
+        <label class="secondary" for="region-new1">State/Region:</label>
         <input type="text" class="text" name="region-new1" id="region-new1" />
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="postal_code-new">Postal code:</label>
+        <label class="secondary" for="postal_code-new1">Postal code:</label>
         <input type="text" class="text" name="postal_code-new1" id="postal_code-new1" />
       </div>
 
