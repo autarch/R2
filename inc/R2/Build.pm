@@ -74,3 +74,21 @@ sub new
           recursive_tests => 1,
 	);
 }
+
+sub ACTION_missing
+{
+    my $self = shift;
+
+    my $prereqs = $self->prereq_failures();
+
+    my %mods =
+        ( map { $_ => 1 }
+          map { keys %{ $prereqs->{$_} } }
+          keys %{ $prereqs }
+        );
+
+    delete $mods{'Image::Magick'};
+
+    print join ' ', sort keys %mods;
+    print "\n";
+}
