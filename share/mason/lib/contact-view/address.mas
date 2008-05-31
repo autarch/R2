@@ -1,4 +1,4 @@
-<h3><% $address->type()->name() %></h3>
+<h3><% $address->type()->name() %><% $address->is_preferred() ? ' (Preferred)' : '' %></h3>
 
 <address>
 <% $address->street_1() %>

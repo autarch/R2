@@ -255,3 +255,7 @@ input.submit {
 #contact-image {
     float: right;
 }
+
+.address-notes, .phone-number-notes {
+    font-style: italic;
+}

@@ -15,6 +15,14 @@
 <& /lib/contact-view/address.mas, address => $address &>
 %   }
 % }
+
+% if (@phone_numbers) {
+<h2>Phone <% PL_N( 'Number', scalar @phone_numbers ) %></h2>
+
+%   for my $number (@phone_numbers) {
+<& /lib/contact-view/phone-number.mas, phone_number => $number &>
+%   }
+% }
 </&>
 
 <%shared>
@@ -33,6 +41,8 @@ if ( my $i = $person->image() )
 }
 
 my @addresses = $person->addresses()->all();
+
+my @phone_numbers = $person->phone_numbers()->all();
 </%init>
 
 <%method title>

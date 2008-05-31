@@ -1,0 +1,13 @@
+<h3><% $phone_number->type()->name() %><% $phone_number->is_preferred() ? ' (Preferred)' : '' %></h3>
+
+<% $phone_number->phone_number() %><br />
+
+% if ( ! string_is_empty( $phone_number->notes() ) ) {
+<p class="phone-number-notes">
+<% $phone_number->notes() %>
+</p>
+% }
+
+<%args>
+$phone_number
+</%args>

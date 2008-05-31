@@ -78,14 +78,44 @@ sub new_address_param_sets
             $address{notes} = $params->{ 'address_notes' . q{-} . $suffix }
         }
 
-        # The user can create an address field set but not fill in any
-        # of the parameters besides type and country.
-        next unless keys %address > 2;
-
         push @addresses, \%address;
     }
 
     return @addresses;
+}
+
+sub new_phone_number_param_sets
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my @numbers;
+
+    my $x = 1;
+    while (1)
+    {
+        my $suffix = 'new' . $x++;
+
+        last unless exists $params->{ 'phone_number_type_id' . q{-} . $suffix };
+
+        my %number =
+            $self->_params_for_classes( [ 'R2::Schema::PhoneNumber' ], $suffix );
+
+        # If it just has a type, we ignore it.
+        next unless keys %number > 1;
+
+        $number{is_preferred} = $params->{'phone_number_is_preferred'} eq $suffix ? 1 : 0;
+
+        if ( ! string_is_empty( $params->{ 'phone_number_notes' . q{-} . $suffix } ) )
+        {
+            $number{notes} = $params->{ 'phone_number_notes' . q{-} . $suffix }
+        }
+
+        push @numbers, \%number;
+    }
+
+    return @numbers;
 }
 
 

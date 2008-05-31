@@ -6,8 +6,11 @@ use warnings;
 use base 'R2::Controller::Base';
 
 use R2::Schema;
+use R2::Schema::Address;
 use R2::Schema::Contact;
+use R2::Schema::File;
 use R2::Schema::Person;
+use R2::Schema::PhoneNumber;
 
 
 sub new_person_form : Local
@@ -60,8 +63,6 @@ sub new_contact_POST
                       };
     }
 
-    my @addresses = $c->request()->new_address_param_sets();
-
     if (@errors)
     {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
@@ -71,6 +72,10 @@ sub new_contact_POST
                                   params => $c->request()->params(),
                                 );
     }
+
+    my @addresses = $c->request()->new_address_param_sets();
+
+    my @phone_numbers = $c->request()->new_phone_number_param_sets();
 
     my $person;
     my $insert_sub =
@@ -96,6 +101,13 @@ sub new_contact_POST
                 R2::Schema::Address->insert( %{ $address },
                                              contact_id => $person->contact_id(),
                                            );
+            }
+
+            for my $number (@phone_numbers)
+            {
+                R2::Schema::PhoneNumber->insert( %{ $number },
+                                                 contact_id => $person->contact_id(),
+                                               );
             }
         };
 
