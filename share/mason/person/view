@@ -4,7 +4,10 @@
   <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" id="contact-image" />
 % }
 
-  <h1><% $title %></h1>
+  <h1>
+   <% $title %>
+   <& .gender-icon, gender => $person->gender() &>
+  </h1>
 
 </div>
 
@@ -31,6 +34,7 @@ Birth date: <% $c->user()->format_date($dt) %>
 </div>
 % }
 
+
 <%shared>
 my $title = $m->caller_args(-1)->{person}->full_name();
 </%shared>
@@ -54,3 +58,13 @@ my @phone_numbers = $person->phone_numbers()->all();
 <%method title>
 <% $title %>
 </%method>
+
+<%def .gender-icon>
+<img src="/images/icons/<% $gender %>.png" title="<% $gender %>" height="16" width="16" />
+<%args>
+$gender
+</%args>
+<%init>
+return unless defined $gender;
+</%init>
+</%def>
