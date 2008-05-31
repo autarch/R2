@@ -25,6 +25,12 @@
 % }
 </&>
 
+% if ( my $dt = $person->birth_date() ) {
+<div>
+Birth date: <% $c->user()->format_date($dt) %>
+</div>
+% }
+
 <%shared>
 my $title = $m->caller_args(-1)->{person}->full_name();
 </%shared>
