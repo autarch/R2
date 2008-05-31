@@ -25,6 +25,12 @@ Does not want to be emailed via Rapport.
 </div>
 % }
 
+% if ( my $website = $person->website ) {
+<div>
+<a href="<% $website %>" title="Website for <% $title %>"><% $website %></a>
+</div>
+% }
+
 <p>
 % if ( $person->allows_mail() ) {
 Is ok with getting snail mail.
