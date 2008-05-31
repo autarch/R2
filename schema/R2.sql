@@ -59,6 +59,12 @@ CREATE TABLE "File" (
        file_id            SERIAL8            PRIMARY KEY,
        mime_type          VARCHAR(100)       NOT NULL,
        filename           TEXT               NOT NULL,
+       -- This lets us look up a variation of a file (notably a
+       -- resized image) by generating a file name from some other
+       -- File row, rather than having to know its file_id. For most
+       -- files, this will be the same as its file_id, but for resized
+       -- images it will be something like 1234-100x100
+       unique_name        TEXT               UNIQUE NOT NULL,
        contents           BYTEA              NOT NULL,
        account_id         INT8               NOT NULL
 );

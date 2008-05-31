@@ -58,34 +58,49 @@ use Fey::ORM::Table;
           default => sub { File::LibMagic->new() },
         );
 
-    class_has '_SelectByFilename' =>
+    class_has '_SelectByUniqueName' =>
         ( is      => 'ro',
           isa     => 'Fey::SQL::Select',
           lazy    => 1,
-          default => \&_build_SelectByFilename,
+          default => \&_build_SelectByUniqueName,
         );
 }
 
+
+around 'insert' => sub
+{
+    my $orig  = shift;
+    my $class = shift;
+    my %p     = @_;
+
+    my $file = $class->$orig(%p);
+
+    return $file if defined $file->unique_name();
+
+    $file->update( unique_name => $file->file_id() );
+
+    return $file;
+};
 
 sub _load_from_dbms
 {
     my $self = shift;
     my $p    = shift;
 
-    if ( ! string_is_empty( $p->{filename} ) )
+    if ( ! string_is_empty( $p->{unique_name} ) )
     {
-        return if $self->_load_by_filename( $p->{filename} );
+        return if $self->_load_by_unique_name( $p->{unique_name} );
     }
 
     return $self->SUPER::_load_from_dbms($p);
 }
 
-sub _load_by_filename
+sub _load_by_unique_name
 {
     my $self     = shift;
     my $filename = shift;
 
-    my $select = $self->_SelectByFilename();
+    my $select = $self->_SelectByUniqueName();
 
     my $dbh = $self->_dbh($select);
 
@@ -98,7 +113,7 @@ sub _load_by_filename
     return 1;
 }
 
-sub _build_SelectByFilename
+sub _build_SelectByUniqueName
 {
     my $class = shift;
 
@@ -108,7 +123,7 @@ sub _build_SelectByFilename
 
     $select->select( $schema->table('File') )
            ->from( $schema->tables( 'File' ) )
-           ->where( $schema->table('File')->column('filename'),
+           ->where( $schema->table('File')->column('unique_name'),
                     '=', Fey::Placeholder->new() );
 
     return $select;

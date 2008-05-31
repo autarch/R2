@@ -40,6 +40,14 @@ my $dbh = mock_dbh();
 
     ok( ! $file->is_image(), 'file is not an image' );
 
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( file_id filename unique_name ) ],
+          [ 1, 'foo.txt', '1' ],
+        ];
+
+    is( $file->unique_name(), '1', 'unique_name defaults to file_id' );
 }
 
 {
@@ -54,27 +62,15 @@ my $dbh = mock_dbh();
 }
 
 {
-
     $dbh->{mock_clear_history} = 1;
 
     $dbh->{mock_add_resultset} =
-        [ [ qw( file_id filename ) ],
-          [ 1, 'test.txt' ],
-          [ 2, 'test.txt' ],
+        [ [ qw( file_id filename unique_name ) ],
+          [ 2, 'test2.txt', '2' ],
         ];
 
-    ok ( ! R2::Schema::File->new( filename => 'test.txt' ),
-         'cannot load a file by filename when the filename is not unique' );
-
-    $dbh->{mock_clear_history} = 1;
-
-    $dbh->{mock_add_resultset} =
-        [ [ qw( file_id filename ) ],
-          [ 2, 'test2.txt' ],
-        ];
-
-    my $file = R2::Schema::File->new( filename => 'test2.txt' );
-    ok( $file, 'loaded file by unique filename' );
+    my $file = R2::Schema::File->new( unique_name => '2' );
+    ok( $file, 'loaded file by unique_name' );
     is( $file->file_id(), 2, 'file_id is expected value' );
 }
 
