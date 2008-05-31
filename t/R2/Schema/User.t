@@ -129,22 +129,14 @@ my $dbh = mock_dbh();
                                   last_name     => 'Smith',
                                   email_address => 'joe.smith@example.com',
                                   password      => 'password',
-                                  date_format   => '%m-%d-%Y',
+                                  date_format   => 'MM-dd-YYY',
+                                  time_format   => 'hh:mm a',
                                 );
 
-    is( $user->date_format_for_display(), 'MM-DD-YYYY',
-        'date_format_for_display()' );
-}
+    my $dt = DateTime->new( year => 2008, month => 7, day => 23, hour => 7, minute => 24 );
+    is( $user->format_date($dt), '07-23-2008',
+        'format_date' );
 
-{
-    my $user =
-        R2::Schema::User->insert( first_name    => 'Joe',
-                                  last_name     => 'Smith',
-                                  email_address => 'joe.smith@example.com',
-                                  password      => 'password',
-                                  date_format   => '%d-%m-%Y',
-                                );
-
-    is( $user->date_format_for_display(), 'DD-MM-YYYY',
-        'date_format_for_display()' );
+    is( $user->format_datetime($dt), '07-23-2008 07:24 AM',
+        'format_datetime' );
 }

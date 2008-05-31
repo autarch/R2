@@ -16,8 +16,8 @@ CREATE TABLE "User" (
        -- SHA512 in Base64 encoding
        password           VARCHAR(86)        NOT NULL,
        timezone           VARCHAR(50)        NOT NULL DEFAULT 'UTC',
-       date_format        VARCHAR(12)        NOT NULL DEFAULT '%m-%d-%Y',
-       time_format        VARCHAR(12)        NOT NULL DEFAULT '%I:%M %P',
+       date_format        VARCHAR(12)        NOT NULL DEFAULT 'MM-dd-YYYY',
+       time_format        VARCHAR(12)        NOT NULL DEFAULT 'hh:mm a',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin    BOOLEAN            DEFAULT FALSE,
        CONSTRAINT valid_username CHECK ( username != '' ),

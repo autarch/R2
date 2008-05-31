@@ -92,17 +92,20 @@ sub _load_from_dbms
         unless $self->password() eq sha512_base64( $p->{password} );
 }
 
-sub date_format_for_display
+sub format_date
 {
     my $self = shift;
+    my $dt   = shift;
 
-    my $format = $self->date_format();
+    return $dt->format_cldr( $self->date_format() );
+}
 
-    $format =~ s/%m/MM/;
-    $format =~ s/%d/DD/;
-    $format =~ s/%Y/YYYY/;
+sub format_datetime
+{
+    my $self = shift;
+    my $dt   = shift;
 
-    return $format;
+    return $dt->format_cldr( $self->date_format() . q{ } . $self->time_format() );
 }
 
 no Fey::ORM::Table;
