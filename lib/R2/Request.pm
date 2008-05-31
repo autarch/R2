@@ -41,9 +41,7 @@ sub _params_for_classes
             $key .= q{-} . $suffix
                 if $suffix;
 
-            next unless exists $params->{$key};
-
-            next if defined $params->{$key} && $params->{$key} eq '';
+            next if string_is_empty( $params->{$key} );
 
             $found{$name} = $params->{$key};
         }
@@ -69,6 +67,9 @@ sub new_address_param_sets
 
         my %address =
             $self->_params_for_classes( [ 'R2::Schema::Address' ], $suffix );
+
+        # If it just has a type and country, we ignore it.
+        next unless keys %address > 2;
 
         $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
 
