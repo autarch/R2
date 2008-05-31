@@ -1,13 +1,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
 use R2::Schema::Contact;
 
+# Just needed so we have a data source for the insert later.
+mock_dbh();
 
 {
     eval
@@ -39,4 +41,16 @@ use R2::Schema::Contact;
     my @e = @{ $@->errors() };
     is( $e[0]->{message}, q{"bob@not a domain.com" is not a valid email address.},
         'got expected error message' );
+}
+
+{
+    my %c = ( contact_type  => 'Contact',
+              email_address => 'bob@example.com',
+              website       => 'urth.org',
+            );
+
+    my $contact = R2::Schema::Contact->insert(%c);
+
+    is( $contact->website(), 'http://urth.org/',
+        'website gets canonicalized with a scheme if needed' );
 }

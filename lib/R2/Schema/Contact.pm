@@ -13,6 +13,8 @@ use R2::Schema::Address;
 use R2::Schema::File;
 use R2::Schema::PhoneNumber;
 use R2::Util qw( string_is_empty );
+use URI;
+use URI::http;
 
 # cannot load these because of circular dependency problems
 #use R2::Schema::Household;
@@ -29,6 +31,10 @@ with 'R2::Role::DataValidator';
     my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Contact') );
+
+    transform 'website' =>
+        deflate { blessed $_[1] ? $_[1]->canonical() . '' : $_[1] },
+        inflate { defined $_[1] ? URI->new( $_[1] ) : $_[1] };
 
     has_one( $schema->table('Account') );
 
@@ -94,7 +100,7 @@ with 'R2::Role::DataValidator';
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _valid_email_address ) ] },
+          default => sub { [ qw( _valid_email_address _canonicalize_website ) ] },
         );
 }
 
@@ -169,6 +175,32 @@ sub _PrimaryPhoneNumberSelect
            ->limit(1);
 
     return $select;
+}
+
+sub _canonicalize_website
+{
+    my $self = shift;
+    my $p    = shift;
+
+    return if string_is_empty( $p->{website} );
+
+    my $website =
+        $p->{website} =~ /^https?/
+        ? $p->{website}
+        : 'http://' . $p->{website};
+
+    my $uri = URI->new($website);
+
+    if ( ( $uri->scheme() && $uri->scheme() !~ /^https?/ )
+         || string_is_empty( $uri->host() ) )
+    {
+        $p->{website} = undef;
+        return;
+    }
+
+    $p->{website} = $uri->canonical() . '';
+
+    return;
 }
 
 no Fey::ORM::Table;
