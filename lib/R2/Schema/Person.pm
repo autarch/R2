@@ -25,8 +25,8 @@ with 'R2::Role::DVAAC';
     has_table $person_t;
 
     transform 'birth_date' =>
-        deflate { blessed $_[0] ? DateTime::Format::Pg->format_date( $_[0] ) : $_[0] },
-        inflate { defined $_[0] ? DateTime::Format::Pg->parse_date( $_[0] ) : $_[0] };
+        deflate { blessed $_[1] ? DateTime::Format::Pg->format_date( $_[1] ) : $_[1] },
+        inflate { defined $_[1] ? DateTime::Format::Pg->parse_date( $_[1] ) : $_[1] };
 
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
