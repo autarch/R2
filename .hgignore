@@ -2,3 +2,5 @@ syntax: glob
 
 *~
 t/lib/R2/Test/Schema.pm
+.#*
+#*#
