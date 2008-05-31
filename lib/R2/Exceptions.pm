@@ -29,7 +29,7 @@ BEGIN
     {
         if ( my @m = $_[0]->messages )
         {
-            return join "\n", 'Data validation errors: ', @m;
+            return join "\n", 'Data validation errors: ', map { ref $_ ? $_->{message} : $_ } @m;
         }
         else
         {
