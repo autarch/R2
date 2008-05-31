@@ -75,7 +75,7 @@ CREATE DOMAIN email_address AS VARCHAR(255)
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
 CREATE DOMAIN uri AS VARCHAR(255)
-       CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\w-]+(\.[\w-]+)*\.\w{2,3}' );
+       CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\\w-_]+(\.[\\w-_]+)*\\.\\w{2,3}' );
 
 CREATE TABLE "Contact" (
        contact_id         SERIAL8            PRIMARY KEY,
@@ -242,7 +242,7 @@ CREATE TABLE "ContactTag" (
 );
 
 CREATE DOMAIN tag AS VARCHAR(255)
-       CONSTRAINT valid_tag CHECK ( VALUE ~ E'^\S+$' );
+       CONSTRAINT valid_tag CHECK ( VALUE ~ E'^\\S+$' );
 
 CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
