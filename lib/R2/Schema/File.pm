@@ -27,6 +27,14 @@ use Fey::ORM::Table;
           init_arg => undef,
         );
 
+    has extensionless_basename =>
+        ( is       => 'ro',
+          isa      => 'Str',
+          lazy     => 1,
+          builder  => '_build_extensionless_basename',
+          init_arg => undef,
+        );
+
     has 'extension' =>
         ( is       => 'ro',
           isa      => 'Str',
@@ -158,6 +166,21 @@ sub _build_path
         or die "Cannot write to $path: $!";
 
     return $path;
+}
+
+sub _build_extensionless_basename
+{
+    my $self = shift;
+
+    my $path = $self->path();
+
+    my $ext = $self->extension();
+
+    my $basename = $self->path()->basename();
+
+    $basename =~ s/\.\Q$ext\E$//;
+
+    return $basename;
 }
 
 sub _build_extension
