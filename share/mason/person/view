@@ -11,6 +11,28 @@
 
 </div>
 
+<p>
+% if ( $person->allows_email() ) {
+Is ok with being emailed via Rapport.
+% } else {
+Does not want to be emailed via Rapport.
+% }
+</p>
+
+% if ( my $email = $person->email_address() ) {
+<div>
+<a href="mailto:<% $email %>" title="Send mail to <% $title %>"><% $email %></a>
+</div>
+% }
+
+<p>
+% if ( $person->allows_mail() ) {
+Is ok with getting snail mail.
+% } else {
+Does not want to receive snail mail.
+% }
+</p>
+
 % if (@addresses) {
 <h2><% PL_N( 'Address', scalar @addresses ) %></h2>
 
@@ -18,6 +40,14 @@
 <& /lib/contact-view/address.mas, address => $address &>
 %   }
 % }
+
+<p>
+% if ( $person->allows_phone() ) {
+Is ok with being called.
+% } else {
+Does not want to receive phone calls.
+% }
+</p>
 
 % if (@phone_numbers) {
 <h2>Phone <% PL_N( 'Number', scalar @phone_numbers ) %></h2>
