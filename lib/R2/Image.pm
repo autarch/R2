@@ -28,22 +28,15 @@ sub resize
                    width  => { isa => 'Int' },
                  );
 
-    my $path = $self->file()->path();
+    my $unique_name = $self->file()->file_id() . q{-} . $width . q{x} . $height;
 
-    my $dir = $path->dir();
-    my ( $name, $ext ) = $path->basename() =~ /(.+)\.([^.]+)$/;
-
-    my $resized_name = $name . q{-} . $width . q{x} . $height . q{.} . $ext;
-
-    my $resized_file = Path::Class::file( $dir, $resized_name );
-
-    my $file = R2::Schema::File->new( filename => $resized_file->basename() );
+    my $file = eval { R2::Schema::File->new( unique_name => $unique_name ) };
 
     return R2::Image->new( file => $file )
         if $file;
 
     my $img = Image::Magick->new();
-    $img->read( filename => $path );
+    $img->read( filename => $self->file()->path() );
 
     my $i_height = $img->get('height');
     my $i_width  = $img->get('width');
@@ -63,6 +56,11 @@ sub resize
                    );
     }
 
+    my $resized_file =
+        $self->file()->path()->dir()->file
+            ( $self->file()->extensionless_basename()
+              . q{.} . $self->file()->extension() );
+
     $img->write( filename => $resized_file->stringify(),
                  quality  => $img->get('quality'),
                  type     => 'Palette',
@@ -70,10 +68,11 @@ sub resize
 
     $file =
         R2::Schema::File->insert
-            ( filename   => $resized_file->basename(),
-              contents   => scalar $resized_file->slurp(),
-              mime_type  => $self->file()->mime_type(),
-              account_id => $self->file()->account_id(),
+            ( filename    => $resized_file->basename(),
+              contents    => scalar $resized_file->slurp(),
+              mime_type   => $self->file()->mime_type(),
+              account_id  => $self->file()->account_id(),
+              unique_name => $unique_name,
             );
 
     return (ref $self)->new( file => $file );

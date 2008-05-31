@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -30,11 +30,11 @@ my $dbh = mock_dbh();
 }
 
 {
-    my $image_data = read_file( 't/files/8th.jpg' );
+    my $image_data = read_file( 't/files/shoe.jpg' );
 
     my $file = R2::Schema::File->new( file_id     => 1,
                                       mime_type   => 'image/jpeg',
-                                      filename    => '8th.jpg',
+                                      filename    => 'shoe.jpg',
                                       contents    => $image_data,
                                       _from_query => 1,
                                     );
@@ -44,21 +44,26 @@ my $dbh = mock_dbh();
     $dbh->{mock_insert_id} = 2;
 
     $dbh->{mock_add_resultset} =
-        [ [ qw( file_id filename ) ],
+        [ [ qw( file_id filename unique_name ) ],
         ];
 
+    my $resized_data = read_file( 't/files/shoe-100x100.jpg' );
+
     $dbh->{mock_add_resultset} =
-        [ [ qw( file_id filename account_id mime_type ) ],
-          [ 2, '8th-100x100.jpg', 1, 'image/jpeg' ],
+        [ [ qw( file_id filename account_id mime_type unique_name contents ) ],
+          [ 2, 'shoe-100x100.jpg', 1, 'image/jpeg', '1-100x100', $resized_data ],
         ];
 
     my $image = R2::Image->new( file => $file );
     my $resized = $image->resize( height => 100, width => 100 );
 
-    is( $resized->file()->filename(), '8th-100x100.jpg',
+    is( $resized->file()->filename(), 'shoe-100x100.jpg',
         'resized file has expected filename' );
 
+    is( $resized->file()->unique_name(), '1-100x100',
+        'resized file has expected unique_name' );
+
     is( Digest::SHA->new()->addfile( $resized->path()->stringify() )->b64digest(),
-        'RNI++LwRNzNokhOz1LNbijnK/mc',
+        'pcb4ZLcwZT5KlSAvWgQOrcAo7ic',
         'file contents hash to expected digest value' );
 }

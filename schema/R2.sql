@@ -64,7 +64,7 @@ CREATE TABLE "File" (
        -- File row, rather than having to know its file_id. For most
        -- files, this will be the same as its file_id, but for resized
        -- images it will be something like 1234-100x100
-       unique_name        TEXT               UNIQUE NOT NULL,
+       unique_name        TEXT               UNIQUE NULL,
        contents           BYTEA              NOT NULL,
        account_id         INT8               NOT NULL
 );
