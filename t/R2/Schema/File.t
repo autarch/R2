@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -27,6 +27,9 @@ my $dbh = mock_dbh();
     like( $file->path(),
         qr{\Qfiles/f0/f0075278acf7e8dc8d64ae8a801626c92c487cb831d21e1798bf344956d7c81d1ed6d5dc7f4d713b84dd29c52213da26d5f9ca6d5aa67379a9d5bba0b0b3a2ff/foo.txt\E$},
         'path has expected end' );
+
+    is( $file->extension(), 'txt',
+        'extension is txt' );
 
     ok( -e $file->path(),
         'calling path() has side effect of writing the file to disk' );

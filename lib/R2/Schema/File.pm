@@ -27,6 +27,14 @@ use Fey::ORM::Table;
           init_arg => undef,
         );
 
+    has 'extension' =>
+        ( is       => 'ro',
+          isa      => 'Str',
+          lazy     => 1,
+          builder  => '_build_extension',
+          init_arg => undef,
+        );
+
     has 'uri' =>
         ( is       => 'ro',
           isa      => 'Str',
@@ -150,6 +158,17 @@ sub _build_path
         or die "Cannot write to $path: $!";
 
     return $path;
+}
+
+sub _build_extension
+{
+    my $self = shift;
+
+    my $path = $self->path();
+
+    my ($ext) = $path->basename() =~ /\.([^\.]+)$/;
+
+    return defined $ext ? $ext : '';
 }
 
 sub _build_uri
