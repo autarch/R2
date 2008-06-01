@@ -1,7 +1,10 @@
   <div id="hd">
     <ul id="global-nav">
 % if ( $c->user() ) {
-      <li><a href="<% $c->uri_for('/user/settings') %>" title="Application settings">Settings</a></li>
+%   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->user()->account() ) ) {
+      <li><a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">Account</a></li>
+%   }
+      <li><a href="<% $c->uri_for('/user/' . $c->user()->user_id() . '/settings') %>" title="Application settings">Settings</a></li>
       <li><a href="<% $c->uri_for( '/user/authentication', { 'x-tunneled-method' => 'DELETE' } ) %>"
              title="Log Out of Rapport">Log Out</a></li>
 % }
