@@ -11,6 +11,18 @@ use R2::Schema::Role;
 use R2::Schema::User;
 
 
+sub user_can_view_account
+{
+    my $self = shift;
+    my ( $user, $account ) =
+        validatep( \@_,
+                   user    => { isa => 'R2::Schema::User' },
+                   account => { isa => 'R2::Schema::Account' },
+                 );
+
+    return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Admin' );
+}
+
 sub user_can_edit_account
 {
     my $self = shift;
@@ -21,6 +33,18 @@ sub user_can_edit_account
                  );
 
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Admin' );
+}
+
+sub user_can_view_contact
+{
+    my $self = shift;
+    my ( $user, $contact ) =
+        validatep( \@_,
+                   user    => { isa => 'R2::Schema::User' },
+                   contact => { isa => 'R2::Schema::Contact' },
+                 );
+
+    return $self->_require_at_least( $user->user_id(), $contact->account_id(), 'Member' );
 }
 
 sub user_can_edit_contact
@@ -47,18 +71,6 @@ sub user_can_add_contact
                  );
 
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Editor' );
-}
-
-sub user_can_view_contact
-{
-    my $self = shift;
-    my ( $user, $contact ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   contact => { isa => 'R2::Schema::Contact' },
-                 );
-
-    return $self->_require_at_least( $user->user_id(), $contact->account_id(), 'Member' );
 }
 
 {
