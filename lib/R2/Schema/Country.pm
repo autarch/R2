@@ -3,7 +3,6 @@ package R2::Schema::Country;
 use strict;
 use warnings;
 
-use R2::Schema::Fund;
 use R2::Schema;
 
 use Fey::ORM::Table;
