@@ -1,4 +1,4 @@
-package R2::Schema::Fund;
+package R2::Schema::PaymentType;
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Fund') );
+    has_table( $schema->table('PaymentType') );
 
     has_one( $schema->table('Account') );
 
@@ -26,9 +26,12 @@ sub CreateDefaultsForAccount
     my $class   = shift;
     my $account = shift;
 
-    $class->insert( name       => 'General Fund',
-                    account_id => $account->account_id(),
-                  );
+    for my $name ( 'cash', 'check', 'credit card', 'in-kind (non-monetary)' )
+    {
+        $class->insert( name       => $name,
+                        account_id => $account->account_id(),
+                      );
+    }
 }
 
 no Fey::ORM::Table;

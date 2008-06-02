@@ -8,8 +8,10 @@ use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::Country;
 use R2::Schema::Domain;
-use R2::Schema::Fund;
+use R2::Schema::DonationSource;
+use R2::Schema::DonationTarget;
 use R2::Schema::MessagingProvider;
+use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
 use R2::Schema;
 
@@ -23,10 +25,22 @@ use MooseX::Params::Validate qw( validatep );
 
     has_one( $schema->table('Domain') );
 
-    has_many 'funds' =>
-        ( table    => $schema->table('Fund'),
+    has_many 'donation_sources' =>
+        ( table    => $schema->table('DonationSource'),
           cache    => 1,
-          order_by => [ $schema->table('Fund')->column('name') ],
+          order_by => [ $schema->table('DonationSource')->column('name') ],
+        );
+
+    has_many 'donation_targets' =>
+        ( table    => $schema->table('DonationTarget'),
+          cache    => 1,
+          order_by => [ $schema->table('DonationTarget')->column('name') ],
+        );
+
+    has_many 'payment_types' =>
+        ( table    => $schema->table('PaymentType'),
+          cache    => 1,
+          order_by => [ $schema->table('PaymentType')->column('name') ],
         );
 
     has_many 'address_types' =>
@@ -102,7 +116,11 @@ sub _initialize
 {
     my $self = shift;
 
-    R2::Schema::Fund->CreateDefaultsForAccount($self);
+    R2::Schema::DonationSource->CreateDefaultsForAccount($self);
+
+    R2::Schema::DonationTarget->CreateDefaultsForAccount($self);
+
+    R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
     R2::Schema::AddressType->CreateDefaultsForAccount($self);
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -31,14 +31,11 @@ my $dbh = mock_dbh();
         map { $_->statement() }
         @{ $dbh->{mock_all_history} };
 
-    ok( ( grep { $_ =~ /INSERT INTO "Fund"/ } @inserts ),
-        'at least one Fund was inserted for a new account' );
-    ok( ( grep { $_ =~ /INSERT INTO "AddressType"/ } @inserts ),
-        'at least one AddressType was inserted for a new account' );
-    ok( ( grep { $_ =~ /INSERT INTO "PhoneNumberType"/ } @inserts ),
-        'at least one PhoneNumberType was inserted for a new account' );
-    ok( ( grep { $_ =~ /INSERT INTO "MessagingProvider"/ } @inserts ),
-        'at least one MessagingProvider was inserted for a new account' );
-    ok( ( grep { $_ =~ /INSERT INTO "AccountCountry"/ } @inserts ),
-        'at least one AccountCountry was inserted for a new account' );
+    for my $table ( qw( DonationSource DonationTarget PaymentType
+                        AddressType PhoneNumberType MessagingProvider
+                        AccountCountry ) )
+    {
+        ok( ( grep { $_ =~ /INSERT INTO "\Q$table\E"/ } @inserts ),
+            "at least one $table was inserted for a new account" );
+    }
 }
