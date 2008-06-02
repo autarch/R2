@@ -2,12 +2,6 @@
 
 <div id="summary">
 <h1><% $title %></h1>
-
-% if ( $authz->user_can_edit_account( user => $user, account => $account ) ) {
-<a href="<% $c->uri_for( '/account/' . $account->account_id() . '/edit_form' ) %>"
-   title="Edit account settings">Edit this account</a>
-% }
-
 </div>
 
 <ul>
