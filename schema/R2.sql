@@ -338,6 +338,21 @@ CREATE TABLE "Country" (
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
+CREATE TABLE "TimeZone" (
+       olson_name         VARCHAR(255)       PRIMARY KEY,
+       iso_code           CHAR(2)            NOT NULL,
+       description        VARCHAR(100)       NOT NULL,
+       display_order      INTEGER            NOT NULL,
+       CONSTRAINT valid_olson_name CHECK ( olson_name != '' ),
+       CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
+       CONSTRAINT valid_description CHECK ( description != '' ),
+       CONSTRAINT valid_display_order CHECK ( display_order > 0 )
+-- unique constraints are not deferrable
+--       CONSTRAINT account_id_display_order_ck
+--                  UNIQUE ( iso_code, display_order )
+--                  INITIALLY DEFERRED
+);
+
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
        name               VARCHAR(255)       NOT NULL,
@@ -434,6 +449,10 @@ ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_account_id"
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_iso_code"
+  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "TimeZone" ADD CONSTRAINT "TimeZone_iso_code"
   FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
