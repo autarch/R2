@@ -374,13 +374,29 @@ CREATE TABLE "Donation" (
        amount             NUMERIC(2)         NOT NULL,
        donation_date      DATE               NOT NULL,
        contact_id         INT8               NOT NULL,
-       fund_id            INT8               NOT NULL,
+       donation_source_id INT8               NOT NULL,
+       donation_target_id INT8               NOT NULL,
+       payment_type_id    INT8               NOT NULL,
        notes              TEXT               NULL,
        CONSTRAINT valid_amount CHECK ( amount > 0.0 )
 );
 
-CREATE TABLE "Fund" (
-       fund_id            SERIAL8            PRIMARY KEY,
+CREATE TABLE "DonationSource" (
+       donation_source_id SERIAL8            PRIMARY KEY,
+       name               VARCHAR(255)       NOT NULL,
+       account_id         INT8               NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' )
+);
+
+CREATE TABLE "DonationTarget" (
+       donation_target_id SERIAL8            PRIMARY KEY,
+       name               VARCHAR(255)       NOT NULL,
+       account_id         INT8               NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' )
+);
+
+CREATE TABLE "PaymentType" (
+       payment_type_id    SERIAL8            PRIMARY KEY,
        name               VARCHAR(255)       NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
@@ -625,10 +641,26 @@ ALTER TABLE "Donation" ADD CONSTRAINT "Donation_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "Donation" ADD CONSTRAINT "Donation_fund_id"
-  FOREIGN KEY ("fund_id") REFERENCES "Fund" ("fund_id")
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_source_id"
+  FOREIGN KEY ("donation_source_id") REFERENCES "DonationSource" ("donation_source_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "Fund" ADD CONSTRAINT "Fund_account_id"
+ALTER TABLE "DonationSource" ADD CONSTRAINT "DonationSource_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_target_id"
+  FOREIGN KEY ("donation_target_id") REFERENCES "DonationTarget" ("donation_target_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "DonationTarget" ADD CONSTRAINT "DonationTarget_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_payment_type_id"
+  FOREIGN KEY ("payment_type_id") REFERENCES "PaymentType" ("payment_type_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "PaymentType" ADD CONSTRAINT "PaymentType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
