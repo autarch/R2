@@ -16,9 +16,9 @@ mock_dbh();
 {
     my $domain =
         R2::Schema::Domain->insert( web_hostname   => 'www.example.com',
-                                   email_hostname => 'www.example.com',
-                                   requires_ssl   => 0,
-                                 );
+                                    email_hostname => 'www.example.com',
+                                    requires_ssl   => 0,
+                                  );
 
     is( $domain->uri( path => '/foo' ),
         'http://www.example.com/foo',
@@ -28,9 +28,9 @@ mock_dbh();
 {
     my $domain =
         R2::Schema::Domain->insert( web_hostname   => 'www.example.com',
-                                   email_hostname => 'www.example.com',
-                                   requires_ssl   => 1,
-                                 );
+                                    email_hostname => 'www.example.com',
+                                    requires_ssl   => 1,
+                                  );
 
     is( $domain->uri( path => '/foo' ),
         'https://www.example.com/foo',
