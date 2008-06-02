@@ -21,9 +21,26 @@ system( "$FindBin::Bin/rebuild-schema" )
 
     make_countries();
 
+    make_time_zones();
+
     my $domain = make_domain();
     make_accounts($domain);
 }
+
+sub make_config_file
+{
+    my $dir = dir( File::HomeDir->my_home(), '.r2', 'etc' );
+
+    $dir->mkpath( 1, 0755 );
+
+    my $file = $dir->file('r2.conf');
+
+    my $fh = $file->openw()
+        or die "Cannot write to $file: $!";
+
+    close $fh;
+}
+
 
 sub make_countries
 {
@@ -35,6 +52,13 @@ sub make_countries
                                      name     => code2country($code),
                                    );
     }
+}
+
+sub make_time_zones
+{
+    require R2::Schema::TimeZone;
+
+    R2::Schema::TimeZone->CreateDefaultZones();
 }
 
 sub make_domain
@@ -116,18 +140,3 @@ sub make_account
 
 EOF
 }
-
-sub make_config_file
-{
-    my $dir = dir( File::HomeDir->my_home(), '.r2', 'etc' );
-
-    $dir->mkpath( 1, 0755 );
-
-    my $file = $dir->file('r2.conf');
-
-    my $fh = $file->openw()
-        or die "Cannot write to $file: $!";
-
-    close $fh;
-}
-
