@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 36;
 
 use HTML::DOM;
 use List::MoreUtils qw( any );
@@ -44,13 +44,14 @@ my $html = <<'EOF';
   </select>
  </div>
 
+ <!--__SELECT__-->
+
  <div class="form-item">
   <label for="textarea">Textarea:</label>
   <textarea name="textarea" id="textarea"></textarea>
  </div>
 </form>
 EOF
-
 
 {
     my $form = form_elt_for();
@@ -133,6 +134,31 @@ EOF
     generic_error_div_tests($form);
     text1_error_div_tests($form);
     fill_in_form_tests($form);
+}
+
+{
+    my $select = <<'EOF';
+ <div class="form-item">
+  <label for="select3">Select 3:</label>
+  <select name="select3">
+   <option value="99">1</option>
+  </select>
+ </div>
+EOF
+
+    $html =~ s/\Q<!--__SELECT__-->/$select/;
+
+    my $form = form_elt_for();
+
+    my $select3 =
+        first { $_->getAttribute('name') eq 'select3' } @{ $form->getElementsByTagName('input') };
+
+    is( lc $select3->tagName(), 'input',
+        'select3 has been made an input element' );
+    is( $select3->getAttribute('type'), 'hidden',
+        'select3 is a hidden input element' );
+    is( $select3->getAttribute('value'), '99',
+        'select3 value is 99' );
 }
 
 sub form_elt_for

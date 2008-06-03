@@ -5,6 +5,7 @@ use warnings;
 
 use HTML::DOM;
 use HTML::FillInForm;
+use R2::Config;
 use R2::Web::FormData;
 
 use Moose::Policy 'MooseX::Policy::SemiAffordanceAccessor';
@@ -58,12 +59,14 @@ sub _fill_in_form
 
     $self->_fill_form_data();
 
+    $self->_collapse_single_option_selects();
+
     my $html = $self->_form_html_from_dom();
 
     return $html unless $self->make_pretty();
 
     require HTML::Tidy;
-    my $tidy = HTML::Tidy->new( { indent         => 1,
+    my $tidy = HTML::Tidy->new( { indent         => 'auto',
                                   output_xhtml   => 1,
                                   doctype        => 'omit',
                                   show_body_only => 1,
@@ -151,6 +154,42 @@ sub _fill_form_data
     $dom->write($filled);
 
     $self->_set_dom($dom);
+}
+
+sub _collapse_single_option_selects
+{
+    my $self = shift;
+
+    for my $select ( @{ $self->_dom()->getElementsByTagName('select') } )
+    {
+        my @options = $select->options();
+
+        next if @options > 1;
+
+        $self->_collapse_single_option_select( $select, $options[0] );
+    }
+}
+
+sub _collapse_single_option_select
+{
+    my $self   = shift;
+    my $select = shift;
+    my $option = shift;
+
+    my $span = $self->_dom()->createElement('span');
+    $span->appendChild($_) for @{ $option->childNodes() };
+
+    my $hidden = $self->_dom()->createElement('input');
+    $hidden->setAttribute( type => 'hidden' );
+    $hidden->setAttribute( name => $select->getAttribute('name') );
+    $hidden->setAttribute( value => $option->getAttribute('value') );
+
+    my $parent = $select->parentNode();
+
+    $parent->removeChild($select);
+
+    $parent->appendChild($span);
+    $parent->appendChild($hidden);
 }
 
 sub _form_html_from_dom
