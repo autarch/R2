@@ -228,14 +228,9 @@
 
       <div class="form-item">
         <label class="secondary" for="iso_code-new1">Country:</label>
-% if ( @countries > 1 )  {
         <select name="iso_code-new1" id="iso_code-new1" />
-%   for my $country (@countries) {
+% for my $country (@countries) {
           <option value="<% $country->iso_code() %>"><% $country->name() %></option>
-%   }
-% } else {
-        <div class="text-for-hidden"><% $countries[0]->name() %></div>
-        <input type="hidden" name="iso_code" value="<% $countries[0]->iso_code() %>" />
 % }
       </div>
 
