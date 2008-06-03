@@ -49,6 +49,11 @@ body {
     padding-top: 1em;
 }
 
+#messages {
+    font-size: 90%;
+    background-color: #FFFFD9;
+}
+
 #local-nav {
     padding-left: 0.5em;
     padding-top: 0.5em;

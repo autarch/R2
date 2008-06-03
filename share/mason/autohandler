@@ -23,6 +23,9 @@
   <div id="bd">
     <div id="yui-main">
       <div class="yui-b">
+
+<& .messages &>
+
 % $m->call_next();
       </div>
     </div>
@@ -43,3 +46,16 @@
 <%attr>
 show_side_nav => 1
 </%attr>
+
+<%def .messages>
+<&| /lib/filter/yui/row.mas, id => 'messages' &>
+% for my $msg (@messages) {
+  <p><% $msg %></p>
+% }
+</&>
+<%init>
+my @messages = @{ $c->session()->{messages} || [] };
+
+return unless @messages;
+</%init>
+</%def>

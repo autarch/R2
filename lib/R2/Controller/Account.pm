@@ -40,6 +40,32 @@ sub account_GET_html : Private
     $c->stash()->{template} = '/account/view';
 }
 
+sub account_PUT : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my %p = $c->request()->account_params();
+    delete $p{domain_id}
+        unless $c->user()->is_system_admin();
+
+    my $account = $c->stash()->{account};
+
+    eval { $account->update(%p) };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $c->uri_for( '/account', $account->account_id(), 'edit_form' ),
+            );
+    }
+
+    $c->add_message( 'The ' . $account->name() . ' account has been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( '/account', $account->account_id() ) );
+}
+
 sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0)
 {
     my $self = shift;

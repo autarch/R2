@@ -6,7 +6,7 @@
 </div>
 
 <&| /lib/filter/form.mas, objects => [ $account ] &>
-<form class="JS-standard-form" action="/account" method="post">
+<form class="JS-standard-form" action="<% $c->uri_for( '/account', $account->account_id() ) %>" method="post">
 
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 
