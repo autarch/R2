@@ -11,6 +11,7 @@ use URI::FromHash ();
 
 use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validate );
+use MooseX::ClassAttribute;
 
 {
     my $schema = R2::Schema->Schema();
@@ -19,6 +20,13 @@ use MooseX::Params::Validate qw( validate );
 
     has_many 'accounts' =>
         ( table => $schema->table('Account') );
+
+    class_has '_SelectAllSQL' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          lazy    => 1,
+          default => \&_MakeSelectAllSQL,
+        );
 }
 
 has '_uri_scheme' =>
@@ -47,6 +55,38 @@ has '_uri_scheme' =>
                                    %p,
                                  );
     }
+}
+
+sub All
+{
+    my $class = shift;
+
+    my $select = $class->_SelectAllSQL();
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    my $sth = $dbh->prepare( $select->sql($dbh) );
+
+    return
+        Fey::Object::Iterator->new( classes     => $class,
+                                    handle      => $sth,
+                                  );
+}
+
+sub _MakeSelectAllSQL
+{
+    my $class = __PACKAGE__;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->table('Domain') )
+           ->from( $schema->tables( 'Domain') )
+           ->order_by( $schema->table('Domain')->column('web_hostname') );
+
+    return $select;
+
 }
 
 no Fey::ORM::Table;

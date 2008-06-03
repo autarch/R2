@@ -40,4 +40,12 @@ sub account_GET_html : Private
     $c->stash()->{template} = '/account/view';
 }
 
+sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{template} = '/account/edit_form';
+}
+
 1;
