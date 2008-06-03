@@ -3,6 +3,7 @@ package R2::Schema::Account;
 use strict;
 use warnings;
 
+use DateTime::Format::Pg;
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
@@ -22,6 +23,10 @@ use MooseX::Params::Validate qw( validatep );
     my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Account') );
+
+    transform 'creation_datetime' =>
+        deflate { blessed $_[1] ? DateTime::Format::Pg->format_datetime( $_[1] ) : $_[1] },
+        inflate { defined $_[1] ? DateTime::Format::Pg->parse_datetime( $_[1] ) : $_[1] };
 
     has_one( $schema->table('Domain') );
 
