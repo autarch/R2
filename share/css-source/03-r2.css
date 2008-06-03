@@ -38,19 +38,25 @@ body {
     padding-left: 0.5em;
 }
 
+/* We will actually override this so this color only applies to the left nav bit */
+#yui-main {
+    background-color: #A1BA6C;
+}
+
+.yui-g {
+    background-color: white;
+    padding-left: 1em;
+    padding-top: 1em;
+}
+
 #local-nav {
     padding-left: 0.5em;
     padding-top: 0.5em;
     padding-bottom: 2em;
-    background-color: #A1BA6C;
 }
 
 #summary h1 {
     margin: 0.2em 0 1em 0;
-}
-
-#bd {
-    padding-top: 5px;
 }
 
 #ft {
