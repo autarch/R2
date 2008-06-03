@@ -48,11 +48,11 @@ show_side_nav => 1
 </%attr>
 
 <%def .messages>
-<&| /lib/filter/yui/row.mas, id => 'messages' &>
+<div id="messages">
 % for my $msg (@messages) {
   <p><% $msg %></p>
 % }
-</&>
+</div>
 <%init>
 my @messages = @{ $c->session()->{messages} || [] };
 

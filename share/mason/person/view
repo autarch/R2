@@ -1,4 +1,3 @@
-<&| /lib/filter/yui/row.mas &>
 <div id="summary" class="<% $image ? 'has-image' : '' %>">
 % if ($image ) {
   <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" id="contact-image" />
@@ -62,7 +61,6 @@ Does not want to receive phone calls.
 <& /lib/contact-view/phone-number.mas, phone_number => $number &>
 %   }
 % }
-</&>
 
 % if ( my $dt = $person->birth_date() ) {
 <div>

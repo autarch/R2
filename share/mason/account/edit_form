@@ -1,4 +1,3 @@
-<&| /lib/filter/yui/row.mas &>
 <div id="summary">
   <h1>
    Edit <% $account->name() %>
@@ -45,8 +44,6 @@
   </div>
 
 </form>
-</&>
-
 </&>
 
 <%args>

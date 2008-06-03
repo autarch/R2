@@ -1,4 +1,3 @@
-<&| /lib/filter/yui/row.mas &>
 <div id="summary">
   <h1>
    <% $account->name() %>
@@ -12,7 +11,7 @@
 <ul>
   <li>
     <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/edit_form' ) %>"
-       title="Edit name, billing, etc.">Edit basic setting</a>
+       title="Edit name, billing, etc.">Edit basic settings</a>
   </li>
   <li>
     <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/donation_settings' ) %>"
@@ -39,9 +38,6 @@
        title="Edit instant messaging providers">Edit instant messaging providers</a>
   </li>
 </ul>
-
-</&>
-
 
 <%args>
 $account

@@ -1,4 +1,3 @@
-<&| /lib/filter/yui/row.mas &>
 <&| /lib/filter/form.mas &>
 <form action="/user/authentication" method="post">
   <input type="hidden" name="return_to" value="<% $return_to | h %>" />
@@ -54,7 +53,6 @@
 <p>
   <a href="/user/forgot_password_form?return_to=<% $return_to | uh %>">Forgot your password</a>?
 </p>
-</&>
 
 <%init>
 my $return_to = $c->request()->param('return_to') || $c->session()->{saved_params}{return_to} || '/';

@@ -1,7 +1,0 @@
-        <div class="yui-g"<% $id ? ' id=' . $id : '' %>>
-<% $m->content() | n %>
-        </div>
-
-<%args>
-$id => ''
-</%args>

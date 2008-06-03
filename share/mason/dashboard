@@ -1,5 +1,3 @@
-<&| /lib/filter/yui/row.mas &>
-
 <div id="summary">
 <h1><% $title %></h1>
 </div>
@@ -11,8 +9,6 @@
  </li>
 % }
 </ul>
-
-</&>
 
 <%shared>
 my $title = 'Dashboard: ' . $c->user()->account()->name();

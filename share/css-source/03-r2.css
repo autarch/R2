@@ -40,7 +40,7 @@ body {
 
 /* We will actually override this so this color only applies to the left nav bit */
 #yui-main {
-    background-color: #A1BA6C;
+
 }
 
 .yui-g {
@@ -57,6 +57,7 @@ body {
 #local-nav {
     padding-left: 0.5em;
     padding-top: 0.5em;
+    background-color: #A1BA6C;
 }
 
 #summary h1 {
