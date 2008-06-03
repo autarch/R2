@@ -38,20 +38,14 @@ body {
     padding-left: 0.5em;
 }
 
-/* We will actually override this so this color only applies to the left nav bit */
-#yui-main {
-
-}
-
-.yui-g {
-    background-color: white;
-    padding-left: 1em;
-    padding-top: 1em;
-}
-
 #messages {
     font-size: 90%;
     background-color: #FFFFD9;
+}
+
+#content {
+    background-color: white;
+    padding: 0.5em;
 }
 
 #local-nav {
