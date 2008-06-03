@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 use HTML::DOM;
 use List::MoreUtils qw( any );
@@ -141,7 +141,7 @@ EOF
  <div class="form-item">
   <label for="select3">Select 3:</label>
   <select name="select3">
-   <option value="99">1</option>
+   <option value="99">ninety-nine</option>
   </select>
  </div>
 EOF
@@ -159,6 +159,12 @@ EOF
         'select3 is a hidden input element' );
     is( $select3->getAttribute('value'), '99',
         'select3 value is 99' );
+
+    my $div =
+        first { $_->className() eq 'text-for-hidden' } @{ $form->getElementsByTagName('div') };
+
+    is( $div->firstChild()->data(), 'ninety-nine',
+        'option text is now in a div' );
 }
 
 sub form_elt_for
