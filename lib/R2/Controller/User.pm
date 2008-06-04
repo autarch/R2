@@ -11,13 +11,7 @@ use R2::Schema::User;
 use R2::Util qw( string_is_empty );
 
 
-sub login_form : Local
-{
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{template} = '/user/login-form';
-}
+sub login_form : Local { }
 
 sub authentication : Local : ActionClass('+R2::Action::REST') { }
 
