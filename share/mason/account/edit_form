@@ -1,6 +1,6 @@
 <div id="summary">
   <h1>
-   Edit <% $account->name() %>
+   <& SELF:title, %ARGS &>
   </h1>
 </div>
 
@@ -56,5 +56,8 @@ my $domains = R2::Schema::Domain->All();
 </%init>
 
 <%method title>
-Edit <% $m->caller_args(-1)->{account}->name() %>
+Edit <% $account->name() %>
+<%args>
+$account
+</%args>
 </%method>

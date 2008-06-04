@@ -1,5 +1,5 @@
 <div id="summary">
-  <h1><% $title %></h1>
+  <h1><& SELF:title, %ARGS &></h1>
 </div>
 
 <&| /lib/filter/form.mas &>
@@ -258,10 +258,6 @@
 </form>
 </&>
 
-<%shared>
-my $title = 'Add a new person';
-</%shared>
-
 <%init>
 my @phone_number_types = @{ $c->user()->account()->person_phone_number_types() };
 my @address_types = @{ $c->user()->account()->person_address_types() };
@@ -269,5 +265,5 @@ my @countries = $c->user()->account()->countries()->all();
 </%init>
 
 <%method title>
-<% $title %>
+Add a new person
 </%method>

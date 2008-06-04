@@ -4,8 +4,10 @@
 % }
 
   <h1>
-   <% $title %>
-   <& .gender-icon, gender => $person->gender() &>
+   <h1>
+     <& SELF:title, %ARGS &>
+     <& .gender-icon, gender => $person->gender() &>
+   </h1>
   </h1>
 
 </div>
@@ -20,13 +22,13 @@ Does not want to be emailed via Rapport.
 
 % if ( my $email = $person->email_address() ) {
 <div>
-<a href="mailto:<% $email %>" title="Send mail to <% $title %>"><% $email %></a>
+<a href="mailto:<% $email %>" title="Send mail to <% $person->full_name() %>"><% $email %></a>
 </div>
 % }
 
 % if ( my $website = $person->website ) {
 <div>
-<a href="<% $website %>" title="Website for <% $title %>"><% $website %></a>
+<a href="<% $website %>" title="Website for <% $person->full_name() %>"><% $website %></a>
 </div>
 % }
 
@@ -68,11 +70,6 @@ Birth date: <% $c->user()->format_date($dt) %>
 </div>
 % }
 
-
-<%shared>
-my $title = $m->caller_args(-1)->{person}->full_name();
-</%shared>
-
 <%args>
 $person
 </%args>
@@ -90,7 +87,10 @@ my @phone_numbers = $person->phone_numbers()->all();
 </%init>
 
 <%method title>
-<% $title %>
+<% $person->full_name() %>
+<%args>
+$person
+</%args>
 </%method>
 
 <%def .gender-icon>

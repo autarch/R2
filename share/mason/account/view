@@ -10,31 +10,31 @@
 
 <ul>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/edit_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'edit_form' ) %>"
        title="Edit name, billing, etc.">Edit basic settings</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/donation_settings' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'donation_settings' ) %>"
        title="Edit donation settings">Edit donation settings (sources, funds, types, etc.)</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/address_types_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'address_types_form' ) %>"
        title="Edit address types">Edit address types</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/countries_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'countries_form' ) %>"
        title="Edit countries for addresses">Edit countries for addresses</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/phone_number_types_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'phone_number_types_form' ) %>"
        title="Edit phone numbers types">Edit phone numbers types</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/contact_history_types_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'contact_history_types_form' ) %>"
        title="Edit contact history types">Edit contact history types</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( '/account/' . $account->account_id() . '/message_providers_form' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'message_providers_form' ) %>"
        title="Edit instant messaging providers">Edit instant messaging providers</a>
   </li>
 </ul>
@@ -44,5 +44,8 @@ $account
 </%args>
 
 <%method title>
-<% $m->caller_args(-1)->{account}->name() %>
+<% $account->name() %>
+<%args>
+$account
+</%args>
 </%method>
