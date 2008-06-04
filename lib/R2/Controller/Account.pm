@@ -1,4 +1,4 @@
-package R2::Controller::User;
+package R2::Controller::Account;
 
 use strict;
 use warnings;
@@ -66,12 +66,8 @@ sub account_PUT : Private
     $c->redirect_and_detach( $c->uri_for( '/account', $account->account_id() ) );
 }
 
-sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0)
-{
-    my $self = shift;
-    my $c    = shift;
+sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) { }
 
-    $c->stash()->{template} = '/account/edit_form';
-}
+sub donation_settings : Chained('_set_account') : PathPart('donation_settings') : Args(0) { }
 
 1;
