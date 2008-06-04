@@ -1,0 +1,49 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<ul>
+  <li>
+    <a href="<% $c->uri_for( $account->account_id(), 'donation_source' ) %>"
+       title="Edit donation sources">Edit donation sources</a>
+    <p>
+      This allows you to keep track of where donations came from, at
+      whatever granularity you want. For most organizations, it may be
+      best to keep these sources broad, like "mail" and
+      "online". Other organizations may prefer to track things in much
+      greater detail in order to evaluate the success of specific
+      campaigns.
+    </p>
+  </li>
+  <li>
+    <a href="<% $c->uri_for( $account->account_id(), 'donation_target' ) %>"
+       title="Edit donation targets">Edit donation targets</a>
+    <p>
+      This allows you to earmark donations for specific
+      funds. However, for many organizations this won't be necessary,
+      and you can simply mark all donations as targeted towards a
+      general fund.
+    </p>
+  </li>
+  <li>
+    <a href="<% $c->uri_for( $account->account_id(), 'payment_type' ) %>"
+       title="Edit payment types">Edit payment types</a>
+    <p>
+      For most organizations, the defaults of "cash", "check", "credit
+      card", and "in-kind" are probably sufficient.
+    </p>
+  </li>
+</ul>
+
+<%args>
+$account
+</%args>
+
+<%method title>
+Donation settings for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
