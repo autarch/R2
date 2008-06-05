@@ -96,6 +96,10 @@ R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
                                                       className: "delete-repeated-group",
                                                     }, div )[0];
 
+    if ( ! deleter ) {
+        return;
+    }
+
     DOM.Events.addListener( deleter,
                             "click",
                             this._makeGroupDeleter(div)
