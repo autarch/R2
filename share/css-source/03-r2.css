@@ -129,10 +129,13 @@ form div.form-item div.help-text p {
     margin-bottom: 0em;
 }
 
+form label {
+    font-weight: bold;
+}
+
 form .for-field {
     display: block;
     float: left;
-    font-weight: bold;
     text-align: right;
     margin-right: 0.5em;
     margin-top: 0.3em;
@@ -142,6 +145,7 @@ form .for-field {
 form label.secondary {
     display: block;
     float: left;
+    font-weight: normal;
     text-align: right;
     margin-right: 0.5em;
     margin-top: 0.3em;
