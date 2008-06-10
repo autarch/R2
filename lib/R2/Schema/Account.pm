@@ -224,7 +224,7 @@ sub _delete_all_donation_sources
 
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    $dbh->do( $delete->sql($dbh), $self->account_id() );
+    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
 
     $self->_clear_donation_sources();
 }
@@ -273,7 +273,7 @@ sub _delete_all_donation_targets
 
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    $dbh->do( $delete->sql($dbh), $self->account_id() );
+    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
 
     $self->_clear_donation_targets();
 }
@@ -322,7 +322,7 @@ sub _delete_all_payment_types
 
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    $dbh->do( $delete->sql($dbh), $self->account_id() );
+    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
 
     $self->_clear_payment_types();
 }
