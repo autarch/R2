@@ -1,0 +1,53 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<& /lib/help-text/payment-type.mas &>
+</p>
+
+<&| /lib/filter/form.mas &>
+    <form action="<% $c->uri_for( $account->account_id(), 'payment_type' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Payment Types</legend>
+% while ( my $target = $targets->next() ) {
+      <input class="text medium no-label" type="text" name="payment_type_name_<% $target->payment_type_id() %>"
+             value="<% $target->name() %>" />
+% }
+
+    <h3>Add New Targets</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-payment-type">
+      <input class="text medium no-label" type="text" name="payment_type_name_new1"
+             id="payment_type_name_new1" />
+    </div>
+
+    <a href="#" class="add-another" id="payment-type-repeater">Add another target</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+  
+</form>
+</&>
+
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $targets = $account->payment_types();
+</%init>
+
+<%method title>
+Payment types for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

@@ -22,6 +22,48 @@ sub account_params
     return $self->_params_for_classes( [ 'R2::Schema::Account' ] );
 }
 
+sub donation_source_names
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    return
+        ( grep { ! string_is_empty($_)  }
+          map  { $params->{$_} }
+          grep { /^donation_source_name/ }
+          keys %{ $params }
+        );
+}
+
+sub donation_target_names
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    return
+        ( grep { ! string_is_empty($_)  }
+          map  { $params->{$_} }
+          grep { /^donation_target_name/ }
+          keys %{ $params }
+        );
+}
+
+sub payment_type_names
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    return
+        ( grep { ! string_is_empty($_)  }
+          map  { $params->{$_} }
+          grep { /^payment_type_name/ }
+          keys %{ $params }
+        );
+}
+
 sub _params_for_classes
 {
     my $self    = shift;

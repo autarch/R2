@@ -57,17 +57,136 @@ sub account_PUT : Private
     {
         $c->_redirect_with_error
             ( error => $e,
-              uri   => $c->uri_for( '/account', $account->account_id(), 'edit_form' ),
+              uri   => $c->uri_for( $account->account_id(), 'edit_form' ),
             );
     }
 
     $c->add_message( 'The ' . $account->name() . ' account has been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( '/account', $account->account_id() ) );
+    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
 }
 
 sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) { }
 
 sub donation_settings : Chained('_set_account') : PathPart('donation_settings') : Args(0) { }
+
+sub donation_source : Chained('_set_account') : PathPart('donation_source') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub donation_source_GET_html : Private { }
+
+sub donation_source_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my @sources = $c->request()->donation_source_names();
+
+    unless (@sources)
+    {
+        $c->_redirect_with_error
+            ( error => 'You must have at least one donation source.',
+              uri   => $c->uri_for( $account->account_id(), 'donation_source' ),
+            );
+    }
+
+    eval
+    {
+        $account->replace_donation_sources(@sources);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $c->uri_for( $account->account_id(), 'donation_source' ),
+            );
+    }
+
+    $c->add_message( 'The donation sources for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+}
+
+sub donation_target : Chained('_set_account') : PathPart('donation_target') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub donation_target_GET_html : Private { }
+
+sub donation_target_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my @targets = $c->request()->donation_target_names();
+
+    unless (@targets)
+    {
+        $c->_redirect_with_error
+            ( error => 'You must have at least one donation target.',
+              uri   => $c->uri_for( $account->account_id(), 'donation_target' ),
+            );
+    }
+
+    eval
+    {
+        $account->replace_donation_targets(@targets);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $c->uri_for( $account->account_id(), 'donation_target' ),
+            );
+    }
+
+    $c->add_message( 'The donation targets for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+}
+
+sub payment_type : Chained('_set_account') : PathPart('payment_type') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub payment_type_GET_html : Private { }
+
+sub payment_type_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my @types = $c->request()->payment_type_names();
+
+    unless (@types)
+    {
+        $c->_redirect_with_error
+            ( error => 'You must have at least one payment source.',
+              uri   => $c->uri_for( $account->account_id(), 'payment_type' ),
+            );
+    }
+
+    eval
+    {
+        $account->replace_payment_types(@types);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $c->uri_for( $account->account_id(), 'payment_type' ),
+            );
+    }
+
+    $c->add_message( 'The payment types for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+}
+
+
 
 1;

@@ -152,8 +152,13 @@ form label.secondary {
     width: 9em;
 }
 
-form .no-label {
+form div.no-label {
     margin-left: 9.5em;
+}
+
+form input.no-label {
+    display: block;
+    margin-bottom: 0.2em;
 }
 
 form label.for-radio {

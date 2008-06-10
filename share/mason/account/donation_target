@@ -1,0 +1,53 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<& /lib/help-text/donation-target.mas &>
+</p>
+
+<&| /lib/filter/form.mas &>
+    <form action="<% $c->uri_for( $account->account_id(), 'donation_target' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Donation Targets</legend>
+% while ( my $target = $targets->next() ) {
+      <input class="text medium no-label" type="text" name="donation_target_name_<% $target->donation_target_id() %>"
+             value="<% $target->name() %>" />
+% }
+
+    <h3>Add New Targets</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-donation-target">
+      <input class="text medium no-label" type="text" name="donation_target_name_new1"
+             id="donation_target_name_new1" />
+    </div>
+
+    <a href="#" class="add-another" id="donation-target-repeater">Add another target</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+  
+</form>
+</&>
+
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $targets = $account->donation_targets();
+</%init>
+
+<%method title>
+Donation targets for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
