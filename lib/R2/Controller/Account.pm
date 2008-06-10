@@ -70,6 +70,8 @@ sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) { }
 
 sub donation_settings : Chained('_set_account') : PathPart('donation_settings') : Args(0) { }
 
+sub donation_sources_form : Chained('_set_account') : PathPart('donation_sources_form') : Args(0) { }
+
 sub donation_source : Chained('_set_account') : PathPart('donation_source') : Args(0) : ActionClass('+R2::Action::REST') { }
 
 sub donation_source_GET_html : Private { }
@@ -109,6 +111,8 @@ sub donation_source_POST : Private
     $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
 }
 
+sub donation_targets_form : Chained('_set_account') : PathPart('donation_targets_form') : Args(0) { }
+
 sub donation_target : Chained('_set_account') : PathPart('donation_target') : Args(0) : ActionClass('+R2::Action::REST') { }
 
 sub donation_target_GET_html : Private { }
@@ -147,6 +151,8 @@ sub donation_target_POST : Private
 
     $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
 }
+
+sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) { }
 
 sub payment_type : Chained('_set_account') : PathPart('payment_type') : Args(0) : ActionClass('+R2::Action::REST') { }
 

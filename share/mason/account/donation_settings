@@ -6,19 +6,19 @@
 
 <ul>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'donation_source' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'donation_sources_form' ) %>"
        title="Edit donation sources">Edit donation sources</a>
 
     <& /lib/help-text/donation-source.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'donation_target' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'donation_targets_form' ) %>"
        title="Edit donation targets">Edit donation targets</a>
 
     <& /lib/help-text/donation-target.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'payment_type' ) %>"
+    <a href="<% $c->uri_for( $account->account_id(), 'payment_types_form' ) %>"
        title="Edit payment types">Edit payment types</a>
 
     <& /lib/help-text/payment-type.mas &>
