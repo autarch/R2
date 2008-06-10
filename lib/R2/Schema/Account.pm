@@ -17,6 +17,7 @@ use R2::Schema::PhoneNumberType;
 use R2::Schema;
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
 {
@@ -89,15 +90,36 @@ use MooseX::Params::Validate qw( validatep );
 
     has_many 'countries' =>
         ( table       => $schema->table('Country'),
-          select      => __PACKAGE__->_CountriesSelect(),
+          select      => __PACKAGE__->_BuildCountriesSelect(),
           bind_params => sub { $_[0]->account_id() },
           cache       => 1,
         );
 
     has_many 'people' =>
         ( table       => $schema->table('Person'),
-          select      => __PACKAGE__->_PeopleSelect(),
+          select      => __PACKAGE__->_BuildPeopleSelect(),
           bind_params => sub { $_[0]->account_id() },
+        );
+
+    class_has '_DonationSourcesDelete' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Delete',
+          lazy    => 1,
+          default => sub { __PACKAGE__->_BuildDonationSourcesDelete },
+        );
+
+    class_has '_DonationTargetsDelete' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Delete',
+          lazy    => 1,
+          default => sub { __PACKAGE__->_BuildDonationTargetsDelete },
+        );
+
+    class_has '_PaymentTypesDelete' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Delete',
+          lazy    => 1,
+          default => sub { __PACKAGE__->_BuildPaymentTypesDelete },
         );
 }
 
@@ -115,7 +137,7 @@ sub insert
                   };
 
     return R2::Schema->RunInTransaction($sub);
-};
+}
 
 sub _initialize
 {
@@ -173,7 +195,154 @@ sub add_country
         );
 }
 
-sub _CountriesSelect
+sub replace_donation_sources
+{
+    my $self    = shift;
+    my @sources = @_;
+
+    my $sub = sub { $self->_delete_all_donation_sources();
+
+                    for my $name (@sources)
+                    {
+                        R2::Schema::DonationSource->insert
+                            ( name       => $name,
+                              account_id => $self->account_id(),
+                            );
+                    }
+                  };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub _delete_all_donation_sources
+{
+    my $self = shift;
+
+    my $delete = $self->_DonationSourcesDelete();
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    $dbh->do( $delete->sql($dbh), $self->account_id() );
+
+    $self->_clear_donation_sources();
+}
+
+sub _BuildDonationSourcesDelete
+{
+    my $class = shift;
+
+    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
+
+    my $schema = R2::Schema->Schema();
+
+    $delete->from( $schema->table('DonationSource') )
+           ->where( $schema->table('DonationSource')->column('account_id'),
+                    '=', Fey::Placeholder->new() );
+
+    return $delete;
+}
+
+sub replace_donation_targets
+{
+    my $self    = shift;
+    my @targets = @_;
+
+    my $sub = sub { $self->_delete_all_donation_targets();
+
+                    for my $name (@targets)
+                    {
+                        R2::Schema::DonationTarget->insert
+                            ( name       => $name,
+                              account_id => $self->account_id(),
+                            );
+                    }
+                  };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub _delete_all_donation_targets
+{
+    my $self = shift;
+
+    my $delete = $self->_DonationTargetsDelete();
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    $dbh->do( $delete->sql($dbh), $self->account_id() );
+
+    $self->_clear_donation_targets();
+}
+
+sub _BuildDonationTargetsDelete
+{
+    my $class = shift;
+
+    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
+
+    my $schema = R2::Schema->Schema();
+
+    $delete->from( $schema->table('DonationTarget') )
+           ->where( $schema->table('DonationTarget')->column('account_id'),
+                    '=', Fey::Placeholder->new() );
+
+    return $delete;
+}
+
+sub replace_payment_types
+{
+    my $self    = shift;
+    my @targets = @_;
+
+    my $sub = sub { $self->_delete_all_payment_types();
+
+                    for my $name (@targets)
+                    {
+                        R2::Schema::PaymentType->insert
+                            ( name       => $name,
+                              account_id => $self->account_id(),
+                            );
+                    }
+                  };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub _delete_all_payment_types
+{
+    my $self = shift;
+
+    my $delete = $self->_PaymentTypesDelete();
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    $dbh->do( $delete->sql($dbh), $self->account_id() );
+
+    $self->_clear_payment_types();
+}
+
+sub _BuildPaymentTypesDelete
+{
+    my $class = shift;
+
+    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
+
+    my $schema = R2::Schema->Schema();
+
+    $delete->from( $schema->table('PaymentType') )
+           ->where( $schema->table('PaymentType')->column('account_id'),
+                    '=', Fey::Placeholder->new() );
+
+    return $delete;
+}
+
+sub _BuildCountriesSelect
 {
     my $class = shift;
 
@@ -194,7 +363,7 @@ sub _CountriesSelect
     return $select;
 }
 
-sub _PeopleSelect
+sub _BuildPeopleSelect
 {
     my $class = shift;
 
@@ -216,6 +385,7 @@ sub _PeopleSelect
 
 no Fey::ORM::Table;
 no Moose;
+no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 
