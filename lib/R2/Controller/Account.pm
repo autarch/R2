@@ -89,7 +89,7 @@ sub donation_source_POST : Private
     {
         $c->_redirect_with_error
             ( error => 'You must have at least one donation source.',
-              uri   => $c->uri_for( $account->account_id(), 'donation_source' ),
+              uri   => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
             );
     }
 
@@ -102,7 +102,7 @@ sub donation_source_POST : Private
     {
         $c->_redirect_with_error
             ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'donation_source' ),
+              uri   => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
             );
     }
 
@@ -130,7 +130,7 @@ sub donation_target_POST : Private
     {
         $c->_redirect_with_error
             ( error => 'You must have at least one donation target.',
-              uri   => $c->uri_for( $account->account_id(), 'donation_target' ),
+              uri   => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
             );
     }
 
@@ -143,7 +143,7 @@ sub donation_target_POST : Private
     {
         $c->_redirect_with_error
             ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'donation_target' ),
+              uri   => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
             );
     }
 
@@ -170,8 +170,8 @@ sub payment_type_POST : Private
     unless (@types)
     {
         $c->_redirect_with_error
-            ( error => 'You must have at least one payment source.',
-              uri   => $c->uri_for( $account->account_id(), 'payment_type' ),
+            ( error => 'You must have at least one payment type.',
+              uri   => $c->uri_for( $account->account_id(), 'payment_types_form' ),
             );
     }
 
@@ -184,7 +184,7 @@ sub payment_type_POST : Private
     {
         $c->_redirect_with_error
             ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'payment_type' ),
+              uri   => $c->uri_for( $account->account_id(), 'payment_types_form' ),
             );
     }
 
