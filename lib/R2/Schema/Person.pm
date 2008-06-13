@@ -51,6 +51,12 @@ with 'R2::Role::DVAAC';
           bind_params => sub { $_[0]->person_id() },
         );
 
+    has 'full_name' =>
+        ( is         => 'ro',
+          isa        => 'Str',
+          lazy_build => 1,
+        );
+
     class_has 'GenderValues' =>
         ( is      => 'ro',
           isa     => 'ArrayRef',
@@ -154,14 +160,14 @@ sub _MessagingSelect
     return $select;
 }
 
-sub friendly_name
+sub _build_friendly_name
 {
     my $self = shift;
 
     return $self->first_name();
 }
 
-sub full_name
+sub _build_full_name
 {
     my $self = shift;
 
@@ -171,7 +177,6 @@ sub full_name
           map { $self->$_() }
           qw( salutation first_name middle_name last_name suffix )
         );
-
 }
 
 no Fey::ORM::Table;

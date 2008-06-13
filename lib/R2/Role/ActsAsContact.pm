@@ -11,6 +11,13 @@ use Moose::Role;
 #
 # has_one 'contact' => ...
 
+requires '_build_friendly_name';
+
+has 'friendly_name' =>
+    ( is         => 'ro',
+      isa        => 'Str',
+      lazy_build => 1,
+    );
 
 # This is a bit inelegant, since it means that the contact validations
 # will run twice on insert and update. In practice, this isn't _that_

@@ -23,7 +23,7 @@ with 'R2::Role::ActsAsContact';
         );
 }
 
-sub friendly_name
+sub _build_friendly_name
 {
     my $self = shift;
 
