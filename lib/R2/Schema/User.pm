@@ -72,7 +72,6 @@ around 'insert' => sub
                     return $user;
                   };
 
-
     return R2::Schema->RunInTransaction($sub);
 };
 
