@@ -73,13 +73,6 @@ use Fey::ORM::Table;
           lazy    => 1,
           default => sub { File::LibMagic->new() },
         );
-
-    class_has '_SelectByUniqueName' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Select',
-          lazy    => 1,
-          default => \&_build_SelectByUniqueName,
-        );
 }
 
 
@@ -97,53 +90,6 @@ around 'insert' => sub
 
     return $file;
 };
-
-sub _load_from_dbms
-{
-    my $self = shift;
-    my $p    = shift;
-
-    if ( ! string_is_empty( $p->{unique_name} ) )
-    {
-        return if $self->_load_by_unique_name( $p->{unique_name} );
-    }
-
-    return $self->SUPER::_load_from_dbms($p);
-}
-
-sub _load_by_unique_name
-{
-    my $self     = shift;
-    my $filename = shift;
-
-    my $select = $self->_SelectByUniqueName();
-
-    my $dbh = $self->_dbh($select);
-
-    my $rows = $dbh->selectall_arrayref( $select->sql($dbh), { Slice => {} }, $filename );
-
-    return unless @{ $rows } == 1;
-
-    $self->_set_column_values_from_hashref( $rows->[0] );
-
-    return 1;
-}
-
-sub _build_SelectByUniqueName
-{
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->table('File') )
-           ->from( $schema->tables( 'File' ) )
-           ->where( $schema->table('File')->column('unique_name'),
-                    '=', Fey::Placeholder->new() );
-
-    return $select;
-}
 
 sub _build_path
 {
