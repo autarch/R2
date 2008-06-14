@@ -105,21 +105,21 @@ use MooseX::Params::Validate qw( validatep );
         ( is      => 'ro',
           isa     => 'Fey::SQL::Delete',
           lazy    => 1,
-          default => sub { __PACKAGE__->_BuildDonationSourcesDelete },
+          default => sub { __PACKAGE__->_BuildDonationSourcesDelete() },
         );
 
     class_has '_DonationTargetsDelete' =>
         ( is      => 'ro',
           isa     => 'Fey::SQL::Delete',
           lazy    => 1,
-          default => sub { __PACKAGE__->_BuildDonationTargetsDelete },
+          default => sub { __PACKAGE__->_BuildDonationTargetsDelete() },
         );
 
     class_has '_PaymentTypesDelete' =>
         ( is      => 'ro',
           isa     => 'Fey::SQL::Delete',
           lazy    => 1,
-          default => sub { __PACKAGE__->_BuildPaymentTypesDelete },
+          default => sub { __PACKAGE__->_BuildPaymentTypesDelete() },
         );
 }
 
