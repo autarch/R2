@@ -22,6 +22,16 @@ subtype 'R2::Type::FileIsImage'
     => where { $_->is_image() }
     => message { 'This file is not an image' };
 
+subtype 'R2::Type::PosInt'
+    => as 'Int'
+    => where { $_ > 0 }
+    => message { 'This must be a positive integer' };
+
+subtype 'R2::Type::PosOrZeroInt'
+    => as 'Int'
+    => where { $_ >= 0 }
+    => message { 'This must be an integer >= 0' };
+
 no Moose::Util::TypeConstraints;
 
 1;
