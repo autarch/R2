@@ -193,6 +193,45 @@ sub payment_type_POST : Private
     $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
 }
 
+sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) { }
 
+sub address_type : Chained('_set_account') : PathPart('address_type') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub address_type_GET_html : Private { }
+
+sub address_type_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my @types = $c->request()->address_type_names();
+
+    unless (@types)
+    {
+        $c->_redirect_with_error
+            ( error => 'You must have at least one address type.',
+              uri   => $c->uri_for( $account->account_id(), 'address_types_form' ),
+            );
+    }
+
+    eval
+    {
+        $account->replace_address_types(@types);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $c->uri_for( $account->account_id(), 'address_types_form' ),
+            );
+    }
+
+    $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+}
 
 1;

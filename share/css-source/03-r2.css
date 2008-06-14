@@ -166,6 +166,10 @@ form label.for-radio {
     color: #777;
 }
 
+form label.for-checkbox {
+    font-weight: normal;
+}
+
 form label.selected {
     color: black;
 }

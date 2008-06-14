@@ -1,0 +1,90 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<& /lib/help-text/address-type.mas &>
+</p>
+
+<&| /lib/filter/form.mas &>
+    <form action="<% $c->uri_for( $account->account_id(), 'address_type' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Address Types</legend>
+% while ( my $type = $types->next() ) {
+    <div class="form-item">
+      <input class="text medium no-label" type="text" name="address_type_name_<% $type->address_type_id() %>"
+             value="<% $type->name() %>" />
+      <label>Applies to ...</label>
+      <input type="checkbox" name="applies_to_person_<% $type->address_type_id() %>"
+             id="applies_to_person_<% $type->address_type_id() %>"
+             value="1" <% $type->applies_to_person() ? q{checked="checked"} : '' %>>
+      <label class="for-checkbox" for="applies_to_person_<% $type->address_type_id() %>">People</label>
+
+      <input type="checkbox" name="applies_to_household_<% $type->address_type_id() %>"
+             id="applies_to_household_<% $type->address_type_id() %>"
+             value="1" <% $type->applies_to_household() ? q{checked="checked"} : '' %>>
+      <label class="for-checkbox" for="applies_to_household_<% $type->address_type_id() %>">Household</label>
+
+      <input type="checkbox" name="applies_to_organization_<% $type->address_type_id() %>"
+             id="applies_to_organization_<% $type->address_type_id() %>"
+             value="1" <% $type->applies_to_organization() ? q{checked="checked"} : '' %>>
+      <label class="for-checkbox" for="applies_to_organization_<% $type->address_type_id() %>">Organizations</label>
+    </div>
+% }
+
+    <h3>Add New Types</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-address-type">
+      <div class="form-item">
+        <input class="text medium no-label" type="text" name="address_type_name_new1"
+               id="address_type_name_new1" />
+
+        <label>Applies to ...</label>
+
+        <input type="checkbox" name="applies_to_person_new1"
+               id="applies_to_person_new1"
+               value="1">
+        <label class="for-checkbox" for="applies_to_person_new1">People</label>
+
+        <input type="checkbox" name="applies_to_household_new1"
+               id="applies_to_household_new1"
+               value="1">
+        <label class="for-checkbox" for="applies_to_household_new1">Household</label>
+
+        <input type="checkbox" name="applies_to_organization_new1"
+               id="applies_to_organization_new1"
+               value="1">
+        <label class="for-checkbox" for="applies_to_organization_new1">Organizations</label>
+
+      </div>
+    </div>
+
+    <a href="#" class="add-another" id="address-type-repeater">Add another type</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+  
+</form>
+</&>
+
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $types = $account->address_types();
+</%init>
+
+<%method title>
+Address Types for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
