@@ -2,6 +2,10 @@
 <h1><% $title %></h1>
 </div>
 
+<h2><% $account->person_count() %> <% PL_N( 'Person', $account->person_count() ) %></h2>
+<h2><% $account->household_count() %> <% PL_N( 'Person', $account->household_count() ) %></h2>
+<h2><% $account->organization_count() %> <% PL_N( 'Person', $account->organization_count() ) %></h2>
+
 <ul>
 % while ( my $person = $people->next() ) {
  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
