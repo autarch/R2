@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 7;
 
 use File::Slurp qw( write_file );
 use File::Temp qw( tempdir );
@@ -29,20 +29,6 @@ my $file = file( tempdir( CLEANUP => 1 ), 'r2.conf' );
 
     like( $@, qr/cannot find a config file/i,
           'error is thrown when we no config file can be found' );
-}
-
-{
-    write_file( $file->stringify(), <<'EOF' );
-[R2]
-is_production = 1
-EOF
-
-    local $ENV{R2_CONFIG} = $file->stringify();
-
-    eval { $config->_build_config_hash() };
-
-    like( $@, qr/must supply a value for .+ forgot_pw/,
-          'if [R2] - is_production is true, then [secrets] forgot_pw is required' );
 }
 
 {
