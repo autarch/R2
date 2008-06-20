@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use DateTime::Format::Pg;
+use Lingua::EN::Inflect qw( PL_N );
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
@@ -11,9 +12,12 @@ use R2::Schema::Country;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
 use R2::Schema::DonationTarget;
+use R2::Schema::Household;
 use R2::Schema::MessagingProvider;
+use R2::Schema::Organization;
 use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
+use R2::Schema::Person;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -21,6 +25,8 @@ use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
 {
+    __PACKAGE__->_AddSQLMethods();
+
     my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Account') );
@@ -157,9 +163,10 @@ sub _initialize
 
     for my $code ( qw( us ca ) )
     {
-        $self->add_country( country    => R2::Schema::Country->new( iso_code => $code ),
-                            is_default => ( $code eq 'us' ? 1 : 0 ),
-                          );
+        $self->add_country
+            ( country    => R2::Schema::Country->new( iso_code => $code ),
+              is_default => ( $code eq 'us' ? 1 : 0 ),
+            );
     }
 }
 
@@ -363,25 +370,53 @@ sub _BuildCountriesSelect
     return $select;
 }
 
-sub _BuildPeopleSelect
+sub _AddSQLMethods
 {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('Person') )
-           ->from( $schema->tables( 'Contact', 'Person' ) )
-           ->where( $schema->table('Contact')->column('account_id'),
-                    '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('Person')->column('last_name'),
-                       $schema->table('Person')->column('first_name'),
-                       $schema->table('Person')->column('middle_name'),
-                     );
+    for my $type ( qw( Person Household Organization ) )
+    {
+        my $pl_type = PL_N($type);
 
-    return $select;
+        my $class = 'R2::Schema::' . $type;
+
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        my $foreign_table = $schema->table($type);
+
+        $select->select($foreign_table)
+               ->from( $schema->tables('Contact'), $foreign_table )
+               ->where( $schema->table('Contact')->column('account_id'),
+                        '=', Fey::Placeholder->new() )
+               ->order_by( @{ $class->DefaultOrderBy() } );
+
+        __PACKAGE__->meta()->add_method
+            ( '_Build' . $pl_type . 'Select' => sub { $select } );
+
+        $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        my $count =
+            Fey::Literal::Function->new
+                ( 'COUNT', $foreign_table->primary_key() );
+
+        $select->select($count)
+               ->from( $schema->tables('Contact'), $foreign_table )
+               ->where( $schema->table('Contact')->column('account_id'),
+                        '=', Fey::Placeholder->new() );
+
+        my $build_count_meth = '_Build' . $type . 'CountSelect';
+        __PACKAGE__->meta()->add_method
+            ( $build_count_meth => sub { $select } );
+
+        has $pl_type . '_count' =>
+            ( metaclass => 'FromSelect',
+              is        => 'ro',
+              isa       => 'Int',
+              select    => __PACKAGE__->$build_count_meth(),
+            );
+    }
 }
+
 
 no Fey::ORM::Table;
 no Moose;

@@ -70,6 +70,16 @@ with 'R2::Role::DVAAC';
           lazy    => 1,
           default => sub { [ qw( _require_some_name _valid_birth_date ) ] },
         );
+
+    class_has 'DefaultOrderBy' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef',
+          lazy    => 1,
+          default => sub { [ $schema->table('Person')->column('last_name'),
+                             $schema->table('Person')->column('first_name'),
+                             $schema->table('Person')->column('middle_name'),
+                           ] },
+        );
 }
 
 sub _GetGenderValues

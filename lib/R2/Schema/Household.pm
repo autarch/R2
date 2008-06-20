@@ -7,6 +7,7 @@ use R2::Schema::Contact;
 use R2::Schema;
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 with 'R2::Role::ActsAsContact';
 
@@ -21,6 +22,14 @@ with 'R2::Role::ActsAsContact';
                        R2::Schema::Contact->meta()->get_attribute_list(),
                      ],
         );
+
+    class_has 'DefaultOrderBy' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef',
+          lazy    => 1,
+          default =>
+          sub { [ $schema->table('Household')->column('name') ] },
+        );
 }
 
 sub _build_friendly_name
@@ -32,6 +41,7 @@ sub _build_friendly_name
 
 no Fey::ORM::Table;
 no Moose;
+no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

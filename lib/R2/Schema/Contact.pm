@@ -8,7 +8,6 @@ use Fey::Literal::String;
 use Fey::Placeholder;
 use R2::Image;
 use R2::Schema;
-use R2::Schema::Account;
 use R2::Schema::Address;
 use R2::Schema::File;
 use R2::Schema::PhoneNumber;
@@ -20,6 +19,7 @@ use URI::http;
 #use R2::Schema::Household;
 #use R2::Schema::Organization;
 #use R2::Schema::Person;
+#use R2::Schema::Account;
 
 use MooseX::ClassAttribute;
 use Fey::ORM::Table;
