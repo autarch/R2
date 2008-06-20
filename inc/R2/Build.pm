@@ -45,6 +45,7 @@ my %Requires =
       'File::Temp'                               => 0,
       'HTML::FillInForm'                         => 0,
       'HTML::DOM'                                => 0,
+      'HTML::Tidy'                               => 0,
       'Image::Magick'                            => 0,
       'IPC::Run3'                                => 0,
       'JavaScript::Squish'                       => 0,
