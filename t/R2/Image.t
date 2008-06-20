@@ -62,8 +62,9 @@ my $dbh = mock_dbh();
 
     is( $resized->file()->unique_name(), '1-100x100',
         'resized file has expected unique_name' );
-
+    warn $resized->file->path, "\n";
+    my $x = <STDIN>;
     is( Digest::SHA->new()->addfile( $resized->path()->stringify() )->b64digest(),
-        'pcb4ZLcwZT5KlSAvWgQOrcAo7ic',
+        'qyiMDI4bKHAezS/IGxneuUuOfp4',
         'file contents hash to expected digest value' );
 }
