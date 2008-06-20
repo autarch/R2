@@ -28,7 +28,8 @@ sub resize
                    width  => { isa => 'Int' },
                  );
 
-    my $unique_name = $self->file()->file_id() . q{-} . $width . q{x} . $height;
+    my $dimensions = $width . q{x} . $height;
+    my $unique_name = $self->file()->file_id() . q{-} . $dimensions;
 
     my $file = eval { R2::Schema::File->new( unique_name => $unique_name ) };
 
@@ -59,6 +60,8 @@ sub resize
     my $resized_file =
         $self->file()->path()->dir()->file
             ( $self->file()->extensionless_basename()
+              . q{-}
+              . $dimensions
               . q{.} . $self->file()->extension() );
 
     $img->write( filename => $resized_file->stringify(),
