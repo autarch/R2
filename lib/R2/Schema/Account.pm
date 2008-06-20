@@ -25,8 +25,6 @@ use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
 {
-    __PACKAGE__->_AddSQLMethods();
-
     my $schema = R2::Schema->Schema();
 
     has_table( $schema->table('Account') );
@@ -67,27 +65,6 @@ use MooseX::Params::Validate qw( validatep );
           order_by => [ $schema->table('PhoneNumberType')->column('name') ],
         );
 
-    for my $type ( qw( person household organization ) )
-    {
-        my $applies_meth = 'applies_to_' . $type;
-
-        has $type . '_address_types' =>
-            ( is      => 'ro',
-              isa     => 'ArrayRef[R2::Schema::AddressType]',
-              lazy    => 1,
-              default => sub { [ grep { $_->$applies_meth() }
-                                 $_[0]->address_types()->all() ] },
-            );
-
-        has $type . '_phone_number_types' =>
-            ( is      => 'ro',
-              isa     => 'ArrayRef[R2::Schema::PhoneNumberType]',
-              lazy    => 1,
-              default => sub { [ grep { $_->$applies_meth() }
-                                 $_[0]->phone_number_types()->all() ] },
-            );
-    }
-
     has_many 'messaging_providers' =>
         ( table    => $schema->table('MessagingProvider'),
           cache    => 1,
@@ -101,11 +78,7 @@ use MooseX::Params::Validate qw( validatep );
           cache       => 1,
         );
 
-    has_many 'people' =>
-        ( table       => $schema->table('Person'),
-          select      => __PACKAGE__->_BuildPeopleSelect(),
-          bind_params => sub { $_[0]->account_id() },
-        );
+    __PACKAGE__->_AddSQLMethods();
 
     class_has '_DonationSourcesDelete' =>
         ( is      => 'ro',
@@ -390,8 +363,11 @@ sub _AddSQLMethods
                         '=', Fey::Placeholder->new() )
                ->order_by( @{ $class->DefaultOrderBy() } );
 
-        __PACKAGE__->meta()->add_method
-            ( '_Build' . $pl_type . 'Select' => sub { $select } );
+        has_many lc $pl_type =>
+            ( table       => $schema->table('Person'),
+              select      => $select,
+              bind_params => sub { $_[0]->account_id() },
+            );
 
         $select = R2::Schema->SQLFactoryClass()->new_select();
 
@@ -408,11 +384,30 @@ sub _AddSQLMethods
         __PACKAGE__->meta()->add_method
             ( $build_count_meth => sub { $select } );
 
-        has $pl_type . '_count' =>
-            ( metaclass => 'FromSelect',
-              is        => 'ro',
-              isa       => 'Int',
-              select    => __PACKAGE__->$build_count_meth(),
+        has lc $type . '_count' =>
+            ( metaclass   => 'FromSelect',
+              is          => 'ro',
+              isa         => 'Int',
+              select      => __PACKAGE__->$build_count_meth(),
+              bind_params => sub { $_[0]->account_id() },
+            );
+
+        my $applies_meth = 'applies_to_' . lc $type;
+
+        has lc $type . '_address_types' =>
+            ( is      => 'ro',
+              isa     => 'ArrayRef[R2::Schema::AddressType]',
+              lazy    => 1,
+              default => sub { [ grep { $_->$applies_meth() }
+                                 $_[0]->address_types()->all() ] },
+            );
+
+        has lc $type . '_phone_number_types' =>
+            ( is      => 'ro',
+              isa     => 'ArrayRef[R2::Schema::PhoneNumberType]',
+              lazy    => 1,
+              default => sub { [ grep { $_->$applies_meth() }
+                                 $_[0]->phone_number_types()->all() ] },
             );
     }
 }
