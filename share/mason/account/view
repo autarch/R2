@@ -27,7 +27,7 @@
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'phone_number_types_form' ) %>"
-       title="Edit phone numbers types">Edit phone numbers types</a>
+       title="Edit phone numbers types">Edit phone number types</a>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'contact_history_types_form' ) %>"
