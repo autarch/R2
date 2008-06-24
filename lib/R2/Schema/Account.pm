@@ -5,6 +5,8 @@ use warnings;
 
 use DateTime::Format::Pg;
 use Lingua::EN::Inflect qw( PL_N );
+use List::MoreUtils qw( any );
+use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
@@ -19,6 +21,7 @@ use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
 use R2::Schema::Person;
 use R2::Schema;
+use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -175,151 +178,133 @@ sub add_country
         );
 }
 
-sub replace_donation_sources
+sub update_or_add_donation_sources
 {
-    my $self    = shift;
-    my @sources = @_;
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
 
-    my $sub = sub { $self->_delete_all_donation_sources();
+    unless ( @{ $new }
+             || any { ! string_is_empty($_) } values %{ $existing } )
+    {
+        error 'You must have at least one donation source.';
+    }
 
-                    for my $name (@sources)
-                    {
-                        R2::Schema::DonationSource->insert
-                            ( name       => $name,
-                              account_id => $self->account_id(),
-                            );
-                    }
-                  };
+    my $sub =
+        sub { for my $source ( $self->donation_sources()->all() )
+              {
+                  my $new_name = $existing->{ $source->donation_source_id() };
+
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $source->is_deletable();
+
+                      $source->delete();
+                  }
+                  else
+                  {
+                      $source->update( name => $new_name );
+                  }
+              }
+
+              for my $name ( @{ $new } )
+              {
+                  R2::Schema::DonationSource->insert
+                      ( name       => $name,
+                        account_id => $self->account_id(),
+                      );
+              }
+            };
 
     R2::Schema->RunInTransaction($sub);
 
     return;
 }
 
-sub _delete_all_donation_sources
+sub update_or_add_donation_targets
 {
-    my $self = shift;
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
 
-    my $delete = $self->_DonationSourcesDelete();
+    unless ( @{ $new }
+             || any { ! string_is_empty($_) } values %{ $existing } )
+    {
+        error 'You must have at least one donation target.';
+    }
 
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+    my $sub =
+        sub { for my $target ( $self->donation_targets()->all() )
+              {
+                  my $new_name = $existing->{ $target->donation_target_id() };
 
-    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $target->is_deletable();
 
-    $self->_clear_donation_sources();
-}
+                      $target->delete();
+                  }
+                  else
+                  {
+                      $target->update( name => $new_name );
+                  }
+              }
 
-sub _BuildDonationSourcesDelete
-{
-    my $class = shift;
-
-    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
-
-    my $schema = R2::Schema->Schema();
-
-    $delete->from( $schema->table('DonationSource') )
-           ->where( $schema->table('DonationSource')->column('account_id'),
-                    '=', Fey::Placeholder->new() );
-
-    return $delete;
-}
-
-sub replace_donation_targets
-{
-    my $self    = shift;
-    my @targets = @_;
-
-    my $sub = sub { $self->_delete_all_donation_targets();
-
-                    for my $name (@targets)
-                    {
-                        R2::Schema::DonationTarget->insert
-                            ( name       => $name,
-                              account_id => $self->account_id(),
-                            );
-                    }
-                  };
+              for my $name ( @{ $new } )
+              {
+                  R2::Schema::DonationTarget->insert
+                      ( name       => $name,
+                        account_id => $self->account_id(),
+                      );
+              }
+            };
 
     R2::Schema->RunInTransaction($sub);
 
     return;
 }
 
-sub _delete_all_donation_targets
+sub update_or_add_payment_types
 {
-    my $self = shift;
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
 
-    my $delete = $self->_DonationTargetsDelete();
+    unless ( @{ $new }
+             || any { ! string_is_empty($_) } values %{ $existing } )
+    {
+        error 'You must have at least one payment type.';
+    }
 
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+    my $sub =
+        sub { for my $type ( $self->payment_types()->all() )
+              {
+                  my $new_name = $existing->{ $type->payment_type_id() };
 
-    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $type->is_deletable();
 
-    $self->_clear_donation_targets();
-}
+                      $type->delete();
+                  }
+                  else
+                  {
+                      $type->update( name => $new_name );
+                  }
+              }
 
-sub _BuildDonationTargetsDelete
-{
-    my $class = shift;
-
-    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
-
-    my $schema = R2::Schema->Schema();
-
-    $delete->from( $schema->table('DonationTarget') )
-           ->where( $schema->table('DonationTarget')->column('account_id'),
-                    '=', Fey::Placeholder->new() );
-
-    return $delete;
-}
-
-sub replace_payment_types
-{
-    my $self    = shift;
-    my @targets = @_;
-
-    my $sub = sub { $self->_delete_all_payment_types();
-
-                    for my $name (@targets)
-                    {
-                        R2::Schema::PaymentType->insert
-                            ( name       => $name,
-                              account_id => $self->account_id(),
-                            );
-                    }
-                  };
+              for my $name ( @{ $new } )
+              {
+                  R2::Schema::PaymentType->insert
+                      ( name       => $name,
+                        account_id => $self->account_id(),
+                      );
+              }
+            };
 
     R2::Schema->RunInTransaction($sub);
 
     return;
-}
-
-sub _delete_all_payment_types
-{
-    my $self = shift;
-
-    my $delete = $self->_PaymentTypesDelete();
-
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
-
-    $dbh->do( $delete->sql($dbh), {}, $self->account_id() );
-
-    $self->_clear_payment_types();
-}
-
-sub _BuildPaymentTypesDelete
-{
-    my $class = shift;
-
-    my $delete = R2::Schema->SQLFactoryClass()->new_delete();
-
-    my $schema = R2::Schema->Schema();
-
-    $delete->from( $schema->table('PaymentType') )
-           ->where( $schema->table('PaymentType')->column('account_id'),
-                    '=', Fey::Placeholder->new() );
-
-    return $delete;
 }
 
 sub _BuildCountriesSelect

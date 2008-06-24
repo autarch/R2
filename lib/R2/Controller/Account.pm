@@ -56,8 +56,9 @@ sub account_PUT : Private
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
-            ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'edit_form' ),
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'edit_form' ),
+              params => $c->request()->params(),
             );
     }
 
@@ -83,26 +84,19 @@ sub donation_source_POST : Private
 
     my $account = $c->stash()->{account};
 
-    my @sources = $c->request()->donation_source_names();
-
-    unless (@sources)
-    {
-        $c->_redirect_with_error
-            ( error => 'You must have at least one donation source.',
-              uri   => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
-            );
-    }
+    my ( $existing, $new ) = $c->request()->donation_sources();
 
     eval
     {
-        $account->replace_donation_sources(@sources);
+        $account->update_or_add_donation_sources( $existing, $new );
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
-            ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
+              params => $c->request()->params(),
             );
     }
 
@@ -124,26 +118,19 @@ sub donation_target_POST : Private
 
     my $account = $c->stash()->{account};
 
-    my @targets = $c->request()->donation_target_names();
-
-    unless (@targets)
-    {
-        $c->_redirect_with_error
-            ( error => 'You must have at least one donation target.',
-              uri   => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
-            );
-    }
+    my ( $existing, $new ) = $c->request()->donation_targets();
 
     eval
     {
-        $account->replace_donation_targets(@targets);
+        $account->update_or_add_donation_targets( $existing, $new );
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
-            ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
+              params => $c->request()->params(),
             );
     }
 
@@ -165,26 +152,19 @@ sub payment_type_POST : Private
 
     my $account = $c->stash()->{account};
 
-    my @types = $c->request()->payment_type_names();
-
-    unless (@types)
-    {
-        $c->_redirect_with_error
-            ( error => 'You must have at least one payment type.',
-              uri   => $c->uri_for( $account->account_id(), 'payment_types_form' ),
-            );
-    }
+    my ( $existing, $new ) = $c->request()->payment_types();
 
     eval
     {
-        $account->replace_payment_types(@types);
+        $account->update_or_add_payment_types( $existing, $new );
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
-            ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'payment_types_form' ),
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'payment_types_form' ),
+              params => $c->request()->params(),
             );
     }
 

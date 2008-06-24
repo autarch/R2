@@ -14,19 +14,26 @@
 
   <fieldset>
     <legend>Payment Types</legend>
-% while ( my $target = $targets->next() ) {
-      <input class="text medium no-label" type="text" name="payment_type_name_<% $target->payment_type_id() %>"
-             value="<% $target->name() %>" />
+% while ( my $type = $types->next() ) {
+      <input class="text medium no-label" type="text" name="payment_type_name_<% $type->payment_type_id() %>"
+             value="<% $type->name() %>" />
+%   if ( ! $type->is_deletable() ) {
+      <div class="help-text">
+        <p>
+          You can change this type's name, but it cannot be deleted because it is still associated with <% $type->donation_count() %> <% PL_N( 'donation', $type->donation_count() ) %>.
+        </p>
+      </div>
+%   }
 % }
 
-    <h3>Add New Targets</h3>
+    <h3>Add New Types</h3>
 
     <div class="JS-repeatable-group JS-repeatable-group-payment-type">
       <input class="text medium no-label" type="text" name="payment_type_name_new1"
              id="payment_type_name_new1" />
     </div>
 
-    <a href="#" class="add-another" id="payment-type-repeater">Add another target</a>
+    <a href="#" class="add-another" id="payment-type-repeater">Add another type</a>
   </fieldset>
 
   <div class="form-item">
@@ -42,7 +49,7 @@ $account
 </%args>
 
 <%init>
-my $targets = $account->payment_types();
+my $types = $account->payment_types();
 </%init>
 
 <%method title>

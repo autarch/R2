@@ -22,16 +22,12 @@ use MooseX::ClassAttribute;
         ( table => $schema->table('Donation') );
 
     has 'donation_count' =>
-        ( is         => 'ro',
-          isa        => 'R2::Type::PosOrZeroInt',
-          lazy_build => 1,
-        );
-
-    class_has '_DonationCountSelect' =>
-        ( is  => 'ro',
-          isa => 'Fey::SQL::Select',
-          lazy    => 1,
-          default => sub { __PACKAGE__->_BuildDonationCountSelect() },
+        ( metaclass   => 'FromSelect',
+          is          => 'ro',
+          isa         => 'R2::Type::PosOrZeroInt',
+          lazy        => 1,
+          select      => __PACKAGE__->_BuildDonationCountSelect(),
+          bind_params => sub { $_[0]->donation_source_id() },
         );
 }
 
@@ -47,20 +43,6 @@ sub CreateDefaultsForAccount
                         account_id => $account->account_id(),
                       );
     }
-}
-
-sub _build_donation_count
-{
-    my $self = shift;
-
-    my $select = $self->_DonationCountSelect();
-
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
-
-    return
-        $dbh->selectrow_arrayref( $select->sql($dbh),
-                                  {},
-                                  $self->donation_source_id() )->[0] || 0;
 }
 
 sub _BuildDonationCountSelect
@@ -80,6 +62,13 @@ sub _BuildDonationCountSelect
                     '=', Fey::Placeholder->new() );
 
     return $select;
+}
+
+sub is_deletable
+{
+    my $self = shift;
+
+    return ! $self->donation_count();
 }
 
 no Fey::ORM::Table;

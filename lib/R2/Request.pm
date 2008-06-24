@@ -22,46 +22,67 @@ sub account_params
     return $self->_params_for_classes( [ 'R2::Schema::Account' ] );
 }
 
-sub donation_source_names
+sub donation_sources
 {
     my $self = shift;
 
     my $params = $self->params();
 
-    return
-        ( grep { ! string_is_empty($_)  }
-          map  { $params->{$_} }
-          grep { /^donation_source_name/ }
+    my %existing =
+        ( map  { /^donation_source_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
           keys %{ $params }
         );
+
+    my @new =
+        ( grep { ! string_is_empty($_) }
+          map  { $params->{$_} }
+          grep { /^donation_source_name_new/ }
+          keys %{ $params }
+        );
+
+    return ( \%existing, \@new );
 }
 
-sub donation_target_names
+sub donation_targets
 {
     my $self = shift;
 
     my $params = $self->params();
 
-    return
-        ( grep { ! string_is_empty($_)  }
-          map  { $params->{$_} }
-          grep { /^donation_target_name/ }
+    my %existing =
+        ( map  { /^donation_target_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
           keys %{ $params }
         );
+
+    my @new =
+        ( grep { ! string_is_empty($_) }
+          map  { $params->{$_} }
+          grep { /^donation_target_name_new/ }
+          keys %{ $params }
+        );
+
+    return ( \%existing, \@new );
 }
 
-sub payment_type_names
+sub payment_types
 {
     my $self = shift;
 
     my $params = $self->params();
 
-    return
-        ( grep { ! string_is_empty($_)  }
-          map  { $params->{$_} }
-          grep { /^payment_type_name/ }
+    my %existing =
+        ( map  { /^payment_type_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
           keys %{ $params }
         );
+
+    my @new =
+        ( grep { ! string_is_empty($_) }
+          map  { $params->{$_} }
+          grep { /^payment_type_name_new/ }
+          keys %{ $params }
+        );
+
+    return ( \%existing, \@new );
 }
 
 sub _params_for_classes
