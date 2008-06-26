@@ -349,7 +349,7 @@ sub _AddSQLMethods
                ->order_by( @{ $class->DefaultOrderBy() } );
 
         has_many lc $pl_type =>
-            ( table       => $schema->table('Person'),
+            ( table       => $foreign_table,
               select      => $select,
               bind_params => sub { $_[0]->account_id() },
             );
