@@ -186,32 +186,25 @@ sub address_type_POST : Private
 
     my $account = $c->stash()->{account};
 
-    my @types = $c->request()->address_type_names();
-
-    unless (@types)
-    {
-        $c->_redirect_with_error
-            ( error => 'You must have at least one address type.',
-              uri   => $c->uri_for( $account->account_id(), 'address_types_form' ),
-            );
-    }
+    my ( $existing, $new ) = $c->request()->address_types();
 
     eval
     {
-        $account->replace_address_types(@types);
+        $account->update_or_add_address_types( $existing, $new );
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
-            ( error => $e,
-              uri   => $c->uri_for( $account->account_id(), 'address_types_form' ),
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'address_types_form' ),
+              params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
 }
 
 1;

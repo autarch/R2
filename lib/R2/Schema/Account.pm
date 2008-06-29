@@ -197,7 +197,7 @@ sub update_or_add_donation_sources
 
                   if ( string_is_empty($new_name) )
                   {
-                      next unless $source->is_deletable();
+                      next unless $source->is_deleteable();
 
                       $source->delete();
                   }
@@ -240,7 +240,7 @@ sub update_or_add_donation_targets
 
                   if ( string_is_empty($new_name) )
                   {
-                      next unless $target->is_deletable();
+                      next unless $target->is_deleteable();
 
                       $target->delete();
                   }
@@ -283,7 +283,7 @@ sub update_or_add_payment_types
 
                   if ( string_is_empty($new_name) )
                   {
-                      next unless $type->is_deletable();
+                      next unless $type->is_deleteable();
 
                       $type->delete();
                   }
@@ -299,6 +299,62 @@ sub update_or_add_payment_types
                       ( name       => $name,
                         account_id => $self->account_id(),
                       );
+              }
+            };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub update_or_add_address_types
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+
+    unless ( @{ $new }
+             || any { ! string_is_empty( $_->{name} ) } values %{ $existing } )
+    {
+        error 'You must have at least one address type.';
+    }
+
+    my $sub =
+        sub { for my $type ( $self->address_types()->all() )
+              {
+                  my $new_name = $existing->{ $type->address_type_id() }{name};
+
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $type->is_deleteable();
+
+                      $type->delete();
+                  }
+                  else
+                  {
+                      for my $contact_type ( qw( person household organization ) )
+                      {
+                          my $key = 'applies_to_' . $contact_type;
+
+                          if ( ! $existing->{ $type->address_type_id() }{$key} )
+                          {
+                              my $meth = 'can_unapply_from_' . $contact_type;
+
+                              $existing->{ $type->address_type_id() }{$key} = 1
+                                  unless $type->$meth();
+                          }
+                      }
+
+                      $type->update( %{ $existing->{ $type->address_type_id() } } );
+                  }
+              }
+
+              for my $type ( @{ $new } )
+              {
+                  R2::Schema::AddressType->insert
+		      ( %{ $type },
+			account_id => $self->account_id(),
+		      );
               }
             };
 
