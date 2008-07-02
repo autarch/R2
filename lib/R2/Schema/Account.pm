@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use DateTime::Format::Pg;
+use Fey::Object::Iterator::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
 use R2::Exceptions qw( error );
@@ -74,11 +75,17 @@ use MooseX::Params::Validate qw( validatep );
           order_by => [ $schema->table('MessagingProvider')->column('name') ],
         );
 
-    has_many 'countries' =>
-        ( table       => $schema->table('Country'),
-          select      => __PACKAGE__->_BuildCountriesSelect(),
-          bind_params => sub { $_[0]->account_id() },
-          cache       => 1,
+    has 'countries' =>
+        ( is         => 'ro',
+          isa        => 'Fey::Object::Iterator::Caching',
+          lazy_build => 1,
+        );
+
+    class_has '_CountriesSelect' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          lazy    => 1,
+          default => sub { __PACKAGE__->_BuildCountriesSelect() },
         );
 
     __PACKAGE__->_AddSQLMethods();
@@ -332,19 +339,6 @@ sub update_or_add_address_types
                   }
                   else
                   {
-                      for my $contact_type ( qw( person household organization ) )
-                      {
-                          my $key = 'applies_to_' . $contact_type;
-
-                          if ( ! $existing->{ $type->address_type_id() }{$key} )
-                          {
-                              my $meth = 'can_unapply_from_' . $contact_type;
-
-                              $existing->{ $type->address_type_id() }{$key} = 1
-                                  unless $type->$meth();
-                          }
-                      }
-
                       $type->update( %{ $existing->{ $type->address_type_id() } } );
                   }
               }
@@ -363,6 +357,67 @@ sub update_or_add_address_types
     return;
 }
 
+sub update_or_add_phone_number_types
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+
+    unless ( @{ $new }
+             || any { ! string_is_empty( $_->{name} ) } values %{ $existing } )
+    {
+        error 'You must have at least one phone number type.';
+    }
+
+    my $sub =
+        sub { for my $type ( $self->phone_number_types()->all() )
+              {
+                  my $new_name = $existing->{ $type->phone_number_type_id() }{name};
+
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $type->is_deleteable();
+
+                      $type->delete();
+                  }
+                  else
+                  {
+                      $type->update( %{ $existing->{ $type->phone_number_type_id() } } );
+                  }
+              }
+
+              for my $type ( @{ $new } )
+              {
+                  R2::Schema::PhoneNumberType->insert
+		      ( %{ $type },
+			account_id => $self->account_id(),
+		      );
+              }
+            };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub _build_countries
+{
+    my $self = shift;
+
+    my $select = $self->_CountriesSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    my $sth = $dbh->prepare( $select->sql($dbh) );
+
+    return
+        Fey::Object::Iterator::Caching->new
+            ( classes     => [ qw( R2::Schema::AccountCountry R2::Schema::Country  ) ],
+              handle      => $sth,
+              bind_params => [ $self->account_id() ],
+            );
+}
+
 sub _BuildCountriesSelect
 {
     my $class = shift;
@@ -371,7 +426,7 @@ sub _BuildCountriesSelect
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('Country') )
+    $select->select( $schema->tables( 'AccountCountry', 'Country' ) )
            ->from( $schema->tables( 'AccountCountry', 'Country' ) )
            ->where( $schema->table('AccountCountry')->column('account_id'),
                     '=', Fey::Placeholder->new() )

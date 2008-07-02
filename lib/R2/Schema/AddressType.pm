@@ -73,7 +73,7 @@ with 'R2::Role::DataValidator';
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _applies_to_something ) ] },
+          default => sub { [ qw( _cannot_unapply _applies_to_something ) ] },
         );
 }
 
@@ -112,20 +112,60 @@ sub CreateDefaultsForAccount
                   );
 }
 
+sub _cannot_unapply
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    return if $is_insert;
+
+    for my $contact_type ( qw( person household organization ) )
+    {
+        my $key = 'applies_to_' . $contact_type;
+
+        if ( exists $p->{$key} && ! $p->{$key} )
+        {
+            my $meth = 'can_unapply_from_' . $contact_type;
+
+            delete $p->{$key}
+                unless $self->$meth();
+        }
+    }
+
+    return;
+}
+
 sub _applies_to_something
 {
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
 
-    unless ( any { $_}
-	     @{ $p }{ map { 'applies_to_' . $_ } qw( person household organization ) } )
+    my @keys = map { 'applies_to_' . $_ } qw( person household organization );
+
+    if ($is_insert)
     {
-	return { message =>
-		 'An address type must apply to a person, household, or organization.' };
+        return if
+            any { exists $p->{$_} && $p->{$_} } @keys;
+    }
+    else
+    {
+        for my $key (@keys)
+        {
+            if ( exists $p->{$key} )
+            {
+                return if $p->{$key};
+            }
+            else
+            {
+                return if $self->$key();
+            }
+        }
     }
 
-    return;
+    return { message =>
+             'An address type must apply to a person, household, or organization.' };
 }
 
 sub can_unapply_from_person
