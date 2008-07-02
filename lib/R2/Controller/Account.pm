@@ -39,7 +39,6 @@ sub account_GET_html : Private
 
     $c->stash()->{template} = '/account/view';
 }
-
 sub account_PUT : Private
 {
     my $self = shift;
@@ -75,8 +74,6 @@ sub donation_sources_form : Chained('_set_account') : PathPart('donation_sources
 
 sub donation_source : Chained('_set_account') : PathPart('donation_source') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub donation_source_GET_html : Private { }
-
 sub donation_source_POST : Private
 {
     my $self = shift;
@@ -108,8 +105,6 @@ sub donation_source_POST : Private
 sub donation_targets_form : Chained('_set_account') : PathPart('donation_targets_form') : Args(0) { }
 
 sub donation_target : Chained('_set_account') : PathPart('donation_target') : Args(0) : ActionClass('+R2::Action::REST') { }
-
-sub donation_target_GET_html : Private { }
 
 sub donation_target_POST : Private
 {
@@ -143,8 +138,6 @@ sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form'
 
 sub payment_type : Chained('_set_account') : PathPart('payment_type') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub payment_type_GET_html : Private { }
-
 sub payment_type_POST : Private
 {
     my $self = shift;
@@ -177,8 +170,6 @@ sub address_types_form : Chained('_set_account') : PathPart('address_types_form'
 
 sub address_type : Chained('_set_account') : PathPart('address_type') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub address_type_GET_html : Private { }
-
 sub address_type_POST : Private
 {
     my $self = shift;
@@ -205,6 +196,17 @@ sub address_type_POST : Private
     $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+}
+
+sub countries_form : Chained('_set_account') : PathPart('countries_form') : Args(0) { }
+
+sub country : Chained('_set_account') : PathPart('country') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub country_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
 }
 
 1;
