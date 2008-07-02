@@ -3,23 +3,7 @@ package R2::Controller::Base;
 use strict;
 use warnings;
 
-use base 'Catalyst::Controller';
-
-# Normally I'd inherit from this class, but that seems to magically
-# break handling of "normal" views (the various *_GET_html
-# methods). Instead we'll manually "import" the handy status related
-# methods it provides, which is pretty lame.
-use Catalyst::Controller::REST;
-
-BEGIN
-{
-    for my $meth ( qw( status_ok status_created status_accepted
-                       status_bad_request status_not_found ) )
-    {
-        no strict 'refs';
-        *{ __PACKAGE__ . '::' . $meth } = \&{ 'Catalyst::Controller::REST::' . $meth };
-    }
-}
+use base 'Catalyst::Controller::REST';
 
 use R2::Config;
 use R2::Web::CSS;
@@ -89,39 +73,6 @@ sub _require_authen
     return if $user;
 
     $c->redirect_and_detach( '/user/login_form' );
-}
-
-# XXX - belongs in request?
-sub _params_from_path_query
-{
-    my $self = shift;
-    my $path = shift;
-
-    return if string_is_empty($path);
-
-    my %p;
-    for my $kv ( split /;/, $path )
-    {
-        my ( $k, $v ) = map { uri_unescape($_) } split /=/, $kv;
-
-        if ( $p{$k} )
-        {
-            if ( ref $p{$k} )
-            {
-                push @{ $p{$k} }, $v;
-            }
-            else
-            {
-                $p{$k} = [ $p{$k}, $v ];
-            }
-        }
-        else
-        {
-            $p{$k} = $v;
-        }
-    }
-
-    return %p;
 }
 
 1;
