@@ -183,7 +183,7 @@ CREATE TABLE "CustomFieldBinaryValue" (
 );
 
 CREATE TABLE "CustomFieldSelectOption" (
-       custom_field_select_option_id INT8 PRIMARY KEY,
+       custom_field_select_option_id INT8    PRIMARY KEY,
        custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    VARCHAR(255) NOT NULL
@@ -195,14 +195,14 @@ CREATE TABLE "CustomFieldSelectOption" (
 CREATE TABLE "CustomFieldSingleSelectValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
-       custom_field_select_option_id  INT8  NOT NULL,
+       custom_field_select_option_id  INT8   NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id )
 );
        
 CREATE TABLE "CustomFieldMultiSelectValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
-       custom_field_select_option_id  INT8  NOT NULL,
+       custom_field_select_option_id  INT8   NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id, custom_field_select_option_id )
 );
 
@@ -230,7 +230,7 @@ CREATE TABLE "ContactHistory" (
 );
 
 CREATE TABLE "ContactHistoryType" (
-       contact_history_type_id  SERIAL         PRIMARY KEY,
+       contact_history_type_id  SERIAL       PRIMARY KEY,
        description        VARCHAR(255)       NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' )
