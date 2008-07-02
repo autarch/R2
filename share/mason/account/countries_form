@@ -1,0 +1,49 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<& /lib/help-text/countries.mas &>
+</p>
+
+<&| /lib/filter/form.mas &>
+<form action="<% $c->uri_for( $account->account_id(), 'countries' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Countries</legend>
+
+    <ul>
+% while ( my ( $account_country, $country ) = $countries->next() ) {
+      <li>
+        <% $country->name() %>
+%   if ( $account_country->is_default() ) {
+        <p>
+          This is the default country for your account.
+        </p>
+%   }
+      </li>
+% }
+    </ul>
+
+  </fieldset>
+
+</form>
+</&>
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $countries = $account->countries();
+</%init>
+
+<%method title>
+Countries for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
