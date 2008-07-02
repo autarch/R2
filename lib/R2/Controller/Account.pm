@@ -209,4 +209,36 @@ sub country_POST : Private
 
 }
 
+sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) { }
+
+sub phone_number_type : Chained('_set_account') : PathPart('phone_number_type') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub phone_number_type_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my ( $existing, $new ) = $c->request()->phone_number_types();
+
+    eval
+    {
+        $account->update_or_add_phone_number_types( $existing, $new );
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'phone_number_types_form' ),
+              params => $c->request()->params(),
+            );
+    }
+
+    $c->add_message( 'The phone number types for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+}
+
 1;
