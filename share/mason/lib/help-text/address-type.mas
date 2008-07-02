@@ -1,7 +1,7 @@
 <p>
   Each address has a type, which lets you distinguish between things
   like home and work addresses. An address type can apply to people,
-  organizations, and/or households. For example, an address type of
-  "Home" does not make sense for an organization, and a type of
-  "Branch" doesn't make sense for people or households.
+  organizations, and/or households. For example, a "Home" type does
+  not make sense for an organization, and a "Branch" type doesn't make
+  sense for people or households.
 </p>
