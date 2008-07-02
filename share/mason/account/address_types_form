@@ -9,8 +9,8 @@
 </p>
 
 <&| /lib/filter/form.mas &>
-    <form action="<% $c->uri_for( $account->account_id(), 'address_type' ) %>"
-	  method="post" class="JS-standard-form">
+  <form action="<% $c->uri_for( $account->account_id(), 'address_type' ) %>"
+        method="post" class="JS-standard-form">
 
   <fieldset>
     <legend>Address Types</legend>
