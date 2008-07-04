@@ -31,9 +31,9 @@ sub new_person_form : Local
     $c->stash()->{template} = '/person/new_person_form';
 }
 
-sub contact : Path('/contact') : ActionClass('+R2::Action::REST') { }
+sub new_contact : Path('/contact') : ActionClass('+R2::Action::REST') { }
 
-sub contact_POST
+sub new_contact_POST
 {
     my $self = shift;
     my $c    = shift;
