@@ -261,7 +261,7 @@
 <%init>
 my @phone_number_types = @{ $c->user()->account()->person_phone_number_types() };
 my @address_types = @{ $c->user()->account()->person_address_types() };
-my @countries = $c->user()->account()->countries()->all();
+my @countries = map { $_->[1] } $c->user()->account()->countries()->all();
 </%init>
 
 <%method title>
