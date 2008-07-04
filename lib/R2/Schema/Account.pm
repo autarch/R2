@@ -90,6 +90,12 @@ use MooseX::Params::Validate qw( validatep );
           lazy_build => 1,
         );
 
+    class_has '_CountriesSelect' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          default => sub { __PACKAGE__->_BuildCountriesSelect() },
+        );
+
     __PACKAGE__->_AddSQLMethods();
 
     class_has '_DonationSourcesDelete' =>
