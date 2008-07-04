@@ -9,7 +9,7 @@
 </p>
 
 <&| /lib/filter/form.mas &>
-    <form action="<% $c->uri_for( $account->account_id(), 'donation_source' ) %>"
+<form action="<% $c->uri_for( $account->account_id(), 'donation_source' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>
