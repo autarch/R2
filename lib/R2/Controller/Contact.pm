@@ -28,7 +28,7 @@ sub new_person_form : Local
             );
     }
 
-    $c->stash()->{template} = '/person/new-person-form';
+    $c->stash()->{template} = '/person/new_person_form';
 }
 
 sub new_contact : Path('/contact') : ActionClass('+R2::Action::REST') { }
