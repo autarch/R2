@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use DateTime::Format::Pg;
+use Fey::Literal;
 use Fey::Object::Iterator::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
@@ -11,6 +12,7 @@ use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
+use R2::Schema::ContactHistoryType;
 use R2::Schema::Country;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
@@ -75,17 +77,17 @@ use MooseX::Params::Validate qw( validatep );
           order_by => [ $schema->table('MessagingProvider')->column('name') ],
         );
 
+    has_many 'user_defined_contact_history_types' =>
+        ( table       => $schema->table('ContactHistoryType'),
+          cache       => 1,
+          select      => __PACKAGE__->_BuildUserDefinedContactHistoryTypesSelect(),
+          bind_params => sub { $_[0]->account_id(), 0 },
+        );
+
     has 'countries' =>
         ( is         => 'ro',
           isa        => 'Fey::Object::Iterator::Caching',
           lazy_build => 1,
-        );
-
-    class_has '_CountriesSelect' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Select',
-          lazy    => 1,
-          default => sub { __PACKAGE__->_BuildCountriesSelect() },
         );
 
     __PACKAGE__->_AddSQLMethods();
@@ -132,17 +134,19 @@ sub _initialize
 {
     my $self = shift;
 
+    R2::Schema::AddressType->CreateDefaultsForAccount($self);
+
+    R2::Schema::ContactHistoryType->CreateDefaultsForAccount($self);
+
     R2::Schema::DonationSource->CreateDefaultsForAccount($self);
 
     R2::Schema::DonationTarget->CreateDefaultsForAccount($self);
 
+    R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
+
     R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
-    R2::Schema::AddressType->CreateDefaultsForAccount($self);
-
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
-
-    R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
 
     for my $code ( qw( us ca ) )
     {
@@ -400,6 +404,69 @@ sub update_or_add_phone_number_types
     return;
 }
 
+sub update_or_add_contact_history_types
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+
+    unless ( @{ $new }
+             || any { ! string_is_empty($_) } values %{ $existing } )
+    {
+        error 'You must have at least one contact history type.';
+    }
+
+    my $sub =
+        sub { for my $type ( $self->user_defined_contact_history_types()->all() )
+              {
+                  my $new_name = $existing->{ $type->contact_history_type_id() };
+
+                  if ( string_is_empty($new_name) )
+                  {
+                      next unless $type->is_deleteable();
+
+                      $type->delete();
+                  }
+                  else
+                  {
+                      $type->update( description =>
+                                     $existing->{ $type->contact_history_type_id() } );
+                  }
+              }
+
+              for my $type ( @{ $new } )
+              {
+                  R2::Schema::ContactHistoryType->insert
+		      ( description => $type,
+			account_id  => $self->account_id(),
+		      );
+              }
+            };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
+}
+
+sub _BuildUserDefinedContactHistoryTypesSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->tables( 'ContactHistoryType' ) )
+           ->from( $schema->tables( 'ContactHistoryType' ) )
+           ->where( $schema->table('ContactHistoryType')->column('account_id'),
+                    '=', Fey::Placeholder->new() )
+           ->and( $schema->table('ContactHistoryType')->column('is_system_defined'),
+                  '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('ContactHistoryType')->column('description') );
+
+    return $select;
+}
+
 sub _build_countries
 {
     my $self = shift;
@@ -483,7 +550,8 @@ sub _AddSQLMethods
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
               is          => 'ro',
-              isa         => 'Int',
+              isa         => 'R2::Type::PosOrZeroInt',
+              lazy        => 1,
               select      => __PACKAGE__->$build_count_meth(),
               bind_params => sub { $_[0]->account_id() },
             );

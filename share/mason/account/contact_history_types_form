@@ -1,0 +1,60 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<& /lib/help-text/contact-history-type.mas &>
+</p>
+
+<&| /lib/filter/form.mas &>
+<form action="<% $c->uri_for( $account->account_id(), 'contact_history_type' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Contact History Types</legend>
+% while ( my $type = $types->next() ) {
+      <input class="text medium no-label" type="text" name="contact_history_type_description_<% $type->contact_history_type_id() %>"
+             value="<% $type->description() %>" />
+%   if ( ! $type->is_deleteable() ) {
+      <div class="help-text">
+        <p>
+          You can change this type's description, but it cannot be deleted because it is still associated with <% $type->history_count() %> history <% PL_N( 'history', $type->history_count() ) %>.
+        </p>
+      </div>
+%   }
+% }
+
+    <h3>Add New Sources</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-contact-history-type">
+      <input class="text medium no-label" type="text" name="contact_history_type_description_new1"
+             id="contact_history_type_description_new1" />
+    </div>
+
+    <a href="#" class="add-another" id="contact-history-type-repeater">Add another type</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+  
+</form>
+</&>
+
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $types = $account->user_defined_contact_history_types();
+</%init>
+
+<%method title>
+Contact History Types for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

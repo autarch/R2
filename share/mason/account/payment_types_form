@@ -17,7 +17,7 @@
 % while ( my $type = $types->next() ) {
       <input class="text medium no-label" type="text" name="payment_type_name_<% $type->payment_type_id() %>"
              value="<% $type->name() %>" />
-%   if ( ! $type->is_deletable() ) {
+%   if ( ! $type->is_deleteable() ) {
       <div class="help-text">
         <p>
           You can change this type's name, but it cannot be deleted because it is still associated with <% $type->donation_count() %> <% PL_N( 'donation', $type->donation_count() ) %>.

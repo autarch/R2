@@ -231,9 +231,12 @@ CREATE TABLE "ContactHistory" (
 
 CREATE TABLE "ContactHistoryType" (
        contact_history_type_id  SERIAL       PRIMARY KEY,
+       system_name        VARCHAR(255)       NOT NULL,
        description        VARCHAR(255)       NOT NULL,
+       is_system_defined  BOOLEAN            DEFAULT FALSE,
        account_id         INT8               NOT NULL,
-       CONSTRAINT valid_description CHECK ( description != '' )
+       CONSTRAINT valid_description CHECK ( description != '' ),
+       CONSTRAINT system_name_account_id_ck UNIQUE ( system_name, account_id )
 );
 
 CREATE TABLE "ContactTag" (

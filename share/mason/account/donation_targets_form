@@ -17,7 +17,7 @@
 % while ( my $target = $targets->next() ) {
       <input class="text medium no-label" type="text" name="donation_target_name_<% $target->donation_target_id() %>"
              value="<% $target->name() %>" />
-%   if ( ! $target->is_deletable() ) {
+%   if ( ! $target->is_deleteable() ) {
       <div class="help-text">
         <p>
           You can change this target's name, but it cannot be deleted because it is still associated with <% $target->donation_count() %> <% PL_N( 'donation', $target->donation_count() ) %>.

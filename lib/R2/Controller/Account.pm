@@ -241,4 +241,36 @@ sub phone_number_type_POST : Private
     $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
 }
 
+sub contact_history_types_form : Chained('_set_account') : PathPart('contact_history_types_form') : Args(0) { }
+
+sub contact_history_type : Chained('_set_account') : PathPart('contact_history_type') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub contact_history_type_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my ( $existing, $new ) = $c->request()->contact_history_types();
+
+    eval
+    {
+        $account->update_or_add_contact_history_types( $existing, $new );
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error  => $e,
+              uri    => $c->uri_for( $account->account_id(), 'contact_history_types_form' ),
+              params => $c->request()->params(),
+            );
+    }
+
+    $c->add_message( 'The contact history types for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+}
+
 1;

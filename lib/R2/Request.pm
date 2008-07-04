@@ -167,44 +167,28 @@ sub _phone_number_type_params
 	   };
 }
 
-sub _bool
+sub contact_history_types
 {
-    return $_[0] ? 1 : 0;
-}
-
-sub _params_for_classes
-{
-    my $self    = shift;
-    my $classes = shift;
-    my $suffix  = shift || '';
+    my $self = shift;
 
     my $params = $self->params();
 
-    my %found;
+    my %existing =
+        ( map  { /^(contact_history_type_description_(\d+))/
+                 ? ( $2 => $params->{$1}  )
+                 : () }
+          keys %{ $params }
+        );
 
-    for my $class ( @{ $classes } )
-    {
-        my $table = $class->Table();
+    my @new =
+        ( grep { ! string_is_empty($_) }
+	  map  { /^(contact_history_type_description_new\d+)/
+                 ? $params->{$1}
+                 : () }
+          keys %{ $params }
+        );
 
-        my %pk = map { $_->name() => 1 } $table->primary_key();
-
-        for my $col ( $table->columns() )
-        {
-            my $name = $col->name();
-
-            next if $pk{$name};
-
-            my $key = $name;
-            $key .= q{-} . $suffix
-                if $suffix;
-
-            next if string_is_empty( $params->{$key} );
-
-            $found{$name} = $params->{$key};
-        }
-    }
-
-    return %found;
+    return ( \%existing, \@new );
 }
 
 sub new_address_param_sets
@@ -275,5 +259,44 @@ sub new_phone_number_param_sets
     return @numbers;
 }
 
+sub _bool
+{
+    return $_[0] ? 1 : 0;
+}
+
+sub _params_for_classes
+{
+    my $self    = shift;
+    my $classes = shift;
+    my $suffix  = shift || '';
+
+    my $params = $self->params();
+
+    my %found;
+
+    for my $class ( @{ $classes } )
+    {
+        my $table = $class->Table();
+
+        my %pk = map { $_->name() => 1 } $table->primary_key();
+
+        for my $col ( $table->columns() )
+        {
+            my $name = $col->name();
+
+            next if $pk{$name};
+
+            my $key = $name;
+            $key .= q{-} . $suffix
+                if $suffix;
+
+            next if string_is_empty( $params->{$key} );
+
+            $found{$name} = $params->{$key};
+        }
+    }
+
+    return %found;
+}
 
 1;
