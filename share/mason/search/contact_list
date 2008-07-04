@@ -1,0 +1,41 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+<table>
+
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+
+  <tbody>
+% while ( my $contact = $contacts->next() ) {
+    <tr>
+      <td><% $contact->person()->full_name() %></td>
+      <td><% $contact->email_address() %>
+    </tr>
+% }
+  </tbody>
+
+  <tfoot>
+  </tfoot>
+
+</table>
+
+<%args>
+$search
+</%args>
+
+<%init>
+my $contacts = $search->contacts();
+</%init>
+
+<%method title>
+Search
+<%args>
+$search
+</%args>
+</%method>
