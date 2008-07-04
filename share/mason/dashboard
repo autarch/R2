@@ -1,5 +1,5 @@
 <div id="summary">
-<h1><% $title %></h1>
+  <h1><% $title %></h1>
 </div>
 
 <h2><% $account->person_count() %> <% PL_N( 'Person', $account->person_count() ) %></h2>
@@ -8,9 +8,9 @@
 
 <ul>
 % while ( my $person = $people->next() ) {
- <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
-        title="View <% $person->full_name() %>"><% $person->full_name() %></a>
- </li>
+  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
+         title="View <% $person->full_name() %>"><% $person->full_name() %></a>
+  </li>
 % }
 </ul>
 
