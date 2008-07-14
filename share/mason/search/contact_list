@@ -2,6 +2,10 @@
   <h1><& SELF:title, %ARGS &></h1>
 </div>
 
+<h2>
+Found <% $search->contact_count() %> matching contacts
+</h2>
+
 <table>
 
   <thead>
