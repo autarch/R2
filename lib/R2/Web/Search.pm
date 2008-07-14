@@ -26,7 +26,6 @@ has 'page' =>
       required => 1,
     );
 
-
 my $Schema = R2::Schema->Schema();
 
 sub contacts
@@ -76,6 +75,26 @@ sub contacts
               handle      => $sth,
               bind_params => [ $select->bind_params() ],
             );
+}
+
+sub contact_count
+{
+    my $self = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+
+    my $count =
+        Fey::Literal::Function->new
+            ( 'COUNT', $Schema->table('Contact')->column('contact_id') );
+
+    $select->select($count);
+
+    $self->_contact_join($select);
+    $self->_where_clauses($select);
+
+    return $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
 }
 
 sub _contact_join
