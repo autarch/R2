@@ -5,7 +5,7 @@ use warnings;
 
 use base 'R2::Controller::Base';
 
-use R2::Search;
+use R2::Web::Search;
 
 
 sub contact : Local
@@ -14,10 +14,10 @@ sub contact : Local
     my $c    = shift;
 
     $c->stash()->{search} =
-        R2::Search->new( account => $c->user()->account() ,
-                         limit   => 20,
-                         page    => 1,
-                       );
+        R2::Web::Search->new( account => $c->user()->account(),
+                              limit   => 20,
+                              page    => 1,
+                            );
 
     $c->stash()->{template} = '/search/contact_list';
 }

@@ -1,4 +1,4 @@
-package R2::Search;
+package R2::Web::Search;
 
 use strict;
 use warnings;
