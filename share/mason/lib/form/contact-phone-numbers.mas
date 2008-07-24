@@ -1,0 +1,36 @@
+  <fieldset>
+    <legend>Phone Numbers</legend>
+
+    <div class="JS-repeatable-group JS-repeatable-group-phone-number">
+      <div class="form-item">
+        <label class="for-field" for="phone_number-new1" id="for-phone_number-new1">Phone number:</label>
+        <select name="phone_number_type_id-new1">
+% for my $type (@phone_number_types) {
+          <option value="<% $type->phone_number_type_id() %>"><% $type->name() %></option>
+% }
+        </select>
+        <input type="text" class="text" name="phone_number-new1" id="phone_number-new1" />
+        <a class="delete-repeated-group" style="display: none" href="#" title="delete this phone number">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="phone_number_notes-new1">notes:</label>
+        <input type="text" class="text wide" name="phone_number_notes-new1" id="phone_number_notes-new1" />
+      </div>
+
+      <div class="form-item">
+        <div class="no-label">
+          <input type="radio" name="phone_number_is_preferred" value="new1" checked="checked" id="phone_number_is_preferred-new1" />
+          <label class="for-radio selected" for="phone_number_is_preferred-new1"
+                 id="for-phone_number_is_preferred-new1">This is the preferred number</label>
+        </div>
+      </div>
+    </div>
+
+    <a href="#" class="add-another" id="phone-number-repeater">Add another phone number</a>
+
+  </fieldset>
+
+<%init>
+my @phone_number_types = @{ $c->user()->account()->person_phone_number_types() };
+</%init>

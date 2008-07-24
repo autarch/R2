@@ -31,6 +31,24 @@ sub new_person_form : Local
     $c->stash()->{template} = '/person/new_person_form';
 }
 
+sub new_household_form : Local
+{
+    my $self = shift;
+    my $c    = shift;
+
+    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
+                                                       account => $c->user()->account(),
+                                                     ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to add contacts',
+              uri   => $c->uri_for('/'),
+            );
+    }
+
+    $c->stash()->{template} = '/household/new_household_form';
+}
+
 sub new_contact : Path('/contact') : ActionClass('+R2::Action::REST') { }
 
 sub new_contact_POST

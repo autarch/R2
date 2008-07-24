@@ -1,0 +1,69 @@
+  <fieldset class="last">
+    <legend>Addresses</legend>
+
+    <div class="JS-repeatable-group JS-repeatable-group-address">
+      <div class="form-item">
+        <label class="for-field" for="address-new1" id="for-address-new1">Address:</label>
+        <select name="address_type_id-new1">
+% for my $type (@address_types) {
+          <option value="<% $type->address_type_id() %>"><% $type->name() %></option>
+% }
+        </select>
+        <a class="delete-repeated-group" style="display: none" href="#" title="delete this address">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="street_1-new1">Line 1:</label>
+        <input type="text" class="text" name="street_1-new1" id="street_1-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="street_2-new1">Line 2:</label>
+        <input type="text" class="text" name="street_2-new1" id="street_2-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="city-new1">City:</label>
+        <input type="text" class="text" name="city-new1" id="city-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="region-new1">State/Region:</label>
+        <input type="text" class="text" name="region-new1" id="region-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="postal_code-new1">Postal code:</label>
+        <input type="text" class="text" name="postal_code-new1" id="postal_code-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="iso_code-new1">Country:</label>
+        <select name="iso_code-new1" id="iso_code-new1" />
+% for my $country (@countries) {
+          <option value="<% $country->iso_code() %>"><% $country->name() %></option>
+% }
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="address_notes-new1">notes:</label>
+        <input type="text" class="text wide" name="address_notes-new1" id="address_notes-new1" />
+      </div>
+
+      <div class="form-item">
+        <div class="no-label">
+          <input type="radio" name="address_is_preferred" value="new1" checked="checked" id="address_is_preferred-new1" />
+          <label class="for-radio selected" for="address_is_preferred-new1"
+                 id="for-address_is_preferred-new1">This is the preferred address</label>
+        </div>
+      </div>
+    </div>
+
+    <a href="#" class="add-another" id="address-repeater">Add another address</a>
+
+  </fieldset>
+
+<%init>
+my @address_types = @{ $c->user()->account()->person_address_types() };
+my @countries = map { $_->[1] } $c->user()->account()->countries()->all();
+</%init>

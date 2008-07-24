@@ -1,0 +1,31 @@
+  <fieldset>
+    <legend>Email & Website</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="email_address">Email address:</label>
+      <input type="text" class="text medium" name="email_address" id="email_address" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="allows_email">Email is ok?</label>
+
+      <div class="radio-group">
+        <input type="radio" class="radio" name="allows_email" id="allows_email-yes" value="1" checked="checked" />
+        <label class="for-radio selected" for="allows_email-yes" id="for-allows_email-yes">Yes</label>
+        <input type="radio" class="radio" name="allows_email" id="allows_email-no" value="0" />
+        <label class="for-radio" for="allows_email-no" id="for-allows_email-no">No</label>
+      </div>
+
+      <div class="help-text">
+        <p>
+          If set to "No", then you will not be able to send mail to this contact via Rapport.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="website">Website:</label>
+      <input type="text" class="text medium" name="website" id="website" />
+    </div>
+
+  </fieldset>

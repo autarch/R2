@@ -4,6 +4,7 @@
 
 <&| /lib/filter/form.mas &>
 <form class="JS-standard-form" action="<% $c->uri_for('') %>" method="post"
+      id="household-form"
       enctype="multipart/form-data">
 
   <input type="hidden" name="contact_type" value="person" />
@@ -12,59 +13,20 @@
     <legend>The Basics</legend>
 
     <div class="form-item">
-      <label class="for-field" for="salutation">Salutation:</label>
-      <input type="text" class="text narrow" name="salutation" id="salutation" />
-      <div class="help-text">
-        <p>
-          Mr., Ms., Dr., etc.
-        </p>
+      <label class="for-field" for="first_name">Name:</label>
+      <input type="text" class="text" name="name" id="name" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field">Members:</label>
+      <div>
+        <input type="text" name="member" />
+        <input type="button" value="Search" id="member-search-submit" />
+
+        <ul id="member-names">
+          <li id="empty-list">No members yet</li>
+        </ul>
       </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="first_name">First name:</label>
-      <input type="text" class="text" name="first_name" id="first_name" />
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="middle_name">Middle name:</label>
-      <input type="text" class="text" name="middle_name" id="middle_name" />
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="last_name">Last name:</label>
-      <input type="text" class="text" name="last_name" id="last_name" />
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="suffix">Name suffix:</label>
-      <input type="text" class="text narrow" name="suffix" id="suffix" />
-      <div class="help-text">
-        <p>
-          Jr., Esq., etc.
-        </p>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="birth_date">Birth date:</label>
-      <input type="text" class="text narrow date" name="birth_date" id="birth_date" />
-      <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
-      <div class="help-text">
-        <p>
-          <% $c->user()->date_format() %>
-        </p>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="last_name">Gender:</label>
-      <select name="gender">
-        <option value="">-- pick a gender --</option>
-% for my $value ( @{ R2::Schema::Person->GenderValues() } ) {
-        <option value="<% $value %>"><% $value %></option>
-% }
-      </select>
     </div>
 
     <div class="form-item">

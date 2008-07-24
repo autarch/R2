@@ -267,6 +267,14 @@ input.submit {
   margin-top: 0.5em;
 }
 
+ul#member-names {
+    margin: 0.5em 0 0.5em 10.5em;
+}
+
+ul#member-names li {
+    margin: 0.05em 0 0.05em 0;
+}
+
 #summary.has-image {
     min-height: 110px;
 }
