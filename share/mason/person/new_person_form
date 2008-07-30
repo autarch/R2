@@ -3,7 +3,7 @@
 </div>
 
 <&| /lib/filter/form.mas &>
-<form class="JS-standard-form" action="<% $c->uri_for('') %>" method="post"
+<form class="JS-standard-form" action="<% $c->uri_for('/person') %>" method="post"
       enctype="multipart/form-data">
 
   <input type="hidden" name="contact_type" value="person" />
