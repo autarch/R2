@@ -113,7 +113,7 @@ sub _where_clauses
     my $select = shift;
 
     $select->where( $Schema->table('Contact')->column('account_id'),
-                    '=', $self->account()->account_id() )
+                    '=', $self->account()->account_id() );
 }
 
 __PACKAGE__->meta()->make_immutable();
