@@ -6,6 +6,7 @@ use warnings;
 use base 'Catalyst::Controller::REST';
 
 use R2::Config;
+use R2::JSON;
 use R2::Web::CSS;
 use R2::Web::Javascript;
 
@@ -61,6 +62,17 @@ sub end : Private
     }
 
     return;
+}
+
+sub _set_entity
+{
+    my $self   = shift;
+    my $c      = shift;
+    my $entity = shift;
+
+    $c->response()->body( R2::JSON->Encode($entity) );
+
+    return 1;
 }
 
 sub _require_authen
