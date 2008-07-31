@@ -267,11 +267,11 @@ input.submit {
   margin-top: 0.5em;
 }
 
-ul#member-names {
+ul#member-search-selected {
     margin: 0.5em 0 0.5em 10.5em;
 }
 
-ul#member-names li {
+ul#member-search-selected li {
     margin: 0.05em 0 0.05em 0;
 }
 

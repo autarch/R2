@@ -32,6 +32,11 @@ subtype 'R2::Type::PosOrZeroInt'
     => where { $_ >= 0 }
     => message { 'This must be an integer >= 0' };
 
+subtype 'R2::Type::NonEmptyStr'
+    => as 'Str'
+    => where { length $_ >= 0 }
+    => message { 'This string must not be empty' };
+
 no Moose::Util::TypeConstraints;
 
 1;

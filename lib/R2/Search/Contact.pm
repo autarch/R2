@@ -1,9 +1,11 @@
-package R2::Web::Search;
+package R2::Search::Contact;
 
 use strict;
 use warnings;
 
+use Fey::Literal::Function;
 use Fey::Literal::Term;
+use Fey::Object::Iterator;
 use R2::Schema;
 
 use Moose;
@@ -15,16 +17,17 @@ has 'account' =>
     );
 
 has 'limit' =>
-    ( is       => 'ro',
-      isa      => 'R2::Type::PosOrZeroInt',
-      required => 1,
+    ( is      => 'ro',
+      isa     => 'R2::Type::PosOrZeroInt',
+      default => 0,
     );
 
 has 'page' =>
-    ( is       => 'ro',
-      isa      => 'R2::Type::PosInt',
-      required => 1,
+    ( is      => 'ro',
+      isa     => 'R2::Type::PosInt',
+      default => 1,
     );
+
 
 my $Schema = R2::Schema->Schema();
 
@@ -114,6 +117,19 @@ sub _where_clauses
 
     $select->where( $Schema->table('Contact')->column('account_id'),
                     '=', $self->account()->account_id() );
+}
+
+sub _limit
+{
+    my $self   = shift;
+    my $select = shift;
+
+    return unless $self->limit();
+
+    my @limit = $self->limit();
+    push @limit, ( $self->page() - 1 ) * $self->limit();
+
+    $select->limit(@limit);
 }
 
 __PACKAGE__->meta()->make_immutable();
