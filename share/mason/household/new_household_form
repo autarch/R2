@@ -7,7 +7,7 @@
       id="household-form"
       enctype="multipart/form-data">
 
-  <input type="hidden" name="contact_type" value="person" />
+  <input type="hidden" name="contact_type" value="household" />
 
   <fieldset>
     <legend>The Basics</legend>
@@ -20,14 +20,15 @@
     <div class="form-item">
       <label class="for-field">Members:</label>
       <div>
-        <input type="text" name="name" id="member-search-text" />
+        <input type="text" class="text" name="name" id="member-search-text" />
         <input type="submit" value="Search" id="member-search-submit" />
 
-        <div id="member-search-results">
+        <div id="member-search-results" style="display: none">
+          <a href="#" id="member-search-results-close">X</a>
         </div>
 
         <ul id="member-search-selected">
-          <li id="empty-list">No members yet</li>
+          <li id="member-search-empty-list">No members yet</li>
         </ul>
       </div>
     </div>

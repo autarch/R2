@@ -219,7 +219,7 @@ select.disabled {
   border-color: #333;
 }
 
-input:focus,
+input.text:focus,
 textarea:focus,
 select:focus {
   border-color: black;
@@ -265,6 +265,17 @@ input.submit {
   border-right: 2px solid #39602A;
 
   margin-top: 0.5em;
+}
+
+#member-search-results {
+    margin: 0.5em 10em 0 9.5em;
+    padding: 0.5em;
+    border: 1px solid black;
+    background-color: lightyellow;
+}
+
+#member-search-results-close {
+    float: right;
 }
 
 ul#member-search-selected {

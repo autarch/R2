@@ -1,4 +1,5 @@
 JSAN.use('DOM.Events');
+JSAN.use('DOM.Utils');
 JSAN.use('HTTP.Request');
 
 
@@ -10,15 +11,16 @@ if ( typeof R2.FormWidget == "undefined" ) {
     R2.FormWidget = {};
 }
 
-R2.FormWidget.AjaxSearch = function ( uri, prefix, on_success, on_failure ) {
-    this.text     = document.getElementById( prefix + "-search-text" );
-    this.submit   = document.getElementById( prefix + "-search-submit" );
+R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_success, on_failure ) {
+    this.text     = $( prefix + "-search-text" );
+    this.submit   = $( prefix + "-search-submit" );
 
     if ( ! ( this.text && this.submit ) ) {
         return;
     }
 
     this.uri        = uri;
+    this.on_submit  = on_submit;
     this.on_success = on_success;
     this.on_failure = on_failure;
 
@@ -48,15 +50,16 @@ R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
 
     var self = this;
 
-    this.req = new HTTP.Request ( { "uri":    this.uri,
-                                    "method": "get",
+    this.req = new HTTP.Request ( { "method": "get",
                                     "parameters": this._parameters(),
                                     "onSuccess": function (trans) { self._handleSuccess(trans) },
                                     "onFailure": function (trans) { self._handleFailure(trans) }
                                   }
                                 );
 
-    this.req.request();
+    this.on_submit();
+
+    this.req.request( this.uri );
 };
 
 R2.FormWidget.AjaxSearch.prototype._parameters = function () {
