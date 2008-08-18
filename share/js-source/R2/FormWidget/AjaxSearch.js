@@ -24,7 +24,29 @@ R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_success, on_fai
     this.on_success = on_success;
     this.on_failure = on_failure;
 
+    this._instrumentTextInput();
     this._instrumentSubmit();
+};
+
+R2.FormWidget.AjaxSearch.prototype._instrumentTextInput = function () {
+    var self = this;
+
+    DOM.Events.addListener( this.text,
+                            "keypress",
+                            function (e) {
+                                if ( e.keyCode != 13 ) {
+                                    return e.keyCode;
+                                }
+
+                                self.submit.click();
+
+                                e.preventDefault();
+                                if ( e.stopPropogation ) {
+                                    e.stopPropagation();
+                                }
+                            }
+                          );
+
 };
 
 R2.FormWidget.AjaxSearch.prototype._instrumentSubmit = function () {
