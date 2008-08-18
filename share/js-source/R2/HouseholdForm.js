@@ -81,6 +81,7 @@ R2.HouseholdForm._populateResults = function (results) {
             li.style.opacity = 1;
 
             var adder = document.createElement("button");
+            adder.type = "button";
             adder.appendChild( document.createTextNode("add") );
 
             DOM.Events.addListener( adder,
@@ -149,6 +150,7 @@ R2.HouseholdForm._appendResult = function (result) {
     li.style.opacity = 0;
 
     var remover = document.createElement("button");
+    remover.type = "button";
     remover.appendChild( document.createTextNode("remove") );
 
     DOM.Events.addListener( remover,
