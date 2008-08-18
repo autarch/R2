@@ -5,6 +5,7 @@ use warnings;
 
 use base 'R2::Controller::Base';
 
+use R2::Schema::Person;
 use R2::Search::Person::ByName;
 use R2::Util qw( string_is_empty );
 
