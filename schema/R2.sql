@@ -264,8 +264,7 @@ CREATE TABLE "Person" (
        last_name          VARCHAR(255)       NOT NULL DEFAULT '',
        suffix             VARCHAR(20)        NOT NULL DEFAULT '',
        birth_date         DATE               NULL,
-       gender             gender             NULL,
-       household_id       INT8               NULL
+       gender             gender             NULL
 );
 
 CREATE TABLE "PersonMessaging" (
@@ -290,6 +289,14 @@ CREATE TABLE "Household" (
        household_id       SERIAL8            PRIMARY KEY,
        name               VARCHAR(255)       NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
+);
+
+CREATE TABLE "HouseholdMember" (
+       household_id       INT8               NOT NULL,
+       person_id          INT8               NOT NULL,
+       position           VARCHAR(255)       NULL,
+       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       PRIMARY KEY ( household_id, person_id )
 );
 
 CREATE TABLE "Organization" (
@@ -599,10 +606,6 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "Person" ADD CONSTRAINT "Person_household_id"
-  FOREIGN KEY ("household_id") REFERENCES "Household" ("household_id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
-
 ALTER TABLE "PersonMessaging" ADD CONSTRAINT "PersonMessaging_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
@@ -617,6 +620,14 @@ ALTER TABLE "MessagingProvider" ADD CONSTRAINT "MessagingProvider_account_id"
 
 ALTER TABLE "Household" ADD CONSTRAINT "Household_household_id"
   FOREIGN KEY ("household_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "HouseholdMember" ADD CONSTRAINT "HouseholdMember_household_id"
+  FOREIGN KEY ("household_id") REFERENCES "Household" ("household_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "HouseholdMember" ADD CONSTRAINT "HouseholdMember_person_id"
+  FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Organization" ADD CONSTRAINT "Organization_organization_id"

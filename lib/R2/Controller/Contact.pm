@@ -96,4 +96,14 @@ sub _display_person
     $c->stash()->{template} = '/person/view';
 }
 
+sub _display_household
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{household} = $c->stash()->{contact}->household();
+
+    $c->stash()->{template} = '/household/view';
+}
+
 1;

@@ -15,6 +15,13 @@ sub person_params
     return $self->_params_for_classes( [ 'R2::Schema::Person', 'R2::Schema::Contact' ] );
 }
 
+sub household_params
+{
+    my $self = shift;
+
+    return $self->_params_for_classes( [ 'R2::Schema::Household', 'R2::Schema::Contact' ] );
+}
+
 sub account_params
 {
     my $self = shift;

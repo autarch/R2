@@ -11,7 +11,7 @@ if ( typeof R2.FormWidget == "undefined" ) {
     R2.FormWidget = {};
 }
 
-R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_success, on_failure ) {
+R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_empty, on_success, on_failure ) {
     this.text     = $( prefix + "-search-text" );
     this.submit   = $( prefix + "-search-submit" );
 
@@ -21,6 +21,7 @@ R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_success, on_fai
 
     this.uri        = uri;
     this.on_submit  = on_submit;
+    this.on_empty   = on_empty;
     this.on_success = on_success;
     this.on_failure = on_failure;
 
@@ -68,6 +69,12 @@ R2.FormWidget.AjaxSearch.prototype._instrumentSubmit = function () {
 R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
     if ( this.req ) {
         this.req.transport.abort();
+    }
+
+    if ( this.text.value.length == 0 ) {
+        this.on_empty();
+
+        return;
     }
 
     var self = this;

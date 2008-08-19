@@ -1,46 +1,17 @@
-package R2::Controller::Person;
+package R2::Controller::Household;
 
 use strict;
 use warnings;
 
 use base 'R2::Controller::Base';
 
-use R2::Schema::Person;
-use R2::Search::Person::ByName;
+use R2::Schema::Household;
 use R2::Util qw( string_is_empty );
 
 
-sub person : Path('') : ActionClass('+R2::Action::REST') { }
+sub household : Path('') : ActionClass('+R2::Action::REST') { }
 
-sub person_GET
-{
-    my $self = shift;
-    my $c    = shift;
-
-    my $name = $c->request()->parameters()->{person_name};
-
-    my @people;
-    if ( ! string_is_empty($name) )
-    {
-        my $people = R2::Search::Person::ByName->new( account => $c->user()->account(),
-                                                      name    => $name,
-                                                    )->people();
-
-        while ( my $person = $people->next() )
-        {
-            push @people, { name      => $person->full_name(),
-                            person_id => $person->person_id(),
-                          };
-        }
-    }
-
-    return
-        $self->status_ok( $c,
-                          entity => \@people,
-                        );
-}
-
-sub person_POST
+sub household_POST
 {
     my $self = shift;
     my $c    = shift;
@@ -55,13 +26,12 @@ sub person_POST
             );
     }
 
-    my %p = $c->request()->person_params();
+    my %p = $c->request()->household_params();
     $p{account_id} = $c->user()->account_id();
-    $p{date_format} = $c->request()->params()->{date_format};
 
     my $image = $c->request()->upload('image');
 
-    my @errors = R2::Schema::Person->ValidateForInsert(%p);
+    my @errors = R2::Schema::Household->ValidateForInsert(%p);
 
     if ( $image && ! R2::Schema::File->TypeIsImage( $image->type() ) )
     {
@@ -70,12 +40,21 @@ sub person_POST
                       };
     }
 
+    my @person_ids = @{ $c->request()->parameters()->{person_id} || [] };
+
+    unless (@person_ids)
+    {
+        push @errors, { field   => 'member-search-text',
+                        message => 'A household must have at least one member.',
+                      };
+    }
+
     if (@errors)
     {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
 
         $c->_redirect_with_error( error  => $e,
-                                  uri    => '/contact/new_person_form',
+                                  uri    => '/contact/new_household_form',
                                   params => $c->request()->params(),
                                 );
     }
@@ -84,7 +63,7 @@ sub person_POST
 
     my @phone_numbers = $c->request()->new_phone_number_param_sets();
 
-    my $person;
+    my $household;
     my $insert_sub =
         sub
         {
@@ -101,26 +80,31 @@ sub person_POST
                 $p{image_file_id} = $file->file_id();
             }
 
-            $person = R2::Schema::Person->insert(%p);
+            $household = R2::Schema::Household->insert(%p);
+
+            for my $person_id (@person_ids)
+            {
+                $household->add_person( person_id => $person_id );
+            }
 
             for my $address (@addresses)
             {
                 R2::Schema::Address->insert( %{ $address },
-                                             contact_id => $person->contact_id(),
+                                             contact_id => $household->contact_id(),
                                            );
             }
 
             for my $number (@phone_numbers)
             {
                 R2::Schema::PhoneNumber->insert( %{ $number },
-                                                 contact_id => $person->contact_id(),
+                                                 contact_id => $household->contact_id(),
                                                );
             }
         };
 
     R2::Schema->RunInTransaction($insert_sub);
 
-    $c->redirect_and_detach( $c->uri_for( '/contact/' . $person->contact_id() ) );
+    $c->redirect_and_detach( $c->uri_for( '/contact/' . $household->contact_id() ) );
 }
 
 1;

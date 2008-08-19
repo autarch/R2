@@ -120,6 +120,9 @@ sub _get_div_for_field
 
     my $elt = $self->_dom()->getElementById($id);
 
+    die "No such element: $id\n"
+        unless $elt;
+
     return $elt->parentNode();
 }
 

@@ -8,8 +8,6 @@ use R2::Exceptions qw( data_validation_error );
 use Moose::Role;
 
 
-#requires_attr '_ValidationSteps';
-
 around 'insert' => sub
 {
     my $orig  = shift;
@@ -50,15 +48,52 @@ sub _validation_errors
     my $p         = shift;
     my $is_insert = shift;
 
-    my @steps = @{ $self->_ValidationSteps };
-
     my @errors;
     for my $step ( @{ $self->_ValidationSteps() } )
     {
         push @errors, $self->$step( $p, $is_insert );
     }
 
+    push @errors, $self->_check_non_nullable_columns( $p, $is_insert );
+
     return @errors;
+}
+
+sub _check_non_nullable_columns
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    my @errors;
+    for my $name ( map { $_->name() }
+                   grep { ! ( $_->is_nullable() || defined $_->default() || $_->is_auto_increment() ) }
+                   $self->Table()->columns() )
+    {
+        if ($is_insert)
+        {
+            push @errors, $self->_needs_value_error($name)
+                unless exists $p->{$name} && defined $p->{$name};
+        }
+        else
+        {
+            push @errors, $self->_needs_value_error($name)
+                if exists $p->{$name} && ! defined $p->{$name};
+        }
+    }
+
+    return @errors;
+}
+
+sub _needs_value_error
+{
+    my $self = shift;
+    my $name = shift;
+
+    ( my $friendly_name = ucfirst $name ) =~ s/_/ /g;
+
+    return { field   => $name,
+             message => "You must provide a $friendly_name." };
 }
 
 sub ValidateForInsert

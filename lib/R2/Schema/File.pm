@@ -7,6 +7,7 @@ use Digest::SHA qw( sha512_hex );
 use File::LibMagic ();
 use File::Slurp qw( read_file );
 use Path::Class qw( dir file );
+use R2::Schema;
 use R2::Util qw( string_is_empty );
 
 use MooseX::ClassAttribute;

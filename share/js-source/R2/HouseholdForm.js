@@ -49,6 +49,7 @@ R2.HouseholdForm._instrumentMemberSearch = function () {
         new R2.FormWidget.AjaxSearch( "/person",
                                       "member",
                                       R2.HouseholdForm._onSearchSubmit,
+                                      R2.HouseholdForm._handleEmptySubmit,
                                       R2.HouseholdForm._populateResults,
                                       R2.HouseholdForm._handleError
                                     );
@@ -101,16 +102,6 @@ R2.HouseholdForm._populateResults = function (results) {
     }
 
     DOM.Element.show( R2.HouseholdForm.results );
-};
-
-R2.HouseholdForm._handleError = function (results) {
-    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
-
-    var text = "An error occurred when searching for matching people."
-    text += " Sometimes this error is temporary, so feel free to try again."
-    text += " If this error persists, please contact support.";
-
-    R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
 };
 
 R2.HouseholdForm._makeAddFunction = function ( li, result ) {
@@ -227,4 +218,23 @@ R2.HouseholdForm._hideResults = function () {
                            "onFinish":
                            function () { DOM.Element.hide( R2.HouseholdForm.results ); } }
                        );
-}
+};
+
+R2.HouseholdForm._handleEmptySubmit = function () {
+    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
+
+    var text = "You must provide a name to search for.";
+    R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
+
+    DOM.Element.show( R2.HouseholdForm.results );
+};
+
+R2.HouseholdForm._handleError = function (results) {
+    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
+
+    var text = "An error occurred when searching for matching people."
+    text += " Sometimes this error is temporary, so feel free to try again."
+    text += " If this error persists, please contact support.";
+
+    R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
+};
