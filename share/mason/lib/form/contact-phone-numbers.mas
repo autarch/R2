@@ -31,6 +31,11 @@
 
   </fieldset>
 
+<%args>
+$contact_type
+</%args>
+
 <%init>
-my @phone_number_types = @{ $c->user()->account()->person_phone_number_types() };
+my $meth = $contact_type . '_phone_number_types';
+my @phone_number_types = @{ $c->user()->account()->$meth() };
 </%init>

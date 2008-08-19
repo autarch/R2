@@ -63,7 +63,13 @@
 
   </fieldset>
 
+<%args>
+$contact_type
+</%args>
+
 <%init>
-my @address_types = @{ $c->user()->account()->person_address_types() };
+my $meth = $contact_type . '_address_types';
+my @address_types = @{ $c->user()->account()->$meth() };
+
 my @countries = map { $_->[1] } $c->user()->account()->countries()->all();
 </%init>

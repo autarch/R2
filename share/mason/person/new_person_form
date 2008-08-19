@@ -121,9 +121,9 @@
 
 <& /lib/form/contact-email-website.mas &>
 
-<& /lib/form/contact-phone-numbers.mas &>
+<& /lib/form/contact-phone-numbers.mas, contact_type => 'person' &>
 
-<& /lib/form/contact-addresses.mas &>
+<& /lib/form/contact-addresses.mas, contact_type => 'person' &>
 
   <div class="form-item">
     <input class="submit" type="submit" value="Submit" />
