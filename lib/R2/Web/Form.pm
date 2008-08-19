@@ -192,7 +192,7 @@ sub _collapse_single_option_select
 
     $parent->removeChild($select);
 
-    $parent->appendChild($div);
+    $parent->insertBefore( $div, $parent->firstChild() );
     $parent->appendChild($hidden);
 }
 
