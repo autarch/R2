@@ -50,7 +50,7 @@ sub _validation_errors
     my $p         = shift;
     my $is_insert = shift;
 
-    my @steps = @{$self->_ValidationSteps};
+    my @steps = @{ $self->_ValidationSteps };
 
     my @errors;
     for my $step ( @{ $self->_ValidationSteps() } )
