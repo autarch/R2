@@ -97,27 +97,6 @@ use MooseX::Params::Validate qw( validatep );
         );
 
     __PACKAGE__->_AddSQLMethods();
-
-    class_has '_DonationSourcesDelete' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Delete',
-          lazy    => 1,
-          default => sub { __PACKAGE__->_BuildDonationSourcesDelete() },
-        );
-
-    class_has '_DonationTargetsDelete' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Delete',
-          lazy    => 1,
-          default => sub { __PACKAGE__->_BuildDonationTargetsDelete() },
-        );
-
-    class_has '_PaymentTypesDelete' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Delete',
-          lazy    => 1,
-          default => sub { __PACKAGE__->_BuildPaymentTypesDelete() },
-        );
 }
 
 
