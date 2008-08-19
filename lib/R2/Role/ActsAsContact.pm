@@ -42,6 +42,20 @@ sub _validation_errors
         push @errors, R2::Schema::Contact->$step( $contact_p, $is_insert );
     }
 
+    {
+        # This is nasty hack to make sure we don't throw an error
+        # because the primary key is null (person_id, household_id,
+        # etc) on insert. This will not be null when we do the real
+        # insert, because it will be the same as the newly created
+        # contact_id.
+        my $temp_p = {};
+        %{ $temp_p } = %{ $my_p };
+
+        $temp_p->{ ( $self->Table()->primary_key() )[0]->name() } = 0;
+
+        push @errors, $self->_check_non_nullable_columns( $temp_p, $is_insert );
+    }
+
     # The validation steps may have altered the data. It will get
     # filtered again for the actual insert.
     %{ $p } = ( %{ $contact_p }, %{ $my_p } );
