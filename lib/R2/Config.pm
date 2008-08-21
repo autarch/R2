@@ -304,9 +304,6 @@ sub _build_catalyst_config
             dbi_dbh        => 'R2::Plugin::Session::Store::R2',
           },
 
-          dbi =>
-          $self->dbi_config(),
-
           authen_cookie =>
           { name       => 'VegGuide-user',
             path       => '/',
@@ -402,7 +399,7 @@ sub _build_dbi_config
         if $db_config->{port};
 
     return { dsn      => $dsn,
-             user     => ( $db_config->{user} || '' ),
+             username => ( $db_config->{username} || '' ),
              password => ( $db_config->{password} || '' ),
            };
 }
