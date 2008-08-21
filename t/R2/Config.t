@@ -62,7 +62,7 @@ my $file = file( tempdir( CLEANUP => 1 ), 'r2.conf' );
     write_file( $file->stringify(), <<'EOF' );
 [db]
 name = Foo
-user = Bar
+username = Bar
 password = baz
 host = example.com
 port = 42
@@ -74,7 +74,7 @@ EOF
 
     is_deeply( $config->dbi_config(),
                { dsn      => 'dbi:Pg:dbname=Foo;host=example.com;port=42',
-                 user     => 'Bar',
+                 username => 'Bar',
                  password => 'baz',
                },
                'dbi_config() from config file'
