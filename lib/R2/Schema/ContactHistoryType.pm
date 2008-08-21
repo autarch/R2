@@ -16,7 +16,7 @@ use Fey::ORM::Table;
 
     my $count =
         Fey::Literal::Function->new
-            ( 'COUNT', $schema->table('ContactHistory')->primary_key() );
+            ( 'COUNT', @{ $schema->table('ContactHistory')->primary_key() } );
 
     $select->select($count)
            ->from( $schema->tables( 'ContactHistory' ),  )

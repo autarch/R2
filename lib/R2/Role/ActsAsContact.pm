@@ -51,7 +51,7 @@ sub _validation_errors
         my $temp_p = {};
         %{ $temp_p } = %{ $my_p };
 
-        $temp_p->{ ( $self->Table()->primary_key() )[0]->name() } = 0;
+        $temp_p->{ $self->Table()->primary_key()->[0]->name() } = 0;
 
         push @errors, $self->_check_non_nullable_columns( $temp_p, $is_insert );
     }

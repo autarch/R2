@@ -29,7 +29,7 @@ with 'R2::Role::DataValidator';
 
         my $count =
             Fey::Literal::Function->new
-                ( 'COUNT', $foreign_table->primary_key() );
+                ( 'COUNT', @{ $foreign_table->primary_key() } );
 
         $select->select($count)
                ->from( $schema->tables( 'PhoneNumber', 'Contact' ),  )
@@ -55,7 +55,7 @@ with 'R2::Role::DataValidator';
 
     my $count =
         Fey::Literal::Function->new
-            ( 'COUNT', $schema->table('Contact')->primary_key() );
+            ( 'COUNT', @{ $schema->table('Contact')->primary_key() } );
 
     $select->select($count)
            ->from( $schema->tables( 'PhoneNumber', 'Contact' ),  )

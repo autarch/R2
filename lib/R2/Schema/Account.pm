@@ -521,7 +521,7 @@ sub _AddSQLMethods
 
         my $count =
             Fey::Literal::Function->new
-                ( 'COUNT', $foreign_table->primary_key() );
+                ( 'COUNT', @{ $foreign_table->primary_key() } );
 
         $select->select($count)
                ->from( $schema->tables('Contact'), $foreign_table )

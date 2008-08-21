@@ -285,7 +285,7 @@ sub _params_for_classes
     {
         my $table = $class->Table();
 
-        my %pk = map { $_->name() => 1 } $table->primary_key();
+        my %pk = map { $_->name() => 1 } @{ $table->primary_key() };
 
         for my $col ( $table->columns() )
         {
