@@ -10,7 +10,7 @@ use File::Slurp qw( read_file );
 use R2::Web::Javascript;
 
 
-R2::Config->new()->_set_is_production(1);
+R2::Config->instance()->_set_is_production(1);
 
 R2::Web::Javascript->new()->create_single_file();
 my $js = read_file( R2::Web::Javascript->_target_file()->stringify() );

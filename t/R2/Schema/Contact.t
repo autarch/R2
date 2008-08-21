@@ -16,6 +16,7 @@ mock_dbh();
     {
         R2::Schema::Contact->insert( contact_type  => 'Contact',
                                      email_address => '@example.com',
+                                     account_id    => 1,
                                    );
     };
 
@@ -32,6 +33,7 @@ mock_dbh();
     {
         R2::Schema::Contact->insert( contact_type  => 'Contact',
                                      email_address => 'bob@not a domain.com',
+                                     account_id    => 1,
                                    );
     };
 
@@ -47,6 +49,7 @@ mock_dbh();
     my %c = ( contact_type  => 'Contact',
               email_address => 'bob@example.com',
               website       => 'urth.org',
+              account_id    => 1,
             );
 
     my $contact = R2::Schema::Contact->insert(%c);

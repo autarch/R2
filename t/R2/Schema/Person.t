@@ -20,6 +20,7 @@ my $dbh = mock_dbh();
                                     suffix        => '',
                                     email_address => 'joe.smith@example.com',
                                     website       => 'http://example.com',
+                                    account_id    => 1,
                                   );
 
     ok( $person->contact(), 'newly created person has a contact' );
@@ -46,6 +47,7 @@ my $dbh = mock_dbh();
                                     middle_name => 'J.',
                                     last_name   => 'Smith',
                                     suffix      => 'the 23rd',
+                                    account_id  => 1,
                                   );
 
     is( $person->full_name(), 'Sir Joe J. Smith the 23rd',
@@ -56,6 +58,7 @@ my $dbh = mock_dbh();
     my @errors =
         R2::Schema::Person->ValidateForInsert( email_address => 'joe.smith@example.com',
                                                website       => 'http://example.com',
+                                               account_id    => 1,
                                              );
 
     is( scalar @errors, 1, 'got one validation error' );
@@ -70,6 +73,7 @@ my $dbh = mock_dbh();
                                     middle_name => 'J.',
                                     last_name   => 'Smith',
                                     suffix      => 'the 23rd',
+                                    account_id  => 1,
                                   );
 
     my @errors =
@@ -87,6 +91,7 @@ my $dbh = mock_dbh();
     {
         R2::Schema::Person->insert( email_address => 'joe.smith@example.com',
                                     website       => 'http://example.com',
+                                    account_id    => 1,
                                   );
     };
 
@@ -103,6 +108,7 @@ my $dbh = mock_dbh();
     {
         R2::Schema::Person->insert( first_name    => 'Joe',
                                     email_address => 'joe.smith@',
+                                    account_id    => 1,
                                   );
     };
 
@@ -122,6 +128,7 @@ my $dbh = mock_dbh();
         R2::Schema::Person->insert( first_name  => 'Dave',
                                     birth_date  => $dt->strftime( '%Y-%m-%d' ),
                                     date_format => '%Y-%m-%d',
+                                    account_id    => 1,
                                   );
     };
 
@@ -141,6 +148,7 @@ my $dbh = mock_dbh();
         R2::Schema::Person->insert( first_name  => 'Dave',
                                     birth_date  => '01-03-1973',
                                     date_format => '%Y-%m-%d',
+                                    account_id  => 1,
                                   );
     };
 
@@ -157,6 +165,7 @@ my $dbh = mock_dbh();
         R2::Schema::Person->insert( first_name  => 'Dave',
                                     birth_date  => '1973-06-23',
                                     date_format => '%Y-%m-%d',
+                                    account_id  => 1,
                                   );
 
     ok( $person, 'date_format gets removed from insert parameters' );

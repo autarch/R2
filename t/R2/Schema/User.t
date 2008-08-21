@@ -19,6 +19,7 @@ my $dbh = mock_dbh();
                                   email_address => 'joe.smith@example.com',
                                   password      => 'password',
                                   website       => 'http://example.com',
+                                  account_id    => 1,
                                 );
 
     ok( $user->person(), 'newly created user has a person' );
@@ -42,6 +43,7 @@ my $dbh = mock_dbh();
                                   email_address => 'bubba.smith@example.com',
                                   website       => 'http://example.com',
                                   disable_login => 1,
+                                  account_id    => 1,
                                 );
 
     is( $user->password(), '*disabled*',
@@ -56,6 +58,7 @@ my $dbh = mock_dbh();
                                   last_name  => 'Smith',
                                   website    => 'http://example.com',
                                   password   => 'whatever',
+                                  account_id => 1,
                                 );
     };
 
@@ -70,6 +73,7 @@ my $dbh = mock_dbh();
                                   email_address => 'bubba.smith@example.com',
                                   website       => 'http://example.com',
                                   disable_login => 1,
+                                  account_id    => 1,
                                 );
 
     $dbh->{mock_add_resultset} =
@@ -131,6 +135,7 @@ my $dbh = mock_dbh();
                                   password      => 'password',
                                   date_format   => 'MM-dd-YYY',
                                   time_format   => 'hh:mm a',
+                                  account_id    => 1,
                                 );
 
     my $dt = DateTime->new( year => 2008, month => 7, day => 23, hour => 7, minute => 24 );
