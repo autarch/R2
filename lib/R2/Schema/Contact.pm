@@ -38,20 +38,21 @@ with 'R2::Role::DataValidator';
 
     has_one( $schema->table('Account') );
 
-    has_one 'person' =>
-        ( table => $schema->table('Person'),
-          undef => 1,
-        );
+    for my $type ( qw( person household organization ) )
+    {
+        has_one $type =>
+            ( table => $schema->table( ucfirst $type ),
+              undef => 1,
+            );
 
-    has_one 'organization' =>
-        ( table => $schema->table('Organization'),
-          undef => 1,
-        );
-
-    has_one 'household' =>
-        ( table => $schema->table('Household'),
-          undef => 1,
-        );
+        has 'is_' . $type =>
+            ( is       => 'ro',
+              isa      => 'Bool',
+              lazy     => 1,
+              default  => sub { $_[0]->contact_type() eq ucfirst $type ? 1 : 0 },
+              init_arg => undef,
+            );
+    }
 
     has_one '_file' =>
         ( table => $schema->table('File') );
