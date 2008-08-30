@@ -59,16 +59,9 @@ sub person_POST
     $p{account_id} = $c->user()->account_id();
     $p{date_format} = $c->request()->params()->{date_format};
 
-    my $image = $c->request()->upload('image');
-
     my @errors = R2::Schema::Person->ValidateForInsert(%p);
 
-    if ( $image && ! R2::Schema::File->TypeIsImage( $image->type() ) )
-    {
-        push @errors, { field   => 'image',
-                        message => 'The image you provided is not a GIF, JPG, or PNG.',
-                      };
-    }
+    my $image = $self->_get_image( $c, \@errors );
 
     if (@errors)
     {

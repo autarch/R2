@@ -29,18 +29,11 @@ sub household_POST
     my %p = $c->request()->household_params();
     $p{account_id} = $c->user()->account_id();
 
-    my $image = $c->request()->upload('image');
-
     my @errors = R2::Schema::Household->ValidateForInsert(%p);
 
-    if ( $image && ! R2::Schema::File->TypeIsImage( $image->type() ) )
-    {
-        push @errors, { field   => 'image',
-                        message => 'The image you provided is not a GIF, JPG, or PNG.',
-                      };
-    }
+    my $image = $self->_get_image( $c, \@errors );
 
-    my @person_ids = @{ $c->request()->parameters()->{person_id} || [] };
+    my @person_ids = $c->request()->param('person_id');
 
     unless (@person_ids)
     {
