@@ -8,6 +8,7 @@ use Path::Class ();
 use R2::Schema::File;
 use R2::Types;
 
+use Moose;
 use MooseX::StrictConstructor;
 use MooseX::Params::Validate qw( validatep );
 
@@ -81,7 +82,8 @@ sub resize
     return (ref $self)->new( file => $file );
 }
 
-__PACKAGE__->meta()->make_immutable();
 no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;

@@ -8,8 +8,8 @@ use HTML::FillInForm;
 use R2::Config;
 use R2::Web::FormData;
 
-use Moose::Policy 'MooseX::Policy::SemiAffordanceAccessor';
 use Moose;
+use MooseX::SemiAffordanceAccessor;
 
 has 'html' =>
     ( is       => 'ro',
@@ -217,8 +217,9 @@ sub _form_html_from_dom
     }
 }
 
-__PACKAGE__->meta()->make_immutable();
 no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 
