@@ -90,7 +90,6 @@ sub _MakeSelectAllSQL
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

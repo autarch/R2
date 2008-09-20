@@ -183,7 +183,6 @@ sub _build_cache_dir
 
 no Fey::ORM::Table;
 no MooseX::ClassAttribute;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

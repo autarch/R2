@@ -192,7 +192,6 @@ sub is_deleteable
 }
 
 no Fey::ORM::Table;
-no Moose;
 no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();

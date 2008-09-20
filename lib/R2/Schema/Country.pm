@@ -14,7 +14,6 @@ use Fey::ORM::Table;
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

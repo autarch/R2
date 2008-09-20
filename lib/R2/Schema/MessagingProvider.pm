@@ -114,7 +114,6 @@ sub _fill_uri
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

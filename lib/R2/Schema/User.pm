@@ -108,7 +108,6 @@ sub format_datetime
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

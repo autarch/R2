@@ -70,7 +70,6 @@ sub is_deleteable
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

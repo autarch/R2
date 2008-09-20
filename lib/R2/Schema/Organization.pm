@@ -40,7 +40,6 @@ sub _build_friendly_name
 }
 
 no Fey::ORM::Table;
-no Moose;
 no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();

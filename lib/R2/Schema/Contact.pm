@@ -205,7 +205,6 @@ sub _canonicalize_website
 }
 
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -41,9 +41,7 @@ sub _build_city_region_postal_code
     return $c_r_pc;
 }
 
-
 no Fey::ORM::Table;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 
