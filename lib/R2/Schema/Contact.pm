@@ -21,8 +21,8 @@ use URI::http;
 #use R2::Schema::Person;
 #use R2::Schema::Account;
 
-use MooseX::ClassAttribute;
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 with 'R2::Role::DataValidator';
 

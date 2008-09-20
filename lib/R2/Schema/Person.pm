@@ -11,8 +11,8 @@ use R2::Schema::PersonMessaging;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
 
-use MooseX::ClassAttribute;
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 with 'R2::Role::DVAAC';
 

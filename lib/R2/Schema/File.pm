@@ -11,6 +11,8 @@ use R2::Schema;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
+
 
 {
     my $schema = R2::Schema->Schema();

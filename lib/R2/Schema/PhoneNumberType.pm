@@ -7,8 +7,8 @@ use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
 use R2::Schema;
 
-use MooseX::ClassAttribute;
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 with 'R2::Role::DataValidator';
 

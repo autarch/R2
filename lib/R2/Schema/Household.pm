@@ -7,9 +7,9 @@ use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::HouseholdMember;
 
+use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
-use Fey::ORM::Table;
 
 with 'R2::Role::DVAAC';
 
