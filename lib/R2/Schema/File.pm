@@ -10,7 +10,6 @@ use Path::Class qw( dir file );
 use R2::Schema;
 use R2::Util qw( string_is_empty );
 
-use MooseX::ClassAttribute;
 use Fey::ORM::Table;
 
 {
@@ -66,13 +65,6 @@ use Fey::ORM::Table;
           lazy     => 1,
           builder  => '_build_is_image',
           init_arg => undef,
-        );
-
-    class_has '_FileMagic' =>
-        ( is      => 'ro',
-          isa     => 'File::LibMagic',
-          lazy    => 1,
-          default => sub { File::LibMagic->new() },
         );
 }
 
