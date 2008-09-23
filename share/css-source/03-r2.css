@@ -266,7 +266,7 @@ input.submit {
 }
 
 #member-search-results {
-    margin: 0.5em 10em 0 9.5em;
+    margin: 0.5em 10em 0 12.5em;
     padding: 0.5em;
     border: 1px solid black;
     background-color: lightyellow;
@@ -277,7 +277,7 @@ input.submit {
 }
 
 ul#member-search-selected {
-    margin: 0.5em 0 0.5em 10.5em;
+    margin: 0.5em 0 0.5em 13.5em;
 }
 
 ul#member-search-selected li {
