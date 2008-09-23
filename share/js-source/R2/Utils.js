@@ -6,6 +6,16 @@ if ( typeof R2.Utils == "undefined" ) {
     R2.Utils = {};
 }
 
+R2.Utils.firstParentWithTagName = function ( child, tag_name ) {
+    var node = child;
+
+    while ( node = node.parentNode ) {
+        if ( node.tagName == tag_name ) {
+            return node;
+        }
+    }
+};
+
 R2.Utils.cleanNode = function ( node, except ) {
     var children = node.childNodes;
 

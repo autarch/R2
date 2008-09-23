@@ -49,6 +49,24 @@ sub new_household_form : Local
     $c->stash()->{template} = '/household/new_household_form';
 }
 
+sub new_organization_form : Local
+{
+    my $self = shift;
+    my $c    = shift;
+
+    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
+                                                       account => $c->user()->account(),
+                                                     ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to add contacts',
+              uri   => $c->uri_for('/'),
+            );
+    }
+
+    $c->stash()->{template} = '/organization/new_organization_form';
+}
+
 sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
 {
     my $self       = shift;
@@ -104,6 +122,16 @@ sub _display_household
     $c->stash()->{household} = $c->stash()->{contact}->household();
 
     $c->stash()->{template} = '/household/view';
+}
+
+sub _display_organization
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{organization} = $c->stash()->{contact}->organization();
+
+    $c->stash()->{template} = '/organization/view';
 }
 
 1;

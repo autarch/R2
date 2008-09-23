@@ -22,6 +22,13 @@ sub household_params
     return $self->_params_for_classes( [ 'R2::Schema::Household', 'R2::Schema::Contact' ] );
 }
 
+sub organization_params
+{
+    my $self = shift;
+
+    return $self->_params_for_classes( [ 'R2::Schema::Organization', 'R2::Schema::Contact' ] );
+}
+
 sub account_params
 {
     my $self = shift;

@@ -11,26 +11,26 @@ if ( typeof R2 == "undefined" ) {
     R2 = {};
 }
 
-if ( typeof R2.HouseholdForm == "undefined" ) {
-    R2.HouseholdForm = {};
+if ( typeof R2.FormWithMemberSearch == "undefined" ) {
+    R2.FormWithMemberSearch = {};
 }
 
-R2.HouseholdForm.instrumentForm = function () {
-    var form = $("household-form");
+R2.FormWithMemberSearch.instrumentForm = function () {
+    var search_div = $("member-search");
 
-    if ( ! form ) {
+    if ( ! search_div ) {
         return;
     }
 
-    R2.HouseholdForm.form = form;
-    R2.HouseholdForm.results = $("member-search-results");
-    R2.HouseholdForm.selected = $("member-search-selected");
+    R2.FormWithMemberSearch.form = R2.Utils.firstParentWithTagName( search_div, "FORM" );
+    R2.FormWithMemberSearch.results = $("member-search-results");
+    R2.FormWithMemberSearch.selected = $("member-search-selected");
 
-    R2.HouseholdForm._instrumentResultsClose();
-    R2.HouseholdForm._instrumentMemberSearch();
+    R2.FormWithMemberSearch._instrumentResultsClose();
+    R2.FormWithMemberSearch._instrumentMemberSearch();
 };
 
-R2.HouseholdForm._instrumentResultsClose = function () {
+R2.FormWithMemberSearch._instrumentResultsClose = function () {
     DOM.Events.addListener( $("member-search-results-close"),
                             "click",
                             function (e) {
@@ -39,41 +39,41 @@ R2.HouseholdForm._instrumentResultsClose = function () {
                                     e.stopPropagation();
                                 }
 
-                                R2.HouseholdForm._hideResults();
+                                R2.FormWithMemberSearch._hideResults();
                             }
                           );
 };
 
-R2.HouseholdForm._instrumentMemberSearch = function () {
+R2.FormWithMemberSearch._instrumentMemberSearch = function () {
     var search =
         new R2.FormWidget.AjaxSearch( "/person",
                                       "member",
-                                      R2.HouseholdForm._onSearchSubmit,
-                                      R2.HouseholdForm._handleEmptySubmit,
-                                      R2.HouseholdForm._populateResults,
-                                      R2.HouseholdForm._handleError
+                                      R2.FormWithMemberSearch._onSearchSubmit,
+                                      R2.FormWithMemberSearch._handleEmptySubmit,
+                                      R2.FormWithMemberSearch._populateResults,
+                                      R2.FormWithMemberSearch._handleError
                                     );
 
 };
 
-R2.HouseholdForm._onSearchSubmit = function () {
-    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
-    R2.HouseholdForm.results.appendChild( document.createTextNode("Searching ...") );
+R2.FormWithMemberSearch._onSearchSubmit = function () {
+    R2.Utils.cleanNode( R2.FormWithMemberSearch.results, [ "member-search-results-close" ] );
+    R2.FormWithMemberSearch.results.appendChild( document.createTextNode("Searching ...") );
 
-    R2.HouseholdForm.results.style.opacity = 1;
-    DOM.Element.show( R2.HouseholdForm.results );
+    R2.FormWithMemberSearch.results.style.opacity = 1;
+    DOM.Element.show( R2.FormWithMemberSearch.results );
 };
 
-R2.HouseholdForm._populateResults = function (results) {
-    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
+R2.FormWithMemberSearch._populateResults = function (results) {
+    R2.Utils.cleanNode( R2.FormWithMemberSearch.results, [ "member-search-results-close" ] );
 
     if ( results.length > 0 ) {
         var text = "Found " + results.length;
         text += results.length == 1 ? " match:" : " matches:";
 
-        R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
+        R2.FormWithMemberSearch.results.appendChild( document.createTextNode(text) );
 
-        var table = R2.HouseholdForm._createResultsTable();
+        var table = R2.FormWithMemberSearch._createResultsTable();
         table.id = "member-search-results-table";
 
         for ( var i = 0; i < results.length; i++ ) {
@@ -108,12 +108,12 @@ R2.HouseholdForm._populateResults = function (results) {
 
             DOM.Events.addListener( adder,
                                     "click",
-                                    R2.HouseholdForm._makeAddFunction( tr, results[i], position )
+                                    R2.FormWithMemberSearch._makeAddFunction( tr, results[i], position )
                                   );
 
             DOM.Events.addListener( position,
                                     "keypress",
-                                    R2.HouseholdForm._makePositionEnterFunction(adder)
+                                    R2.FormWithMemberSearch._makePositionEnterFunction(adder)
                                   );
 
             adder_td.appendChild(adder);
@@ -123,16 +123,16 @@ R2.HouseholdForm._populateResults = function (results) {
             table.appendChild(tr);
         }
 
-        R2.HouseholdForm.results.appendChild(table);
+        R2.FormWithMemberSearch.results.appendChild(table);
     }
     else {
-        R2.HouseholdForm.results.appendChild( document.createTextNode("No people found that matched your search.") );
+        R2.FormWithMemberSearch.results.appendChild( document.createTextNode("No people found that matched your search.") );
     }
 
-    DOM.Element.show( R2.HouseholdForm.results );
+    DOM.Element.show( R2.FormWithMemberSearch.results );
 };
 
-R2.HouseholdForm._createResultsTable = function () {
+R2.FormWithMemberSearch._createResultsTable = function () {
     var table = document.createElement("table");
 
     var thead = document.createElement("thead");
@@ -165,7 +165,7 @@ R2.HouseholdForm._createResultsTable = function () {
     return table;
 };
 
-R2.HouseholdForm._makeAddFunction = function ( tr, res, pos ) {
+R2.FormWithMemberSearch._makeAddFunction = function ( tr, res, pos ) {
     var results_tr = tr;
     var result     = res;
     var position   = pos;
@@ -183,16 +183,16 @@ R2.HouseholdForm._makeAddFunction = function ( tr, res, pos ) {
                                                          parent );
 
         if ( other_tr.length == 1 ) {
-            R2.HouseholdForm._hideResults();
+            R2.FormWithMemberSearch._hideResults();
         }
 
-        R2.HouseholdForm._appendResult( result, position.value );
+        R2.FormWithMemberSearch._appendResult( result, position.value );
     };
 
     return func;
 };
 
-R2.HouseholdForm._makePositionEnterFunction = function (button) {
+R2.FormWithMemberSearch._makePositionEnterFunction = function (button) {
     var adder = button;
 
     var func = function (e) {
@@ -211,7 +211,7 @@ R2.HouseholdForm._makePositionEnterFunction = function (button) {
     return func;
 }
 
-R2.HouseholdForm._appendResult = function ( result, position_name ) {
+R2.FormWithMemberSearch._appendResult = function ( result, position_name ) {
     var empty = $( "member-search-empty" );
 
     if (empty) {
@@ -220,7 +220,7 @@ R2.HouseholdForm._appendResult = function ( result, position_name ) {
 
     var table = $( "member-search-selected-table" );
     if ( ! table ) {
-        table = R2.HouseholdForm._createResultsTable();
+        table = R2.FormWithMemberSearch._createResultsTable();
         table.id = "member-search-selected-table";
         table.style.opacity = 0;
     }
@@ -252,7 +252,7 @@ R2.HouseholdForm._appendResult = function ( result, position_name ) {
 
     DOM.Events.addListener( remover,
                             "click",
-                            R2.HouseholdForm._makeRemoveFunction( tr, result )
+                            R2.FormWithMemberSearch._makeRemoveFunction( tr, result )
                           );
 
     remover_td.appendChild(remover);
@@ -269,18 +269,18 @@ R2.HouseholdForm._appendResult = function ( result, position_name ) {
     position.name = "position-" + result.id;
     position.value = position_name;
 
-    R2.HouseholdForm.form.appendChild(person_id);
-    R2.HouseholdForm.form.appendChild(position);
+    R2.FormWithMemberSearch.form.appendChild(person_id);
+    R2.FormWithMemberSearch.form.appendChild(position);
 
     if ( table.style.opacity == 0 ) {
-        R2.HouseholdForm.selected.appendChild(table);
+        R2.FormWithMemberSearch.selected.appendChild(table);
     }
 
     Animation.Fade.fade( { "elementId":     ( table.style.opacity == 0 ? table.id : tr.id ),
                            "targetOpacity": 1 } );
 };
 
-R2.HouseholdForm._makeRemoveFunction = function ( tr, result ) {
+R2.FormWithMemberSearch._makeRemoveFunction = function ( tr, result ) {
     var selected_tr = tr;
     var res = result;
 
@@ -293,13 +293,13 @@ R2.HouseholdForm._makeRemoveFunction = function ( tr, result ) {
         Animation.Fade.fade( { "elementId":     tr.id,
                                "targetOpacity": 0,
                                "onFinish":
-                               function () { R2.HouseholdForm._removeSelectedTr(tr); } } );
+                               function () { R2.FormWithMemberSearch._removeSelectedTr(tr); } } );
 
         var hidden = DOM.Find.getElementsByAttributes( { tagName:   "INPUT",
                                                          type:      "hidden",
                                                          name:      "person_id",
                                                          value:     res.person_id },
-                                                       R2.HouseholdForm.form );
+                                                       R2.FormWithMemberSearch.form );
 
         if ( hidden.length ) {
             hidden[0].parentNode.removeChild( hidden[0] );
@@ -309,7 +309,7 @@ R2.HouseholdForm._makeRemoveFunction = function ( tr, result ) {
     return func;
 };
 
-R2.HouseholdForm._removeSelectedTr = function (tr) {
+R2.FormWithMemberSearch._removeSelectedTr = function (tr) {
     var table = tr.parentNode;
     table.removeChild(tr);
 
@@ -318,43 +318,43 @@ R2.HouseholdForm._removeSelectedTr = function (tr) {
 
     if ( other_tr.length == 1 ) {
         table.parentNode.removeChild(table);
-        R2.HouseholdForm._addEmptyResultsP();
+        R2.FormWithMemberSearch._addEmptyResultsP();
     }
 };
 
-R2.HouseholdForm._addEmptyResultsP = function () {
+R2.FormWithMemberSearch._addEmptyResultsP = function () {
     var p = document.createElement("p");
     p.appendChild( document.createTextNode("No members yet") );
     p.id = "member-search-empty";
 
-    R2.HouseholdForm.selected.appendChild(p);
+    R2.FormWithMemberSearch.selected.appendChild(p);
 };
 
-R2.HouseholdForm._hideResults = function () {
-    R2.HouseholdForm.results.style.opacity = 1;
+R2.FormWithMemberSearch._hideResults = function () {
+    R2.FormWithMemberSearch.results.style.opacity = 1;
 
-    Animation.Fade.fade( { "elementId":     R2.HouseholdForm.results.id,
+    Animation.Fade.fade( { "elementId":     R2.FormWithMemberSearch.results.id,
                            "targetOpacity": 0,
                            "onFinish":
-                           function () { DOM.Element.hide( R2.HouseholdForm.results ); } }
+                           function () { DOM.Element.hide( R2.FormWithMemberSearch.results ); } }
                        );
 };
 
-R2.HouseholdForm._handleEmptySubmit = function () {
-    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
+R2.FormWithMemberSearch._handleEmptySubmit = function () {
+    R2.Utils.cleanNode( R2.FormWithMemberSearch.results, [ "member-search-results-close" ] );
 
     var text = "You must provide a name to search for.";
-    R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
+    R2.FormWithMemberSearch.results.appendChild( document.createTextNode(text) );
 
-    DOM.Element.show( R2.HouseholdForm.results );
+    DOM.Element.show( R2.FormWithMemberSearch.results );
 };
 
-R2.HouseholdForm._handleError = function (results) {
-    R2.Utils.cleanNode( R2.HouseholdForm.results, [ "member-search-results-close" ] );
+R2.FormWithMemberSearch._handleError = function (results) {
+    R2.Utils.cleanNode( R2.FormWithMemberSearch.results, [ "member-search-results-close" ] );
 
     var text = "An error occurred when searching for matching people."
     text += " Sometimes this error is temporary, so feel free to try again."
     text += " If this error persists, please contact support.";
 
-    R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
+    R2.FormWithMemberSearch.results.appendChild( document.createTextNode(text) );
 };
