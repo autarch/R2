@@ -53,6 +53,8 @@ body {
     padding-left: 0.5em;
     padding-top: 0.5em;
     background-color: #FCFFE4;
+    border-right: 1px solid #777;
+    border-bottom: 1px solid #777;
 }
 
 #summary h1 {
