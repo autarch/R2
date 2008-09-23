@@ -17,7 +17,7 @@
 
     <div class="form-item">
       <label class="for-field">Members:</label>
-      <div>
+      <div id="member-search">
         <input type="text" class="text" name="person_name" id="member-search-text" />
         <button id="member-search-submit" type="button">Search</button>
 
@@ -25,9 +25,9 @@
           <a href="#" id="member-search-results-close">X</a>
         </div>
 
-        <ul id="member-search-selected">
-          <li id="member-search-empty-list">No members yet</li>
-        </ul>
+        <div id="member-search-selected">
+          <p id="member-search-empty">No members yet</p>
+        </div>
       </div>
     </div>
 

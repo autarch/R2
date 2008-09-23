@@ -73,41 +73,102 @@ R2.HouseholdForm._populateResults = function (results) {
 
         R2.HouseholdForm.results.appendChild( document.createTextNode(text) );
 
-        var ul = document.createElement("ul");
+        var table = R2.HouseholdForm._createResultsTable();
+        table.id = "member-search-results-table";
 
         for ( var i = 0; i < results.length; i++ ) {
-            var li = document.createElement("li");
-            li.appendChild( document.createTextNode( results[i].name ) );
-            li.id = R2.Utils.makeUniqueId();
-            li.style.opacity = 1;
+            var tr = document.createElement("tr");
 
+            var id = R2.Utils.makeUniqueId();
+            results[i].id = id;
+
+            var name_td = document.createElement("td");
+            name_td.appendChild( document.createTextNode( results[i].name ) );
+            name_td.className = "name";
+
+            tr.appendChild(name_td);
+
+            var position_td = document.createElement("td");
+            position_td.className = "position";
+            var position = document.createElement("input");
+            position.type = "text";
+            position.name = "position-for-" + id;
+            position.className = "text";
+
+            position_td.appendChild(position);
+
+            tr.appendChild(position_td);
+
+            var adder_td = document.createElement("td");
+            adder_td.className = "button";
             var adder = document.createElement("button");
             adder.type = "button";
             adder.appendChild( document.createTextNode("add") );
+            adder.id = "adder-" + id;
 
             DOM.Events.addListener( adder,
                                     "click",
-                                    R2.HouseholdForm._makeAddFunction( li, results[i] )
+                                    R2.HouseholdForm._makeAddFunction( tr, results[i], position )
                                   );
 
-            li.appendChild(adder);
+            DOM.Events.addListener( position,
+                                    "keypress",
+                                    R2.HouseholdForm._makePositionEnterFunction(adder)
+                                  );
 
-            ul.appendChild(li);
+            adder_td.appendChild(adder);
+
+            tr.appendChild(adder_td);
+
+            table.appendChild(tr);
         }
 
-        R2.HouseholdForm.results.appendChild(ul);
+        R2.HouseholdForm.results.appendChild(table);
     }
     else {
-        R2.HouseholdForm.results.appendChild( document.createTextNode("No people found.") );
+        R2.HouseholdForm.results.appendChild( document.createTextNode("No people found that matched your search.") );
     }
 
     DOM.Element.show( R2.HouseholdForm.results );
 };
 
-R2.HouseholdForm._makeAddFunction = function ( li, result ) {
-    var res = result;
+R2.HouseholdForm._createResultsTable = function () {
+    var table = document.createElement("table");
 
-    var results_li = li;
+    var thead = document.createElement("thead");
+
+    var tr = document.createElement("tr");
+
+    var name_th = document.createElement("th");
+    name_th.appendChild( document.createTextNode("Name") );
+    name_th.className = "name";
+
+    tr.appendChild(name_th);
+
+    var position_th = document.createElement("th");
+    position_th.appendChild( document.createTextNode("Position") );
+    position_th.className = "position";
+
+    tr.appendChild(position_th);
+
+    var button_th = document.createElement("th");
+    button_th.className = "button";
+
+    tr.appendChild(button_th);
+
+    thead.appendChild(tr);
+
+    table.appendChild(thead);
+
+    table.appendChild( document.createElement("tbody") );
+
+    return table;
+};
+
+R2.HouseholdForm._makeAddFunction = function ( tr, res, pos ) {
+    var results_tr = tr;
+    var result     = res;
+    var position   = pos;
 
     var func = function (e) {
         e.preventDefault();
@@ -115,56 +176,112 @@ R2.HouseholdForm._makeAddFunction = function ( li, result ) {
             e.stopPropagation();
         }
 
-        var parent = results_li.parentNode;
-        parent.removeChild(results_li);
+        var parent = results_tr.parentNode;
+        parent.removeChild(results_tr);
 
-        if ( parent.childNodes.length == 0 ) {
+        var other_tr = DOM.Find.getElementsByAttributes( { tagName:   "TR" },
+                                                         parent );
+
+        if ( other_tr.length == 1 ) {
             R2.HouseholdForm._hideResults();
         }
 
-        R2.HouseholdForm._appendResult(result);
+        R2.HouseholdForm._appendResult( result, position.value );
     };
 
     return func;
 };
 
-R2.HouseholdForm._appendResult = function (result) {
-    var empty = $( "member-search-empty-list" );
+R2.HouseholdForm._makePositionEnterFunction = function (button) {
+    var adder = button;
+
+    var func = function (e) {
+        if ( e.keyCode != 13 ) {
+            return e.keyCode;
+        }
+
+        adder.click();
+
+        e.preventDefault();
+        if ( e.stopPropogation ) {
+            e.stopPropagation();
+        }
+    };
+
+    return func;
+}
+
+R2.HouseholdForm._appendResult = function ( result, position_name ) {
+    var empty = $( "member-search-empty" );
 
     if (empty) {
         empty.parentNode.removeChild(empty);
     }
 
-    var li = document.createElement("li");
-    li.appendChild( document.createTextNode( result.name ) );
-    li.id = R2.Utils.makeUniqueId();
-    li.style.opacity = 0;
+    var table = $( "member-search-selected-table" );
+    if ( ! table ) {
+        table = R2.HouseholdForm._createResultsTable();
+        table.id = "member-search-selected-table";
+        table.style.opacity = 0;
+    }
 
+    var tr = document.createElement("tr");
+    tr.id = R2.Utils.makeUniqueId();
+    tr.style.opacity = table.style.opacity == 0 ? 1 : 0;
+
+    var name_td = document.createElement("td");
+    name_td.className = "name";
+    name_td.appendChild( document.createTextNode( result.name ) );
+
+    tr.appendChild(name_td);
+
+    var position_td = document.createElement("td");
+    position_td.className = "position";
+    position_td.appendChild
+        ( document.createTextNode( typeof position_name != "undefined" ? position_name : "" ) );
+
+    tr.appendChild(position_td);
+
+    var remover_td = document.createElement("td");
+    remover_td.className = "button";
     var remover = document.createElement("button");
     remover.type = "button";
     remover.appendChild( document.createTextNode("remove") );
 
+    tr.appendChild(remover_td);
+
     DOM.Events.addListener( remover,
                             "click",
-                            R2.HouseholdForm._makeRemoveFunction( li, result )
+                            R2.HouseholdForm._makeRemoveFunction( tr, result )
                           );
 
-    li.appendChild(remover);
+    remover_td.appendChild(remover);
 
-    var hidden = document.createElement("input");
-    hidden.type = "hidden";
-    hidden.name = "person_id";
-    hidden.value = result.person_id;
+    table.appendChild(tr);
 
-    R2.HouseholdForm.form.appendChild(hidden);
-    R2.HouseholdForm.selected.appendChild(li);
+    var person_id = document.createElement("input");
+    person_id.type = "hidden";
+    person_id.name = "person_id-" + result.id;
+    person_id.value = result.person_id;
 
-    Animation.Fade.fade( { "elementId":     li.id,
+    var position = document.createElement("input");
+    position.type = "hidden";
+    position.name = "position-" + result.id;
+    position.value = position_name;
+
+    R2.HouseholdForm.form.appendChild(person_id);
+    R2.HouseholdForm.form.appendChild(position);
+
+    if ( table.style.opacity == 0 ) {
+        R2.HouseholdForm.selected.appendChild(table);
+    }
+
+    Animation.Fade.fade( { "elementId":     ( table.style.opacity == 0 ? table.id : tr.id ),
                            "targetOpacity": 1 } );
 };
 
-R2.HouseholdForm._makeRemoveFunction = function ( li, result ) {
-    var selected_li = li;
+R2.HouseholdForm._makeRemoveFunction = function ( tr, result ) {
+    var selected_tr = tr;
     var res = result;
 
     var func = function (e) {
@@ -173,10 +290,10 @@ R2.HouseholdForm._makeRemoveFunction = function ( li, result ) {
             e.stopPropagation();
         }
 
-        Animation.Fade.fade( { "elementId":     li.id,
+        Animation.Fade.fade( { "elementId":     tr.id,
                                "targetOpacity": 0,
                                "onFinish":
-                               function () { R2.HouseholdForm._removeSelectedLi(li); } } );
+                               function () { R2.HouseholdForm._removeSelectedTr(tr); } } );
 
         var hidden = DOM.Find.getElementsByAttributes( { tagName:   "INPUT",
                                                          type:      "hidden",
@@ -192,22 +309,25 @@ R2.HouseholdForm._makeRemoveFunction = function ( li, result ) {
     return func;
 };
 
-R2.HouseholdForm._removeSelectedLi = function (li) {
-    li.parentNode.removeChild(li);
-    var other_li = DOM.Find.getElementsByAttributes( { tagName:   "LI" },
-                                                     R2.HouseholdForm.selected );
+R2.HouseholdForm._removeSelectedTr = function (tr) {
+    var table = tr.parentNode;
+    table.removeChild(tr);
 
-    if ( other_li.length == 0 ) {
-        R2.HouseholdForm._addEmptyListLi();
+    var other_tr = DOM.Find.getElementsByAttributes( { tagName:   "TR" },
+                                                     table );
+
+    if ( other_tr.length == 1 ) {
+        table.parentNode.removeChild(table);
+        R2.HouseholdForm._addEmptyResultsP();
     }
 };
 
-R2.HouseholdForm._addEmptyListLi = function () {
-    var li = document.createElement("li");
-    li.appendChild( document.createTextNode("No members yet") );
-    li.id = "member-search-empty-list";
+R2.HouseholdForm._addEmptyResultsP = function () {
+    var p = document.createElement("p");
+    p.appendChild( document.createTextNode("No members yet") );
+    p.id = "member-search-empty";
 
-    R2.HouseholdForm.selected.appendChild(li);
+    R2.HouseholdForm.selected.appendChild(p);
 };
 
 R2.HouseholdForm._hideResults = function () {
