@@ -182,10 +182,6 @@ form a.add-another {
     font-size: 90%;
 }
 
-form div.radio-group {
-    margin-top: 0.4em;
-}
-
 input.text,
 input.file,
 textarea,
