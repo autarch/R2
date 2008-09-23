@@ -179,9 +179,9 @@ sub _collapse_single_option_select
     my $select = shift;
     my $option = shift;
 
-    my $div = $self->_dom()->createElement('div');
-    $div->className('text-for-hidden');
-    $div->appendChild($_) for @{ $option->childNodes() };
+    my $span = $self->_dom()->createElement('span');
+    $span->className('text-for-hidden');
+    $span->appendChild($_) for @{ $option->childNodes() };
 
     my $hidden = $self->_dom()->createElement('input');
     $hidden->setAttribute( type => 'hidden' );
@@ -190,9 +190,7 @@ sub _collapse_single_option_select
 
     my $parent = $select->parentNode();
 
-    $parent->removeChild($select);
-
-    $parent->insertBefore( $div, $parent->firstChild() );
+    $parent->replaceChild( $span, $select );
     $parent->appendChild($hidden);
 }
 

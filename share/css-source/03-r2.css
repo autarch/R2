@@ -197,12 +197,9 @@ select {
   border: 1px solid #5B824C;
 }
 
-div.text-for-hidden {
-    padding: 0.2em;
+span.text-for-hidden {
     font-weight: bold;
     color: #5B824C;
-
-    line-height: 1.2em;
 }
 
 input.error,
