@@ -65,41 +65,7 @@
       </select>
     </div>
 
-    <div class="form-item">
-      <label class="for-field" >Mail is ok?</label>
-      <div class="radio-group">
-        <input type="radio" class="radio" name="allows_mail" id="allows_mail-yes" value="1" checked="checked" />
-        <label class="for-radio selected" for="allows_mail-yes" id="for-allows_mail-yes">Yes</label>
-        <input type="radio" class="radio" name="allows_mail" id="allows_mail-no" value="0" />
-        <label class="for-radio" for="allows_mail-no" id="for-allows_mail-no">No</label>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" >Calls are ok?</label>
-      <div class="radio-group">
-        <input type="radio" class="radio" name="allows_phone" id="allows_phone-yes" value="1" checked="checked" />
-        <label class="for-radio selected" for="allows_phone-yes" id="for-allows_phone-yes">Yes</label>
-        <input type="radio" class="radio" name="allows_phone" id="allows_phone-no" value="0" />
-        <label class="for-radio" for="allows_phone-no" id="for-allows_phone-no">No</label>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" >Trading is ok?</label>
-      <div class="radio-group">
-        <input type="radio" class="radio" name="allows_trade" id="allows_trade-yes" value="1" />
-        <label class="for-radio" for="allows_trade-yes" id="for-allows_trade-yes">Yes</label>
-        <input type="radio" class="radio" name="allows_trade" id="allows_trade-no" value="0" checked="checked" />
-        <label class="for-radio selected" for="allows_trade-no" id="for-allows_trade-no">No</label>
-      </div>
-
-      <div class="help-text">
-        <p>
-          Can this contact be traded to other organizations?
-        </p>
-      </div>
-    </div>
+<& /lib/form/contact-ok-fields.mas &>
 
     <div class="form-item">
       <label class="for-field" for="image">Image:</label>
