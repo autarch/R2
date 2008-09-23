@@ -101,7 +101,7 @@ form div.form-error, form div.error {
 }
 
 form div.error p.error-message {
-    margin-left: 9.5em;
+    margin-left: 12.5em;
     margin-bottom: 0.1em;
 }
 
@@ -120,7 +120,7 @@ form div.form-item {
    the label, so the em size is not the same. */
 form div.form-item div.help-text { 
     margin-top: 0.1em;
-    margin-left: 9.5em;
+    margin-left: 12.5em;
     clear: both;
 }
 
@@ -138,8 +138,7 @@ form .for-field {
     float: left;
     text-align: right;
     margin-right: 0.5em;
-    margin-top: 0.3em;
-    width: 9em;
+    width: 12em;
 }
 
 form label.secondary {
@@ -148,12 +147,11 @@ form label.secondary {
     font-weight: normal;
     text-align: right;
     margin-right: 0.5em;
-    margin-top: 0.3em;
-    width: 9em;
+    width: 12em;
 }
 
 form div.no-label {
-    margin-left: 9.5em;
+    margin-left: 12.5em;
 }
 
 form input.no-label {
@@ -190,6 +188,7 @@ input.text,
 input.file,
 textarea,
 select {
+  margin-top: -0.1em;
   padding: 0.2em;
   font-weight: bold;
 
