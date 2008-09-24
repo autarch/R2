@@ -15,21 +15,7 @@
       <input type="text" class="text" name="name" id="name" />
     </div>
 
-    <div class="form-item">
-      <label class="for-field">Members:</label>
-      <div id="member-search">
-        <input type="text" class="text" name="person_name" id="member-search-text" />
-        <button id="member-search-submit" type="button">Search</button>
-
-        <div id="member-search-results" style="display: none">
-          <a href="#" id="member-search-results-close">X</a>
-        </div>
-
-        <div id="member-search-selected">
-          <p id="member-search-empty">No members yet</p>
-        </div>
-      </div>
-    </div>
+<& /lib/form/member-search.mas &>
 
 <& /lib/form/contact-ok-fields.mas &>
 
