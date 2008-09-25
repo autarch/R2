@@ -102,6 +102,10 @@ form div.form-error, form div.error {
     background-color: #FCC841;
 }
 
+form div.error {
+    margin-top: 2px;
+}
+
 form div.error p.error-message {
     margin-left: 12.5em;
     margin-bottom: 0.1em;
