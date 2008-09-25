@@ -123,7 +123,15 @@ sub _get_div_for_field
     die "No such element: $id\n"
         unless $elt;
 
-    return $elt->parentNode();
+    my $node = $elt;
+
+    while ( $node = $node->parentNode() )
+    {
+        return $node
+            if lc $node->tagName() eq 'div' && $node->className() =~ /form-item/;
+
+        last if lc $node->tagName() eq 'form';
+    }
 }
 
 sub _create_error_para

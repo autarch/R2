@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 
 use HTML::DOM;
 use List::MoreUtils qw( any );
@@ -49,6 +49,13 @@ my $html = <<'EOF';
  <div class="form-item">
   <label for="textarea">Textarea:</label>
   <textarea name="textarea" id="textarea"></textarea>
+ </div>
+
+ <div class="form-item">
+  <label for="nested">Nested:</label>
+  <div class="foo">
+   <input type="text" name="nested" id="nested" />
+  </div>
  </div>
 </form>
 EOF
@@ -134,6 +141,26 @@ EOF
     generic_error_div_tests($form);
     text1_error_div_tests($form);
     fill_in_form_tests($form);
+}
+
+{
+    my $form = form_elt_for( errors    => [ { field   => 'nested',
+                                              message => 'Error in nested',
+                                            },
+                                          ],
+                           );
+
+    my $nested =
+        first { $_->getAttribute('name') eq 'nested' } @{ $form->getElementsByTagName('input') };
+
+    my $grandparent = $nested->parentNode()->parentNode();
+
+    my $error_p = $grandparent->getElementsByTagName('p')->[0];
+
+    is( $error_p->className(), 'error-message',
+        q{found error message p tag} );
+    is( $error_p->parentNode(), $grandparent,
+        q{error message is a child of nested input's grandparent node} );
 }
 
 {
