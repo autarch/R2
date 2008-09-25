@@ -9,7 +9,7 @@ use R2::Schema;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::ActsAsContact';
+with 'R2::Role::ActsAsContact', 'R2::Role::HasMembers';
 
 {
     my $schema = R2::Schema->Schema();
@@ -30,6 +30,9 @@ with 'R2::Role::ActsAsContact';
           default =>
           sub { [ $schema->table('Organization')->column('name') ] },
         );
+
+    my $mt = $schema->table('HouseholdMember');
+    sub _MembershipTable { $mt }
 }
 
 sub _build_friendly_name
