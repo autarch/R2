@@ -77,7 +77,8 @@ sub household_POST
 
             for my $member (@members)
             {
-                $household->add_member( %{ $member } )            }
+                $household->add_member( %{ $member } )
+            }
 
             for my $address (@addresses)
             {
