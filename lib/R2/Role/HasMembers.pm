@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema::Person;
+use MooseX::Params::Validate qw( validatep );
 
 use Moose::Role;
 
@@ -56,24 +57,24 @@ sub _build_members
 
 # Can't have class attributes in a role yet
 {
-    my $MembersSelect;
+    my %MembersSelect;
 
     sub _MembersSelect
     {
-        my $class = shift;
+        my $class = ref $_[0] || $_[0];
 
-        return $MembersSelect ||= $class->_BuildMembersSelect();
+        return $MembersSelect{$class} ||= $class->_BuildMembersSelect();
     }
 }
 
 {
-    my $MembersInsert;
+    my %MemberInsert;
 
-    sub _MembersInsert
+    sub _MemberInsert
     {
-        my $class = shift;
+        my $class = ref $_[0] || $_[0];
 
-        return $MembersInsert ||= $class->_BuildMembersInsert();
+        return $MemberInsert{$class} ||= $class->_BuildMemberInsert();
     }
 }
 
@@ -122,7 +123,9 @@ sub _BuildMemberInsert
 
     my %pk_vals = map { $_->name() => $ph } @{ $class->Table()->primary_key() };
 
-    $insert->into( $class->_MembershipTable()->columns() )
+    $insert->into( $class->_MembershipTable()->columns
+                       ( ( keys %pk_vals ), 'person_id', 'position' )
+                 )
            ->values( %pk_vals,
                      person_id    => $ph,
                      position     => $ph,

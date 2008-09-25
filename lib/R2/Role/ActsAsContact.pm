@@ -32,9 +32,13 @@ sub _validation_errors
     my ( $contact_p, $my_p ) = $self->_filter_contact_parameters( %{ $p } );
 
     my @errors;
-    for my $step ( @{ $self->_ValidationSteps() } )
+
+    if ( $self->can('_ValidationSteps') )
     {
-        push @errors, $self->$step( $my_p, $is_insert );
+        for my $step ( @{ $self->_ValidationSteps() } )
+        {
+            push @errors, $self->$step( $my_p, $is_insert );
+        }
     }
 
     for my $step ( @{ R2::Schema::Contact->_ValidationSteps() } )

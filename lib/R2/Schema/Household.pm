@@ -9,9 +9,8 @@ use R2::Schema::HouseholdMember;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-use MooseX::Params::Validate qw( validatep );
 
-with 'R2::Role::ActsAsContact', 'R2::Role::HasMembers';;
+with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
 
 {
     my $schema = R2::Schema->Schema();

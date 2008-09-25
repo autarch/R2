@@ -3,13 +3,14 @@ package R2::Schema::Organization;
 use strict;
 use warnings;
 
-use R2::Schema::Contact;
 use R2::Schema;
+use R2::Schema::Contact;
+use R2::Schema::OrganizationMember;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::ActsAsContact', 'R2::Role::HasMembers';
+with 'R2::Role::DVAAC', 'R2::Role::HasMembers';
 
 {
     my $schema = R2::Schema->Schema();
@@ -31,7 +32,7 @@ with 'R2::Role::ActsAsContact', 'R2::Role::HasMembers';
           sub { [ $schema->table('Organization')->column('name') ] },
         );
 
-    my $mt = $schema->table('HouseholdMember');
+    my $mt = $schema->table('OrganizationMember');
     sub _MembershipTable { $mt }
 }
 
