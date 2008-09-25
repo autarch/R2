@@ -70,7 +70,7 @@ sub _build_friendly_name
     return $self->name();
 }
 
-sub add_person
+sub add_member
 {
     my $self = shift;
     my ( $person_id, $position ) =

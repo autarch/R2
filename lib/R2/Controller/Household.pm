@@ -33,9 +33,9 @@ sub household_POST
 
     my $image = $self->_get_image( $c, \@errors );
 
-    my @person_ids = $c->request()->param('person_id');
+    my @members = $c->request()->members();
 
-    unless (@person_ids)
+    unless (@members)
     {
         push @errors, { field   => 'member-search-text',
                         message => 'A household must have at least one member.',
@@ -75,10 +75,9 @@ sub household_POST
 
             $household = R2::Schema::Household->insert(%p);
 
-            for my $person_id (@person_ids)
+            for my $member (@members)
             {
-                $household->add_person( person_id => $person_id );
-            }
+                $household->add_member( %{ $member } )            }
 
             for my $address (@addresses)
             {

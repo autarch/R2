@@ -273,6 +273,30 @@ sub new_phone_number_param_sets
     return @numbers;
 }
 
+sub members
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my @members;
+
+    for my $key ( grep { /^person_id-/ } keys %{ $params } )
+    {
+        my ($suffix) = $key =~ /^person_id-(\S+)$/;
+
+        my $position = $params->{ 'position-' . $suffix };
+
+        my %member = ( person_id => $params->{$key} );
+        $member{position} = $position
+            unless string_is_empty($position);
+
+        push @members, \%member;
+    }
+
+    return @members;
+}
+
 sub _bool
 {
     return $_[0] ? 1 : 0;
