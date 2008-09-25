@@ -160,10 +160,10 @@ EOF
     is( $select3->getAttribute('value'), '99',
         'select3 value is 99' );
 
-    my $div =
-        first { $_->className() eq 'text-for-hidden' } @{ $form->getElementsByTagName('div') };
+    my $span =
+        first { $_->className() eq 'text-for-hidden' } @{ $form->getElementsByTagName('span') };
 
-    is( $div->firstChild()->data(), 'ninety-nine',
+    is( $span->firstChild()->data(), 'ninety-nine',
         'option text is now in a div' );
 }
 
