@@ -11,7 +11,7 @@ use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
-with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
+with 'R2::Role::ActsAsContact', 'R2::Role::HasMembers';;
 
 {
     my $schema = R2::Schema->Schema();
@@ -33,13 +33,6 @@ with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
           lazy    => 1,
           default =>
           sub { [ $schema->table('Household')->column('name') ] },
-        );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ ] },
         );
 
     my $mt = $schema->table('HouseholdMember');
