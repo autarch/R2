@@ -171,14 +171,19 @@ sub _collapse_single_option_selects
 {
     my $self = shift;
 
+    my @to_collapse;
     for my $select ( @{ $self->_dom()->getElementsByTagName('select') } )
     {
         my @options = $select->options();
 
         next if @options > 1;
 
-        $self->_collapse_single_option_select( $select, $options[0] );
+        push @to_collapse, [ $select, $options[0] ];
     }
+
+    # Modifying the dom as we loop through it seems to cause weirdness
+    # where some select elements get skipped.
+    $self->_collapse_single_option_select( @{ $_ } ) for @to_collapse;
 }
 
 sub _collapse_single_option_select
