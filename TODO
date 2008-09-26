@@ -1,0 +1,27 @@
+Search
+
+- search on any field
+- include any (reasonable) field in search results
+- do something with search results (email, delete, tag, group, etc)
+- order search results by any orderable field
+
+Edit
+
+- core info
+- tags, groups
+- donations
+
+Reports
+
+- Top donors
+- "Expiring" donors
+
+Custom Fields
+
+- create
+
+View
+
+- contact history
+- donations
+- notes
