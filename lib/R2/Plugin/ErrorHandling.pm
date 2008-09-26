@@ -70,7 +70,7 @@ sub _log_error
 
     if ( my $user = $self->user() )
     {
-        $error{user} = $user->email_address();
+        $error{user} = $user->username();
         $error{user} .= q{ - } . $user->user_id()
             if $user->user_id();
     }
