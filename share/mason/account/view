@@ -12,10 +12,16 @@
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'edit_form' ) %>"
        title="Edit name, billing, etc.">Edit basic settings</a>
+    <p>
+      Account name, default time zone, etc.
+    </p>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'donation_settings' ) %>"
-       title="Edit donation settings">Edit donation settings (sources, funds, types, etc.)</a>
+       title="Edit donation settings">Edit donation settings</a>
+    <p>
+      Donation sources and targets, as well as allowed payment types.
+    </p>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'address_types_form' ) %>"
@@ -25,14 +31,17 @@
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'countries_form' ) %>"
        title="Edit countries for addresses">Edit countries for addresses</a>
+    <& /lib/help-text/countries.mas &>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'phone_number_types_form' ) %>"
        title="Edit phone numbers types">Edit phone number types</a>
+    <& /lib/help-text/phone-number-type.mas &>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'contact_history_types_form' ) %>"
        title="Edit contact history types">Edit contact history types</a>
+    <& /lib/help-text/contact-history-type.mas &>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'message_providers_form' ) %>"
