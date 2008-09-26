@@ -4,10 +4,8 @@
 % }
 
   <h1>
-   <h1>
      <& SELF:title, %ARGS &>
      <& .gender-icon, gender => $person->gender() &>
-   </h1>
   </h1>
 
 </div>
