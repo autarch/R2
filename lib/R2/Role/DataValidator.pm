@@ -49,9 +49,12 @@ sub _validation_errors
     my $is_insert = shift;
 
     my @errors;
-    for my $step ( @{ $self->_ValidationSteps() } )
+    if ( $self->can('_ValidationSteps') )
     {
-        push @errors, $self->$step( $p, $is_insert );
+        for my $step ( @{ $self->_ValidationSteps() } )
+        {
+            push @errors, $self->$step( $p, $is_insert );
+        }
     }
 
     push @errors, $self->_check_non_nullable_columns( $p, $is_insert );

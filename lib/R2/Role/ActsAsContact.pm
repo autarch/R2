@@ -41,9 +41,12 @@ sub _validation_errors
         }
     }
 
-    for my $step ( @{ R2::Schema::Contact->_ValidationSteps() } )
+    if ( R2::Schema::Contact->can('_ValidationSteps') )
     {
-        push @errors, R2::Schema::Contact->$step( $contact_p, $is_insert );
+        for my $step ( @{ R2::Schema::Contact->_ValidationSteps() } )
+        {
+            push @errors, R2::Schema::Contact->$step( $contact_p, $is_insert );
+        }
     }
 
     {

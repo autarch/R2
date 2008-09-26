@@ -9,6 +9,9 @@ CREATE DATABASE "R2"
 
 SET CLIENT_MIN_MESSAGES = ERROR;
 
+CREATE DOMAIN email_address AS VARCHAR(255)
+       CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
+
 CREATE TABLE "User" (
        -- will be the same as a person_id
        user_id            INT8               PRIMARY KEY,
@@ -71,9 +74,6 @@ CREATE TABLE "File" (
 
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
-CREATE DOMAIN email_address AS VARCHAR(255)
-       CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
-
 CREATE DOMAIN uri AS VARCHAR(255)
        CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\\w-_]+(\.[\\w-_]+)*\\.\\w{2,3}' );
 
@@ -84,15 +84,12 @@ CREATE TABLE "Contact" (
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_trade       BOOLEAN            NOT NULL DEFAULT FALSE,
-       email_address      email_address      NULL,
-       website            uri                NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        image_file_id      INT8               NULL,
        -- an identifier from another app, probably created via an
        -- initial import from something else
        external_id        VARCHAR(255)       UNIQUE NULL,
-       account_id         INTEGER            NOT NULL,
-       CONSTRAINT email_address_account_id_ck UNIQUE ( email_address, account_id )
+       account_id         INTEGER            NOT NULL
 );
 
 CREATE DOMAIN pos_int AS INTEGER
@@ -311,6 +308,23 @@ CREATE TABLE "OrganizationMember" (
        position           VARCHAR(255)       NULL,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY ( organization_id, person_id )
+);
+
+-- It's tepmting to make the email address unique, but contacts could
+-- share an email address, especially in the case of a household and a
+-- person in the household, or an organization.
+CREATE TABLE "EmailAddress" (
+       email_address_id   SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       email_address      email_address      NOT NULL,
+       is_preferred       BOOLEAN            DEFAULT FALSE
+);
+
+CREATE TABLE "Website" (
+       website_id         SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       label              VARCHAR(50)        NOT NULL DEFAULT 'Website',
+       uri                uri                NOT NULL
 );
 
 -- Consider a trigger to enforce one primary address per contact?
@@ -642,6 +656,10 @@ ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "EmailAddress" ADD CONSTRAINT "EmailAddress_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "Address" ADD CONSTRAINT "Address_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
@@ -668,6 +686,10 @@ ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_phone_number_type_id"
 
 ALTER TABLE "PhoneNumberType" ADD CONSTRAINT "PhoneNumberType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Website" ADD CONSTRAINT "Website_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_contact_id"

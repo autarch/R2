@@ -96,6 +96,13 @@ sub person_POST
 
             $person = R2::Schema::Person->insert(%p);
 
+            for my $email (@email_addresses)
+            {
+                R2::Schema::EmailAddress->insert( %{ $email },
+                                                  contact_id => $person->contact_id(),
+                                                );
+            }
+
             for my $address (@addresses)
             {
                 R2::Schema::Address->insert( %{ $address },

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 21;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -18,19 +18,12 @@ my $dbh = mock_dbh();
                                     middle_name   => '',
                                     last_name     => 'Smith',
                                     suffix        => '',
-                                    email_address => 'joe.smith@example.com',
-                                    website       => 'http://example.com',
                                     account_id    => 1,
                                   );
 
     ok( $person->contact(), 'newly created person has a contact' );
     is( $person->contact()->contact_id(), 1, 'contact_id == 1' );
     is( $person->person_id(), $person->contact()->contact_id(), 'person_id == contact_id' );
-
-    is( $person->contact()->email_address(), 'joe.smith@example.com',
-        'data for contact is passed through on person insert' );
-    is( $person->email_address(), 'joe.smith@example.com',
-        'attributes of contact are available as person methods' );
 
     is( $person->first_name(), 'Joe',
         'first_name == Joe' );
@@ -56,9 +49,8 @@ my $dbh = mock_dbh();
 
 {
     my @errors =
-        R2::Schema::Person->ValidateForInsert( email_address => 'joe.smith@example.com',
-                                               website       => 'http://example.com',
-                                               account_id    => 1,
+        R2::Schema::Person->ValidateForInsert( salutation => 'Yo',
+                                               account_id => 1,
                                              );
 
     is( scalar @errors, 1, 'got one validation error' );
@@ -89,9 +81,8 @@ my $dbh = mock_dbh();
 {
     eval
     {
-        R2::Schema::Person->insert( email_address => 'joe.smith@example.com',
-                                    website       => 'http://example.com',
-                                    account_id    => 1,
+        R2::Schema::Person->insert( salutation => 'Yo',
+                                    account_id => 1,
                                   );
     };
 
@@ -100,23 +91,6 @@ my $dbh = mock_dbh();
 
     my @e = @{ $@->errors() };
     is( $e[0]->{message}, 'A person requires either a first or last name.',
-        'got expected error message' );
-}
-
-{
-    eval
-    {
-        R2::Schema::Person->insert( first_name    => 'Joe',
-                                    email_address => 'joe.smith@',
-                                    account_id    => 1,
-                                  );
-    };
-
-    ok( $@, 'cannot create a new person with an invalid email address' );
-    can_ok( $@, 'errors' );
-
-    my @e = @{ $@->errors() };
-    is( $e[0]->{message}, q{"joe.smith@" is not a valid email address.},
         'got expected error message' );
 }
 

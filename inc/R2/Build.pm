@@ -27,6 +27,7 @@ my %Requires =
       'CSS::Minifier'                            => '0',
       'Cwd'                                      => '0',
       'Data::Validate::Domain'                   => '0',
+      'Data::Validate::URI'                      => '0',
       'DateTime'                                 => '0',
       'DateTime::Format::Pg'                     => '0',
       'DateTime::Format::Strptime'               => '0',

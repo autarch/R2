@@ -6,12 +6,17 @@ use warnings;
 use Digest::SHA qw( sha512_base64 );
 use Fey::ORM::Exceptions qw( no_such_row );
 use List::Util qw( first );
-use R2::Schema::Contact;
-use R2::Schema::Person;
 use R2::Schema;
+use R2::Schema::Contact;
+use R2::Schema::EmailAddress;
+use R2::Schema::Person;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
+
+with 'R2::Role::DataValidator';
+
 
 {
     my $schema = R2::Schema->Schema();
@@ -24,6 +29,13 @@ use Fey::ORM::Table;
                        grep { $_ ne 'person' }
                        R2::Schema::Person->meta()->get_attribute_list(),
                        R2::Schema::Contact->meta()->get_attribute_list() ],
+        );
+
+    class_has '_ValidationSteps' =>
+        ( is      => 'ro',
+          isa     => 'ArrayRef[Str]',
+          lazy    => 1,
+          default => sub { [ qw( _validate_password _require_username_or_email ) ] },
         );
 }
 
@@ -42,25 +54,28 @@ around 'insert' => sub
     }
     elsif ( $p{password} )
     {
-        die 'A new user requires a password'
-            unless $p{password};
-
         # XXX - require a certain length or complexity? make it
         # configurable?
-        $password = sha512_base64( $p{password} );
+        $password = sha512_base64( delete $p{password} );
     }
-
-    delete $p{password};
-
-    die 'A new user requires an email address'
-        unless $p{email_address};
 
     my %user_p =
         map { $_ => delete $p{$_} } grep { $class->Table()->column($_) } keys %p;
 
     $user_p{username} ||= $p{email_address};
 
+    my $email_address = delete $p{email_address};
+
     my $sub = sub { my $person = R2::Schema::Person->insert(%p);
+
+                    unless ( string_is_empty($email_address) )
+                    {
+                        R2::Schema::EmailAddress->insert
+                            ( email_address => $email_address,
+                              contact_id    => $person->person_id(),
+                              is_preferred  => 1,
+                            );
+                    }
 
                     my $user = $class->$orig( %user_p,
                                               password => $password,
@@ -74,6 +89,41 @@ around 'insert' => sub
 
     return R2::Schema->RunInTransaction($sub);
 };
+
+# XXX - need an update wrapper for password hashing!
+
+sub _validate_password
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    return
+        unless exists $p->{password} || $is_insert;
+
+    return { message => 'A user requires a password.',
+             field   => 'password',
+           }
+        if string_is_empty( $p->{password} ) && ! $p->{disable_login};
+
+    return;
+}
+
+sub _require_username_or_email
+{
+    my $self = shift;
+    my $p    = shift;
+    my $is_insert = shift;
+
+    return unless $is_insert;
+
+    return { message => 'A user must have a username or email address.',
+             field   => 'username',
+           }
+        if string_is_empty( $p->{username} ) && string_is_empty( $p->{email_address} );
+
+    return;
+}
 
 sub _load_from_dbms
 {
