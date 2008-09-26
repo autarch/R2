@@ -4,6 +4,10 @@
   </h1>
 </div>
 
+<p>
+<a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">back to the account</a>
+</p>
+
 <ul>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'donation_sources_form' ) %>"

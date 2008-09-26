@@ -20,6 +20,7 @@
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'address_types_form' ) %>"
        title="Edit address types">Edit address types</a>
+    <& /lib/help-text/address-type.mas &>
   </li>
   <li>
     <a href="<% $c->uri_for( $account->account_id(), 'countries_form' ) %>"

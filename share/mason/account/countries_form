@@ -5,8 +5,10 @@
 </div>
 
 <p>
-<& /lib/help-text/countries.mas &>
+<a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">back to the account</a>
 </p>
+
+<& /lib/help-text/countries.mas &>
 
 <&| /lib/filter/form.mas &>
 <form action="<% $c->uri_for( $account->account_id(), 'countries' ) %>"
