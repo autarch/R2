@@ -47,6 +47,13 @@
     <a href="<% $c->uri_for( $account->account_id(), 'message_providers_form' ) %>"
        title="Edit instant messaging providers">Edit instant messaging providers</a>
   </li>
+  <li>
+    <a href="<% $c->uri_for( $account->account_id(), 'users' ) %>"
+       title="Edit instant messaging providers">Edit users</a>
+    <p>
+      Add, edit, or delete users for this account.
+    </p>
+  </li>
 </ul>
 
 <%args>
