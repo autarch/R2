@@ -14,7 +14,7 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="phone_number_notes-new1">notes:</label>
+        <label class="secondary" for="phone_number_notes-new1">Notes:</label>
         <input type="text" class="text wide" name="phone_number_notes-new1" id="phone_number_notes-new1" />
       </div>
 

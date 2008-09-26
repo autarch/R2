@@ -27,7 +27,7 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="email_address_notes-new1">notes:</label>
+        <label class="secondary" for="email_address_notes-new1">Notes:</label>
         <input type="text" class="text wide" name="email_address_notes-new1" id="email_address_notes-new1" />
       </div>
 
@@ -60,7 +60,7 @@
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="website_notes-new1">notes:</label>
+        <label class="secondary" for="website_notes-new1">Notes:</label>
         <input type="text" class="text wide" name="website_notes-new1" id="website_notes-new1" />
       </div>
     </div>
