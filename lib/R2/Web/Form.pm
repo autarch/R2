@@ -211,6 +211,7 @@ sub _form_html_from_dom
     return $form->as_HTML( undef, q{  }, {} );
 }
 
+# This bizarro bit seems to fix some tests. Sigh ...
 {
     package HTML::DOM::Node;
 
