@@ -1,0 +1,101 @@
+<div id="summary" class="<% $image ? 'has-image' : '' %>">
+% if ($image ) {
+  <img src="<% $image->uri() %>" title="Photo of <% $organization->name() %>" id="contact-image" />
+% }
+
+  <h1>
+   <h1>
+     <& SELF:title, %ARGS &>
+   </h1>
+  </h1>
+
+</div>
+
+<ul>
+% while ( my ( $person, $membership ) = $members->next() ) {
+  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
+         title="View <% $person->full_name() %>"
+         ><% $person->full_name() %></a>
+%   if ( my $pos = $membership->position() ) {
+      - <% $pos %>
+%   }
+  </li>
+% }
+</ul> 
+
+<p>
+% if ( $organization->allows_email() ) {
+Is ok with being emailed via Rapport.
+% } else {
+Does not want to be emailed via Rapport.
+% }
+</p>
+
+% if ( my $email = $organization->email_address() ) {
+<div>
+<a href="mailto:<% $email %>" title="Send mail to <% $organization->name() %>"><% $email %></a>
+</div>
+% }
+
+% if ( my $website = $organization->website ) {
+<div>
+<a href="<% $website %>" title="Website for <% $organization->name() %>"><% $website %></a>
+</div>
+% }
+
+<p>
+% if ( $organization->allows_mail() ) {
+Is ok with getting snail mail.
+% } else {
+Does not want to receive snail mail.
+% }
+</p>
+
+% if (@addresses) {
+<h2><% PL_N( 'Address', scalar @addresses ) %></h2>
+
+%   for my $address (@addresses) {
+<& /lib/contact-view/address.mas, address => $address &>
+%   }
+% }
+
+<p>
+% if ( $organization->allows_phone() ) {
+Is ok with being called.
+% } else {
+Does not want to receive phone calls.
+% }
+</p>
+
+% if (@phone_numbers) {
+<h2>Phone <% PL_N( 'Number', scalar @phone_numbers ) %></h2>
+
+%   for my $number (@phone_numbers) {
+<& /lib/contact-view/phone-number.mas, phone_number => $number &>
+%   }
+% }
+
+<%args>
+$organization
+</%args>
+
+<%init>
+my $image;
+if ( $organization->image() )
+{
+    $image = $organization->image()->resize( height => 100, width => 100 );
+}
+
+my @addresses = $organization->addresses()->all();
+
+my @phone_numbers = $organization->phone_numbers()->all();
+
+my $members = $organization->members();
+</%init>
+
+<%method title>
+<% $organization->name() %>
+<%args>
+$organization
+</%args>
+</%method>
