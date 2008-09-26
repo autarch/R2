@@ -317,14 +317,16 @@ CREATE TABLE "EmailAddress" (
        email_address_id   SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
        email_address      email_address      NOT NULL,
-       is_preferred       BOOLEAN            DEFAULT FALSE
+       is_preferred       BOOLEAN            DEFAULT FALSE,
+       notes              TEXT               NULL
 );
 
 CREATE TABLE "Website" (
        website_id         SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
        label              VARCHAR(50)        NOT NULL DEFAULT 'Website',
-       uri                uri                NOT NULL
+       uri                uri                NOT NULL,
+       notes              TEXT               NULL
 );
 
 -- Consider a trigger to enforce one primary address per contact?

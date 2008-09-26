@@ -3,11 +3,15 @@ package R2::Controller::Person;
 use strict;
 use warnings;
 
-use base 'R2::Controller::Base';
-
+use R2::Schema::Address;
+use R2::Schema::EmailAddress;
 use R2::Schema::Person;
+use R2::Schema::PhoneNumber;
+use R2::Schema::Website;
 use R2::Search::Person::ByName;
 use R2::Util qw( string_is_empty );
+
+use base 'R2::Controller::Base';
 
 
 sub person : Path('') : ActionClass('+R2::Action::REST') { }
@@ -73,6 +77,10 @@ sub person_POST
                                 );
     }
 
+    my @email_addresses = $c->request()->new_email_address_param_sets();
+
+    my @websites = $c->request()->new_website_param_sets();
+
     my @addresses = $c->request()->new_address_param_sets();
 
     my @phone_numbers = $c->request()->new_phone_number_param_sets();
@@ -101,6 +109,13 @@ sub person_POST
                 R2::Schema::EmailAddress->insert( %{ $email },
                                                   contact_id => $person->contact_id(),
                                                 );
+            }
+
+            for my $website (@websites)
+            {
+                R2::Schema::Website->insert( %{ $website },
+                                             contact_id => $person->contact_id(),
+                                           );
             }
 
             for my $address (@addresses)

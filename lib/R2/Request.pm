@@ -205,6 +205,70 @@ sub contact_history_types
     return ( \%existing, \@new );
 }
 
+sub new_email_address_param_sets
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my @emails;
+
+    my $x = 1;
+    while (1)
+    {
+        my $suffix = 'new' . $x++;
+
+        last unless exists $params->{ 'email_address' . q{-} . $suffix };
+
+        my %email =
+            $self->_params_for_classes( [ 'R2::Schema::EmailAddress' ], $suffix );
+
+        next if string_is_empty( $email{email_address} );
+
+        if ( ! string_is_empty( $params->{ 'email_address_notes' . q{-} . $suffix } ) )
+        {
+            $email{notes} = $params->{ 'email_address_notes' . q{-} . $suffix }
+        }
+
+        $email{is_preferred} = $params->{'email_address_is_preferred'} eq $suffix ? 1 : 0;
+
+        push @emails, \%email;
+    }
+
+    return @emails;
+}
+
+sub new_website_param_sets
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my @websites;
+
+    my $x = 1;
+    while (1)
+    {
+        my $suffix = 'new' . $x++;
+
+        last unless exists $params->{ 'uri' . q{-} . $suffix };
+
+        my %website =
+            $self->_params_for_classes( [ 'R2::Schema::Website' ], $suffix );
+
+        next if string_is_empty( $website{uri} );
+
+        if ( ! string_is_empty( $params->{ 'website_notes' . q{-} . $suffix } ) )
+        {
+            $website{notes} = $params->{ 'website_notes' . q{-} . $suffix }
+        }
+
+        push @websites, \%website;
+    }
+
+    return @websites;
+}
+
 sub new_address_param_sets
 {
     my $self = shift;

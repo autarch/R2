@@ -1,0 +1,27 @@
+<ul>
+% for my $email (@emails) {
+  <li>
+%   if ( $email->is_preferred() ) {
+    <strong>
+%   }
+    <a href="mailto:<% $email->email_address() %>"
+       title="Send email to <% $contact->full_name() %>"><% $email->email_address() %></a>
+%   if ( $email->is_preferred() ) {
+    </strong>
+%   }
+%   if ( my $notes = $email->notes() ) {
+    <p><% $notes %></p>
+%   } 
+  </li>
+% }
+</ul>
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my @emails = $contact->email_addresses()->all();
+
+return unless @emails;
+</%init>

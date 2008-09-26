@@ -1,0 +1,22 @@
+<ul>
+% for my $website (@websites) {
+  <li>
+    <strong><% $website->label() %></strong>:
+    <a href="<% $website->uri() %>"
+       title="<% $website->label() %> for <% $contact->full_name() %>"><% $website->uri() %></a>
+%   if ( my $notes = $website->notes() ) {
+    <p><% $notes %></p>
+%   } 
+  </li>
+% }
+</ul>
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my @websites = $contact->websites()->all();
+
+return unless @websites;
+</%init>

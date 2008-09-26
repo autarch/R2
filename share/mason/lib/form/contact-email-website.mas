@@ -1,10 +1,5 @@
   <fieldset>
-    <legend>Email & Website</legend>
-
-    <div class="form-item">
-      <label class="for-field" for="email_address">Email address:</label>
-      <input type="text" class="text medium" name="email_address" id="email_address" />
-    </div>
+    <legend>Email Addresses</legend>
 
     <div class="form-item">
       <label class="for-field" for="allows_email">Email is ok?</label>
@@ -23,9 +18,53 @@
       </div>
     </div>
 
-    <div class="form-item">
-      <label class="for-field" for="website">Website:</label>
-      <input type="text" class="text medium" name="website" id="website" />
+    <div class="JS-repeatable-group JS-repeatable-group-email-address">
+
+      <div class="form-item">
+        <label class="for-field" for="email_address-new1">Email address:</label>
+        <input type="text" class="text medium" name="email_address-new1" id="email_address-new1" />
+        <a class="delete-repeated-group" style="display: none" href="#" title="delete this email address">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="email_address_notes-new1">notes:</label>
+        <input type="text" class="text wide" name="email_address_notes-new1" id="email_address_notes-new1" />
+      </div>
+
+      <div class="form-item">
+        <div class="no-label">
+          <input type="radio" name="email_address_is_preferred" value="new1" checked="checked" id="email_address_is_preferred-new1" />
+          <label class="for-radio selected" for="email_address_is_preferred-new1"
+                 id="for-email_address_is_preferred-new1">This is the preferred email address</label>
+        </div>
+      </div>
     </div>
+
+    <a href="#" class="add-another" id="email-address-repeater">Add another email address</a>
+  </fieldset>
+
+  <fieldset>
+    <legend>Websites</legend>
+
+    <div class="JS-repeatable-group JS-repeatable-group-website">
+
+      <div class="form-item">
+        <label class="for-field" for="label-new1">Label:</label>
+        <input type="text" class="text" name="label-new1" id="label-new1" value="Website" />
+        <a class="delete-repeated-group" style="display: none" href="#" title="delete this website">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="uri-new1">URI:</label>
+        <input type="text" class="text medium" name="uri-new1" id="uri-new1" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="website_notes-new1">notes:</label>
+        <input type="text" class="text wide" name="website_notes-new1" id="website_notes-new1" />
+      </div>
+    </div>
+
+    <a href="#" class="add-another" id="website-repeater">Add another website</a>
 
   </fieldset>

@@ -18,17 +18,9 @@ Does not want to be emailed via Rapport.
 % }
 </p>
 
-% if ( my $email = $person->email_address() ) {
-<div>
-<a href="mailto:<% $email %>" title="Send mail to <% $person->full_name() %>"><% $email %></a>
-</div>
-% }
+<& /lib/contact-view/email-addresses.mas, contact => $person &>
 
-% if ( my $website = $person->website ) {
-<div>
-<a href="<% $website %>" title="Website for <% $person->full_name() %>"><% $website %></a>
-</div>
-% }
+<& /lib/contact-view/websites.mas, contact => $person &>
 
 <p>
 % if ( $person->allows_mail() ) {

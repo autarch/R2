@@ -20,6 +20,7 @@ with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
           handles => [ qw( email_addresses primary_email_address
+                           websites
                            addresses primary_address
                            phone_numbers primary_phone_number ),
                        ( grep { ! __PACKAGE__->meta()->has_attribute($_) }
