@@ -4,9 +4,7 @@
 % }
 
   <h1>
-   <h1>
-     <& SELF:title, %ARGS &>
-   </h1>
+    <& SELF:title, %ARGS &>
   </h1>
 
 </div>
