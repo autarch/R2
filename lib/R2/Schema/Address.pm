@@ -10,6 +10,9 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
+with 'R2::Role::DataValidator';
+
+
 {
     my $schema = R2::Schema->Schema();
 

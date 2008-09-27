@@ -173,6 +173,11 @@ sub _MessagingSelect
     return $select;
 }
 
+sub display_name
+{
+    return $_[0]->full_name();
+}
+
 sub _build_friendly_name
 {
     my $self = shift;

@@ -211,7 +211,7 @@ sub new_email_address_param_sets
 
     my $params = $self->params();
 
-    my @emails;
+    my %emails;
 
     my $x = 1;
     while (1)
@@ -232,10 +232,10 @@ sub new_email_address_param_sets
 
         $email{is_preferred} = $params->{'email_address_is_preferred'} eq $suffix ? 1 : 0;
 
-        push @emails, \%email;
+        $emails{$suffix} = \%email;
     }
 
-    return @emails;
+    return \%emails;
 }
 
 sub new_website_param_sets
@@ -244,7 +244,7 @@ sub new_website_param_sets
 
     my $params = $self->params();
 
-    my @websites;
+    my %websites;
 
     my $x = 1;
     while (1)
@@ -263,10 +263,10 @@ sub new_website_param_sets
             $website{notes} = $params->{ 'website_notes' . q{-} . $suffix }
         }
 
-        push @websites, \%website;
+        $websites{$suffix} = \%website;
     }
 
-    return @websites;
+    return \%websites;
 }
 
 sub new_address_param_sets
@@ -275,7 +275,7 @@ sub new_address_param_sets
 
     my $params = $self->params();
 
-    my @addresses;
+    my %addresses;
 
     my $x = 1;
     while (1)
@@ -297,10 +297,10 @@ sub new_address_param_sets
             $address{notes} = $params->{ 'address_notes' . q{-} . $suffix }
         }
 
-        push @addresses, \%address;
+        $addresses{$suffix} = \%address;
     }
 
-    return @addresses;
+    return \%addresses;
 }
 
 sub new_phone_number_param_sets
@@ -309,7 +309,7 @@ sub new_phone_number_param_sets
 
     my $params = $self->params();
 
-    my @numbers;
+    my %numbers;
 
     my $x = 1;
     while (1)
@@ -331,10 +331,10 @@ sub new_phone_number_param_sets
             $number{notes} = $params->{ 'phone_number_notes' . q{-} . $suffix }
         }
 
-        push @numbers, \%number;
+        $numbers{$suffix} = \%number;
     }
 
-    return @numbers;
+    return \%numbers;
 }
 
 sub members

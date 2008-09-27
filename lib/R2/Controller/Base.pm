@@ -88,22 +88,4 @@ sub _require_authen
     $c->redirect_and_detach( '/user/login_form' );
 }
 
-sub _get_image
-{
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
-
-    my $image = $c->request()->upload('image');
-
-    if ( $image && ! R2::Schema::File->TypeIsImage( $image->type() ) )
-    {
-        push @{ $errors }, { field   => 'image',
-                             message => 'The image you provided is not a GIF, JPG, or PNG.',
-                           };
-    }
-
-    return $image;
-}
-
 1;

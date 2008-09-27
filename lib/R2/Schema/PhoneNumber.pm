@@ -9,6 +9,9 @@ use R2::Schema;
 
 use Fey::ORM::Table;
 
+with 'R2::Role::DataValidator';
+
+
 {
     my $schema = R2::Schema->Schema();
 

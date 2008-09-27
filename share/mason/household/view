@@ -29,17 +29,9 @@ Does not want to be emailed via Rapport.
 % }
 </p>
 
-% if ( my $email = $household->email_address() ) {
-<div>
-<a href="mailto:<% $email %>" title="Send mail to <% $household->name() %>"><% $email %></a>
-</div>
-% }
+<& /lib/contact-view/email-addresses.mas, contact => $household &>
 
-% if ( my $website = $household->website ) {
-<div>
-<a href="<% $website %>" title="Website for <% $household->name() %>"><% $website %></a>
-</div>
-% }
+<& /lib/contact-view/websites.mas, contact => $household &>
 
 <p>
 % if ( $household->allows_mail() ) {

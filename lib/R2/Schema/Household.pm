@@ -41,6 +41,11 @@ with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
     sub _MembershipTable { $mt }
 }
 
+sub display_name
+{
+    return $_[0]->name();
+}
+
 sub _build_friendly_name
 {
     my $self = shift;

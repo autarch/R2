@@ -11,7 +11,7 @@ use Moose::Role;
 #
 # has_one 'contact' => ...
 
-requires '_build_friendly_name';
+requires '_build_friendly_name', 'display_name';
 
 has 'friendly_name' =>
     ( is         => 'ro',

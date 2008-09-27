@@ -5,7 +5,7 @@
     <strong>
 %   }
     <a href="mailto:<% $email->email_address() %>"
-       title="Send email to <% $contact->full_name() %>"><% $email->email_address() %></a>
+       title="Send email to <% $contact->display_name() %>"><% $email->email_address() %></a>
 %   if ( $email->is_preferred() ) {
     </strong>
 %   }
