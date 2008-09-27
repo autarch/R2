@@ -131,7 +131,7 @@ sub _PreferredEmailAddressSelect
            ->from( $schema->table('EmailAddress') )
            ->where( $schema->table('EmailAddress')->column('contact_id'),
                     '=', Fey::Placeholder->new() )
-           ->and( $schema->table('Address')->column('is_preferred'),
+           ->and( $schema->table('EmailAddress')->column('is_preferred'),
                   '=', Fey::Literal::String->new('t') )
            ->limit(1);
 
