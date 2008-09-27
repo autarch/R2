@@ -358,7 +358,7 @@ sub members
         push @members, \%member;
     }
 
-    return @members;
+    return \@members;
 }
 
 sub _bool
