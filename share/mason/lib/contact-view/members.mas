@@ -1,0 +1,19 @@
+<ul>
+% while ( my ( $person, $membership ) = $members->next() ) {
+  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
+         title="View <% $person->full_name() %>"
+         ><% $person->full_name() %></a>
+%   if ( my $pos = $membership->position() ) {
+      - <% $pos %>
+%   }
+  </li>
+% }
+</ul> 
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my $members = $contact->members();
+</%init>

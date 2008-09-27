@@ -1,16 +1,6 @@
 <& /lib/contact-view/summary.mas, contact => $household &>
 
-<ul>
-% while ( my ( $person, $membership ) = $members->next() ) {
-  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
-         title="View <% $person->full_name() %>"
-         ><% $person->full_name() %></a>
-%   if ( my $pos = $membership->position() ) {
-      - <% $pos %>
-%   }
-  </li>
-% }
-</ul> 
+<& /lib/contact-view/members.mas, contact => $household &>
 
 <p>
 % if ( $household->allows_email() ) {
@@ -61,17 +51,9 @@ $household
 </%args>
 
 <%init>
-my $image;
-if ( $household->image() )
-{
-    $image = $household->image()->resize( height => 100, width => 100 );
-}
-
 my @addresses = $household->addresses()->all();
 
 my @phone_numbers = $household->phone_numbers()->all();
-
-my $members = $household->members();
 </%init>
 
 <%method title>

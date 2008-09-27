@@ -55,12 +55,6 @@ $person
 </%args>
 
 <%init>
-my $image;
-if ( my $i = $person->image() )
-{
-    $image = $i->resize( height => 100, width => 100 );
-}
-
 my @addresses = $person->addresses()->all();
 
 my @phone_numbers = $person->phone_numbers()->all();
