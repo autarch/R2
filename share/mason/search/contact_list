@@ -29,7 +29,11 @@ Found <% $search->contact_count() %> matching contacts
 %   }
         </a>
       </td>
-      <td><% $contact->preferred_email_address()->email_address() %>
+      <td>
+%   if ( my $address = $contact->preferred_email_address() ) {
+       <% $address->email_address() %>
+%   }
+      </td>
     </tr>
 % }
   </tbody>
