@@ -3,6 +3,7 @@ package R2::Role::HasMembers;
 use strict;
 use warnings;
 
+use R2::Exceptions qw( data_validation_error );
 use R2::Schema::Person;
 use MooseX::Params::Validate qw( validatep );
 
@@ -25,6 +26,13 @@ sub add_member
                    person_id => { isa => 'Int' },
                    position  => { isa => 'Str', default => undef },
                  );
+
+    my $person = R2::Schema::Person->new( person_id => $person_id );
+
+    if ( $person->account_id() != $self->account_id() )
+    {
+        data_validation_error 'Cannot add a person from a different account.';
+    }
 
     my $insert = $self->_MemberInsert();
 
