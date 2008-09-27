@@ -156,6 +156,12 @@ sub _insert_contact
 
     my $phone_numbers = $self->_get_phone_numbers( $c, $errors );
 
+    my $members;
+    if ( $class->can('members') )
+    {
+        $members = $c->request()->members();
+    }
+
     if ( @{ $errors } )
     {
         my $e = R2::Exception::DataValidation->new( errors => $errors );
@@ -174,6 +180,7 @@ sub _insert_contact
                                  $websites,
                                  $addresses,
                                  $phone_numbers,
+                                 $members,
                                );
 
     return R2::Schema->RunInTransaction($insert_sub);
@@ -189,6 +196,7 @@ sub _make_insert_sub
     my $websites      = shift;
     my $addresses     = shift;
     my $phone_numbers = shift;
+    my $members       = shift;
 
     return
         sub
@@ -234,6 +242,14 @@ sub _make_insert_sub
                 R2::Schema::PhoneNumber->insert( %{ $number },
                                                  contact_id => $contact->contact_id(),
                                                );
+            }
+
+            if ($members)
+            {
+                for my $member ( @{ $members } )
+                {
+                    $contact->add_member( %{ $member } );
+                }
             }
 
             return $contact;
