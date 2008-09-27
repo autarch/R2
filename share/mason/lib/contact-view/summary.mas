@@ -1,0 +1,40 @@
+<div id="summary">
+  <h1>
+    <% $contact->display_name() %>
+
+% if ( $contact->is_person() ) {
+    <& .gender-icon, gender => $contact->gender() &>
+% } elsif ( $contact->is_household() ) {
+    <img src="/images/icons/household.png" title="organization" height="16" width="16" />
+% } else {
+    <img src="/images/icons/organization.png" title="organization" height="16" width="16" />
+% }
+
+% if ($image ) {
+    <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
+% }
+  </h1>
+</div>
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my $image;
+if ( $contact->image() )
+{
+    $image = $contact->image()->resize( height => 100, width => 100 );
+}
+</%init>
+
+<%def .gender-icon>
+% if ( defined $gender ) {
+<img src="/images/icons/<% $gender %>.png" title="<% $gender %>" height="16" width="16" />
+% } else {
+<img src="/images/icons/person.png" title="<% $gender %>" height="16" width="16" />
+% }
+<%args>
+$gender
+</%args>
+</%def>

@@ -317,12 +317,9 @@ input.submit {
     width: 7em;
 }
 
-#summary.has-image {
-    min-height: 110px;
-}
-
 #contact-image {
-    float: right;
+    margin-left: 0.5em;
+    vertical-align: top;
 }
 
 .address-notes, .phone-number-notes {

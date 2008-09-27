@@ -1,14 +1,4 @@
-<div id="summary" class="<% $image ? 'has-image' : '' %>">
-% if ($image ) {
-  <img src="<% $image->uri() %>" title="Photo of <% $person->full_name() %>" id="contact-image" />
-% }
-
-  <h1>
-     <& SELF:title, %ARGS &>
-     <& .gender-icon, gender => $person->gender() &>
-  </h1>
-
-</div>
+<& /lib/contact-view/summary.mas, contact => $person &>
 
 <p>
 % if ( $person->allows_email() ) {
@@ -82,13 +72,3 @@ my @phone_numbers = $person->phone_numbers()->all();
 $person
 </%args>
 </%method>
-
-<%def .gender-icon>
-<img src="/images/icons/<% $gender %>.png" title="<% $gender %>" height="16" width="16" />
-<%args>
-$gender
-</%args>
-<%init>
-return unless defined $gender;
-</%init>
-</%def>

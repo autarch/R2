@@ -1,13 +1,4 @@
-<div id="summary" class="<% $image ? 'has-image' : '' %>">
-% if ($image ) {
-  <img src="<% $image->uri() %>" title="Photo of <% $household->name() %>" id="contact-image" />
-% }
-
-  <h1>
-    <& SELF:title, %ARGS &>
-  </h1>
-
-</div>
+<& /lib/contact-view/summary.mas, contact => $household &>
 
 <ul>
 % while ( my ( $person, $membership ) = $members->next() ) {
