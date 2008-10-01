@@ -43,7 +43,7 @@ sub _uri_requires_authen
     return 0
         if $uri->path() =~ m{^/user/(?:login_form|forgot_password_form|authentication)};
 
-    return 0 if $uri->path() eq '/robots.txt';
+    return 0 if $uri->path() =~ m{^/(?:die|robots\.txt|exit)};
 
     return 1;
 }
