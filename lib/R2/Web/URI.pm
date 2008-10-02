@@ -13,7 +13,7 @@ use URI::FromHash ();
 
 
 {
-    my $Prefix = R2::Config->instance()->dynamic_path_prefix() || '';
+    my $Prefix = R2::Config->instance()->path_prefix() || '';
 
     sub dynamic_uri
     {

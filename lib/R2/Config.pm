@@ -128,10 +128,10 @@ has 'static_path_prefix' =>
       writer  => '_set_static_path_prefix',
     );
 
-has 'dynamic_path_prefix' =>
+has 'path_prefix' =>
     ( is      => 'ro',
       isa     => 'Maybe[Str]',
-      default => undef,
+      default => sub { $_[0]->_config_hash()->{R2}{path_prefix} },
     );
 
 has 'secret' =>
@@ -436,9 +436,11 @@ sub _build_static_path_prefix
 {
     my $self = shift;
 
-    return unless $self->is_production();
+    return $self->path_prefix() unless $self->is_production();
 
-    return q{/} . read_file( $self->etc_dir()->file('revision')->stringify() );
+    my $prefix = defined $self->path_prefix() ? $self->path_prefix() : '';
+
+    return $prefix . q{/} . read_file( $self->etc_dir()->file('revision')->stringify() );
 }
 
 sub _build_secret
