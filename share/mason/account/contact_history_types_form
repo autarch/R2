@@ -5,13 +5,13 @@
 </div>
 
 <p>
-<a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">back to the account</a>
+<a href="<% $account->uri() %>" title="Account settings">back to the account</a>
 </p>
 
 <& /lib/help-text/contact-history-type.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $c->uri_for( $account->account_id(), 'contact_history_type' ) %>"
+<form action="<% $account->uri( view => 'contact_history_type' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

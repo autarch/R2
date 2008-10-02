@@ -19,7 +19,7 @@ Found <% $search->contact_count() %> matching contacts
 % while ( my $contact = $contacts->next() ) {
     <tr>
       <td>
-        <a href="<% $c->uri_for( '/contact/' . $contact->contact_id() ) %>">
+        <a href="<% $contact->uri() %>">
 %   if ( $contact->is_person() ) {
         <% $contact->person()->full_name() %>
 %   } elsif ( $contact->is_household() ) {

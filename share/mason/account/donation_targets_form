@@ -5,13 +5,13 @@
 </div>
 
 <p>
-<a href="<% $c->uri_for( $account->account_id(), 'donation_settings' ) %>" title="Donation settings">back to donation settings</a>
+<a href="<% $account->uri( view => 'donation_settings' ) %>" title="Donation settings">back to donation settings</a>
 </p>
 
 <& /lib/help-text/donation-target.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $c->uri_for( $account->account_id(), 'donation_target' ) %>"
+<form action="<% $account->uri( view => 'donation_target' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

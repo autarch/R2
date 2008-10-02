@@ -12,15 +12,15 @@
       <h2>Add a ...</h2>
       <ul>
         <li>
-          <a href="<% $c->uri_for( '/contact/new_person_form'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/contact/new_person_form' ) %>"
              title="Add a new person">Person</a>
         </li>
         <li>
-          <a href="<% $c->uri_for( '/contact/new_household_form'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/contact/new_household_form' ) %>"
              title="Add a new household">Household</a>
         </li>
         <li>
-          <a href="<% $c->uri_for( '/contact/new_organization_form'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/contact/new_organization_form' ) %>"
              title="Add a new organization">Organization</a>
         </li>
       </ul>
@@ -30,19 +30,19 @@
 
       <ul>
         <li>
-          <a href="<% $c->uri_for( '/search/contact' ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/search/contact' ) %>"
              title="Add a new person">Contacts</a>
         </li>
         <li>
-          <a href="<% $c->uri_for( '/search/person'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/search/person' ) %>"
              title="Add a new person">People</a>
         </li>
         <li>
-          <a href="<% $c->uri_for( '/search/household'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/search/household' ) %>"
              title="Add a new household">Households</a>
         </li>
         <li>
-          <a href="<% $c->uri_for( '/search/organization'  ) %>"
+          <a href="<% $c->domain()->application_uri( path => '/search/organization' ) %>"
              title="Add a new organization">Organizations</a>
         </li>
     </div>

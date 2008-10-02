@@ -6,8 +6,8 @@
     <legend>Your login info</legend>
 
     <div class="form-item">
-      <label class="for-field" for="username">Email:</label>
-      <input id="email_address" class="text medium" type="text" name="username" value="" />
+      <label class="for-field" for="username">Username:</label>
+      <input id="username" class="text medium" type="text" name="username" value="" />
     </div>
 
     <div class="form-item">

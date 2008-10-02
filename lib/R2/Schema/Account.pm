@@ -30,6 +30,9 @@ use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
+with 'R2::Role::URIMaker';
+
+
 {
     my $schema = R2::Schema->Schema();
 
@@ -559,6 +562,20 @@ sub _AddSQLMethods
                                  $_[0]->phone_number_types()->all() ] },
             );
     }
+}
+
+sub dashboard_uri
+{
+    my $self = shift;
+
+    return $self->_dynamic_uri( path => '/', @_ );
+}
+
+sub _base_uri_path
+{
+    my $self = shift;
+
+    return '/account/' . $self->account_id();
 }
 
 no Fey::ORM::Table;

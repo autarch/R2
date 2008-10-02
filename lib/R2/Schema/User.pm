@@ -15,7 +15,7 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
 
 {
@@ -155,6 +155,13 @@ sub format_datetime
     my $dt   = shift;
 
     return $dt->format_cldr( $self->date_format() . q{ } . $self->time_format() );
+}
+
+sub _base_uri_path
+{
+    my $self = shift;
+
+    return '/user/' . $self->user_id();
 }
 
 no Fey::ORM::Table;

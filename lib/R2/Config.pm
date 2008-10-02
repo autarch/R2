@@ -128,6 +128,12 @@ has 'static_path_prefix' =>
       writer  => '_set_static_path_prefix',
     );
 
+has 'dynamic_path_prefix' =>
+    ( is      => 'ro',
+      isa     => 'Maybe[Str]',
+      default => undef,
+    );
+
 has 'secret' =>
     ( is      => 'ro',
       isa     => 'Str',
@@ -184,7 +190,6 @@ sub _build_config_file
 }
 
 {
-#            +R2::Plugin::Session::Store::R2
     my @StandardImports =
         qw( AuthenCookie
             +R2::Plugin::Domain
@@ -433,7 +438,7 @@ sub _build_static_path_prefix
 
     return unless $self->is_production();
 
-    return read_file( $self->etc_dir()->file('revision')->stringify() );
+    return q{/} . read_file( $self->etc_dir()->file('revision')->stringify() );
 }
 
 sub _build_secret

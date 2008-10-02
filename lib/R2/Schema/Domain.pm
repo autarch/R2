@@ -13,6 +13,9 @@ use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validate );
 use MooseX::ClassAttribute;
 
+with 'R2::Role::URIMaker';
+
+
 {
     my $schema = R2::Schema->Schema();
 
@@ -21,40 +24,19 @@ use MooseX::ClassAttribute;
     has_many 'accounts' =>
         ( table => $schema->table('Account') );
 
+    has 'uri_params' =>
+        ( is         => 'ro',
+          isa        => 'HashRef',
+          lazy_build => 1,
+          init_arg => undef,
+        );
+
     class_has '_SelectAllSQL' =>
         ( is      => 'ro',
           isa     => 'Fey::SQL::Select',
           lazy    => 1,
           default => \&_MakeSelectAllSQL,
         );
-}
-
-has '_uri_scheme' =>
-    ( is      => 'ro',
-      isa     => 'Str',
-      lazy    => 1,
-      default => sub { $_[0]->requires_ssl() ? 'https' : 'http' },
-    );
-
-
-{
-    my %spec = ( path     => { isa      => 'R2::Type::URIPath' },
-                 query    => { isa      => 'HashRef',
-                               default  => {},
-                             },
-                 fragment => { isa      => 'Str',
-                               optional => 1,
-                             },
-               );
-    sub uri
-    {
-        my ( $self, %p ) = validate( \@_, %spec );
-
-        return URI::FromHash::uri( scheme => $self->_uri_scheme(),
-                                   host   => $self->web_hostname(),
-                                   %p,
-                                 );
-    }
 }
 
 sub All
@@ -88,6 +70,38 @@ sub _MakeSelectAllSQL
     return $select;
 
 }
+
+sub _build_uri_params
+{
+    my $self = shift;
+
+    my $scheme = $self->requires_ssl() ? 'https' : 'http';
+
+    return { schema => $scheme,
+             host   => $_[0]->web_hostname(),
+           };
+}
+
+sub _base_uri_path
+{
+    my $self = shift;
+
+    return '/domain/' . $self->domain_id();
+}
+
+sub application_uri
+{
+    my ( $self, %p ) =
+        validate( \@_,
+                  path      => { isa => 'Str', optional => 1 },
+                  fragment  => { isa => 'Str', optional => 1 },
+                  query     => { isa => 'HashRef', default => {} },
+                  with_host => { isa => 'Bool', default => 0 },
+                );
+
+    return $self->_make_uri(%p);
+}
+
 
 no Fey::ORM::Table;
 

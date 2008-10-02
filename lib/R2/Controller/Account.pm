@@ -23,7 +23,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this account',
-              uri   => $c->uri_for('/'),
+              uri   => $account->dashboard_uri(),
             );
     }
 
@@ -56,14 +56,14 @@ sub account_PUT : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'edit_form' ),
+              uri    => $account->uri( view => 'edit_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The ' . $account->name() . ' account has been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+    $c->redirect_and_detach( $account->uri() );
 }
 
 sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) { }
@@ -92,14 +92,14 @@ sub donation_source_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'donation_sources_form' ),
+              uri    => $account->uri( view => 'donation_sources_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The donation sources for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
 sub donation_targets_form : Chained('_set_account') : PathPart('donation_targets_form') : Args(0) { }
@@ -124,14 +124,14 @@ sub donation_target_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'donation_targets_form' ),
+              uri    => $account->uri( view => 'donation_targets_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The donation targets for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
 sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) { }
@@ -156,14 +156,14 @@ sub payment_type_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'payment_types_form' ),
+              uri    => $account->uri( view => 'payment_types_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The payment types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id(), 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
 sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) { }
@@ -188,14 +188,14 @@ sub address_type_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'address_types_form' ),
+              uri    => $account->uri( view => 'address_types_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+    $c->redirect_and_detach( $account->uri() );
 }
 
 sub countries_form : Chained('_set_account') : PathPart('countries_form') : Args(0) { }
@@ -231,14 +231,14 @@ sub phone_number_type_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'phone_number_types_form' ),
+              uri    => $account->uri( view => 'phone_number_types_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The phone number types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+    $c->redirect_and_detach( $account->uri() );
 }
 
 sub contact_history_types_form : Chained('_set_account') : PathPart('contact_history_types_form') : Args(0) { }
@@ -263,14 +263,14 @@ sub contact_history_type_POST : Private
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $c->uri_for( $account->account_id(), 'contact_history_types_form' ),
+              uri    => $account->uri( view => 'contact_history_types_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The contact history types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $c->uri_for( $account->account_id() ) );
+    $c->redirect_and_detach( $account->uri() );
 }
 
 1;

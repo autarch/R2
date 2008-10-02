@@ -1,6 +1,6 @@
 <ul>
 % while ( my ( $person, $membership ) = $members->next() ) {
-  <li><a href="<% $c->uri_for( '/contact/' . $person->contact_id() ) %>"
+  <li><a href="<% $person->contact()->uri() ) %>"
          title="View <% $person->full_name() %>"
          ><% $person->full_name() %></a>
 %   if ( my $pos = $membership->position() ) {

@@ -29,7 +29,7 @@ sub authentication_GET_html
     }
     else
     {
-        $c->redirect_and_detach( '/user/login_form' );
+        $c->redirect_and_detach( $c->domain()->application_uri( path => '/user/login_form' ) );
     }
 }
 
@@ -52,7 +52,7 @@ sub authentication_POST
 
     my @errors;
 
-    push @errors, 'You must provide an email address or an OpenID URL.'
+    push @errors, 'You must provide a username or an OpenID URL.'
         if string_is_empty($username);
     push @errors, { field   => 'password',
                     message => 'You must provide a password.' }
@@ -67,7 +67,7 @@ sub authentication_POST
         unless ($user)
         {
             push @errors,
-                'The email or password you provided was not valid.';
+                'The username or password you provided was not valid.';
         }
     }
 
@@ -77,9 +77,9 @@ sub authentication_POST
 
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => '/user/login_form',
-              params => { email_address => $username,
-                          return_to     => $c->request()->parameters()->{return_to},
+              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
+              params => { username  => $username,
+                          return_to => $c->request()->parameters()->{return_to},
                         },
             );
     }
@@ -111,7 +111,7 @@ sub authentication_POST
 
             $c->_redirect_with_error
                 ( error  => $error,
-                  uri    => '/user/login_form',
+                  uri    => $c->domain()->application_uri( path => '/user/login_form' ),
                   params => { openid_uri => $uri },
                 );
         }
@@ -121,14 +121,14 @@ sub authentication_POST
             if $c->request()->param('remember');
 
         my $return_to =
-            $c->uri_for( '/user/openid_authentication',
-                         \%query,
-                       );
+            $c->domain()->application_uri( path  => '/user/openid_authentication',
+                                           query => \%query,
+                                         );
 
         my $check_url =
             $identity->check_url
                 ( return_to      => $return_to,
-                  trust_root     => $c->uri_for('/'),
+                  trust_root     => '/',
                   delayed_return => 1,
                 );
 
@@ -163,7 +163,7 @@ sub openid_authentication : Local
     {
         $c->_redirect_with_error
             ( error  => 'You can still login without OpenID, or make a new account',
-              uri    => '/user/login_form',
+              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
             );
     }
 
@@ -172,7 +172,7 @@ sub openid_authentication : Local
     {
         $c->_redirect_with_error
             ( error  => 'Something went mysteriously wrong trying to authenticate you with OpenID',
-              uri    => '/user/login_form',
+              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
             );
     }
 
@@ -183,7 +183,7 @@ sub openid_authentication : Local
         # XXXXXXX?
         $c->_redirect_with_error
             ( error  => 'Now you need to create a Rapport account for your OpenID URL',
-              uri    => '/user/new_user_form',
+              uri    => $c->domain()->application_uri( path => '/user/new_user_form' ),
               params => { openid_uri => $identity->url() },
             );
     }

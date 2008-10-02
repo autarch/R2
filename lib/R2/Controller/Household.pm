@@ -20,13 +20,15 @@ sub household_POST
     my $self = shift;
     my $c    = shift;
 
+    my $account = $c->user()->account();
+
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $c->user()->account(),
+                                                       account => $account,
                                                      ) )
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $c->uri_for('/'),
+              uri   => $account->dashboard_uri(),
             );
     }
 
@@ -43,7 +45,7 @@ sub household_POST
               \@errors,
             );
 
-    $c->redirect_and_detach( $c->uri_for( '/contact/' . $household->contact_id() ) );
+    $c->redirect_and_detach( $household->uri() );
 }
 
 1;

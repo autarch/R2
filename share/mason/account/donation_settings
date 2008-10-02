@@ -5,24 +5,24 @@
 </div>
 
 <p>
-<a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">back to the account</a>
+<a href="<% $account->uri() %>" title="Account settings">back to the account</a>
 </p>
 
 <ul>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'donation_sources_form' ) %>"
+    <a href="<% $account->uri( view => 'donation_sources_form' ) %>"
        title="Edit donation sources">Edit donation sources</a>
 
     <& /lib/help-text/donation-source.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'donation_targets_form' ) %>"
+    <a href="<% $account->uri( view => 'donation_targets_form' ) %>"
        title="Edit donation targets">Edit donation targets</a>
 
     <& /lib/help-text/donation-target.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'payment_types_form' ) %>"
+    <a href="<% $account->uri( view => 'payment_types_form' ) %>"
        title="Edit payment types">Edit payment types</a>
 
     <& /lib/help-text/payment-type.mas &>

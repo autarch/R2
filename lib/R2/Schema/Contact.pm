@@ -23,7 +23,7 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
 
 {
@@ -31,7 +31,10 @@ with 'R2::Role::DataValidator';
 
     has_table( $schema->table('Contact') );
 
-    has_one( $schema->table('Account') );
+    has_one 'account' =>
+        ( table   => $schema->table('Account'),
+          handles => [ 'domain' ],
+        );
 
     for my $type ( qw( person household organization ) )
     {
@@ -174,6 +177,13 @@ sub _PreferredPhoneNumberSelect
            ->limit(1);
 
     return $select;
+}
+
+sub _base_uri_path
+{
+    my $self = shift;
+
+    return '/contact/' . $self->contact_id();
 }
 
 no Fey::ORM::Table;

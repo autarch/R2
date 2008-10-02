@@ -33,7 +33,9 @@ with 'R2::Role::DVAAC';
           handles => [ qw( email_addresses primary_email_address
                            websites
                            addresses primary_address
-                           phone_numbers primary_phone_number ),
+                           phone_numbers primary_phone_number
+                           uri
+                         ),
                        ( grep { ! __PACKAGE__->meta()->has_attribute($_) }
                          R2::Schema::Contact->meta()->get_attribute_list(),
                        )

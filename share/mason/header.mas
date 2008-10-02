@@ -2,16 +2,33 @@
     <ul id="global-nav">
 % if ( $c->user() ) {
 %   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->user()->account() ) ) {
-      <li><a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">Account</a></li>
+      <li><a href="<% $c->user()->account()->uri() %>" title="Account settings">Account</a></li>
 %   }
-      <li><a href="<% $c->uri_for('/user/' . $c->user()->user_id() . '/settings') %>" title="Application settings">Settings</a></li>
-      <li><a href="<% $c->uri_for( '/user/authentication', { 'x-tunneled-method' => 'DELETE' } ) %>"
+      <li><a href="<% $c->user()->uri( view => 'settings') %>" title="Application settings">Settings</a></li>
+      <li><a href="<% $c->domain()->application_uri
+                          ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
              title="Log Out of Rapport">Log Out</a></li>
 % }
-      <li><a href="<% $c->uri_for( '/application/help' ) %>"
+      <li><a href="<% $c->domain()->application_uri( path => '/application/help' ) %>"
              title="Help Using Rapport">Help</a></li>
     </ul>
 
-    <a href="<% $c->uri_for('/') %>"><img src="<% static_uri('/images/rapport-logo.jpg') %>"
-                                          width="115" height="57" /></a>
+    <a href="<% $c->domain()->application_uri( path => '' ) %>"
+       ><img src="<% static_uri('/images/rapport-logo.jpg') %>"
+             width="115" height="57" /></a>
+
+    <div id="tabs">
+      <ul>
+% for my $tab (@tabs) {
+        <li class="<% $tab->{selected} ? 'selected' : '' %>"><a href="<% $tab->{uri} %>"><% $tab->{text} %></a></li>
+% }
+% if ( ! @tabs ) {
+        <li class="invisible">&nbsp;</li>
+% }
+      </ul>
+    </div>
   </div>
+
+<%args>
+@tabs => ()
+</%args>

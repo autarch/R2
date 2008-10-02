@@ -3,8 +3,9 @@
 </div>
 
 <&| /lib/filter/form.mas &>
-<form class="JS-standard-form" action="<% $c->uri_for('/household') %>" method="post"
-      id="household-form"
+<form class="JS-standard-form"
+      action="<% $c->domain()->application_uri( path => '/household ) %>"
+      method="post"
       enctype="multipart/form-data">
 
   <fieldset>

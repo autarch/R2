@@ -18,13 +18,15 @@ sub new_person_form : Local
     my $self = shift;
     my $c    = shift;
 
+    my $account = $c->user()->account();
+
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $c->user()->account(),
+                                                       account => $account,
                                                      ) )
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $c->uri_for('/'),
+              uri   => $account->dashboard_uri(),
             );
     }
 
@@ -36,13 +38,15 @@ sub new_household_form : Local
     my $self = shift;
     my $c    = shift;
 
+    my $account = $c->user()->account();
+
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $c->user()->account(),
+                                                       account => $account,
                                                      ) )
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $c->uri_for('/'),
+              uri   => $account->dashboard_uri(),
             );
     }
 
@@ -54,13 +58,15 @@ sub new_organization_form : Local
     my $self = shift;
     my $c    = shift;
 
+    my $account = $c->user()->account();
+
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $c->user()->account(),
+                                                       account => $account,
                                                      ) )
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $c->uri_for('/'),
+              uri   => $account->dashboard_uri(),
             );
     }
 
@@ -84,7 +90,7 @@ sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this contact',
-              uri   => $c->uri_for('/'),
+              uri   => $c->user()->account()->dashboard_uri(),
             );
     }
 
@@ -100,8 +106,30 @@ sub contact_GET_html : Private
 
     my $contact = $c->stash()->{contact};
 
+    $c->stash()->{tabs} = $self->_contact_view_tabs($c);
+
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
+}
+
+sub _contact_view_tabs
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    return [ { uri      => $contact->uri(),
+               text     => 'basics',
+               selected => 1,
+             },
+             { uri      => $contact->uri( view => 'history' ),
+               text     => 'history',
+             },
+             { uri      => $contact->uri( view => 'donations' ),
+               text     => 'donations',
+             },
+           ];
 }
 
 sub _display_person

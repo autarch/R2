@@ -10,45 +10,45 @@
 
 <ul>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'edit_form' ) %>"
+    <a href="<% $account->uri( view => 'edit_form' ) %>"
        title="Edit name, billing, etc.">Edit basic settings</a>
     <p>
       Account name, default time zone, etc.
     </p>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'donation_settings' ) %>"
+    <a href="<% $account->uri( view => 'donation_settings' ) %>"
        title="Edit donation settings">Edit donation settings</a>
     <p>
       Donation sources and targets, as well as allowed payment types.
     </p>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'address_types_form' ) %>"
+    <a href="<% $account->uri( view => 'address_types_form' ) %>"
        title="Edit address types">Edit address types</a>
     <& /lib/help-text/address-type.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'countries_form' ) %>"
+    <a href="<% $account->uri( view => 'countries_form' ) %>"
        title="Edit countries for addresses">Edit countries for addresses</a>
     <& /lib/help-text/countries.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'phone_number_types_form' ) %>"
+    <a href="<% $account->uri( view => 'phone_number_types_form' ) %>"
        title="Edit phone numbers types">Edit phone number types</a>
     <& /lib/help-text/phone-number-type.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'contact_history_types_form' ) %>"
+    <a href="<% $account->uri( view => 'contact_history_types_form' ) %>"
        title="Edit contact history types">Edit contact history types</a>
     <& /lib/help-text/contact-history-type.mas &>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'message_providers_form' ) %>"
+    <a href="<% $account->uri( view => 'message_providers_form' ) %>"
        title="Edit instant messaging providers">Edit instant messaging providers</a>
   </li>
   <li>
-    <a href="<% $c->uri_for( $account->account_id(), 'users' ) %>"
+    <a href="<% $account->uri( view => 'users' ) %>"
        title="Edit instant messaging providers">Edit users</a>
     <p>
       Add, edit, or delete users for this account.

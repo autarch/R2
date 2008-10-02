@@ -5,11 +5,11 @@
 </div>
 
 <p>
-<a href="<% $c->uri_for('/account/' . $c->user()->account()->account_id() ) %>" title="Account settings">back to the account</a>
+<a href="<% $account->uri() %>" title="Account settings">back to the account</a>
 </p>
 
 <&| /lib/filter/form.mas, objects => [ $account ] &>
-<form class="JS-standard-form" action="<% $c->uri_for( '/account', $account->account_id() ) %>" method="post">
+<form class="JS-standard-form" action="<% $account->uri() %>" method="post">
 
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 
