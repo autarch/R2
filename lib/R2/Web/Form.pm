@@ -176,7 +176,7 @@ sub _collapse_single_option_selects
     {
         my @options = $select->options();
 
-        next if @options > 1;
+        next if @options != 1;
 
         push @to_collapse, [ $select, $options[0] ];
     }
