@@ -6,7 +6,7 @@ use warnings;
 use MooseX::Params::Validate qw( validate );
 use R2::Config;
 use R2::Util qw( string_is_empty );
-use R2::Web::URI qw( dynamic_uri );
+use R2::URI qw( dynamic_uri );
 
 use Moose::Role;
 

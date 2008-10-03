@@ -7,7 +7,7 @@ use lib 't/lib';
 
 use R2::Test::Config;
 use R2::Config;
-use R2::Web::URI qw( static_uri );
+use R2::URI qw( static_uri );
 
 
 {
@@ -15,10 +15,9 @@ use R2::Web::URI qw( static_uri );
         '/css/base.css',
         'static_uri() with no path prefix' );
 
-    R2::Config->new()->_set_static_path_prefix( '12982' );
+    R2::Config->new()->_set_static_path_prefix( '/12982' );
 
     is( static_uri('/css/base.css'),
         '/12982/css/base.css',
-        'static_uri() with a path prefix' );
+        'static_uri() with a static path prefix' );
 }
-

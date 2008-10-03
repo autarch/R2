@@ -120,18 +120,21 @@ has 'cache_dir' =>
     );
 
 has 'static_path_prefix' =>
-    ( is      => 'ro',
+    ( is      => 'rw',
       isa     => 'Maybe[Str]',
       lazy    => 1,
       builder => '_build_static_path_prefix',
       # for testing
       writer  => '_set_static_path_prefix',
+      clearer => '_clear_static_path_prefix',
     );
 
 has 'path_prefix' =>
-    ( is      => 'ro',
+    ( is      => 'rw',
       isa     => 'Maybe[Str]',
       default => sub { $_[0]->_config_hash()->{R2}{path_prefix} },
+      # for testing
+      writer  => '_set_path_prefix',
     );
 
 has 'secret' =>
