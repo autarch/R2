@@ -174,4 +174,32 @@ sub donations_GET_html : Private
     $c->stash()->{template} = '/contact/donations';
 }
 
+sub donations_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my %p = $c->request()->donation_params();
+
+    my $contact = $c->stash()->{contact};
+
+    eval
+    {
+        R2::Schema::Donation->insert
+            ( contact_id => $contact->contact_id(),
+              %p,
+            );
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
+}
+
 1;
