@@ -3,6 +3,8 @@ package R2::Schema::Donation;
 use strict;
 use warnings;
 
+use DateTime::Format::Pg;
+use DateTime::Format::Strptime;
 use R2::Schema::DonationSource;
 use R2::Schema::DonationTarget;
 use R2::Schema;
@@ -20,13 +22,18 @@ with 'R2::Role::DataValidator';
 
     has_table( $schema->table('Donation') );
 
+    transform 'donation_date' =>
+        deflate { blessed $_[1] ? DateTime::Format::Pg->format_date( $_[1] ) : $_[1] },
+        inflate { defined $_[1] ? DateTime::Format::Pg->parse_date( $_[1] ) : $_[1] };
+
     has_one source =>
         ( table => $schema->table('DonationSource') );
 
     has_one target =>
         ( table => $schema->table('DonationTarget') );
 
-    has_one( $schema->table('PaymentType') );
+    has_one payment_type =>
+        ( table => $schema->table('PaymentType') );
 
     has_one( $schema->table('Contact') );
 
@@ -34,7 +41,7 @@ with 'R2::Role::DataValidator';
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _validate_amount ) ] },
+          default => sub { [ qw( _validate_amount _valid_donation_date ) ] },
         );
 }
 
@@ -44,7 +51,7 @@ sub _validate_amount
     my $p    = shift;
 
     # remove any currency symbols and such
-    $p->{amount} =~ s/^\D+(\d)/$1/;
+    $p->{amount} =~ s/^[^\d\-](\d)/$1/;
 
     # will be caught later
     return if string_is_empty( $p->{amount} );
@@ -54,6 +61,10 @@ sub _validate_amount
     if ( ! looks_like_number( $p->{amount} ) )
     {
         $msg = "The amount you specified ($p->{amount}) does not seem to be a number.";
+    }
+    elsif ( $p->{amount} <= 0 )
+    {
+        $msg = "You cannot have a negative amount for a donation.";
     }
     elsif ( sprintf( '%.2f', $p->{amount} ) != $p->{amount} )
     {
@@ -65,6 +76,32 @@ sub _validate_amount
     return { message => $msg,
              field   => 'amount',
            };
+}
+
+sub _valid_donation_date
+{
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    my $format = delete $p->{date_format};
+
+    return if string_is_empty( $p->{donation_date} );
+
+    return if blessed $p->{donation_date};
+
+    my $parser = DateTime::Format::Strptime->new( pattern   => $format,
+                                                  time_zone => 'floating',
+                                                );
+
+    my $dt = $parser->parse_datetime( $p->{donation_date} );
+
+    return { field   => 'donation_date',
+             message => 'This does not seem to be a valid date.',
+           }
+        unless $dt;
+
+    return;
 }
 
 no Fey::ORM::Table;

@@ -180,6 +180,7 @@ sub donations_POST : Private
     my $c    = shift;
 
     my %p = $c->request()->donation_params();
+    $p{date_format} = $c->request()->params()->{date_format};
 
     my $contact = $c->stash()->{contact};
 

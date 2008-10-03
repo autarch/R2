@@ -412,14 +412,14 @@ CREATE TABLE "PhoneNumberType" (
 
 CREATE TABLE "Donation" (
        donation_id        SERIAL8            PRIMARY KEY,
-       amount             NUMERIC(2)         NOT NULL,
+       amount             NUMERIC(13,2)      NOT NULL,
        donation_date      DATE               NOT NULL,
        contact_id         INT8               NOT NULL,
        donation_source_id INT8               NOT NULL,
        donation_target_id INT8               NOT NULL,
        payment_type_id    INT8               NOT NULL,
        notes              TEXT               NULL,
-       CONSTRAINT valid_amount CHECK ( amount > 0.0 )
+       CONSTRAINT valid_amount CHECK ( amount > 0.00 )
 );
 
 CREATE TABLE "DonationSource" (

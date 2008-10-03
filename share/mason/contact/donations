@@ -1,7 +1,28 @@
 <& /lib/contact-view/summary.mas, contact => $real_contact &>
 
 % if ( $contact->donation_count() ) {
-
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Amount</th>
+      <th>Source</th>
+      <th>Target</th>
+      <th>Payment Type</th>
+    </tr>
+  </thead>
+  <tbody>
+%   while ( my $donation = $donations->next() ) {
+    <tr>
+      <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
+      <td><% $donation->amount() %></td>
+      <td><% $donation->source()->name() %></td>
+      <td><% $donation->target()->name() %></td>
+      <td><% $donation->payment_type()->name() %></td>
+    </tr>
+%   }
+  </tbody>
+</table>
 % } else {
 <p>
 This <% lc $contact->contact_type() %> has not made any donations.
@@ -85,6 +106,8 @@ $real_contact
 my $sources = $c->user()->account()->donation_sources();
 my $targets = $c->user()->account()->donation_targets();
 my $payment_types = $c->user()->account()->payment_types();
+
+my $donations = $contact->donations();
 </%init>
 
 <%method title>
