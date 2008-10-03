@@ -3,6 +3,7 @@ package R2::Role::DataValidator;
 use strict;
 use warnings;
 
+use Lingua::EN::Inflect qw( A );
 use R2::Exceptions qw( data_validation_error );
 
 use Moose::Role;
@@ -93,10 +94,12 @@ sub _needs_value_error
     my $self = shift;
     my $name = shift;
 
-    ( my $friendly_name = ucfirst $name ) =~ s/_/ /g;
+    ( my $friendly_name = $name ) =~ s/_/ /g;
+
+    my $articled = A($friendly_name);
 
     return { field   => $name,
-             message => "You must provide a $friendly_name." };
+             message => "You must provide $articled." };
 }
 
 sub ValidateForInsert
