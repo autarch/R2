@@ -163,7 +163,7 @@ form div.error p span {
 
 form div.form-item { 
     clear: both;
-    padding: 0.1em 0 0.4em 0;
+    padding: 0.4em 0 0.4em 0;
 }
 
 /* Having the help-text div allows us to set the margin in ems, to
