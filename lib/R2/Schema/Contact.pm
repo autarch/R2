@@ -52,6 +52,13 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
             );
     }
 
+    has 'real_contact' =>
+        ( is         => 'ro',
+          does       => 'R2::Role::ActsAsContact',
+          lazy_build => 1,
+          init_arg   => undef,
+        );
+
     has_one '_file' =>
         ( table => $schema->table('File') );
 
@@ -76,7 +83,7 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
     has_one 'preferred_email_address' =>
         ( table       => $schema->table('EmailAddress'),
-          select      => __PACKAGE__->_PreferredEmailAddressSelect(),
+          select      => __PACKAGE__->_BuildPreferredEmailAddressSelect(),
           bind_params => sub { $_[0]->contact_id() }
         );
 
@@ -96,7 +103,7 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
     has_one 'preferred_address' =>
         ( table       => $schema->table('Address'),
-          select      => __PACKAGE__->_PreferredAddressSelect(),
+          select      => __PACKAGE__->_BuildPreferredAddressSelect(),
           bind_params => sub { $_[0]->contact_id() }
         );
 
@@ -107,7 +114,7 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
     has_one 'preferred_phone_number' =>
         ( table       => $schema->table('PhoneNumber'),
-          select      => __PACKAGE__->_PreferredPhoneNumberSelect(),
+          select      => __PACKAGE__->_BuildPreferredPhoneNumberSelect(),
           bind_params => sub { $_[0]->contact_id() }
         );
 
@@ -120,9 +127,28 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
                       ],
           cache    => 1,
         );
+
+    has_many 'donations' =>
+        ( table    => $schema->table('Donation'),
+          order_by => [ $schema->table('Donation')->column('donation_date'),
+                        'DESC',
+                        $schema->table('Donation')->column('amount'),
+                        'DESC',
+                      ],
+          cache    => 1,
+        );
+
+    has 'donation_count' =>
+        ( metaclass   => 'FromSelect',
+          is          => 'ro',
+          isa         => 'R2::Type::PosOrZeroInt',
+          lazy        => 1,
+          select      => __PACKAGE__->_BuildDonationCountSelect(),
+          bind_params => sub { $_[0]->contact_id() },
+        );
 }
 
-sub _PreferredEmailAddressSelect
+sub _BuildPreferredEmailAddressSelect
 {
     my $class = shift;
 
@@ -141,7 +167,7 @@ sub _PreferredEmailAddressSelect
     return $select;
 }
 
-sub _PreferredAddressSelect
+sub _BuildPreferredAddressSelect
 {
     my $class = shift;
 
@@ -160,7 +186,7 @@ sub _PreferredAddressSelect
     return $select;
 }
 
-sub _PreferredPhoneNumberSelect
+sub _BuildPreferredPhoneNumberSelect
 {
     my $class = shift;
 
@@ -177,6 +203,37 @@ sub _PreferredPhoneNumberSelect
            ->limit(1);
 
     return $select;
+}
+
+sub _BuildDonationCountSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $count =
+        Fey::Literal::Function->new( 'COUNT', $schema->table('Donation')->column('donation_id') );
+
+    $select->select($count)
+           ->from( $schema->tables( 'Donation' ) )
+           ->where( $schema->table('Donation')->column('contact_id'),
+                    '=', Fey::Placeholder->new() );
+
+    return $select;
+}
+
+sub _build_real_contact
+{
+    my $self = shift;
+
+    for my $type ( qw( person household organization ) )
+    {
+        my $is = 'is_' . $type;
+        warn "$type - $is\n";
+        return $self->$type() if $self->$is();
+    }
 }
 
 sub _base_uri_path

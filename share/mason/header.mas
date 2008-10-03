@@ -20,7 +20,7 @@
     <div id="tabs">
       <ul>
 % for my $tab (@tabs) {
-        <li class="<% $tab->{selected} ? 'selected' : '' %>"><a href="<% $tab->{uri} %>"><% $tab->{text} %></a></li>
+        <li class="<% $tab->is_selected() ? 'selected' : '' %>"><a href="<% $tab->uri() %>"><% $tab->label() %></a></li>
 % }
 % if ( ! @tabs ) {
         <li class="invisible">&nbsp;</li>

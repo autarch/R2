@@ -11,6 +11,7 @@ use R2::Schema::Contact;
 use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
+use R2::Web::Tab;
 
 
 sub new_person_form : Local
@@ -94,7 +95,28 @@ sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
             );
     }
 
+    $c->stash()->{tabs} = $self->_contact_view_tabs($contact);
+
     $c->stash()->{contact} = $contact;
+}
+
+sub _contact_view_tabs
+{
+    my $self    = shift;
+    my $contact = shift;
+
+    return [ map { R2::Web::Tab->new( %{ $_ } ) }
+             { uri         => $contact->uri(),
+               label       => 'basics',
+               is_selected => 1,
+             },
+             { uri   => $contact->uri( view => 'history' ),
+               label => 'history',
+             },
+             { uri   => $contact->uri( view => 'donations' ),
+               label => 'donations',
+             },
+           ];
 }
 
 sub contact : Chained('_set_contact') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') { }
@@ -106,30 +128,8 @@ sub contact_GET_html : Private
 
     my $contact = $c->stash()->{contact};
 
-    $c->stash()->{tabs} = $self->_contact_view_tabs($c);
-
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
-}
-
-sub _contact_view_tabs
-{
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    return [ { uri      => $contact->uri(),
-               text     => 'basics',
-               selected => 1,
-             },
-             { uri      => $contact->uri( view => 'history' ),
-               text     => 'history',
-             },
-             { uri      => $contact->uri( view => 'donations' ),
-               text     => 'donations',
-             },
-           ];
 }
 
 sub _display_person
@@ -160,6 +160,18 @@ sub _display_organization
     $c->stash()->{organization} = $c->stash()->{contact}->organization();
 
     $c->stash()->{template} = '/organization/view';
+}
+
+sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub donations_GET_html : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
+
+    $c->stash()->{template} = '/contact/donations';
 }
 
 1;
