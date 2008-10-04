@@ -1,3 +1,11 @@
+<div id="contact-view">
+
+% if ( my $dt = $person->birth_date() ) {
+<div>
+Birth date: <% $c->user()->format_date($dt) %>
+</div>
+% }
+
 <& /lib/contact-view/summary.mas, contact => $person &>
 
 <& /lib/contact-view/email-addresses.mas, contact => $person &>
@@ -8,11 +16,7 @@
 
 <& /lib/contact-view/addresses.mas, contact => $person &>
 
-% if ( my $dt = $person->birth_date() ) {
-<div>
-Birth date: <% $c->user()->format_date($dt) %>
 </div>
-% }
 
 <%args>
 $person

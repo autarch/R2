@@ -23,6 +23,14 @@ body {
     background-color: #A1BA6C;
 }
 
+#ft {
+    text-align: center;
+    font-size: 90%;
+    padding: 2em 0.5em;
+    background-color: #777;
+    color: white;
+}
+
 #global-nav {
     display: inline;
     float: right;
@@ -108,12 +116,13 @@ body {
     margin: 0.2em 0 1em 0;
 }
 
-#ft {
-    text-align: center;
-    font-size: 90%;
-    padding: 2em 0.5em;
-    background-color: #777;
-    color: white;
+#contact-view h2 {
+    color: #333;
+    border-bottom: 1px solid #333;
+}
+
+#contact-view h3 {
+    color: #666;
 }
 
 fieldset {

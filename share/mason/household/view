@@ -1,3 +1,5 @@
+<div id="contact-view">
+
 <& /lib/contact-view/summary.mas, contact => $household &>
 
 <& /lib/contact-view/members.mas, contact => $household &>
@@ -9,6 +11,8 @@
 <& /lib/contact-view/phone-numbers.mas, contact => $household &>
 
 <& /lib/contact-view/addresses.mas, contact => $household &>
+
+</div>
 
 <%args>
 $household

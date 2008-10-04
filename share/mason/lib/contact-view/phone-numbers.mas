@@ -8,9 +8,19 @@ Does not want to receive phone calls.
 % }
 </p>
 
+<ul>
 % for my $number (@phone_numbers) {
-<& /lib/contact-view/phone-number.mas, phone_number => $number &>
+  <li><% $number->type()->name() %>:
+      <% $number->phone_number() %>
+%   if ( $number->is_preferred() ) {
+      <strong>(Preferred)</strong>
+%   }
+%   if ( ! string_is_empty( $number->notes() ) ) {
+      <br /
+      <span class="phone-number-notes"><% $number->notes() %></span>
+%   }
 % }
+</ul>
 
 <%args>
 $contact
