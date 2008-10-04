@@ -83,6 +83,7 @@ body {
 #tabs li a:hover {
     color: white;
     background-color: #5B824C;
+    border-bottom: 1px solid #5B824C;
 }
 
 #messages {
