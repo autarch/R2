@@ -214,34 +214,27 @@ sub _make_insert_sub
                 $p->{image_file_id} = $file->file_id();
             }
 
-            my $contact = $class->insert( %{ $p } );
+            my $thing = $class->insert( %{ $p } );
+            my $contact = $thing->contact();
 
             for my $email ( @{ $emails } )
             {
-                R2::Schema::EmailAddress->insert( %{ $email },
-                                                  contact_id => $contact->contact_id(),
-                                                );
+                $contact->add_email_address( %{ $email } );
             }
 
             for my $website ( @{ $websites } )
             {
-                R2::Schema::Website->insert( %{ $website },
-                                             contact_id => $contact->contact_id(),
-                                           );
+                $contact->add_website( %{ $website } );
             }
 
             for my $address ( @{ $addresses } )
             {
-                R2::Schema::Address->insert( %{ $address },
-                                             contact_id => $contact->contact_id(),
-                                           );
+                $contact->add_address( %{ $address } );
             }
 
             for my $number ( @{ $phone_numbers } )
             {
-                R2::Schema::PhoneNumber->insert( %{ $number },
-                                                 contact_id => $contact->contact_id(),
-                                               );
+                $contact->add_phone_number( %{ $number } );
             }
 
             if ($members)
@@ -252,7 +245,7 @@ sub _make_insert_sub
                 }
             }
 
-            return $contact;
+            return $thing;
         };
 }
 

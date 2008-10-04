@@ -248,6 +248,50 @@ sub add_donation
             );
 }
 
+sub add_email_address
+{
+    my $self = shift;
+
+    return
+        R2::Schema::EmailAddress->insert
+            ( contact_id => $self->contact_id(),
+              @_,
+            );
+}
+
+sub add_website
+{
+    my $self = shift;
+
+    return
+        R2::Schema::Website->insert
+            ( contact_id => $self->contact_id(),
+              @_,
+            );
+}
+
+sub add_address
+{
+    my $self = shift;
+
+    return
+        R2::Schema::Address->insert
+            ( contact_id => $self->contact_id(),
+              @_,
+            );
+}
+
+sub add_phone_number
+{
+    my $self = shift;
+
+    return
+        R2::Schema::PhoneNumber->insert
+            ( contact_id => $self->contact_id(),
+              @_,
+            );
+}
+
 sub _base_uri_path
 {
     my $self = shift;
