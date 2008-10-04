@@ -108,7 +108,6 @@ sub _contact_view_tabs
     return [ map { R2::Web::Tab->new( %{ $_ } ) }
              { uri         => $contact->uri(),
                label       => 'basics',
-               is_selected => 1,
              },
              { uri   => $contact->uri( view => 'history' ),
                label => 'history',
@@ -127,6 +126,8 @@ sub contact_GET_html : Private
     my $c    = shift;
 
     my $contact = $c->stash()->{contact};
+
+    $c->stash()->{tabs}[0]->is_selected(1);
 
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
@@ -170,6 +171,8 @@ sub donations_GET_html : Private
     my $c    = shift;
 
     $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
+
+    $c->stash()->{tabs}[2]->is_selected(1);
 
     $c->stash()->{template} = '/contact/donations';
 }

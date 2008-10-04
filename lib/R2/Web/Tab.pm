@@ -20,7 +20,7 @@ has 'label' =>
     );
 
 has 'is_selected' =>
-    ( is      => 'ro',
+    ( is      => 'rw',
       isa     => 'Bool',
       default => 0,
     );
