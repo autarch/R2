@@ -110,13 +110,17 @@ sub _contact_view_tabs
                label   => 'basics',
                tooltip => 'Name, email, address, phone, etc.',
              },
-             { uri     => $contact->uri( view => 'history' ),
-               label   => 'history',
-               tooltip => q{What's new with this contact. Changes to their info, meetings, emails, etc.},
-             },
              { uri     => $contact->uri( view => 'donations' ),
                label   => 'donations',
                tooltip => 'Donations from this contact',
+             },
+             { uri     => $contact->uri( view => 'interactions' ),
+               label   => 'interactions',
+               tooltip => 'Email, meetings, phone calls, etc.',
+             },
+             { uri     => $contact->uri( view => 'history' ),
+               label   => 'history',
+               tooltip => 'Changes to contact data made via this system',
              },
            ];
 }
@@ -175,7 +179,7 @@ sub donations_GET_html : Private
 
     $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
 
-    $c->stash()->{tabs}[2]->is_selected(1);
+    $c->stash()->{tabs}[0]->is_selected(1);
 
     $c->stash()->{template} = '/contact/donations';
 }
