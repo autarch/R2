@@ -19,6 +19,12 @@ has 'label' =>
       required => 1,
     );
 
+has 'tooltip' =>
+    ( is       => 'ro',
+      isa      => 'Str',
+      required => 1,
+    );
+
 has 'is_selected' =>
     ( is      => 'rw',
       isa     => 'Bool',

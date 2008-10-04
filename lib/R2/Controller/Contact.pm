@@ -106,14 +106,17 @@ sub _contact_view_tabs
     my $contact = shift;
 
     return [ map { R2::Web::Tab->new( %{ $_ } ) }
-             { uri         => $contact->uri(),
-               label       => 'basics',
+             { uri     => $contact->uri(),
+               label   => 'basics',
+               tooltip => 'Name, email, address, phone, etc.',
              },
-             { uri   => $contact->uri( view => 'history' ),
-               label => 'history',
+             { uri     => $contact->uri( view => 'history' ),
+               label   => 'history',
+               tooltip => q{What's new with this contact. Changes to their info, meetings, emails, etc.},
              },
-             { uri   => $contact->uri( view => 'donations' ),
-               label => 'donations',
+             { uri     => $contact->uri( view => 'donations' ),
+               label   => 'donations',
+               tooltip => 'Donations from this contact',
              },
            ];
 }
