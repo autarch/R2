@@ -1,0 +1,22 @@
+<h2>Phone <% PL_N( 'Number', scalar @phone_numbers ) %></h2>
+
+<p>
+% if ( $contact->allows_phone() ) {
+Is ok with being called.
+% } else {
+Does not want to receive phone calls.
+% }
+</p>
+
+% for my $number (@phone_numbers) {
+<& /lib/contact-view/phone-number.mas, phone_number => $number &>
+% }
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my @phone_numbers = $contact->phone_numbers()->all()
+    or return;
+</%init>

@@ -16,6 +16,14 @@
 % }
 </ul>
 
+<p>
+% if ( $contact->allows_email() ) {
+Is ok with being emailed via Rapport.
+% } else {
+Does not want to be emailed via Rapport.
+% }
+</p>
+
 <%args>
 $contact
 </%args>

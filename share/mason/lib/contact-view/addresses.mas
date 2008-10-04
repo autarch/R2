@@ -1,0 +1,22 @@
+<h2><% PL_N( 'Address', scalar @addresses ) %></h2>
+
+<p>
+% if ( $contact->allows_mail() ) {
+Is ok with getting mail.
+% } else {
+Does not want to receive mail.
+% }
+</p>
+
+% for my $address (@addresses) {
+<& /lib/contact-view/address.mas, address => $address &>
+% }
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my @addresses = $contact->addresses()->all()
+    or return;
+</%init>

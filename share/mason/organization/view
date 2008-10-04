@@ -1,60 +1,18 @@
-<& /lib/contact-view/summary.mas, contact => $organization &>
+<& /lib/contact-view/summary.mas, contact => $household &>
 
-<& /lib/contact-view/members.mas, contact => $organization &>
+<& /lib/contact-view/members.mas, contact => $household &>
 
-<p>
-% if ( $organization->allows_email() ) {
-Is ok with being emailed via Rapport.
-% } else {
-Does not want to be emailed via Rapport.
-% }
-</p>
+<& /lib/contact-view/email-addresses.mas, contact => $household &>
 
-<& /lib/contact-view/email-addresses.mas, contact => $organization &>
+<& /lib/contact-view/websites.mas, contact => $household &>
 
-<& /lib/contact-view/websites.mas, contact => $organization &>
+<& /lib/contact-view/phone-numbers.mas, contact => $household &>
 
-<p>
-% if ( $organization->allows_mail() ) {
-Is ok with getting snail mail.
-% } else {
-Does not want to receive snail mail.
-% }
-</p>
-
-% if (@addresses) {
-<h2><% PL_N( 'Address', scalar @addresses ) %></h2>
-
-%   for my $address (@addresses) {
-<& /lib/contact-view/address.mas, address => $address &>
-%   }
-% }
-
-<p>
-% if ( $organization->allows_phone() ) {
-Is ok with being called.
-% } else {
-Does not want to receive phone calls.
-% }
-</p>
-
-% if (@phone_numbers) {
-<h2>Phone <% PL_N( 'Number', scalar @phone_numbers ) %></h2>
-
-%   for my $number (@phone_numbers) {
-<& /lib/contact-view/phone-number.mas, phone_number => $number &>
-%   }
-% }
+<& /lib/contact-view/addresses.mas, contact => $household &>
 
 <%args>
 $organization
 </%args>
-
-<%init>
-my @addresses = $organization->addresses()->all();
-
-my @phone_numbers = $organization->phone_numbers()->all();
-</%init>
 
 <%method title>
 <% $organization->name() %>
