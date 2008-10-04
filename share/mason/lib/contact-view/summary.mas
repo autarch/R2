@@ -5,9 +5,9 @@
 % if ( $contact->is_person() ) {
     <& .gender-icon, gender => $contact->gender() &>
 % } elsif ( $contact->is_household() ) {
-    <img src="/images/icons/household.png" title="organization" height="16" width="16" />
+    <img src="/images/icons/household.png" title="Household" height="16" width="16" />
 % } else {
-    <img src="/images/icons/organization.png" title="organization" height="16" width="16" />
+    <img src="/images/icons/organization.png" title="Organization" height="16" width="16" />
 % }
 
 % if ($image ) {
