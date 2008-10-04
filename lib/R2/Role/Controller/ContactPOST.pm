@@ -241,7 +241,7 @@ sub _make_insert_sub
             {
                 for my $member ( @{ $members } )
                 {
-                    $contact->add_member( %{ $member } );
+                    $thing->add_member( %{ $member } );
                 }
             }
 

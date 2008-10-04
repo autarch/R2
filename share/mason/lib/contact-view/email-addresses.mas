@@ -1,3 +1,5 @@
+<h2>Email <% PL_N( 'Address', scalar @emails ) %></h2>
+
 <ul>
 % for my $email (@emails) {
   <li>
@@ -29,7 +31,6 @@ $contact
 </%args>
 
 <%init>
-my @emails = $contact->email_addresses()->all();
-
-return unless @emails;
+my @emails = $contact->email_addresses()->all()
+    or return;
 </%init>

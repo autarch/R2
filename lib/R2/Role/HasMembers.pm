@@ -17,6 +17,12 @@ has 'members' =>
       lazy_build => 1,
     );
 
+has 'member_count' =>
+    ( is         => 'ro',
+      isa        => 'Int',
+      lazy_build => 1,
+    );
+
 
 sub add_member
 {
@@ -63,6 +69,17 @@ sub _build_members
             );
 }
 
+sub _build_member_count
+{
+    my $self = shift;
+
+    my $select = $self->_MemberCount();
+
+    my $dbh = $self->_dbh($select);
+
+    return $dbh->selectrow_arrayref( $select->sql($dbh), {}, $self->_pk_vals() )->[0];
+}
+
 # Can't have class attributes in a role yet
 {
     my %MembersSelect;
@@ -83,6 +100,17 @@ sub _build_members
         my $class = ref $_[0] || $_[0];
 
         return $MemberInsert{$class} ||= $class->_BuildMemberInsert();
+    }
+}
+
+{
+    my %MemberCount;
+
+    sub _MemberCount
+    {
+        my $class = ref $_[0] || $_[0];
+
+        return $MemberCount{$class} ||= $class->_BuildMemberCount();
     }
 }
 
@@ -140,6 +168,28 @@ sub _BuildMemberInsert
                    );
 
     return $insert;
+}
+
+sub _BuildMemberCount
+{
+    my $class = shift;
+
+    my $schema = R2::Schema->Schema();
+
+    my $ph = Fey::Placeholder->new();
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    $select->select( Fey::Literal::Function->new( 'COUNT', '*' ) )
+           ->from( $class->_MembershipTable() );
+
+    for my $col ( @{ $class->Table()->primary_key() } )
+    {
+        $select->where( $class->_MembershipTable()->column( $col->name() ),
+                        '=', $ph );
+    }
+
+    return $select;
 }
 
 no Moose::Role;

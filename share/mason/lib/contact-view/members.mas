@@ -1,6 +1,8 @@
+<h2><% PL_N( 'Member', $contact->member_count() ) %></h2>
+
 <ul>
 % while ( my ( $person, $membership ) = $members->next() ) {
-  <li><a href="<% $person->contact()->uri() ) %>"
+  <li><a href="<% $person->contact()->uri() %>"
          title="View <% $person->full_name() %>"
          ><% $person->full_name() %></a>
 %   if ( my $pos = $membership->position() ) {
