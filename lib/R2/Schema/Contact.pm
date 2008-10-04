@@ -15,6 +15,7 @@ use R2::Schema::Website;
 use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems
+#use R2::Schema::Donation;
 #use R2::Schema::Household;
 #use R2::Schema::Organization;
 #use R2::Schema::Person;
@@ -234,6 +235,17 @@ sub _build_real_contact
         warn "$type - $is\n";
         return $self->$type() if $self->$is();
     }
+}
+
+sub add_donation
+{
+    my $self = shift;
+
+    return
+        R2::Schema::Donation->insert
+            ( contact_id => $self->contact_id(),
+              @_,
+            );
 }
 
 sub _base_uri_path

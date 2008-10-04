@@ -189,10 +189,7 @@ sub donations_POST : Private
 
     eval
     {
-        R2::Schema::Donation->insert
-            ( contact_id => $contact->contact_id(),
-              %p,
-            );
+        $contact->add_donation(%p);
     };
 
     if ( my $e = $@ )
