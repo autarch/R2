@@ -125,6 +125,50 @@ body {
     color: #666;
 }
 
+#contact-image {
+    margin-left: 0.5em;
+    vertical-align: top;
+}
+
+.address-notes, .phone-number-notes {
+    font-style: italic;
+}
+
+/* === Tables === */
+
+table.standard-table {
+    width: 100%;
+}
+
+table.standard-table th,
+table.standard-table td {
+    border: none;
+}
+
+table.standard-table thead tr {
+    background-color: #A1BA6C;
+    color: white;
+}
+
+table.standard-table th {
+    text-align: left;
+}
+
+table.standard-table tr.even {
+    background-color: #F6FFE4;
+}
+
+table.standard-table tr.notes {
+    font-style: italic;
+    font-size: 90%;
+}
+
+table.standard-table tr.notes td {
+    padding-top: 0;
+}
+
+/* === Forms === */
+
 fieldset {
     border-top: 1px solid #A1BA6C;
     padding: 0.5em;
@@ -371,13 +415,4 @@ input.submit {
 #member-search-results-table td.button,
 #member-search-selected-table td.button {
     width: 7em;
-}
-
-#contact-image {
-    margin-left: 0.5em;
-    vertical-align: top;
-}
-
-.address-notes, .phone-number-notes {
-    font-style: italic;
 }

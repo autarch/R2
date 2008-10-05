@@ -1,7 +1,7 @@
 <& /lib/contact-view/summary.mas, contact => $real_contact &>
 
 % if ( $contact->donation_count() ) {
-<table>
+<table class="standard-table">
   <thead>
     <tr>
       <th>Date</th>
@@ -9,17 +9,24 @@
       <th>Source</th>
       <th>Target</th>
       <th>Payment Type</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
 %   while ( my $donation = $donations->next() ) {
-    <tr>
+    <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
       <td><% $donation->amount() %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->target()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
+      <td>buttons</td>
     </tr>
+%      if ( my $notes = $donation->notes() ) {
+    <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> notes">
+      <td colspan="6"><% $donation->notes() %></td>
+    </tr>
+%      }
 %   }
   </tbody>
 </table>
@@ -85,7 +92,7 @@ This <% lc $contact->contact_type() %> has not made any donations.
 
     <div class="form-item">
       <label class="for-field" for="note">Notes:</label>
-      <textarea class="short wide"></textarea>
+      <textarea name="notes" class="short wide"></textarea>
     </div>
 
   </fieldset>
