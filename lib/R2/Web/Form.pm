@@ -213,7 +213,7 @@ sub _form_html_from_dom
 
     my $form = $self->_dom()->getElementsByTagName('form')->[0];
 
-    return $form->as_HTML( undef, q{  }, {} );
+    return $form->as_HTML( undef, q{}, {} );
 }
 
 # This bizarro bit seems to fix some tests. Sigh ...
