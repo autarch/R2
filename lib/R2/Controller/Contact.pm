@@ -179,7 +179,7 @@ sub donations_GET_html : Private
 
     $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
 
-    $c->stash()->{tabs}[0]->is_selected(1);
+    $c->stash()->{tabs}[1]->is_selected(1);
 
     $c->stash()->{template} = '/contact/donations';
 }
