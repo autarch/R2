@@ -60,8 +60,11 @@ R2.FormWithMemberSearch._onSearchSubmit = function () {
     R2.Utils.cleanNode( R2.FormWithMemberSearch.results, [ "member-search-results-close" ] );
     R2.FormWithMemberSearch.results.appendChild( document.createTextNode("Searching ...") );
 
-    R2.FormWithMemberSearch.results.style.opacity = 1;
+    R2.FormWithMemberSearch.results.style.opacity = 0;
     DOM.Element.show( R2.FormWithMemberSearch.results );
+
+    Animation.Fade.fade( { "elementId":     R2.FormWithMemberSearch.results.id,
+                           "targetOpacity": 1 } );
 };
 
 R2.FormWithMemberSearch._populateResults = function (results) {
