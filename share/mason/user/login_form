@@ -18,22 +18,6 @@
   </fieldset>
 
   <fieldset>
-
-    <legend>Or your OpenID</legend>
-
-    <div class="form-item">
-      <label class="for-field" for="openid_url">OpenID URL:</label>
-      <input id="openid_url" class="text medium" type="text" name="openid_uri" value="" size="40" />
-      <div class="help-text">
-        <p>
-          Learn more <a href="http://openid.net/">about OpenID</a>.
-        </p>
-      </div>
-     </div>
-
-  </fieldset>
-
-  <fieldset>
     <legend>Log In</legend>
 
     <div class="form-item">
