@@ -1,5 +1,13 @@
 <h2>Email <% PL_N( 'Address', scalar @emails ) %></h2>
 
+<p>
+% if ( $contact->allows_email() ) {
+Is ok with being emailed via Rapport.
+% } else {
+Does not want to be emailed via Rapport.
+% }
+</p>
+
 <ul>
 % for my $email (@emails) {
   <li>
@@ -17,14 +25,6 @@
   </li>
 % }
 </ul>
-
-<p>
-% if ( $contact->allows_email() ) {
-Is ok with being emailed via Rapport.
-% } else {
-Does not want to be emailed via Rapport.
-% }
-</p>
 
 <%args>
 $contact
