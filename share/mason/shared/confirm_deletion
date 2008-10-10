@@ -1,0 +1,23 @@
+<h1>Delete this <% $type %>?</h1>
+
+<p>
+Are you sure you want to delete this <% $type %>?
+</p>
+
+<form action="<% $uri %>" method="post">
+  <input type="hidden" name="x-tunneled-method" value="DELETE" />
+
+  <input type="submit" class="submit" value="Delete" />
+</form>
+
+<%args>
+$type
+$uri
+</%args>
+
+<%method title>
+Delete this <% $type %>?
+<%args>
+$type
+</%args>
+</%method>

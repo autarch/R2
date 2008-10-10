@@ -210,8 +210,6 @@ sub donations_POST : Private
     my %p = $c->request()->donation_params();
     $p{date_format} = $c->request()->params()->{date_format};
 
-    my $contact = $c->stash()->{contact};
-
     eval
     {
         $contact->add_donation(%p);
@@ -260,8 +258,6 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
             );
     }
 
-    $c->stash()->{tabs}[1]->is_selected(1);
-
     $c->stash()->{template} = '/donation/edit_form';
 }
 
@@ -304,6 +300,68 @@ sub donation_PUT
     }
 
     $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
+}
+
+sub donation_DELETE
+{
+    my $self        = shift;
+    my $c           = shift;
+
+    my $account = $c->user()->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to delete donations',
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
+    my $donation = $c->stash()->{donation};
+
+    eval
+    {
+        $donation->delete();
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
+}
+
+sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_deletion') : Args(0)
+{
+    my $self        = shift;
+    my $c           = shift;
+
+    my $account = $c->user()->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to delete donations',
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
+    my $donation = $c->stash()->{donation};
+
+    $c->stash()->{type} = 'donation';
+    $c->stash()->{uri} = $donation->uri();
+
+    $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
 1;
