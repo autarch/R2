@@ -9,8 +9,10 @@
       <th>Source</th>
       <th>Target</th>
       <th>Payment Type</th>
+%   if ($can_edit_donations) {
       <th></th>
       <th></th>
+%   }
     </tr>
   </thead>
   <tbody>
@@ -21,12 +23,18 @@
       <td><% $donation->source()->name() %></td>
       <td><% $donation->target()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
+%     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
-      <td><button>Delete</button></td>
+      <td>
+        <form class="inline" action="<% $donation->uri( view => 'confirm_deletion' ) %>" method="GET">
+          <input type="submit" class="submit" value="Delete" />
+        </form>
+      </td>
+%     }
     </tr>
 %      if ( my $notes = $donation->notes() ) {
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> notes">
-      <td colspan="7"><% $donation->notes() %></td>
+      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% $donation->notes() %></td>
     </tr>
 %      }
 %   }
@@ -38,11 +46,14 @@ This <% lc $contact->contact_type() %> has not made any donations.
 </p>
 % }
 
+% if ($can_edit_donations) {
 <& /lib/form/donation.mas, contact => $contact &>
+% }
 
 <%args>
 $contact
 $real_contact
+$can_edit_donations
 </%args>
 
 <%init>

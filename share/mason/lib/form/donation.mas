@@ -1,5 +1,9 @@
 <&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date' ] &>
-<form action="<% $contact->uri( view => 'donations' ) %>" method="post">
+<form action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>" method="post">
+% if ($donation) {
+  <input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
   <fieldset>
     <legend>Add a new donation</legend>
 

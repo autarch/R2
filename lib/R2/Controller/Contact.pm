@@ -181,6 +181,11 @@ sub donations_GET_html : Private
 
     $c->stash()->{tabs}[1]->is_selected(1);
 
+    $c->stash()->{can_edit_donations} =
+        $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                   contact => $c->stash()->{contact},
+                                                 );
+
     $c->stash()->{template} = '/contact/donations';
 }
 
@@ -188,6 +193,19 @@ sub donations_POST : Private
 {
     my $self = shift;
     my $c    = shift;
+
+    my $account = $c->user()->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to add donations',
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
 
     my %p = $c->request()->donation_params();
     $p{date_format} = $c->request()->params()->{date_format};
@@ -229,9 +247,63 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
     my $self        = shift;
     my $c           = shift;
 
+    my $account = $c->user()->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to edit donations',
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
     $c->stash()->{tabs}[1]->is_selected(1);
 
     $c->stash()->{template} = '/donation/edit_form';
+}
+
+sub donation : Chained('_set_donation') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub donation_PUT
+{
+    my $self        = shift;
+    my $c           = shift;
+
+    my $account = $c->user()->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to edit donations',
+              uri   => $contact->uri( view => 'donations' ),
+            );
+    }
+
+    my %p = $c->request()->donation_params();
+    $p{date_format} = $c->request()->params()->{date_format};
+
+    my $donation = $c->stash()->{donation};
+
+    eval
+    {
+        $donation->update(%p);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $donation->uri( view => 'edit_form' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
 }
 
 1;
