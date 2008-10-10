@@ -19,6 +19,8 @@ system( "$FindBin::Bin/rebuild-schema" )
 {
     make_config_file();
 
+    make_roles();
+
     make_countries();
 
     make_time_zones();
@@ -41,6 +43,15 @@ sub make_config_file
     close $fh;
 }
 
+sub make_roles
+{
+    require R2::Schema::Role;
+
+    for my $role ( qw( Member Editor Admin ) )
+    {
+        R2::Schema::Role->$role();
+    }
+}
 
 sub make_countries
 {
