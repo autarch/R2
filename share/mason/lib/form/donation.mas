@@ -1,0 +1,78 @@
+<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date' ] &>
+<form action="<% $contact->uri( view => 'donations' ) %>" method="post">
+  <fieldset>
+    <legend>Add a new donation</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="amount">Amount:</label>
+      <input type="text" class="text narrow" name="amount" id="amount" />
+      <div class="help-text">
+        <p>
+          Enter an amount in dollars and cents (50, 9.22).
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="donation_date">Date:</label>
+      <input type="text" class="text narrow" name="donation_date" id="donation_date"
+             value="<% $c->user()->format_date( $donation ? $donation->donation_date() : DateTime->now( time_zone => $c->user()->timezone() ) ) %>" />
+      <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
+      <div class="help-text">
+        <p>
+          <% $c->user()->date_format() %>
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="source">Source:</label>
+      <select name="donation_source_id">
+% while ( my $source = $sources->next() ) {
+        <option value="<% $source->donation_source_id() %>"><% $source->name() %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="target">Target:</label>
+      <select name="donation_target_id">
+% while ( my $target = $targets->next() ) {
+        <option value="<% $target->donation_target_id() %>"><% $target->name() %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="payment_type">Payment Type:</label>
+      <select name="payment_type_id">
+% while ( my $type = $payment_types->next() ) {
+        <option value="<% $type->payment_type_id() %>"><% $type->name() %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="note">Notes:</label>
+      <textarea name="notes" class="short wide"></textarea>
+    </div>
+
+  </fieldset>
+    
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$contact
+$donation => undef
+</%args>
+
+<%init>
+my $sources = $c->user()->account()->donation_sources();
+my $targets = $c->user()->account()->donation_targets();
+my $payment_types = $c->user()->account()->payment_types();
+</%init>

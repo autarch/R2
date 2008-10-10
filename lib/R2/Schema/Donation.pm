@@ -14,7 +14,7 @@ use Scalar::Util qw( looks_like_number );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
 
 {
@@ -102,6 +102,13 @@ sub _valid_donation_date
         unless $dt;
 
     return;
+}
+
+sub _base_uri_path
+{
+    my $self = shift;
+
+    return $self->contact()->_base_uri_path() . '/donation/' . $self->donation_id();
 }
 
 no Fey::ORM::Table;

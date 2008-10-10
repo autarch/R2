@@ -17,6 +17,12 @@ has 'html' =>
       required => 1,
     );
 
+has 'exclude' =>
+    ( is      => 'ro',
+      isa     => 'ArrayRef[Str]',
+      default => sub { [] },
+    );
+
 has '_dom' =>
     ( is      => 'rw',
       isa     => 'HTML::DOM',
@@ -159,7 +165,8 @@ sub _fill_form_data
 
     my $html = $self->_form_html_from_dom();
 
-    my $filled = HTML::FillInForm->fill( \$html, $data );
+    my $filled =
+        HTML::FillInForm->fill( \$html, $data, ignore_fields => $self->exclude() );
 
     my $dom = HTML::DOM->new();
     $dom->write($filled);

@@ -98,6 +98,8 @@ sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
     $c->stash()->{tabs} = $self->_contact_view_tabs($contact);
 
     $c->stash()->{contact} = $contact;
+
+    $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
 }
 
 sub _contact_view_tabs
@@ -177,8 +179,6 @@ sub donations_GET_html : Private
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
-
     $c->stash()->{tabs}[1]->is_selected(1);
 
     $c->stash()->{template} = '/contact/donations';
@@ -208,6 +208,30 @@ sub donations_POST : Private
     }
 
     $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
+}
+
+sub _set_donation : Chained('_set_contact') : PathPart('donation') : CaptureArgs(1)
+{
+    my $self        = shift;
+    my $c           = shift;
+    my $donation_id = shift;
+
+    my $donation = R2::Schema::Donation->new( donation_id => $donation_id );
+
+    $c->redirect_and_detach('/')
+        unless $donation && $donation->contact_id() == $c->stash()->{contact}->contact_id();
+
+    $c->stash()->{donation} = $donation;
+}
+
+sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args(0)
+{
+    my $self        = shift;
+    my $c           = shift;
+
+    $c->stash()->{tabs}[1]->is_selected(1);
+
+    $c->stash()->{template} = '/donation/edit_form';
 }
 
 1;
