@@ -53,6 +53,8 @@ has '_config_file' =>
       isa     => 'Path::Class::File',
       lazy    => 1,
       builder => '_build_config_file',
+      # for testing
+      clearer => '_clear_config_file',
     );
 
 has 'catalyst_imports' =>

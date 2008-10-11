@@ -70,6 +70,7 @@ EOF
 
     local $ENV{R2_CONFIG} = $file->stringify();
 
+    $config->_clear_config_file();
     $config->_clear_config_hash();
 
     is_deeply( $config->dbi_config(),
