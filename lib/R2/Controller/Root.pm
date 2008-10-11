@@ -12,12 +12,12 @@ __PACKAGE__->config()->{namespace} = '';
 
 
 
-sub dashboard : Path('/') : Args(0)
+sub root : Path('/') : Args(0)
 {
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{template} = '/dashboard';
+    $c->redirect_and_detach( $c->user()->account()->uri() );
 }
 
 sub exit : Path('/exit') : Args(0)

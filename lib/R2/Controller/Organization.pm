@@ -28,7 +28,7 @@ sub organization_POST
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $account->dashboard_uri(),
+              uri   => $account->uri(),
             );
     }
 

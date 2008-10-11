@@ -2,9 +2,9 @@
     <ul id="global-nav">
 % if ( $c->user() ) {
 %   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->user()->account() ) ) {
-      <li><a href="<% $c->user()->account()->uri() %>" title="Account settings">Account</a></li>
+      <li><a href="<% $c->user()->account()->uri( view => 'settings' ) %>" title="Account settings">Account</a></li>
 %   }
-      <li><a href="<% $c->user()->uri( view => 'settings') %>" title="Application settings">Settings</a></li>
+      <li><a href="<% $c->user()->uri( view => 'preferences') %>" title="Your application prefences">Prefs</a></li>
       <li><a href="<% $c->domain()->application_uri
                           ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
              title="Log Out of Rapport">Log Out</a></li>

@@ -3,6 +3,8 @@ package R2::Controller::Account;
 use strict;
 use warnings;
 
+use R2::URI qw( dynamic_uri );
+
 use base 'R2::Controller::Base';
 
 
@@ -23,7 +25,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this account',
-              uri   => $account->dashboard_uri(),
+              uri   => dynamic_uri( path => '/' ),
             );
     }
 
@@ -37,8 +39,9 @@ sub account_GET_html : Private
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{template} = '/account/view';
+    $c->stash()->{template} = '/dashboard';
 }
+
 sub account_PUT : Private
 {
     my $self = shift;
@@ -65,6 +68,8 @@ sub account_PUT : Private
 
     $c->redirect_and_detach( $account->uri() );
 }
+
+sub settings : Chained('_set_account') : PathPart('settings') : Args(0) { }
 
 sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) { }
 

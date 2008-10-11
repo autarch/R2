@@ -27,7 +27,7 @@ sub new_person_form : Local
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $account->dashboard_uri(),
+              uri   => $account->uri(),
             );
     }
 
@@ -47,7 +47,7 @@ sub new_household_form : Local
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $account->dashboard_uri(),
+              uri   => $account->uri(),
             );
     }
 
@@ -67,14 +67,14 @@ sub new_organization_form : Local
     {
         $c->_redirect_with_error
             ( error => 'You are not allowed to add contacts',
-              uri   => $account->dashboard_uri(),
+              uri   => $account->uri(),
             );
     }
 
     $c->stash()->{template} = '/organization/new_organization_form';
 }
 
-sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
+sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : CaptureArgs(1)
 {
     my $self       = shift;
     my $c          = shift;
@@ -91,7 +91,7 @@ sub _set_contact : Chained('/') : PathPart('contact') : CaptureArgs(1)
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this contact',
-              uri   => $c->user()->account()->dashboard_uri(),
+              uri   => $c->user()->account()->uri(),
             );
     }
 

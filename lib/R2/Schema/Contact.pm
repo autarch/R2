@@ -296,7 +296,7 @@ sub _base_uri_path
 {
     my $self = shift;
 
-    return '/contact/' . $self->contact_id();
+    return '/account/' . $self->account_id() . '/contact/' . $self->contact_id();
 }
 
 no Fey::ORM::Table;

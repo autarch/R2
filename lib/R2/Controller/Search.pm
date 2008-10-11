@@ -8,7 +8,7 @@ use base 'R2::Controller::Base';
 use R2::Search::Contact;
 
 
-sub contact : Local
+sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Args(0)
 {
     my $self = shift;
     my $c    = shift;

@@ -564,13 +564,6 @@ sub _AddSQLMethods
     }
 }
 
-sub dashboard_uri
-{
-    my $self = shift;
-
-    return $self->_dynamic_uri( path => '/', @_ );
-}
-
 sub _base_uri_path
 {
     my $self = shift;
