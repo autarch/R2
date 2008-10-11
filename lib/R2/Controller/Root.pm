@@ -17,7 +17,7 @@ sub root : Path('/') : Args(0)
     my $self = shift;
     my $c    = shift;
 
-    $c->redirect_and_detach( $c->user()->account()->uri() );
+    $c->redirect_and_detach( $c->account()->uri() );
 }
 
 sub exit : Path('/exit') : Args(0)

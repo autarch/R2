@@ -197,6 +197,7 @@ sub _build_config_file
 {
     my @StandardImports =
         qw( AuthenCookie
+            +R2::Plugin::Account
             +R2::Plugin::Domain
             +R2::Plugin::User
             +R2::Plugin::ErrorHandling

@@ -76,7 +76,7 @@ $donation => undef
 </%args>
 
 <%init>
-my $sources = $c->user()->account()->donation_sources();
-my $targets = $c->user()->account()->donation_targets();
-my $payment_types = $c->user()->account()->payment_types();
+my $sources = $c->account()->donation_sources();
+my $targets = $c->account()->donation_targets();
+my $payment_types = $c->account()->payment_types();
 </%init>

@@ -14,7 +14,7 @@ sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Ar
     my $c    = shift;
 
     $c->stash()->{search} =
-        R2::Search::Contact->new( account => $c->user()->account(),
+        R2::Search::Contact->new( account => $c->account(),
                                   limit   => 20,
                                   page    => 1,
                                 );

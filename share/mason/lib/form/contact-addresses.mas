@@ -69,7 +69,7 @@ $contact_type
 
 <%init>
 my $meth = $contact_type . '_address_types';
-my @address_types = @{ $c->user()->account()->$meth() };
+my @address_types = @{ $c->account()->$meth() };
 
-my @countries = map { $_->[1] } $c->user()->account()->countries()->all();
+my @countries = map { $_->[1] } $c->account()->countries()->all();
 </%init>

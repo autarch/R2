@@ -19,7 +19,7 @@ sub new_person_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
 
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
                                                        account => $account,
@@ -39,7 +39,7 @@ sub new_household_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
 
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
                                                        account => $account,
@@ -59,7 +59,7 @@ sub new_organization_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
 
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
                                                        account => $account,
@@ -91,7 +91,7 @@ sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : Capt
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this contact',
-              uri   => $c->user()->account()->uri(),
+              uri   => $c->account()->uri(),
             );
     }
 
@@ -194,7 +194,7 @@ sub donations_POST : Private
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
     unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
@@ -245,7 +245,7 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
     my $self        = shift;
     my $c           = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
     unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
@@ -268,7 +268,7 @@ sub donation_PUT
     my $self        = shift;
     my $c           = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
     unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
@@ -307,7 +307,7 @@ sub donation_DELETE
     my $self        = shift;
     my $c           = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
     unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
@@ -343,7 +343,7 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     my $self        = shift;
     my $c           = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
     unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),

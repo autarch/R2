@@ -4,7 +4,7 @@
 
 <&| /lib/filter/form.mas &>
 <form class="JS-standard-form"
-      action="<% $c->domain()->application_uri( path => '/person' ) %>"
+      action="<% $c->account()->uri( view => 'person' ) %>"
       method="post"
       enctype="multipart/form-data">
 

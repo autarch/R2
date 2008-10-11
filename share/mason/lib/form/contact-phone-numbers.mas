@@ -37,5 +37,5 @@ $contact_type
 
 <%init>
 my $meth = $contact_type . '_phone_number_types';
-my @phone_number_types = @{ $c->user()->account()->$meth() };
+my @phone_number_types = @{ $c->account()->$meth() };
 </%init>

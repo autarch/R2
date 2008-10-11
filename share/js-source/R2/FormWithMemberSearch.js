@@ -23,6 +23,7 @@ R2.FormWithMemberSearch.instrumentForm = function () {
     }
 
     R2.FormWithMemberSearch.form = R2.Utils.firstParentWithTagName( search_div, "FORM" );
+    R2.FormWithMemberSearch.uri = $("member-search-uri").value;
     R2.FormWithMemberSearch.results = $("member-search-results");
     R2.FormWithMemberSearch.selected = $("member-search-selected");
 
@@ -46,7 +47,7 @@ R2.FormWithMemberSearch._instrumentResultsClose = function () {
 
 R2.FormWithMemberSearch._instrumentMemberSearch = function () {
     var search =
-        new R2.FormWidget.AjaxSearch( "/person",
+        new R2.FormWidget.AjaxSearch( R2.FormWithMemberSearch.uri,
                                       "member",
                                       R2.FormWithMemberSearch._onSearchSubmit,
                                       R2.FormWithMemberSearch._handleEmptySubmit,

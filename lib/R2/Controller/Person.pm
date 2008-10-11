@@ -18,7 +18,7 @@ BEGIN { extends 'R2::Controller::Base' }
 with 'R2::Role::Controller::ContactPOST';
 
 
-sub person : Path('') : ActionClass('+R2::Action::REST') { }
+sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) : ActionClass('+R2::Action::REST') { }
 
 sub person_GET
 {
@@ -30,7 +30,7 @@ sub person_GET
     my @people;
     if ( ! string_is_empty($name) )
     {
-        my $people = R2::Search::Person::ByName->new( account => $c->user()->account(),
+        my $people = R2::Search::Person::ByName->new( account => $c->account(),
                                                       name    => $name,
                                                     )->people();
 
@@ -53,7 +53,7 @@ sub person_POST
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
 
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
                                                        account => $account,
@@ -66,7 +66,7 @@ sub person_POST
     }
 
     my %p = $c->request()->person_params();
-    $p{account_id} = $c->user()->account_id();
+    $p{account_id} = $account->account_id();
     $p{date_format} = $c->request()->params()->{date_format};
 
     my @errors = R2::Schema::Person->ValidateForInsert(%p);

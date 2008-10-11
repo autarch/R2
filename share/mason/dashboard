@@ -15,12 +15,12 @@
 </ul>
 
 <%shared>
-my $title = 'Dashboard: ' . $c->user()->account()->name();
+my $title = 'Dashboard: ' . $c->account()->name();
 </%shared>
 
 <%init>
 my $user = $c->user();
-my $account = $user->account();
+my $account = $c->account();
 
 my $authz = $c->model('Authz');
 

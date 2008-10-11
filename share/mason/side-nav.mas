@@ -30,19 +30,19 @@
 
       <ul>
         <li>
-          <a href="<% $c->user()->account()->uri( view => 'search/contact' ) %>"
+          <a href="<% $account->uri( view => 'search/contact' ) %>"
              title="Add a new person">Contacts</a>
         </li>
         <li>
-          <a href="<% $c->user()->account()->uri( view => 'search/person' ) %>"
+          <a href="<% $account->uri( view => 'search/person' ) %>"
              title="Add a new person">People</a>
         </li>
         <li>
-          <a href="<% $c->user()->account()->uri( view => 'search/household' ) %>"
+          <a href="<% $account->uri( view => 'search/household' ) %>"
              title="Add a new household">Households</a>
         </li>
         <li>
-          <a href="<% $c->user()->account()->uri( view => 'search/organization' ) %>"
+          <a href="<% $account->uri( view => 'search/organization' ) %>"
              title="Add a new organization">Organizations</a>
         </li>
     </div>

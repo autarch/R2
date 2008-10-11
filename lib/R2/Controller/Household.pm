@@ -13,14 +13,14 @@ BEGIN { extends 'R2::Controller::Base' }
 with 'R2::Role::Controller::ContactPOST';
 
 
-sub household : Path('') : ActionClass('+R2::Action::REST') { }
+sub household : Chained('/account/_set_account') : PathPart('household') : Args(0) : ActionClass('+R2::Action::REST') { }
 
 sub household_POST
 {
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->user()->account();
+    my $account = $c->account();
 
     unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
                                                        account => $account,
@@ -33,7 +33,7 @@ sub household_POST
     }
 
     my %p = $c->request()->household_params();
-    $p{account_id} = $c->user()->account_id();
+    $p{account_id} = $account->account_id();
 
     my @errors = R2::Schema::Household->ValidateForInsert(%p);
 
