@@ -77,8 +77,8 @@ sub _build_uri_params
 
     my $scheme = $self->requires_ssl() ? 'https' : 'http';
 
-    return { schema => $scheme,
-             host   => $_[0]->web_hostname(),
+    return { scheme => $scheme,
+             host   => $self->web_hostname(),
            };
 }
 
@@ -102,6 +102,7 @@ sub application_uri
     return $self->_make_uri(%p);
 }
 
+sub domain { $_[0] }
 
 no Fey::ORM::Table;
 

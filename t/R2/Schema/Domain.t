@@ -20,7 +20,7 @@ mock_dbh();
                                     requires_ssl   => 0,
                                   );
 
-    is( $domain->uri( path => '/foo' ),
+    is( $domain->application_uri( path => '/foo', with_host => 1 ),
         'http://www.example.com/foo',
         'uri() for /foo' );
 }
@@ -32,7 +32,7 @@ mock_dbh();
                                     requires_ssl   => 1,
                                   );
 
-    is( $domain->uri( path => '/foo' ),
+    is( $domain->application_uri( path => '/foo', with_host => 1 ),
         'https://www.example.com/foo',
         'ssl uri() for /foo' );
 

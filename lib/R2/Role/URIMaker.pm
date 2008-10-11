@@ -58,7 +58,7 @@ sub _host_params_for_uri
 
     return unless $_[0];
 
-    return ( $self->domain()->uri_params() );
+    return %{ $self->domain()->uri_params() } ;
 }
 
 no Moose::Role;
