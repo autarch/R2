@@ -13,7 +13,7 @@ use URI::http;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator';
+with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
 
 
 {

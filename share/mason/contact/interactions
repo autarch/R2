@@ -1,0 +1,18 @@
+interact
+
+<%args>
+$contact
+$real_contact
+$can_edit_interactions
+</%args>
+
+<%init>
+my $interactions = $contact->interactions();
+</%init>
+
+<%method title>
+Interactions from <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>

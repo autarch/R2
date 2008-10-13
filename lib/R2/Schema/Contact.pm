@@ -15,6 +15,7 @@ use R2::Schema::Website;
 use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems
+#use R2::Schema::ContactInteraction;
 #use R2::Schema::Donation;
 #use R2::Schema::Household;
 #use R2::Schema::Organization;
@@ -24,8 +25,9 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
-
+with qw( R2::Role::DataValidator
+         R2::Role::URIMaker
+       );
 
 {
     my $schema = R2::Schema->Schema();
@@ -147,6 +149,25 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
           select      => __PACKAGE__->_BuildDonationCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
         );
+
+    has_many 'interactions' =>
+        ( table    => $schema->table('ContactInteraction'),
+          order_by => [ $schema->table('ContactInteraction')->column('interaction_datetime'),
+                        'DESC',
+                        $schema->table('ContactInteraction')->column('contact_interaction_type_id'),
+                        'ASC',
+                      ],
+          cache    => 1,
+        );
+
+    has 'interaction_count' =>
+        ( metaclass   => 'FromSelect',
+          is          => 'ro',
+          isa         => 'R2::Type::PosOrZeroInt',
+          lazy        => 1,
+          select      => __PACKAGE__->_BuildInteractionCountSelect(),
+          bind_params => sub { $_[0]->contact_id() },
+        );
 }
 
 sub _BuildPreferredEmailAddressSelect
@@ -220,6 +241,25 @@ sub _BuildDonationCountSelect
     $select->select($count)
            ->from( $schema->tables( 'Donation' ) )
            ->where( $schema->table('Donation')->column('contact_id'),
+                    '=', Fey::Placeholder->new() );
+
+    return $select;
+}
+
+sub _BuildInteractionCountSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $count =
+        Fey::Literal::Function->new( 'COUNT', $schema->table('ContactInteraction')->column('contact_id') );
+
+    $select->select($count)
+           ->from( $schema->tables( 'ContactInteraction' ) )
+           ->where( $schema->table('ContactInteraction')->column('contact_id'),
                     '=', Fey::Placeholder->new() );
 
     return $select;

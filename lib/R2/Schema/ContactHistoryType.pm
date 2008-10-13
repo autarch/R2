@@ -6,6 +6,8 @@ use warnings;
 use R2::Schema;
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
+
 
 {
     my $schema = R2::Schema->Schema();
@@ -31,102 +33,90 @@ use Fey::ORM::Table;
           select      => $select,
           bind_params => sub { $_[0]->contact_history_type_id() },
         );
-}
 
-sub CreateDefaultsForAccount
-{
-    my $class   = shift;
-    my $account = shift;
-
-    $class->insert( system_name       => 'modified',
-                    description       => 'Contact was modified',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'add_address',
-                    description       => 'A new address was added for the contact',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'delete_address',
-                    description       => 'An address for the contact was deleted',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'modify_address',
-                    description       => 'An address for the contact was modified',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'add_phone_number',
-                    description       => 'A new phone number was added for the contact',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'delete_phone_number',
-                    description       => 'A phone number for the contact was deleted',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'modify_phone_number',
-                    description       => 'A phone number for the contact was modified',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( system_name       => 'send_email',
-                    description       => 'An email was sent to this contact',
-                    is_system_defined => 1,
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( description       => 'Called this contact',
-                    account_id        => $account->account_id(),
-                  );
-
-    $class->insert( description       => 'Met with this contact',
-                    account_id        => $account->account_id(),
-                  );
-}
-
-around 'insert' => sub
-{
-    my $orig  = shift;
-    my $class = shift;
-    my %p     = @_;
-
-    $p{system_name} = $p{description}
-        unless exists $p{system_name};
-
-    return $class->$orig(%p);
-};
-
-around 'update' => sub
-{
-    my $orig = shift;
-    my $self = shift;
-    my %p    = @_;
-
-    if ( exists $p{description} )
+    for my $type ( __PACKAGE__->_Types() )
     {
-        $p{system_name} = $p{description}
-            unless $self->is_system_defined();
+        my $name = $type->{system_name};
+
+        class_has $name =>
+            ( is      => 'ro',
+              isa     => 'R2::Schema::ContactHistoryType',
+              lazy    => 1,
+              default => sub { __PACKAGE__->_CreateOrFindType($type) },
+            );
     }
+}
 
-    return $self->$orig(%p);
-};
-
-sub is_deleteable
+sub _CreateOrFindType
 {
-    my $self = shift;
+    my $class = shift;
+    my $type  = shift;
 
-    return ! $self->history_count();
+    my $obj = $class->new( system_name => $type->{system_name} );
+
+    $obj ||= $class->insert( %{ $type } );
+
+    return $obj;
+}
+
+sub _Types
+{
+    return ( { system_name       => 'Created',
+               description       => 'Contact was created',
+             },
+
+             { system_name       => 'Modified',
+               description       => 'Contact was modified',
+             },
+
+             { system_name       => 'AddEmailAddress',
+               description       => 'A new email address was added for the contact',
+             },
+
+             { system_name       => 'DeleteEmailAddress',
+               description       => 'An email address for the contact was deleted',
+             },
+
+             { system_name       => 'ModifyEmailAddress',
+               description       => 'An email address for the contact was modified',
+             },
+
+             { system_name       => 'AddWebsite',
+               description       => 'A new website was added for the contact',
+             },
+
+             { system_name       => 'DeleteWebsite',
+               description       => 'A website for the contact was deleted',
+             },
+
+             { system_name       => 'ModifyWebsite',
+               description       => 'A website for the contact was modified',
+             },
+
+             { system_name       => 'AddAddress',
+               description       => 'A new address was added for the contact',
+             },
+
+             { system_name       => 'DeleteAddress',
+               description       => 'An address for the contact was deleted',
+             },
+
+             { system_name       => 'ModifyAddress',
+               description       => 'An address for the contact was modified',
+             },
+
+             { system_name       => 'AddPhoneNumber',
+               description       => 'A new phone number was added for the contact',
+             },
+
+             { system_name       => 'DeletePhoneNumber',
+               description       => 'A phone number for the contact was deleted',
+             },
+
+             { system_name       => 'ModifyPhoneNumber',
+               description       => 'A phone number for the contact was modified',
+             },
+           );
 }
 
 no Fey::ORM::Table;

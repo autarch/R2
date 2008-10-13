@@ -21,6 +21,8 @@ system( "$FindBin::Bin/rebuild-schema" )
 
     make_roles();
 
+    make_history_types();
+
     make_countries();
 
     make_time_zones();
@@ -47,9 +49,21 @@ sub make_roles
 {
     require R2::Schema::Role;
 
-    for my $role ( qw( Member Editor Admin ) )
+    for my $attr ( R2::Schema::Role->meta()->get_all_class_attributes() )
     {
+        my $role = $attr->name();
         R2::Schema::Role->$role();
+    }
+}
+
+sub make_history_types
+{
+    require R2::Schema::ContactHistoryType;
+
+    for my $attr ( R2::Schema::ContactHistoryType->meta()->get_all_class_attributes() )
+    {
+        my $name = $attr->name();
+        R2::Schema::ContactHistoryType->$name();
     }
 }
 

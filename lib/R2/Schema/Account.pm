@@ -13,6 +13,7 @@ use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactHistoryType;
+use R2::Schema::ContactInteractionType;
 use R2::Schema::Country;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
@@ -124,7 +125,7 @@ sub _initialize
 
     R2::Schema::AddressType->CreateDefaultsForAccount($self);
 
-    R2::Schema::ContactHistoryType->CreateDefaultsForAccount($self);
+    R2::Schema::ContactInteractionType->CreateDefaultsForAccount($self);
 
     R2::Schema::DonationSource->CreateDefaultsForAccount($self);
 

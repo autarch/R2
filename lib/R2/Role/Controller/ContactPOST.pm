@@ -82,7 +82,7 @@ sub _get_addresses
     my $errors = shift;
 
     my $addresses = $c->request()->new_address_param_sets();
-
+    use Data::Dumper; warn Dumper \$addresses;
     for my $suffix ( keys %{ $addresses } )
     {
         my @e =
@@ -173,7 +173,8 @@ sub _insert_contact
     }
 
     my $insert_sub =
-        $self->_make_insert_sub( $class,
+        $self->_make_insert_sub( $c->user(),
+                                 $class,
                                  $p,
                                  $image,
                                  $emails,
@@ -189,6 +190,7 @@ sub _insert_contact
 sub _make_insert_sub
 {
     my $self          = shift;
+    my $user          = shift;
     my $class         = shift;
     my $p             = shift;
     my $image         = shift;
@@ -214,27 +216,27 @@ sub _make_insert_sub
                 $p->{image_file_id} = $file->file_id();
             }
 
-            my $thing = $class->insert( %{ $p } );
+            my $thing = $class->insert( %{ $p }, user => $user );
             my $contact = $thing->contact();
 
             for my $email ( @{ $emails } )
             {
-                $contact->add_email_address( %{ $email } );
+                $contact->add_email_address( %{ $email }, user => $user );
             }
 
             for my $website ( @{ $websites } )
             {
-                $contact->add_website( %{ $website } );
+                $contact->add_website( %{ $website }, user => $user );
             }
 
             for my $address ( @{ $addresses } )
             {
-                $contact->add_address( %{ $address } );
+                $contact->add_address( %{ $address }, user => $user );
             }
 
             for my $number ( @{ $phone_numbers } )
             {
-                $contact->add_phone_number( %{ $number } );
+                $contact->add_phone_number( %{ $number }, user => $user );
             }
 
             if ($members)

@@ -14,7 +14,7 @@ use Scalar::Util qw( blessed );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DVAAC';
+with qw( R2::Role::DVAAC );
 
 
 {

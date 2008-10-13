@@ -211,11 +211,32 @@ CREATE TABLE "ContactNote" (
        user_id            INT8               NOT NULL
 );
 
+CREATE TABLE "ContactInteraction" (
+       contact_interaction_id SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       contact_interaction_type_id  INT          NOT NULL,
+       user_id            INT8               NOT NULL,
+       notes              TEXT               NULL,
+       interaction_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "ContactInteractionType" (
+       contact_interaction_type_id  SERIAL       PRIMARY KEY,
+       system_name        VARCHAR(255)       NOT NULL,
+       description        VARCHAR(255)       NOT NULL,
+       is_system_defined  BOOLEAN            DEFAULT FALSE,
+       account_id         INT8               NOT NULL,
+       CONSTRAINT valid_description CHECK ( description != '' ),
+       CONSTRAINT system_name_account_id_ck UNIQUE ( system_name, account_id )
+);
+
 CREATE TABLE "ContactHistory" (
        contact_history_id SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
        contact_history_type_id  INT          NOT NULL,
        user_id            INT8               NOT NULL,
+       email_address_id   INT8               NULL,
+       website_id         INT8               NULL,
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
        notes              TEXT               NULL,
@@ -228,12 +249,9 @@ CREATE TABLE "ContactHistory" (
 
 CREATE TABLE "ContactHistoryType" (
        contact_history_type_id  SERIAL       PRIMARY KEY,
-       system_name        VARCHAR(255)       NOT NULL,
+       system_name        VARCHAR(255)       UNIQUE  NOT NULL,
        description        VARCHAR(255)       NOT NULL,
-       is_system_defined  BOOLEAN            DEFAULT FALSE,
-       account_id         INT8               NOT NULL,
-       CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT system_name_account_id_ck UNIQUE ( system_name, account_id )
+       CONSTRAINT valid_description CHECK ( description != '' )
 );
 
 CREATE TABLE "ContactTag" (
@@ -332,6 +350,7 @@ CREATE TABLE "Website" (
 -- Consider a trigger to enforce one primary address per contact?
 CREATE TABLE "Address" (
        address_id         SERIAL8            PRIMARY KEY,
+       contact_id         INTEGER            NOT NULL,
        address_type_id    INTEGER            NOT NULL,
        street_1           VARCHAR(255)       NOT NULL DEFAULT '',
        street_2           VARCHAR(255)       NULL,
@@ -346,8 +365,7 @@ CREATE TABLE "Address" (
        canonical_address  TEXT               NULL,
        is_preferred       BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       contact_id         INTEGER            NULL
+       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "AccountCountry" (
@@ -392,12 +410,12 @@ CREATE TABLE "AddressType" (
 -- Consider a trigger to enforce one primary phone number per contact?
 CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
+       contact_id         INTEGER            NOT NULL,
        phone_number_type_id   INT8           NOT NULL,
        phone_number       VARCHAR(30)        DEFAULT '',
        is_preferred       BOOLEAN            DEFAULT FALSE,
        notes              TEXT               NULL,
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       contact_id         INTEGER            NULL
+       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "PhoneNumberType" (
@@ -602,13 +620,25 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_address_id"
   FOREIGN KEY ("address_id") REFERENCES "Address" ("address_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "ContactHistoryType" ADD CONSTRAINT "ContactHistoryType_account_id"
-  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_phone_number_id"
   FOREIGN KEY ("phone_number_id") REFERENCES "PhoneNumber" ("phone_number_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_contact_interaction_type_id"
+  FOREIGN KEY ("contact_interaction_type_id") REFERENCES "ContactInteractionType" ("contact_interaction_type_id")
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "ContactInteractionType" ADD CONSTRAINT "ContactInteractionType_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")

@@ -364,4 +364,58 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
+sub interactions : Chained('_set_contact') : PathPart('interactions') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub interactions_GET_html : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{tabs}[2]->is_selected(1);
+
+    $c->stash()->{can_edit_interactions} =
+        $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                   contact => $c->stash()->{contact},
+                                                 );
+
+    $c->stash()->{template} = '/contact/interactions';
+}
+
+sub interactions_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to add interactions',
+              uri   => $contact->uri( view => 'interactions' ),
+            );
+    }
+
+    my %p = $c->request()->interaction_params();
+    $p{date_format} = $c->request()->params()->{date_format};
+
+    eval
+    {
+        $contact->add_interaction(%p);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $contact->uri( view => 'interactions' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'interactions' ) );
+}
+
 1;

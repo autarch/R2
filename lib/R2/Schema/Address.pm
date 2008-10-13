@@ -10,7 +10,7 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator';
+with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
 
 
 {
