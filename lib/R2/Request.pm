@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Catalyst::Request::REST::ForBrowsers';
 
+use List::MoreUtils qw( false );
 use R2::Util qw( string_is_empty );
 
 
@@ -295,7 +296,7 @@ sub new_address_param_sets
             $self->_params_for_classes( [ 'R2::Schema::Address' ], $suffix );
 
         # If it just has a type and country, we ignore it.
-        next unless keys %address > 2;
+        next unless ( false { string_is_empty } values %address ) > 2;
 
         $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
 
@@ -329,7 +330,7 @@ sub new_phone_number_param_sets
             $self->_params_for_classes( [ 'R2::Schema::PhoneNumber' ], $suffix );
 
         # If it just has a type, we ignore it.
-        next unless keys %number > 1;
+        next unless ( false { string_is_empty } values %number ) > 1;
 
         $number{is_preferred} = $params->{'phone_number_is_preferred'} eq $suffix ? 1 : 0;
 
