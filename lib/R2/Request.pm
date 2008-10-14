@@ -330,7 +330,7 @@ sub new_phone_number_param_sets
             $self->_params_for_classes( [ 'R2::Schema::PhoneNumber' ], $suffix );
 
         # If it just has a type, we ignore it.
-        next unless ( false { string_is_empty } values %number ) > 1;
+        next unless ( false { string_is_empty($_) } values %number ) > 1;
 
         $number{is_preferred} = $params->{'phone_number_is_preferred'} eq $suffix ? 1 : 0;
 
