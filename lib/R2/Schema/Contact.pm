@@ -285,7 +285,7 @@ sub _build_real_contact
     for my $type ( qw( person household organization ) )
     {
         my $is = 'is_' . $type;
-        warn "$type - $is\n";
+
         return $self->$type() if $self->$is();
     }
 }
