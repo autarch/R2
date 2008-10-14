@@ -239,7 +239,7 @@ CREATE TABLE "ContactHistory" (
        website_id         INT8               NULL,
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
-       notes              TEXT               NULL,
+       description        TEXT               NOT NULL,
        history_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- something that describes the change to the thing in question
        -- as a data structure, and provides a way to reverse it,

@@ -23,6 +23,8 @@ with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
         ( table => $schema->table('PhoneNumberType') );
 }
 
+sub summary { $_[0]->type()->name() . q{: } . $_[0]->phone_number() }
+
 no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();

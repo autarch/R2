@@ -1,0 +1,35 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>When</th>
+      <th>What happened</th>
+      <th>Who did it</th>
+    </tr>
+  </thead>
+  <tbody>
+% while ( my $history = $histories->next() ) {
+    <tr class="<% $histories->index() % 2 ? 'odd' : 'even' %>">
+      <td><% $c->user()->format_datetime( $history->history_datetime() ) %></td>
+      <td><% $history->description() %></td>
+      <td><a href="<% $history->user()->uri() %>"><% $history->user()->display_name() %></td>
+    </tr>
+% }
+  </tbody>
+</table>
+
+<%args>
+$contact
+$real_contact
+$can_edit_contact
+</%args>
+
+<%init>
+my $histories = $contact->history();
+</%init>
+
+<%method title>
+History for <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>

@@ -75,6 +75,8 @@ sub _canonicalize_uri
     return $uri->canonical() . '';
 }
 
+sub summary { $_[0]->label() . q{: } . $_[0]->uri() }
+
 no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();

@@ -51,6 +51,7 @@ sub _valid_email_address
            };
 }
 
+sub summary { $_[0]->email_address() }
 
 no Fey::ORM::Table;
 

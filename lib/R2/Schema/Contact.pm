@@ -372,7 +372,7 @@ sub _BuildHistorySelect
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
+    $select->select( $schema->tables( 'ContactHistory' ) )
            ->from( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
            ->where( $schema->table('ContactHistory')->column('contact_id'),
                     '=', Fey::Placeholder->new() )

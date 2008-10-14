@@ -33,9 +33,12 @@ around 'insert' => sub
         );
 
     my $type;
+    my $description;
     if ( $row->does('R2::Role::ActsAsContact' ) )
     {
         $type = R2::Schema::ContactHistoryType->Created();
+
+        $description = 'Created this contact';
     }
     else
     {
@@ -44,6 +47,9 @@ around 'insert' => sub
         my $type_name = 'Add' . $thing;
 
         $type = R2::Schema::ContactHistoryType->$type_name();
+
+        $description = 'Added a new ' . $class->_ClassDescription();
+        $description .= q{ - } . $row->summary();
     }
 
     my @pk = map { $_->name() } @{ $class->Table()->primary_key() };
@@ -57,11 +63,12 @@ around 'insert' => sub
         ( %history_p,
           user_id                 => $user->user_id(),
           contact_history_type_id => $type->contact_history_type_id(),
+          description             => $description,
           reversal_blob           => nfreeze($reversal),
         );
 };
 
-sub _class_description
+sub _ClassDescription
 {
     my $class = ref $_[0] || $_[0];
 
