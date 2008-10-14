@@ -3,6 +3,7 @@ package R2::Schema::Address;
 use strict;
 use warnings;
 
+use List::Util qw( first );
 use R2::Schema::AddressType;
 use R2::Schema::Contact;
 use R2::Schema;
@@ -26,10 +27,15 @@ with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
     has_one( $schema->table('Country') );
 
     has 'city_region_postal_code' =>
-        ( is      => 'ro',
-          isa     => 'Str|Undef',
-          lazy    => 1,
-          builder => '_build_city_region_postal_code',
+        ( is         => 'ro',
+          isa        => 'Str|Undef',
+          lazy_build => 1,
+        );
+
+    has 'summary' =>
+        ( is         => 'ro',
+          isa        => 'Str',
+          lazy_build => 1,
         );
 }
 
@@ -42,6 +48,13 @@ sub _build_city_region_postal_code
     $c_r_pc .= $self->postal_code() if ! string_is_empty( $self->postal_code() );
 
     return $c_r_pc;
+}
+
+sub _build_summary
+{
+    my $self = shift;
+
+    return first { defined } map { $self->$_() } qw( street_1 city_region_postal_code );
 }
 
 no Fey::ORM::Table;

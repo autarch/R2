@@ -240,7 +240,7 @@ CREATE TABLE "ContactHistory" (
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
        notes              TEXT               NULL,
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       history_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- something that describes the change to the thing in question
        -- as a data structure, and provides a way to reverse it,
        -- presumably a Storable-created data structure
@@ -251,6 +251,7 @@ CREATE TABLE "ContactHistoryType" (
        contact_history_type_id  SERIAL       PRIMARY KEY,
        system_name        VARCHAR(255)       UNIQUE  NOT NULL,
        description        VARCHAR(255)       NOT NULL,
+       sort_order         pos_int            NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' )
 );
 
@@ -615,6 +616,14 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_user_id"
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_contact_history_type_id"
   FOREIGN KEY ("contact_history_type_id") REFERENCES "ContactHistoryType" ("contact_history_type_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_email_address_id"
+  FOREIGN KEY ("email_address_id") REFERENCES "EmailAddress" ("email_address_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_website_id"
+  FOREIGN KEY ("website_id") REFERENCES "Website" ("website_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_address_id"
   FOREIGN KEY ("address_id") REFERENCES "Address" ("address_id")

@@ -28,7 +28,9 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
           handles => [ grep { ! __PACKAGE__->meta()->has_attribute($_) }
                        grep { $_ ne 'person' }
                        R2::Schema::Person->meta()->get_attribute_list(),
-                       R2::Schema::Contact->meta()->get_attribute_list() ],
+                       R2::Schema::Contact->meta()->get_attribute_list(),
+                       qw( display_name ),
+                     ],
         );
 
     class_has '_ValidationSteps' =>

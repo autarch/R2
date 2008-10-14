@@ -11,7 +11,7 @@ my $interactions = $contact->interactions();
 </%init>
 
 <%method title>
-Interactions from <% $real_contact->display_name() %>
+Interactions with <% $real_contact->display_name() %>
 <%args>
 $real_contact
 </%args>

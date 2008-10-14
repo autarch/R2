@@ -32,8 +32,6 @@ around 'insert' => sub
           qw( contact_id email_address_id website_id address_id phone_number_id )
         );
 
-    my $notes = 'Added a new ' . $class->_class_description();
-
     my $type;
     if ( $row->does('R2::Role::ActsAsContact' ) )
     {
@@ -59,7 +57,6 @@ around 'insert' => sub
         ( %history_p,
           user_id                 => $user->user_id(),
           contact_history_type_id => $type->contact_history_type_id(),
-          notes                   => $notes,
           reversal_blob           => nfreeze($reversal),
         );
 };
@@ -70,7 +67,7 @@ sub _class_description
 
     ( my $string = $class ) =~ s/R2::Schema:://;
 
-    $string =~ s/(^|.)([A-Z])/$1 ? "$1\L_$2" : "\L$2"/ge;
+    $string =~ s/(^|.)([A-Z])/$1 ? "$1\L $2" : "\L$2"/ge;
 
     return $string;
 }

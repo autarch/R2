@@ -418,4 +418,21 @@ sub interactions_POST : Private
     $c->redirect_and_detach( $contact->uri( view => 'interactions' ) );
 }
 
+sub history : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub history_GET_html : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{tabs}[3]->is_selected(1);
+
+    $c->stash()->{can_edit_contact} =
+        $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                   contact => $c->stash()->{contact},
+                                                 );
+
+    $c->stash()->{template} = '/contact/history';
+}
+
 1;

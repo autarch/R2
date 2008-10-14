@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Fey::Literal::String;
+use Fey::Object::Iterator::Caching;
 use Fey::Placeholder;
 use R2::Image;
 use R2::Schema;
@@ -168,6 +169,18 @@ with qw( R2::Role::DataValidator
           select      => __PACKAGE__->_BuildInteractionCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
         );
+
+    class_has '_HistorySelect' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          default => sub { __PACKAGE__->_BuildHistorySelect() },
+        );
+
+    has 'history' =>
+        ( is         => 'ro',
+          isa        => 'Fey::Object::Iterator::Caching',
+          lazy_build => 1,
+        );
 }
 
 sub _BuildPreferredEmailAddressSelect
@@ -330,6 +343,46 @@ sub add_phone_number
             ( contact_id => $self->contact_id(),
               @_,
             );
+}
+
+sub _build_history
+{
+    my $self = shift;
+
+    my $select = $self->_HistorySelect();
+
+    my $dbh = $self->_dbh($select);
+
+    my $sth = $dbh->prepare( $select->sql($dbh) );
+
+    return
+        Fey::Object::Iterator::Caching->new
+            ( classes     =>
+                  [ qw( R2::Schema::ContactHistory R2::Schema::ContactHistoryType ) ],
+              handle      => $sth,
+              bind_params => [ $self->contact_id() ],
+            );
+}
+
+sub _BuildHistorySelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
+           ->from( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
+           ->where( $schema->table('ContactHistory')->column('contact_id'),
+                    '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('ContactHistory')->column('history_datetime'),
+                       'DESC',
+                       $schema->table('ContactHistoryType')->column('sort_order'),
+                       'ASC',
+                     );
+
+    return $select;
 }
 
 sub _base_uri_path

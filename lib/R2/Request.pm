@@ -296,7 +296,7 @@ sub new_address_param_sets
             $self->_params_for_classes( [ 'R2::Schema::Address' ], $suffix );
 
         # If it just has a type and country, we ignore it.
-        next unless ( false { string_is_empty } values %address ) > 2;
+        next unless ( false { string_is_empty($_) } values %address ) > 2;
 
         $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
 
