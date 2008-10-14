@@ -34,8 +34,11 @@ use MooseX::ClassAttribute;
           bind_params => sub { $_[0]->contact_history_type_id() },
         );
 
+    my $x = 1;
     for my $type ( __PACKAGE__->_Types() )
     {
+        $type->{sort_order} = $x++;
+
         my $name = $type->{system_name};
 
         class_has $name =>
@@ -63,72 +66,66 @@ sub _Types
 {
     return ( { system_name => 'Created',
                description => 'Contact was created',
-               sort_order  => 1,
              },
 
              { system_name => 'Modified',
                description => 'Contact was modified',
-               sort_order  => 2,
+             },
+
+             { system_name => 'AddHouseholdMember',
+               description => 'A person was added to this household',
+             },
+
+             { system_name => 'AddOrganizationMember',
+               description => 'A person was added to this organization',
              },
 
              { system_name => 'AddEmailAddress',
                description => 'A new email address was added for the contact',
-               sort_order  => 3,
              },
 
              { system_name => 'DeleteEmailAddress',
                description => 'An email address for the contact was deleted',
-               sort_order  => 4,
              },
 
              { system_name => 'ModifyEmailAddress',
                description => 'An email address for the contact was modified',
-               sort_order  => 5,
              },
 
              { system_name => 'AddWebsite',
                description => 'A new website was added for the contact',
-               sort_order  => 6,
              },
 
              { system_name => 'DeleteWebsite',
                description => 'A website for the contact was deleted',
-               sort_order  => 7,
              },
 
              { system_name => 'ModifyWebsite',
                description => 'A website for the contact was modified',
-               sort_order  => 8,
              },
 
              { system_name => 'AddAddress',
                description => 'A new address was added for the contact',
-               sort_order  => 9,
              },
 
              { system_name => 'DeleteAddress',
                description => 'An address for the contact was deleted',
-               sort_order  => 10,
              },
 
              { system_name => 'ModifyAddress',
                description => 'An address for the contact was modified',
-               sort_order  => 11,
              },
 
              { system_name => 'AddPhoneNumber',
                description => 'A new phone number was added for the contact',
-               sort_order  => 12,
              },
 
              { system_name => 'DeletePhoneNumber',
                description => 'A phone number for the contact was deleted',
-               sort_order  => 13,
              },
 
              { system_name => 'ModifyPhoneNumber',
                description => 'A phone number for the contact was modified',
-               sort_order  => 14,
              },
            );
 }

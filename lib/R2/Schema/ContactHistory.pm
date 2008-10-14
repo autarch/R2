@@ -3,6 +3,7 @@ package R2::Schema::ContactHistory;
 use strict;
 use warnings;
 
+use List::Util qw( first );
 use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
 use R2::Schema;
@@ -27,7 +28,13 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
     has_one $schema->table('User');
 
-    has_one( $schema->table('Contact') );
+    has_one contact =>
+        ( table => $schema->table('Contact'),
+          fk    =>
+              ( first { $_->source_columns()->[0]->name() eq 'contact_id' }
+                $schema->foreign_keys_for_table('Contact')
+              )
+        );
 
     has_one email_address =>
         ( table => $schema->table('EmailAddress') );
@@ -38,6 +45,14 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 
     has_one phone_number =>
         ( table => $schema->table('PhoneNumber') );
+
+    has_one other_contact =>
+        ( table => $schema->table('Contact'),
+          fk    =>
+              ( first { $_->source_columns()->[0]->name() eq 'other_contact_id' }
+                $schema->foreign_keys_for_table('Contact')
+              )
+        );
 }
 
 sub _base_uri_path

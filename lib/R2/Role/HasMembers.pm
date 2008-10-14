@@ -7,6 +7,9 @@ use R2::Exceptions qw( data_validation_error );
 use R2::Schema::Person;
 use MooseX::Params::Validate qw( validatep );
 
+#use R2::Schema::HouseholdMember;
+#use R2::Schema::OrganizationMember;
+
 use Moose::Role;
 
 requires '_MembershipTable';
@@ -27,10 +30,11 @@ has 'member_count' =>
 sub add_member
 {
     my $self = shift;
-    my ( $person_id, $position ) =
+    my ( $person_id, $position, $user ) =
         validatep( \@_,
                    person_id => { isa => 'Int' },
                    position  => { isa => 'Str', default => undef },
+                   user      => { isa => 'R2::Schema::User' },
                  );
 
     my $person = R2::Schema::Person->new( person_id => $person_id );
@@ -40,12 +44,13 @@ sub add_member
         data_validation_error 'Cannot add a person from a different account.';
     }
 
-    my $insert = $self->_MemberInsert();
+    my $class = (ref $self) . 'Member';
 
-    my $dbh = $self->_dbh($insert);
-
-    $dbh->do( $insert->sql($dbh), {},
-              $self->pk_values(), $person_id, $position );
+    $class->insert( $self->pk_hash(),
+                    person_id => $person_id,
+                    position  => $position,
+                    user      => $user,
+                  );
 }
 
 sub _build_members
@@ -93,17 +98,6 @@ sub _build_member_count
 }
 
 {
-    my %MemberInsert;
-
-    sub _MemberInsert
-    {
-        my $class = ref $_[0] || $_[0];
-
-        return $MemberInsert{$class} ||= $class->_BuildMemberInsert();
-    }
-}
-
-{
     my %MemberCount;
 
     sub _MemberCount
@@ -112,6 +106,17 @@ sub _build_member_count
 
         return $MemberCount{$class} ||= $class->_BuildMemberCount();
     }
+}
+
+sub pk_hash
+{
+    my $self = shift;
+
+    return
+        ( map { $_ => $self->$_() }
+          map { $_->name() }
+          @{ $self->Table()->primary_key() }
+        );
 }
 
 sub pk_values
@@ -145,29 +150,6 @@ sub _BuildMembersSelect
     $select->order_by( @{ R2::Schema::Person->DefaultOrderBy() } );
 
     return $select;
-}
-
-sub _BuildMemberInsert
-{
-    my $class = shift;
-
-    my $insert = R2::Schema->SQLFactoryClass()->new_insert();
-
-    my $schema = R2::Schema->Schema();
-
-    my $ph = Fey::Placeholder->new();
-
-    my %pk_vals = map { $_->name() => $ph } @{ $class->Table()->primary_key() };
-
-    $insert->into( $class->_MembershipTable()->columns
-                       ( ( keys %pk_vals ), 'person_id', 'position' )
-                 )
-           ->values( %pk_vals,
-                     person_id    => $ph,
-                     position     => $ph,
-                   );
-
-    return $insert;
 }
 
 sub _BuildMemberCount

@@ -32,6 +32,12 @@ around 'insert' => sub
           qw( contact_id email_address_id website_id address_id phone_number_id )
         );
 
+    $history_p{contact_id} = $row->contact_id_for_history()
+        if $row->can('contact_id_for_history');
+
+    $history_p{other_contact_id} = $row->other_contact_id_for_history()
+        if $row->can('other_contact_id_for_history');
+
     my $type;
     my $description;
     if ( $row->does('R2::Role::ActsAsContact' ) )
@@ -66,6 +72,8 @@ around 'insert' => sub
           description             => $description,
           reversal_blob           => nfreeze($reversal),
         );
+
+    return $row;
 };
 
 sub _ClassDescription

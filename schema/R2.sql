@@ -239,12 +239,14 @@ CREATE TABLE "ContactHistory" (
        website_id         INT8               NULL,
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
+       other_contact_id   INT8               NULL,
        description        TEXT               NOT NULL,
        history_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- something that describes the change to the thing in question
        -- as a data structure, and provides a way to reverse it,
        -- presumably a Storable-created data structure
-       reversal_blob      BYTEA              NOT NULL
+       reversal_blob      BYTEA              NOT NULL,
+       CONSTRAINT contact_id_ne_other_contact_id CHECK ( contact_id != other_contact_id )
 );
 
 CREATE TABLE "ContactHistoryType" (
@@ -631,6 +633,10 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_address_id"
 
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_phone_number_id"
   FOREIGN KEY ("phone_number_id") REFERENCES "PhoneNumber" ("phone_number_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_other_contact_id"
+  FOREIGN KEY ("other_contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_contact_id"
