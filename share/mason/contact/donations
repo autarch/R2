@@ -1,4 +1,6 @@
-<& /lib/contact-view/summary.mas, contact => $real_contact &>
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
 
 % if ( $contact->donation_count() ) {
 <table class="standard-table">
