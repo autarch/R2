@@ -44,7 +44,7 @@
 </table>
 % } else {
 <p>
-This <% lc $contact->contact_type() %> has not made any donations.
+<% $real_contact->display_name() %> has not made any donations.
 </p>
 % }
 
