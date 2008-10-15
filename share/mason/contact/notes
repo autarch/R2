@@ -1,3 +1,8 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+% if ($count) {
 <table class="standard-table">
   <thead>
     <tr>
@@ -8,16 +13,19 @@
     </tr>
   </thead>
   <tbody>
-% while ( my $note = $notes->next() ) {
+%   while ( my $note = $notes->next() ) {
     <tr class="<% $notes->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_datetime( $note->note_datetime() ) %></td>
       <td><a href="<% $note->user()->uri() %>"><% $note->user()->display_name() %></td>
       <td><% $note->type()->description() %></td>
       <td><% $note->note() %></td>
     </tr>
-% }
+%   }
   </tbody>
 </table>
+% } else {
+<p>Nobody has made any notes for this contact yet</p>
+% }
 
 <%args>
 $contact
@@ -26,11 +34,14 @@ $can_edit_notes
 </%args>
 
 <%init>
-my $notes = $contact->notes();
+my $count = $contact->note_count();
+my $notes;
+$notes = $contact->notes()
+    if $count;
 </%init>
 
 <%method title>
-Notes with <% $real_contact->display_name() %>
+Notes about <% $real_contact->display_name() %>
 <%args>
 $real_contact
 </%args>
