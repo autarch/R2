@@ -2,16 +2,16 @@
   <thead>
     <tr>
       <th>When</th>
-      <th>What happened</th>
       <th>Who did it</th>
+      <th>What happened</th>
     </tr>
   </thead>
   <tbody>
 % while ( my $history = $histories->next() ) {
     <tr class="<% $histories->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_datetime( $history->history_datetime() ) %></td>
-      <td><% $history->description() %></td>
       <td><a href="<% $history->user()->uri() %>"><% $history->user()->display_name() %></td>
+      <td><% $history->description() %></td>
     </tr>
 % }
   </tbody>
