@@ -16,7 +16,7 @@ use R2::Schema::Website;
 use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems
-#use R2::Schema::ContactInteraction;
+#use R2::Schema::ContactNote;
 #use R2::Schema::Donation;
 #use R2::Schema::Household;
 #use R2::Schema::Organization;
@@ -24,6 +24,7 @@ use R2::Util qw( string_is_empty );
 #use R2::Schema::Account;
 
 use Fey::ORM::Table;
+use MooseX::Params::Validate qw( validatep );
 use MooseX::ClassAttribute;
 
 with qw( R2::Role::DataValidator
@@ -151,22 +152,22 @@ with qw( R2::Role::DataValidator
           bind_params => sub { $_[0]->contact_id() },
         );
 
-    has_many 'interactions' =>
-        ( table    => $schema->table('ContactInteraction'),
-          order_by => [ $schema->table('ContactInteraction')->column('interaction_datetime'),
+    has_many 'notes' =>
+        ( table    => $schema->table('ContactNote'),
+          order_by => [ $schema->table('ContactNote')->column('note_datetime'),
                         'DESC',
-                        $schema->table('ContactInteraction')->column('contact_interaction_type_id'),
+                        $schema->table('ContactNote')->column('contact_note_type_id'),
                         'ASC',
                       ],
           cache    => 1,
         );
 
-    has 'interaction_count' =>
+    has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
           isa         => 'R2::Type::PosOrZeroInt',
           lazy        => 1,
-          select      => __PACKAGE__->_BuildInteractionCountSelect(),
+          select      => __PACKAGE__->_BuildNoteCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
         );
 
@@ -259,7 +260,7 @@ sub _BuildDonationCountSelect
     return $select;
 }
 
-sub _BuildInteractionCountSelect
+sub _BuildNoteCountSelect
 {
     my $class = shift;
 
@@ -268,11 +269,11 @@ sub _BuildInteractionCountSelect
     my $schema = R2::Schema->Schema();
 
     my $count =
-        Fey::Literal::Function->new( 'COUNT', $schema->table('ContactInteraction')->column('contact_id') );
+        Fey::Literal::Function->new( 'COUNT', $schema->table('ContactNote')->column('contact_id') );
 
     $select->select($count)
-           ->from( $schema->tables( 'ContactInteraction' ) )
-           ->where( $schema->table('ContactInteraction')->column('contact_id'),
+           ->from( $schema->tables( 'ContactNote' ) )
+           ->where( $schema->table('ContactNote')->column('contact_id'),
                     '=', Fey::Placeholder->new() );
 
     return $select;
@@ -342,6 +343,25 @@ sub add_phone_number
         R2::Schema::PhoneNumber->insert
             ( contact_id => $self->contact_id(),
               @_,
+            );
+}
+
+sub add_note
+{
+    my $self = shift;
+    my ( $user, $type, $note ) =
+         validatep( \@_,
+                    user => { isa => 'R2::Schema::User' },
+                    type => { isa => 'R2::Schema::ContactNoteType' },
+                    note => { isa => 'Str' },
+                  );
+
+    return
+        R2::Schema::ContactNote->insert
+            ( contact_id           => $self->contact_id(),
+              user_id              => $user->user_id(),
+              contact_note_type_id => $type->contact_note_type_id(),
+              note                 => $note,
             );
 }
 

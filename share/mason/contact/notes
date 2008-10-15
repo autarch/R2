@@ -1,0 +1,37 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>When</th>
+      <th>Who wrote it</th>
+      <th>What</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+% while ( my $note = $notes->next() ) {
+    <tr class="<% $notes->index() % 2 ? 'odd' : 'even' %>">
+      <td><% $c->user()->format_datetime( $note->note_datetime() ) %></td>
+      <td><a href="<% $note->user()->uri() %>"><% $note->user()->display_name() %></td>
+      <td><% $note->type()->description() %></td>
+      <td><% $note->note() %></td>
+    </tr>
+% }
+  </tbody>
+</table>
+
+<%args>
+$contact
+$real_contact
+$can_edit_notes
+</%args>
+
+<%init>
+my $notes = $contact->notes();
+</%init>
+
+<%method title>
+Notes with <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>

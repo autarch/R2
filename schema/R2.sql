@@ -206,28 +206,19 @@ CREATE TABLE "CustomFieldMultiSelectValue" (
 CREATE TABLE "ContactNote" (
        contact_note_id    SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
-       notes              TEXT               NOT NULL,
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       user_id            INT8               NOT NULL
-);
-
-CREATE TABLE "ContactInteraction" (
-       contact_interaction_id SERIAL8            PRIMARY KEY,
-       contact_id         INT8               NOT NULL,
-       contact_interaction_type_id  INT          NOT NULL,
+       contact_note_type_id  INT             NOT NULL,
        user_id            INT8               NOT NULL,
-       notes              TEXT               NULL,
-       interaction_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
+       note               TEXT               NOT NULL,
+       note_datetime      TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "ContactInteractionType" (
-       contact_interaction_type_id  SERIAL       PRIMARY KEY,
-       system_name        VARCHAR(255)       NOT NULL,
+CREATE TABLE "ContactNoteType" (
+       contact_note_type_id  SERIAL          PRIMARY KEY,
        description        VARCHAR(255)       NOT NULL,
        is_system_defined  BOOLEAN            DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT system_name_account_id_ck UNIQUE ( system_name, account_id )
+       CONSTRAINT description_account_id_ck UNIQUE ( description, account_id )
 );
 
 CREATE TABLE "ContactHistory" (
@@ -599,14 +590,6 @@ ALTER TABLE "CustomFieldMultiSelectValue" ADD CONSTRAINT "CustomFieldMultiSelect
   FOREIGN KEY ("custom_field_select_option_id") REFERENCES "CustomFieldSelectOption" ("custom_field_select_option_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_id"
-  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_user_id"
-  FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
@@ -639,19 +622,19 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_other_contact_id"
   FOREIGN KEY ("other_contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_contact_id"
+ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_user_id"
+ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_user_id"
   FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ContactInteraction" ADD CONSTRAINT "ContactInteraction_contact_interaction_type_id"
-  FOREIGN KEY ("contact_interaction_type_id") REFERENCES "ContactInteractionType" ("contact_interaction_type_id")
+ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_note_type_id"
+  FOREIGN KEY ("contact_note_type_id") REFERENCES "ContactNoteType" ("contact_note_type_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ContactInteractionType" ADD CONSTRAINT "ContactInteractionType_account_id"
+ALTER TABLE "ContactNoteType" ADD CONSTRAINT "ContactNoteType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 

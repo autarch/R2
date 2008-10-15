@@ -5,6 +5,7 @@ use warnings;
 
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
+use R2::Util qw( string_is_empty );
 
 use Moose::Role;
 
@@ -173,7 +174,7 @@ sub _insert_contact
     }
 
     my $insert_sub =
-        $self->_make_insert_sub( $c->user(),
+        $self->_make_insert_sub( $c,
                                  $class,
                                  $p,
                                  $image,
@@ -190,7 +191,7 @@ sub _insert_contact
 sub _make_insert_sub
 {
     my $self          = shift;
-    my $user          = shift;
+    my $c             = shift;
     my $class         = shift;
     my $p             = shift;
     my $image         = shift;
@@ -199,6 +200,9 @@ sub _make_insert_sub
     my $addresses     = shift;
     my $phone_numbers = shift;
     my $members       = shift;
+
+    my $user    = $c->user();
+    my $account = $c->account();
 
     return
         sub
@@ -245,6 +249,16 @@ sub _make_insert_sub
                 {
                     $thing->add_member( %{ $member }, user => $user );
                 }
+            }
+
+            my $note = $c->request()->params()->{note};
+            if ( ! string_is_empty($note) )
+            {
+                $contact->add_note
+                    ( note => $note,
+                      type => $account->made_a_note_contact_note_type(),
+                      user => $user,
+                    );
             }
 
             return $thing;

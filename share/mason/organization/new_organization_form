@@ -12,7 +12,7 @@
     <legend>The Basics</legend>
 
     <div class="form-item">
-      <label class="for-field" for="first_name">Name:</label>
+      <label class="for-field" for="name">Name:</label>
       <input type="text" class="text" name="name" id="name" />
     </div>
 
@@ -20,21 +20,9 @@
 
 <& /lib/form/contact-ok-fields.mas &>
 
-    <div class="form-item">
-      <label class="for-field" for="image">Image:</label>
-      <input type="file" class="file" name="image" id="image" />
+<& /lib/form/contact-image.mas &>
 
-      <div class="help-text">
-        <p>
-          A GIF, JPG, or PNG. Images will be resized so they are no larger than 100x100.
-        </p>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="note">Note:</label>
-      <textarea class="short wide"></textarea>
-    </div>
+<& /lib/form/contact-notes.mas &>
 
   </fieldset>
 

@@ -12,8 +12,7 @@ use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
-use R2::Schema::ContactHistoryType;
-use R2::Schema::ContactInteractionType;
+use R2::Schema::ContactNoteType;
 use R2::Schema::Country;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
@@ -81,11 +80,15 @@ with 'R2::Role::URIMaker';
           order_by => [ $schema->table('MessagingProvider')->column('name') ],
         );
 
-    has_many 'user_defined_contact_history_types' =>
-        ( table       => $schema->table('ContactHistoryType'),
-          cache       => 1,
-          select      => __PACKAGE__->_BuildUserDefinedContactHistoryTypesSelect(),
-          bind_params => sub { $_[0]->account_id(), 0 },
+    has_many 'contact_note_types' =>
+        ( table => $schema->table('ContactNoteType'),
+          cache => 1,
+        );
+
+    has 'made_a_note_contact_note_type' =>
+        ( is         => 'ro',
+          isa        => 'R2::Schema::ContactNoteType',
+          lazy_build => 1,
         );
 
     has 'countries' =>
@@ -125,7 +128,7 @@ sub _initialize
 
     R2::Schema::AddressType->CreateDefaultsForAccount($self);
 
-    R2::Schema::ContactInteractionType->CreateDefaultsForAccount($self);
+    R2::Schema::ContactNoteType->CreateDefaultsForAccount($self);
 
     R2::Schema::DonationSource->CreateDefaultsForAccount($self);
 
@@ -393,7 +396,7 @@ sub update_or_add_phone_number_types
     return;
 }
 
-sub update_or_add_contact_history_types
+sub update_or_add_contact_note_types
 {
     my $self     = shift;
     my $existing = shift;
@@ -402,13 +405,13 @@ sub update_or_add_contact_history_types
     unless ( @{ $new }
              || any { ! string_is_empty($_) } values %{ $existing } )
     {
-        error 'You must have at least one contact history type.';
+        error 'You must have at least one contact note type.';
     }
 
     my $sub =
-        sub { for my $type ( $self->user_defined_contact_history_types()->all() )
+        sub { for my $type ( $self->user_defined_contact_note_types()->all() )
               {
-                  my $new_name = $existing->{ $type->contact_history_type_id() };
+                  my $new_name = $existing->{ $type->contact_note_type_id() };
 
                   if ( string_is_empty($new_name) )
                   {
@@ -419,13 +422,13 @@ sub update_or_add_contact_history_types
                   else
                   {
                       $type->update( description =>
-                                     $existing->{ $type->contact_history_type_id() } );
+                                     $existing->{ $type->contact_note_type_id() } );
                   }
               }
 
               for my $type ( @{ $new } )
               {
-                  R2::Schema::ContactHistoryType->insert
+                  R2::Schema::ContactNoteType->insert
 		      ( description => $type,
 			account_id  => $self->account_id(),
 		      );
@@ -437,23 +440,14 @@ sub update_or_add_contact_history_types
     return;
 }
 
-sub _BuildUserDefinedContactHistoryTypesSelect
+sub _build_made_a_note_contact_note_type
 {
-    my $class = shift;
+    my $self = shift;
 
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->tables( 'ContactHistoryType' ) )
-           ->from( $schema->tables( 'ContactHistoryType' ) )
-           ->where( $schema->table('ContactHistoryType')->column('account_id'),
-                    '=', Fey::Placeholder->new() )
-           ->and( $schema->table('ContactHistoryType')->column('is_system_defined'),
-                  '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('ContactHistoryType')->column('description') );
-
-    return $select;
+    return
+        R2::Schema::ContactNoteType->new( description => 'Made a note',
+                                          account_id  => $self->account_id(),
+                                        );
 }
 
 sub _build_countries

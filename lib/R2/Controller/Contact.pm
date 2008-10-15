@@ -116,9 +116,13 @@ sub _contact_view_tabs
                label   => 'donations',
                tooltip => 'Donations from this contact',
              },
-             { uri     => $contact->uri( view => 'interactions' ),
-               label   => 'interactions',
-               tooltip => 'Email, meetings, phone calls, etc.',
+             { uri     => $contact->uri( view => 'notes' ),
+               label   => 'notes',
+               tooltip => 'Notes of meetings, phone calls, etc.',
+             },
+             { uri     => $contact->uri( view => 'emails' ),
+               label   => 'emails',
+               tooltip => 'Email to and from this contact',
              },
              { uri     => $contact->uri( view => 'history' ),
                label   => 'history',
@@ -364,24 +368,24 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
-sub interactions : Chained('_set_contact') : PathPart('interactions') : Args(0) : ActionClass('+R2::Action::REST') { }
+sub notes : Chained('_set_contact') : PathPart('notes') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub interactions_GET_html : Private
+sub notes_GET_html : Private
 {
     my $self = shift;
     my $c    = shift;
 
     $c->stash()->{tabs}[2]->is_selected(1);
 
-    $c->stash()->{can_edit_interactions} =
+    $c->stash()->{can_edit_notes} =
         $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
                                                    contact => $c->stash()->{contact},
                                                  );
 
-    $c->stash()->{template} = '/contact/interactions';
+    $c->stash()->{template} = '/contact/notes';
 }
 
-sub interactions_POST : Private
+sub notes_POST : Private
 {
     my $self = shift;
     my $c    = shift;
@@ -394,28 +398,28 @@ sub interactions_POST : Private
                                                       ) )
     {
         $c->_redirect_with_error
-            ( error => 'You are not allowed to add interactions',
-              uri   => $contact->uri( view => 'interactions' ),
+            ( error => 'You are not allowed to add notes',
+              uri   => $contact->uri( view => 'notes' ),
             );
     }
 
-    my %p = $c->request()->interaction_params();
+    my %p = $c->request()->note_params();
     $p{date_format} = $c->request()->params()->{date_format};
 
     eval
     {
-        $contact->add_interaction(%p);
+        $contact->add_note(%p);
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
             ( error => $e,
-              uri   => $contact->uri( view => 'interactions' ),
+              uri   => $contact->uri( view => 'notes' ),
             );
     }
 
-    $c->redirect_and_detach( $contact->uri( view => 'interactions' ) );
+    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
 }
 
 sub history : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') { }
@@ -425,7 +429,7 @@ sub history_GET_html : Private
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{tabs}[3]->is_selected(1);
+    $c->stash()->{tabs}[4]->is_selected(1);
 
     $c->stash()->{can_edit_contact} =
         $c->model('Authz')->user_can_edit_contact( user    => $c->user(),

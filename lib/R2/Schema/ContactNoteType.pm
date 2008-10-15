@@ -1,4 +1,4 @@
-package R2::Schema::ContactInteractionType;
+package R2::Schema::ContactNoteType;
 
 use strict;
 use warnings;
@@ -10,26 +10,26 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('ContactInteractionType') );
+    has_table( $schema->table('ContactNoteType') );
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
     my $count =
         Fey::Literal::Function->new
-            ( 'COUNT', @{ $schema->table('ContactInteraction')->primary_key() } );
+            ( 'COUNT', @{ $schema->table('ContactNote')->primary_key() } );
 
     $select->select($count)
-           ->from( $schema->tables( 'ContactInteraction' ),  )
-           ->where( $schema->table('ContactInteraction')->column('contact_interaction_type_id'),
+           ->from( $schema->tables('ContactNote') )
+           ->where( $schema->table('ContactNote')->column('contact_note_type_id'),
                     '=', Fey::Placeholder->new() );
 
-    has 'interaction_count' =>
+    has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
           isa         => 'R2::Type::PosOrZeroInt',
           lazy        => 1,
           select      => $select,
-          bind_params => sub { $_[0]->contact_interaction_type_id() },
+          bind_params => sub { $_[0]->contact_note_type_id() },
         );
 }
 
@@ -38,10 +38,9 @@ sub CreateDefaultsForAccount
     my $class   = shift;
     my $account = shift;
 
-    $class->insert( system_name       => 'send_email',
-                    description       => 'An email was sent to this contact',
-                    is_system_defined => 1,
+    $class->insert( description       => 'Made a note',
                     account_id        => $account->account_id(),
+                    is_system_defined => 1,
                   );
 
     $class->insert( description => 'Called this contact',
@@ -57,32 +56,12 @@ sub CreateDefaultsForAccount
                   );
 }
 
-around 'insert' => sub
+sub is_updateable
 {
-    my $orig  = shift;
-    my $class = shift;
-    my %p     = @_;
-
-    $p{system_name} = $p{description}
-        unless exists $p{system_name};
-
-    return $class->$orig(%p);
-};
-
-around 'update' => sub
-{
-    my $orig = shift;
     my $self = shift;
-    my %p    = @_;
 
-    if ( exists $p{description} )
-    {
-        $p{system_name} = $p{description}
-            unless $self->is_system_defined();
-    }
-
-    return $self->$orig(%p);
-};
+    return ! $self->is_system_defined();
+}
 
 sub is_deleteable
 {
@@ -90,7 +69,7 @@ sub is_deleteable
 
     return 0 if $self->is_system_defined();
 
-    return ! $self->interaction_count();
+    return ! $self->note_count();
 }
 
 no Fey::ORM::Table;
