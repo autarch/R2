@@ -1,3 +1,7 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
 <table class="standard-table">
   <thead>
     <tr>
