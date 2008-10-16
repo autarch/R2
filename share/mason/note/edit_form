@@ -1,0 +1,16 @@
+<h1><& SELF:title, %ARGS &></h1>
+
+<& /lib/form/note.mas, contact => $contact, note => $note &>
+
+<%args>
+$note
+$contact
+$real_contact
+</%args>
+
+<%method title>
+Editing a note about <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>

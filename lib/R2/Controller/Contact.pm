@@ -8,6 +8,7 @@ use base 'R2::Controller::Base';
 use R2::Schema;
 use R2::Schema::Address;
 use R2::Schema::Contact;
+use R2::Schema::ContactNote;
 use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
@@ -246,8 +247,8 @@ sub _set_donation : Chained('_set_contact') : PathPart('donation') : CaptureArgs
 
 sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args(0)
 {
-    my $self        = shift;
-    my $c           = shift;
+    my $self = shift;
+    my $c    = shift;
 
     my $account = $c->account();
     my $contact = $c->stash()->{contact};
@@ -269,8 +270,8 @@ sub donation : Chained('_set_donation') : PathPart('') : Args(0) : ActionClass('
 
 sub donation_PUT
 {
-    my $self        = shift;
-    my $c           = shift;
+    my $self = shift;
+    my $c    = shift;
 
     my $account = $c->account();
     my $contact = $c->stash()->{contact};
@@ -308,8 +309,8 @@ sub donation_PUT
 
 sub donation_DELETE
 {
-    my $self        = shift;
-    my $c           = shift;
+    my $self = shift;
+    my $c    = shift;
 
     my $account = $c->account();
     my $contact = $c->stash()->{contact};
@@ -344,8 +345,8 @@ sub donation_DELETE
 
 sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_deletion') : Args(0)
 {
-    my $self        = shift;
-    my $c           = shift;
+    my $self = shift;
+    my $c    = shift;
 
     my $account = $c->account();
     my $contact = $c->stash()->{contact};
@@ -366,6 +367,41 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     $c->stash()->{uri} = $donation->uri();
 
     $c->stash()->{template} = '/shared/confirm_deletion';
+}
+
+sub _set_note : Chained('_set_contact') : PathPart('note') : CaptureArgs(1)
+{
+    my $self            = shift;
+    my $c               = shift;
+    my $contact_note_id = shift;
+
+    my $note = R2::Schema::ContactNote->new( contact_note_id => $contact_note_id );
+
+    $c->redirect_and_detach('/')
+        unless $note && $note->contact_id() == $c->stash()->{contact}->contact_id();
+
+    $c->stash()->{note} = $note;
+}
+
+sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to edit notes',
+              uri   => $contact->uri( view => 'notes' ),
+            );
+    }
+
+    $c->stash()->{template} = '/note/edit_form';
 }
 
 sub notes : Chained('_set_contact') : PathPart('notes') : Args(0) : ActionClass('+R2::Action::REST') { }
@@ -422,6 +458,109 @@ sub notes_POST : Private
     }
 
     $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
+}
+
+sub note : Chained('_set_note') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub note_PUT
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to edit notes',
+              uri   => $contact->uri( view => 'notes' ),
+            );
+    }
+
+    my %p = $c->request()->note_params();
+    $p{datetime_format} = $c->request()->params()->{datetime_format};
+
+    my $note = $c->stash()->{note};
+
+    eval
+    {
+        $note->update(%p);
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $note->uri( view => 'edit_form' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
+}
+
+sub note_DELETE
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to delete notes',
+              uri   => $contact->uri( view => 'notes' ),
+            );
+    }
+
+    my $note = $c->stash()->{note};
+
+    eval
+    {
+        $note->delete();
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error => $e,
+              uri   => $contact->uri( view => 'notes' ),
+            );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
+}
+
+sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
+
+    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
+                                                        contact => $c->stash()->{contact},
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not allowed to delete notes',
+              uri   => $contact->uri( view => 'notes' ),
+            );
+    }
+
+    my $note = $c->stash()->{note};
+
+    $c->stash()->{type} = 'note';
+    $c->stash()->{uri} = $note->uri();
+
+    $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
 sub history : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') { }
