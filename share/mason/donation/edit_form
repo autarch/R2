@@ -1,3 +1,5 @@
+<h1><& SELF:title, %ARGS &></h1>
+
 <& /lib/form/donation.mas, contact => $contact, donation => $donation &>
 
 <%args>
