@@ -7,9 +7,13 @@
   <thead>
     <tr>
       <th>When</th>
-      <th>Who wrote it</th>
+      <th>Who</th>
       <th>What</th>
       <th>Note</th>
+%   if ($can_edit_notes) {
+      <th></th>
+      <th></th>
+%   }
     </tr>
   </thead>
   <tbody>
@@ -19,12 +23,24 @@
       <td><a href="<% $note->user()->uri() %>"><% $note->user()->display_name() %></td>
       <td><% $note->type()->description() %></td>
       <td><% $note->note() %></td>
+%     if ($can_edit_notes) {
+      <td><a href="<% $note->uri( view => 'edit_form' ) %>">Edit</a></td>
+      <td>
+        <form class="inline" action="<% $note->uri( view => 'confirm_deletion' ) %>" method="GET">
+          <input type="submit" class="submit" value="Delete" />
+        </form>
+      </td>
+%     }
     </tr>
 %   }
   </tbody>
 </table>
 % } else {
 <p>Nobody has made any notes for this contact yet</p>
+% }
+
+% if ($can_edit_notes) {
+<& /lib/form/note.mas, contact => $contact &>
 % }
 
 <%args>

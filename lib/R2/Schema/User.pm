@@ -33,6 +33,16 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
                      ],
         );
 
+    has 'datetime_format' =>
+        ( is      => 'ro',
+          isa     => 'Str',
+          lazy    => 1,
+          # This isn't really right because it assumes that the date
+          # comes before the time, but it's probably okay for the US &
+          # Canada.
+          default => sub { $_[0]->date_format() . q{ } . $_[0]->time_format() },
+        );
+
     class_has '_ValidationSteps' =>
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
@@ -156,7 +166,7 @@ sub format_datetime
     my $self = shift;
     my $dt   = shift;
 
-    return $dt->format_cldr( $self->date_format() . q{ } . $self->time_format() );
+    return $dt->format_cldr( $self->datetime_format() );
 }
 
 sub _base_uri_path

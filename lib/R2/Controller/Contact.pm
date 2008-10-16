@@ -404,11 +404,13 @@ sub notes_POST : Private
     }
 
     my %p = $c->request()->note_params();
-    $p{date_format} = $c->request()->params()->{date_format};
+    $p{datetime_format} = $c->request()->params()->{datetime_format};
 
     eval
     {
-        $contact->add_note(%p);
+        $contact->add_note( %p,
+                            user_id => $c->user()->user_id(),
+                          );
     };
 
     if ( my $e = $@ )

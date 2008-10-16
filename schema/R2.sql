@@ -430,7 +430,7 @@ CREATE TABLE "Donation" (
        donation_source_id INT8               NOT NULL,
        donation_target_id INT8               NOT NULL,
        payment_type_id    INT8               NOT NULL,
-       notes              TEXT               NULL,
+       note               TEXT               NULL,
        CONSTRAINT valid_amount CHECK ( amount > 0.00 )
 );
 

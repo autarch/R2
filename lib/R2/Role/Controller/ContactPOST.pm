@@ -256,8 +256,10 @@ sub _make_insert_sub
             {
                 $contact->add_note
                     ( note => $note,
-                      type => $account->made_a_note_contact_note_type(),
-                      user => $user,
+                      contact_note_type_id =>
+                          $account->made_a_note_contact_note_type()
+                                  ->contact_note_type_id(),
+                      user_id => $c->user()->user_id(),
                     );
             }
 

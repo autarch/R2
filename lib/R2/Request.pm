@@ -44,6 +44,13 @@ sub donation_params
     return $self->_params_for_classes( [ 'R2::Schema::Donation' ] );
 }
 
+sub note_params
+{
+    my $self = shift;
+
+    return $self->_params_for_classes( [ 'R2::Schema::ContactNote' ] );
+}
+
 sub donation_sources
 {
     my $self = shift;

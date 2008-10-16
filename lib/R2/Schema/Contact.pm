@@ -349,19 +349,11 @@ sub add_phone_number
 sub add_note
 {
     my $self = shift;
-    my ( $user, $type, $note ) =
-         validatep( \@_,
-                    user => { isa => 'R2::Schema::User' },
-                    type => { isa => 'R2::Schema::ContactNoteType' },
-                    note => { isa => 'Str' },
-                  );
 
     return
         R2::Schema::ContactNote->insert
-            ( contact_id           => $self->contact_id(),
-              user_id              => $user->user_id(),
-              contact_note_type_id => $type->contact_note_type_id(),
-              note                 => $note,
+            ( contact_id => $self->contact_id(),
+              @_,
             );
 }
 
