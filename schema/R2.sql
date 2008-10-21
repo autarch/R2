@@ -98,7 +98,7 @@ CREATE DOMAIN pos_int AS INTEGER
 CREATE TABLE "CustomFieldGroup" (
        custom_field_group_id          SERIAL8      PRIMARY KEY,
        name                           VARCHAR(255) NOT NULL,
-       description                    TEXT         NULL,
+       description                    TEXT         NOT NULL DEFAULT '',
        display_order                  pos_int      NOT NULL,
        applies_to_person              BOOLEAN      NOT NULL DEFAULT TRUE,
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -113,7 +113,7 @@ CREATE TABLE "CustomFieldGroup" (
 CREATE TABLE "CustomField" (
        custom_field_id          SERIAL8      PRIMARY KEY,
        label                    VARCHAR(255) NOT NULL,
-       description              TEXT         NULL,
+       description              TEXT         NOT NULL DEFAULT '',
        custom_field_type_id     INTEGER      NOT NULL,
        account_id               INT8         NOT NULL,
        is_required              BOOLEAN      DEFAULT FALSE,
@@ -231,7 +231,7 @@ CREATE TABLE "ContactHistory" (
        address_id         INT8               NULL,
        phone_number_id    INT8               NULL,
        other_contact_id   INT8               NULL,
-       description        TEXT               NOT NULL,
+       description        TEXT               NOT NULL DEFAULT '',
        history_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        -- something that describes the change to the thing in question
        -- as a data structure, and provides a way to reverse it,
@@ -286,11 +286,11 @@ CREATE TABLE "PersonMessaging" (
 CREATE TABLE "MessagingProvider" (
        messaging_provider_id  SERIAL8        PRIMARY KEY,
        name                   VARCHAR(255)   NOT NULL,
-       add_uri_template       VARCHAR(255)   NULL,
-       chat_uri_template      VARCHAR(255)   NULL,
-       call_uri_template      VARCHAR(255)   NULL,
-       video_uri_template     VARCHAR(255)   NULL,
-       status_uri_template    VARCHAR(255)   NULL,
+       add_uri_template       VARCHAR(255)   NOT NULL DEFAULT '',
+       chat_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
+       call_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
+       video_uri_template     VARCHAR(255)   NOT NULL DEFAULT '',
+       status_uri_template    VARCHAR(255)   NOT NULL DEFAULT '',
        account_id             INT8           NOT NULL
 );
 
@@ -303,7 +303,7 @@ CREATE TABLE "Household" (
 CREATE TABLE "HouseholdMember" (
        household_id       INT8               NOT NULL,
        person_id          INT8               NOT NULL,
-       position           VARCHAR(255)       NULL,
+       position           VARCHAR(255)       NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY ( household_id, person_id )
 );
@@ -317,7 +317,7 @@ CREATE TABLE "Organization" (
 CREATE TABLE "OrganizationMember" (
        organization_id    INT8               NOT NULL,
        person_id          INT8               NOT NULL,
-       position           VARCHAR(255)       NULL,
+       position           VARCHAR(255)       NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY ( organization_id, person_id )
 );
@@ -330,7 +330,7 @@ CREATE TABLE "EmailAddress" (
        contact_id         INT8               NOT NULL,
        email_address      email_address      NOT NULL,
        is_preferred       BOOLEAN            DEFAULT FALSE,
-       notes              TEXT               NULL
+       note               TEXT               NOT NULL DEFAULT ''
 );
 
 CREATE TABLE "Website" (
@@ -338,7 +338,7 @@ CREATE TABLE "Website" (
        contact_id         INT8               NOT NULL,
        label              VARCHAR(50)        NOT NULL DEFAULT 'Website',
        uri                uri                NOT NULL,
-       notes              TEXT               NULL
+       note               TEXT               NOT NULL DEFAULT ''
 );
 
 -- Consider a trigger to enforce one primary address per contact?
@@ -347,7 +347,7 @@ CREATE TABLE "Address" (
        contact_id         INTEGER            NOT NULL,
        address_type_id    INTEGER            NOT NULL,
        street_1           VARCHAR(255)       NOT NULL DEFAULT '',
-       street_2           VARCHAR(255)       NULL,
+       street_2           VARCHAR(255)       NOT NULL DEFAULT '',
        city               VARCHAR(255)       NOT NULL DEFAULT '',
        region             VARCHAR(255)       NOT NULL DEFAULT '',
        postal_code        VARCHAR(20)        NOT NULL DEFAULT '',
@@ -356,9 +356,9 @@ CREATE TABLE "Address" (
        longitude          FLOAT              NULL,
        -- The address as returned by a geocoding service like Google
        -- Maps.
-       canonical_address  TEXT               NULL,
+       canonical_address  TEXT               NOT NULL DEFAULT '',
        is_preferred       BOOLEAN            DEFAULT FALSE,
-       notes              TEXT               NULL,
+       note               TEXT               NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -408,7 +408,7 @@ CREATE TABLE "PhoneNumber" (
        phone_number_type_id   INT8           NOT NULL,
        phone_number       VARCHAR(30)        DEFAULT '',
        is_preferred       BOOLEAN            DEFAULT FALSE,
-       notes              TEXT               NULL,
+       note               TEXT               NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -430,7 +430,7 @@ CREATE TABLE "Donation" (
        donation_source_id INT8               NOT NULL,
        donation_target_id INT8               NOT NULL,
        payment_type_id    INT8               NOT NULL,
-       note               TEXT               NULL,
+       note               TEXT               NOT NULL DEFAULT '',
        CONSTRAINT valid_amount CHECK ( amount > 0.00 )
 );
 
