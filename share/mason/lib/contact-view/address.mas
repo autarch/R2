@@ -15,9 +15,9 @@
 <% $address->country()->name() %>
 </address>
 
-% if ( ! string_is_empty( $address->notes() ) ) {
-<p class="address-notes">
-<% $address->notes() %>
+% if ( ! string_is_empty( $address->note() ) ) {
+<p class="address-note">
+<% $address->note() %>
 </p>
 % }
 

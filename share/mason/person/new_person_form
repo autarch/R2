@@ -71,7 +71,7 @@
 
 <& /lib/form/contact-image.mas &>
 
-<& /lib/form/contact-notes.mas &>
+<& /lib/form/contact-note.mas &>
 
   </fieldset>
 

@@ -240,9 +240,9 @@ sub new_email_address_param_sets
 
         next if string_is_empty( $email{email_address} );
 
-        if ( ! string_is_empty( $params->{ 'email_address_notes' . q{-} . $suffix } ) )
+        if ( ! string_is_empty( $params->{ 'email_address_note' . q{-} . $suffix } ) )
         {
-            $email{notes} = $params->{ 'email_address_notes' . q{-} . $suffix }
+            $email{notes} = $params->{ 'email_address_note' . q{-} . $suffix }
         }
 
         $email{is_preferred} = $params->{'email_address_is_preferred'} eq $suffix ? 1 : 0;
@@ -273,9 +273,9 @@ sub new_website_param_sets
 
         next if string_is_empty( $website{uri} );
 
-        if ( ! string_is_empty( $params->{ 'website_notes' . q{-} . $suffix } ) )
+        if ( ! string_is_empty( $params->{ 'website_note' . q{-} . $suffix } ) )
         {
-            $website{notes} = $params->{ 'website_notes' . q{-} . $suffix }
+            $website{notes} = $params->{ 'website_note' . q{-} . $suffix }
         }
 
         $websites{$suffix} = \%website;
@@ -307,9 +307,9 @@ sub new_address_param_sets
 
         $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
 
-        if ( ! string_is_empty( $params->{ 'address_notes' . q{-} . $suffix } ) )
+        if ( ! string_is_empty( $params->{ 'address_note' . q{-} . $suffix } ) )
         {
-            $address{notes} = $params->{ 'address_notes' . q{-} . $suffix }
+            $address{notes} = $params->{ 'address_note' . q{-} . $suffix }
         }
 
         $addresses{$suffix} = \%address;
@@ -341,9 +341,9 @@ sub new_phone_number_param_sets
 
         $number{is_preferred} = $params->{'phone_number_is_preferred'} eq $suffix ? 1 : 0;
 
-        if ( ! string_is_empty( $params->{ 'phone_number_notes' . q{-} . $suffix } ) )
+        if ( ! string_is_empty( $params->{ 'phone_number_note' . q{-} . $suffix } ) )
         {
-            $number{notes} = $params->{ 'phone_number_notes' . q{-} . $suffix }
+            $number{notes} = $params->{ 'phone_number_note' . q{-} . $suffix }
         }
 
         $numbers{$suffix} = \%number;

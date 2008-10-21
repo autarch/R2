@@ -34,9 +34,9 @@
       </td>
 %     }
     </tr>
-%      if ( my $notes = $donation->notes() ) {
-    <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> notes">
-      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% $donation->notes() %></td>
+%      if ( my $note = $donation->note() ) {
+    <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> note">
+      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% $note %></td>
     </tr>
 %      }
 %   }

@@ -19,8 +19,8 @@ Does not want to be emailed via Rapport.
 %   if ( $email->is_preferred() ) {
     </strong>
 %   }
-%   if ( my $notes = $email->notes() ) {
-    <p><% $notes %></p>
+%   if ( my $note = $email->note() ) {
+    <p><% $note %></p>
 %   } 
   </li>
 % }

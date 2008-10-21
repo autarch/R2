@@ -15,9 +15,9 @@ Does not want to receive phone calls.
 %   if ( $number->is_preferred() ) {
       <strong>(Preferred)</strong>
 %   }
-%   if ( ! string_is_empty( $number->notes() ) ) {
+%   if ( ! string_is_empty( $number->note() ) ) {
       <br /
-      <span class="phone-number-notes"><% $number->notes() %></span>
+      <span class="phone-number-note"><% $number->note() %></span>
 %   }
 % }
 </ul>
