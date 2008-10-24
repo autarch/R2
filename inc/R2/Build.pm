@@ -75,7 +75,7 @@ sub new
     my $class = shift;
 
     return $class->SUPER::new
-        ( license              => 'AGPL3',
+        ( license              => 'agpl3',
           module_name          => 'R2',
           requires             => \%Requires,
           script_files         => [ glob('bin/*.pl') ],
