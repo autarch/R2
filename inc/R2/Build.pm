@@ -75,12 +75,12 @@ sub new
     my $class = shift;
 
     return $class->SUPER::new
-	( license         => 'perl',
-	  module_name     => 'R2',
-	  requires        => \%Requires,
-	  script_files    => [ glob('bin/*') ],
-          recursive_tests => 1,
-	);
+        ( license              => 'AGPL3',
+          module_name          => 'R2',
+          requires             => \%Requires,
+          script_files         => [ glob('bin/*.pl') ],
+          recursive_test_files => 1,
+        );
 }
 
 sub ACTION_missing
@@ -99,4 +99,15 @@ sub ACTION_missing
 
     print join ' ', sort keys %mods;
     print "\n";
+}
+
+sub valid_licenses
+{
+    my $self = shift;
+
+    my $licenses = $self->SUPER::valid_licenses();
+
+    $licenses->{agpl3} = 'http://opensource.org/licenses/agpl-v3.html';
+
+    return $licenses;
 }
