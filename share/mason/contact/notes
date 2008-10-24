@@ -9,20 +9,18 @@
       <th>When</th>
       <th>Who</th>
       <th>What</th>
-      <th>Note</th>
 %   if ($can_edit_notes) {
       <th></th>
       <th></th>
 %   }
     </tr>
   </thead>
-  <tbody>
 %   while ( my $note = $notes->next() ) {
+  <tbody>
     <tr class="<% $notes->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_datetime( $note->note_datetime() ) %></td>
       <td><a href="<% $note->user()->uri() %>"><% $note->user()->display_name() %></td>
       <td><% $note->type()->description() %></td>
-      <td><% $note->note() %></td>
 %     if ($can_edit_notes) {
       <td><a href="<% $note->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
@@ -32,8 +30,13 @@
       </td>
 %     }
     </tr>
+    <tr class="<% $notes->index() % 2 ? 'odd' : 'even' %> note">
+%   if ( my $note = $note->note() ) {
+      <td colspan="5"><% format_note( $note ) | n %></td>
 %   }
+    </tr>
   </tbody>
+%   }
 </table>
 % } else {
 <p>Nobody has made any notes for this contact yet</p>

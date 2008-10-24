@@ -145,9 +145,17 @@ table.standard-table td {
     border: none;
 }
 
+table.standard-table td {
+    padding: 0.2em 0.5em;
+}
+
 table.standard-table thead tr {
     background-color: #A1BA6C;
     color: white;
+}
+
+table.standard-table tbody:hover tr {
+    background-color: #EEE;
 }
 
 table.standard-table th {
@@ -159,12 +167,16 @@ table.standard-table tr.even {
 }
 
 table.standard-table tr.note {
-    font-style: italic;
-    font-size: 90%;
+    padding-top: 0;
 }
 
 table.standard-table tr.note td {
     padding-top: 0;
+    padding-bottom: 0;
+}
+
+table.standard-table tr.note td p {
+    margin-left: 1em;
 }
 
 /* === Forms === */

@@ -17,8 +17,8 @@
 %   }
     </tr>
   </thead>
-  <tbody>
 %   while ( my $donation = $donations->next() ) {
+  <tbody>
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
       <td>$<% $donation->amount() %></td>
@@ -36,11 +36,11 @@
     </tr>
 %      if ( my $note = $donation->note() ) {
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> note">
-      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% $note %></td>
+      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% format_note( $note ) | n %></td>
     </tr>
 %      }
-%   }
   </tbody>
+%   }
 </table>
 % } else {
 <p>
