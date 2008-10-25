@@ -34,7 +34,7 @@ use R2::Schema::MessagingProvider;
         R2::Schema::MessagingProvider->new
             ( messaging_provider_id => 1,
               name                  => 'Windows Live Messenger',
-              add_uri_template      => undef,
+              add_uri_template      => q{},
               _from_query           => 1,
             );
 
