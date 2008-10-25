@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema;
+use R2::Util qw( string_is_empty );
 use URI::Template;
 
 use Fey::ORM::Table;
@@ -22,14 +23,15 @@ use MooseX::Params::Validate qw( validatep );
     {
         ( my $meth = $type ) =~ s/_template$//;
 
-        __PACKAGE__->meta()->add_method( $meth =>
-                                         sub { my $self = shift;
-                                               $self->_fill_uri( $type, screen_name => shift ) }
-                                       );
+        __PACKAGE__->meta()->add_method
+            ( $meth =>
+              sub { my $self = shift;
+                    $self->_fill_uri( $type, screen_name => shift ) }
+            );
     }
 
     transform @uri_types
-        => inflate { return unless defined $_[1]; URI::Template->new( $_[1] ) }
+        => inflate { return if string_is_empty( $_[1] ); URI::Template->new( $_[1] ) }
         => deflate { defined $_[1] && ref $_[1] ? $_[1]->as_string() : $_[1] };
 }
 
