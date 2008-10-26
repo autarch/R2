@@ -13,6 +13,7 @@ use R2::Schema::EmailAddress;
 use R2::Schema::File;
 use R2::Schema::PhoneNumber;
 use R2::Schema::Website;
+use R2::Types;
 use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems

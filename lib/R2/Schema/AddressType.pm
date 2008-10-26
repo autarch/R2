@@ -6,6 +6,7 @@ use warnings;
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
 use R2::Schema;
+use R2::Types;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;

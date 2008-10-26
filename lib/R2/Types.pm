@@ -8,9 +8,9 @@ use Moose::Util::TypeConstraints;
 
 
 subtype 'R2.Type.FileIsImage'
-    => as class_type('R2.Schema.File')
+    => as class_type('R2::Schema::File')
     => where { $_->is_image() }
-    => message { 'This file is not an image' };
+    => message { 'This file (' . $_->filename() . ') is not an image' };
 
 subtype 'R2.Type.PosInt'
     => as 'Int'

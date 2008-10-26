@@ -6,6 +6,7 @@ use warnings;
 use R2::Schema::Account;
 use R2::Schema::Donation;
 use R2::Schema;
+use R2::Types;
 
 use Fey::ORM::Table;
 

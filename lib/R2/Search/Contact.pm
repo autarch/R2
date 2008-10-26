@@ -7,6 +7,7 @@ use Fey::Literal::Function;
 use Fey::Literal::Term;
 use Fey::Object::Iterator;
 use R2::Schema;
+use R2::Types;
 
 use Moose;
 

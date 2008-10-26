@@ -167,8 +167,6 @@ sub _build_cache_dir
     {
         my $self = shift;
 
-        my $type = $self->mime_type();
-
         return $ImageType{ $self->mime_type() };
     }
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Test::Exception;
 use Test::More tests => 11;
 
 use lib 't/lib';
@@ -26,9 +27,9 @@ my $image_data = read_file( 't/files/shoe.jpg' );
                                       _from_query => 1,
                                     );
 
-    eval { R2::Image->new( file => $file ) };
-    like( $@, qr/This file is not an image/,
-          'cannot create an R2::Image with a non-image R2::Schema::File' );
+    throws_ok( sub { R2::Image->new( file => $file ) },
+               qr/\QThis file (foo.txt) is not an image/,
+               'cannot create an R2::Image with a non-image R2::Schema::File' );
 }
 
 {

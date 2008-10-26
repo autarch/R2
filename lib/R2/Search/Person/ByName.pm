@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema;
+use R2::Types;
 
 use Moose;
 

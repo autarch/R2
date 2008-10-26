@@ -24,6 +24,7 @@ use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
 use R2::Schema::Person;
 use R2::Schema;
+use R2::Types;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
