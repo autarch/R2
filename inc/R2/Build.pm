@@ -11,7 +11,6 @@ my %Requires =
       'Catalyst::Action::REST'                   => '0.5',
       'Catalyst::DR'                             => '0',
       'Catalyst::Plugin::AuthenCookie'           => '0.01',
-      'Catalyst::Plugin::Cache::Store::FastMmap' => '0',
       'Catalyst::Plugin::Log::Dispatch'          => '0',
       'Catalyst::Plugin::RedirectAndDetach'      => '0',
       'Catalyst::Plugin::Session'                => '0.17',
