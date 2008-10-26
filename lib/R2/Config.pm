@@ -155,9 +155,10 @@ sub _build_config_hash
 
     my $hash = Config::INI::Reader->read_file( $self->_config_file() );
 
+    # Can't call $self->is_production() or else we get a loop
     if ( $hash->{R2}{is_production} )
     {
-        die "If is_production is true, you must supply a value for [R2] - secret"
+        die 'You must supply a value for [R2] - secret when running R2 in production'
             if string_is_empty( $hash->{R2}{secret} );
     }
 
@@ -264,7 +265,7 @@ sub _build_etc_dir
 {
     my $self = shift;
 
-    return $self->_dir( [ 'cache' ],
+    return $self->_dir( [ 'etc' ],
                         '/etc/r2',
                       );
 }
@@ -341,13 +342,6 @@ sub _build_catalyst_config
 }
 
 {
-    my %DatePatterns =
-        ( 'hourly'  => 'yyyy-MM-dd-HH',
-          'daily'   => 'yyyy-MM-dd',
-          'weekly'  => 'yyyy-ww',
-          'monthly' => 'yyyy-MM',
-        );
-
     sub _log_config
     {
         my $self = shift;
@@ -369,17 +363,11 @@ sub _build_catalyst_config
             }
             else
             {
-                require Log::Dispatch::FileRotate;
+                require Log::Dispatch::Syslog;
 
-                my $pattern = $self->_config_hash()->{log}{rotation};
-                $pattern = $DatePatterns{$pattern}
-                    if $DatePatterns{$pattern};
-
-                push @loggers, { class       => 'FileRotate',
-                                 name        => 'FileRotate',
+                push @loggers, { class       => 'Syslog',
+                                 name        => 'Syslog',
                                  min_level   => 'warning',
-                                 max         => $self->_config_hash()->{log}{max_files} || 52,
-                                 DatePattern => $pattern || $DatePatterns{weekly},
                                };
             }
         }
@@ -410,8 +398,8 @@ sub _build_dbi_config
         if $db_config->{port};
 
     return { dsn      => $dsn,
-             username => ( $db_config->{username} || '' ),
-             password => ( $db_config->{password} || '' ),
+             username => ( $db_config->{username} || q{} ),
+             password => ( $db_config->{password} || q{} ),
            };
 }
 
@@ -444,7 +432,7 @@ sub _build_static_path_prefix
 
     return $self->path_prefix() unless $self->is_production();
 
-    my $prefix = defined $self->path_prefix() ? $self->path_prefix() : '';
+    my $prefix = string_is_empty( $self->path_prefix() ) ? q{} : $self->path_prefix();
 
     return $prefix . q{/} . read_file( $self->etc_dir()->file('revision')->stringify() );
 }
