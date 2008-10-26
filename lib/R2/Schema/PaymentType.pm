@@ -22,7 +22,7 @@ use Fey::ORM::Table;
     has 'donation_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => __PACKAGE__->_BuildDonationCountSelect(),
           bind_params => sub { $_[0]->payment_type_id() },

@@ -26,7 +26,7 @@ use Fey::ORM::Table;
     has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->contact_note_type_id() },

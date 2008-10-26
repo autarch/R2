@@ -8,8 +8,6 @@ use Fey::ORM::Schema;
 use Fey::DBIManager::Source;
 use Fey::Loader;
 use R2::Config;
-# Loading this for the sake of all the table classes which need it.
-use R2::Types;
 
 
 my $source;

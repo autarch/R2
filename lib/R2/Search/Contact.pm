@@ -18,13 +18,13 @@ has 'account' =>
 
 has 'limit' =>
     ( is      => 'ro',
-      isa     => 'R2::Type::PosOrZeroInt',
+      isa     => 'R2.Type.PosOrZeroInt',
       default => 0,
     );
 
 has 'page' =>
     ( is      => 'ro',
-      isa     => 'R2::Type::PosInt',
+      isa     => 'R2.Type.PosInt',
       default => 1,
     );
 

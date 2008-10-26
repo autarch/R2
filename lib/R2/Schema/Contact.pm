@@ -146,7 +146,7 @@ with qw( R2::Role::DataValidator
     has 'donation_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => __PACKAGE__->_BuildDonationCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
@@ -165,7 +165,7 @@ with qw( R2::Role::DataValidator
     has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => __PACKAGE__->_BuildNoteCountSelect(),
           bind_params => sub { $_[0]->contact_id() },

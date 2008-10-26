@@ -28,7 +28,7 @@ use MooseX::ClassAttribute;
     has 'history_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->contact_history_type_id() },

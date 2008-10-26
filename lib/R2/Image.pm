@@ -17,7 +17,7 @@ use Moose::Util::TypeConstraints;
 
 has 'file' =>
     ( is       => 'ro',
-      isa      => 'R2::Type::FileIsImage',
+      isa      => 'R2.Type.FileIsImage',
       required => 1,
       handles  => [ 'path', 'uri' ],
     );
@@ -33,7 +33,7 @@ has '_magick' =>
 
 has 'height' =>
     ( is       => 'ro',
-      isa      => 'R2::Type::PosInt',
+      isa      => 'R2.Type.PosInt',
       lazy     => 1,
       default  => sub { $_[0]->_magick()->get('height') },
       init_arg => undef,
@@ -41,7 +41,7 @@ has 'height' =>
 
 has 'width' =>
     ( is       => 'ro',
-      isa      => 'R2::Type::PosInt',
+      isa      => 'R2.Type.PosInt',
       lazy     => 1,
       default  => sub { $_[0]->_magick()->get('width') },
       init_arg => undef,

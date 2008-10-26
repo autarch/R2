@@ -11,7 +11,7 @@ extends 'R2::Search::Person';
 
 has 'name' =>
     ( is  => 'ro',
-      isa => 'R2::Type::NonEmptyStr',
+      isa => 'R2.Type.NonEmptyStr',
     );
 
 

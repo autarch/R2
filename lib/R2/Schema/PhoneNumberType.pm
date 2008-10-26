@@ -44,7 +44,7 @@ with 'R2::Role::DataValidator';
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
               is          => 'ro',
-              isa         => 'R2::Type::PosOrZeroInt',
+              isa         => 'R2.Type.PosOrZeroInt',
               lazy        => 1,
               select      => __PACKAGE__->$build_count_meth(),
               bind_params => sub { $_[0]->phone_number_type_id() },
@@ -65,7 +65,7 @@ with 'R2::Role::DataValidator';
     has 'contact_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2::Type::PosOrZeroInt',
+          isa         => 'R2.Type.PosOrZeroInt',
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->phone_number_type_id() },
