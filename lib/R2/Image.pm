@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Image::Magick;
+use List::Util qw( min );
 use Path::Class ();
 use R2::Schema::File;
 use R2::Types;
@@ -11,6 +12,7 @@ use R2::Types;
 use Moose;
 use MooseX::StrictConstructor;
 use MooseX::Params::Validate qw( validatep );
+use Moose::Util::TypeConstraints;
 
 
 has 'file' =>
@@ -18,6 +20,31 @@ has 'file' =>
       isa      => 'R2::Type::FileIsImage',
       required => 1,
       handles  => [ 'path', 'uri' ],
+    );
+
+class_type('Image::Magick');
+
+has '_magick' =>
+    ( is         => 'ro',
+      isa        => 'Image::Magick',
+      lazy_build => 1,
+      init_arg   => undef,
+    );
+
+has 'height' =>
+    ( is       => 'ro',
+      isa      => 'R2::Type::PosInt',
+      lazy     => 1,
+      default  => sub { $_[0]->_magick()->get('height') },
+      init_arg => undef,
+    );
+
+has 'width' =>
+    ( is       => 'ro',
+      isa      => 'R2::Type::PosInt',
+      lazy     => 1,
+      default  => sub { $_[0]->_magick()->get('width') },
+      init_arg => undef,
     );
 
 sub resize
@@ -29,6 +56,8 @@ sub resize
                    width  => { isa => 'Int' },
                  );
 
+    ( $height, $width ) = $self->_new_dimensions( $height, $width );
+
     my $dimensions = $width . q{x} . $height;
     my $unique_name = $self->file()->file_id() . q{-} . $dimensions;
 
@@ -37,26 +66,38 @@ sub resize
     return R2::Image->new( file => $file )
         if $file;
 
-    my $img = Image::Magick->new();
-    $img->read( filename => $self->file()->path() );
+    $file = $self->_make_resized_image( $height, $width, $dimensions, $unique_name );
+}
 
-    my $i_height = $img->get('height');
-    my $i_width  = $img->get('width');
+sub _new_dimensions
+{
+    my $self   = shift;
+    my $height = shift;
+    my $width  = shift;
 
-    if ( $height < $i_height
-         ||
-         $width  < $i_width
-       )
-    {
-        my $height_r = $height / $i_height;
-        my $width_r  = $width / $i_width;
+    my $orig_height = $self->height();
+    my $orig_width  = $self->width();
 
-        my $ratio = $height_r < $width_r ? $height_r : $width_r;
+    return ( $orig_height, $orig_width )
+        if $height >= $orig_height && $width >= $orig_width;
 
-        $img->Scale( height => int( $i_height * $ratio ),
-                     width  => int( $i_width * $ratio ),
-                   );
-    }
+    my $height_r = $height / $orig_height;
+    my $width_r  = $width / $orig_width;
+
+    my $ratio = min ( $height_r, $width_r );
+
+    return ( int( $orig_height * $ratio ),
+             int( $orig_width * $ratio ),
+           );
+}
+
+sub _make_resized_image
+{
+    my $self        = shift;
+    my $height      = shift;
+    my $width       = shift;
+    my $dimensions  = shift;
+    my $unique_name = shift;
 
     my $resized_file =
         $self->file()->path()->dir()->file
@@ -65,12 +106,19 @@ sub resize
               . $dimensions
               . q{.} . $self->file()->extension() );
 
-    $img->write( filename => $resized_file->stringify(),
-                 quality  => $img->get('quality'),
+    my $orig = $self->_magick();
+    my $new = $orig->Clone();
+
+    $new->Scale( height => $height,
+                 width  => $width,
+               );
+
+    $new->write( filename => $resized_file->stringify(),
+                 quality  => $orig->get('quality'),
                  type     => 'Palette',
                );
 
-    $file =
+    my $file =
         R2::Schema::File->insert
             ( filename    => $resized_file->basename(),
               contents    => scalar $resized_file->slurp(),
@@ -82,7 +130,18 @@ sub resize
     return (ref $self)->new( file => $file );
 }
 
+sub _build__magick
+{
+    my $self = shift;
+
+    my $img = Image::Magick->new();
+    $img->read( filename => $self->path() );
+
+    return $img;
+}
+
 no Moose;
+no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta()->make_immutable();
 
