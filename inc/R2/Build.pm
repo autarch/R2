@@ -70,8 +70,8 @@ my %Requires =
     );
 
 my %BuildRequires =
-    ( Test::Exception => '0',
-      Test::More      => '0',
+    ( 'Test::Exception' => '0',
+      'Test::More'      => '0',
     );
 
 sub new
