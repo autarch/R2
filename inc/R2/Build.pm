@@ -69,6 +69,11 @@ my %Requires =
       'URI::Template'                            => '0',
     );
 
+my %BuildRequires =
+    ( Test::Exception => '0',
+      Test::More      => '0',
+    );
+
 sub new
 {
     my $class = shift;
@@ -77,6 +82,7 @@ sub new
         ( license              => 'agpl3',
           module_name          => 'R2',
           requires             => \%Requires,
+          build_requires       => \%BuildRequires,
           script_files         => [ glob('bin/*.pl') ],
           recursive_test_files => 1,
         );
