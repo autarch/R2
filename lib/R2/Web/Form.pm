@@ -4,6 +4,10 @@ use strict;
 use warnings;
 
 use HTML::DOM;
+
+die "HTML::DOM 0.022 breaks this module"
+    if HTML::DOM->VERSION eq '0.022';
+
 use HTML::FillInForm;
 use R2::Config;
 use R2::Web::FormData;
