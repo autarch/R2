@@ -92,6 +92,22 @@ CREATE TABLE "Contact" (
        account_id         INTEGER            NOT NULL
 );
 
+CREATE TABLE "Group" (
+       group_id           SERIAL             PRIMARY KEY,
+       name               VARCHAR(255)       NOT NULL,
+       is_mailing_list    BOOLEAN            NOT NULL DEFAULT FALSE,
+       applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
+       applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
+       applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
+       account_id         INT8               NOT NULL
+);
+
+CREATE TABLE "GroupMember" (
+       group_id           INT8               NOT NULL,
+       contact_id         INT8               NOT NULL,
+       PRIMARY KEY ( group_id, contact_id )
+);
+
 CREATE DOMAIN pos_int AS INTEGER
        CONSTRAINT is_positive CHECK ( VALUE > 0 );
 
@@ -505,6 +521,18 @@ ALTER TABLE "Contact" ADD CONSTRAINT "Contact_account_id"
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_image_file_id"
   FOREIGN KEY ("image_file_id") REFERENCES "File" ("file_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "Group" ADD CONSTRAINT "Group_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "GroupMember" ADD CONSTRAINT "GroupMember_group_id"
+  FOREIGN KEY ("group_id") REFERENCES "Group" ("group_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "GroupMember" ADD CONSTRAINT "GroupMember_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "CustomFieldGroup" ADD CONSTRAINT "CustomFieldGroup_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
