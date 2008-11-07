@@ -38,16 +38,12 @@ with 'R2::Role::DataValidator';
                ->where( $schema->table('Address')->column('address_type_id'),
                         '=', Fey::Placeholder->new() );
 
-        my $build_count_meth = '_Build' . $type . 'CountSelect';
-        __PACKAGE__->meta()->add_method
-            ( $build_count_meth => sub { $select } );
-
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
               is          => 'ro',
               isa         => 'R2.Type.PosOrZeroInt',
               lazy        => 1,
-              select      => __PACKAGE__->$build_count_meth(),
+              select      => $select,
               bind_params => sub { $_[0]->address_type_id() },
             );
     }
