@@ -28,6 +28,8 @@ around 'update' => sub
 
     $self->_clean_and_validate_data(\%p);
 
+    return unless keys %p;
+
     return $self->$orig(%p);
 };
 
