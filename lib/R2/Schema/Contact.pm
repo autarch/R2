@@ -366,13 +366,12 @@ sub _build_history
 
     my $dbh = $self->_dbh($select);
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     return
         Fey::Object::Iterator::Caching->new
             ( classes     =>
                   [ qw( R2::Schema::ContactHistory R2::Schema::ContactHistoryType ) ],
-              handle      => $sth,
+              dbh         => $dbh,
+              selcet      => $select,
               bind_params => [ $self->contact_id() ],
             );
 }

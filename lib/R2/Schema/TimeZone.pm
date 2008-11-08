@@ -76,11 +76,10 @@ sub ByCountry
 
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     return
         Fey::Object::Iterator->new( classes     => $class,
-                                    handle      => $sth,
+                                    dbh         => $dbh,
+                                    select      => $select,
                                     bind_params => [ $iso_code ],
                                   );
 }

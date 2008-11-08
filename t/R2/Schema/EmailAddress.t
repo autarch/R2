@@ -4,12 +4,12 @@ use warnings;
 use Test::More tests => 6;
 
 use lib 't/lib';
-use R2::Test qw( mock_dbh );
+use R2::Test qw( mock_schema );
 
 use R2::Schema::EmailAddress;
 
-mock_dbh();
 
+mock_schema();
 
 {
     eval

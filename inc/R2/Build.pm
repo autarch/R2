@@ -70,7 +70,8 @@ my %Requires =
     );
 
 my %BuildRequires =
-    ( 'Test::Exception' => '0',
+    ( 'Fey::ORM::Mock'  => '0',
+      'Test::Exception' => '0',
       'Test::More'      => '0',
     );
 

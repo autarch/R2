@@ -47,11 +47,10 @@ sub All
 
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     return
-        Fey::Object::Iterator->new( classes     => $class,
-                                    handle      => $sth,
+        Fey::Object::Iterator->new( classes => $class,
+                                    dbh     => $dbh,
+                                    select  => $select,
                                   );
 }
 

@@ -5,23 +5,29 @@ use warnings;
 
 use Exporter qw(import);
 
-our @EXPORT_OK = qw( mock_dbh );
+our @EXPORT_OK = qw( mock_schema mock_dbh );
 
 use DBD::Mock 1.36;
+use Fey::ORM::Mock;
 use R2::Test::Schema;
 use R2::Schema;
 
 
-sub mock_dbh
+my $IsMocked = 0;
+sub mock_schema
 {
     require R2::Schema;
 
-    my $man = R2::Schema->DBIManager();
+    $IsMocked = 1;
 
-    $man->remove_source('default');
-    $man->add_source( name => 'default', dsn => 'dbi:Mock:' );
+    return Fey::ORM::Mock->new( schema_class => 'R2::Schema' );
+}
 
-    return $man->default_source()->dbh();
+sub mock_dbh
+{
+    mock_schema unless $IsMocked;
+
+    return R2::Schema->DBIManager()->default_source()->dbh();
 }
 
 1;

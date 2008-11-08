@@ -71,12 +71,11 @@ sub contacts
         $select->limit(@limit);
     }
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     return
         Fey::Object::Iterator->new
             ( classes     => 'R2::Schema::Contact',
-              handle      => $sth,
+              dbh         => $dbh,
+              select      => $select,
               bind_params => [ $select->bind_params() ],
             );
 }

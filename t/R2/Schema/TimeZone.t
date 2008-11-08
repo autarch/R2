@@ -22,7 +22,8 @@ my $dbh = mock_dbh();
           [ 'America/New_York', 'us', 'The Big Apple', 2 ],
         ];
 
-    R2::Schema::TimeZone->ByCountry('us');
+    my $iter = R2::Schema::TimeZone->ByCountry('us');
+    $iter->next();
 
     like( $dbh->{mock_all_history}[0]->statement(),
           qr/SELECT .+ FROM "TimeZone" WHERE "TimeZone"."iso_code" = \?/,

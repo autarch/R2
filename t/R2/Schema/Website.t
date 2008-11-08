@@ -4,12 +4,12 @@ use warnings;
 use Test::More tests => 7;
 
 use lib 't/lib';
-use R2::Test qw( mock_dbh );
+use R2::Test qw( mock_schema );
 
 use R2::Schema::Website;
 
-mock_dbh();
 
+mock_schema();
 
 {
     my $contact = R2::Schema::Website->insert( uri        => 'urth.org',

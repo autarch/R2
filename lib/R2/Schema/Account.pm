@@ -459,12 +459,11 @@ sub _build_countries
 
     my $dbh = $self->_dbh($select);
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     return
         Fey::Object::Iterator::Caching->new
             ( classes     => [ qw( R2::Schema::AccountCountry R2::Schema::Country  ) ],
-              handle      => $sth,
+              dbh         => $dbh,
+              select      => $select,
               bind_params => [ $self->account_id() ],
             );
 }

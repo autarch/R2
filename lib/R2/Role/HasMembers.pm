@@ -61,15 +61,14 @@ sub _build_members
 
     my $dbh = $self->_dbh($select);
 
-    my $sth = $dbh->prepare( $select->sql($dbh) );
-
     my $membership_class =
         Fey::Meta::Class::Table->ClassForTable( $self->_MembershipTable() );
 
     return
         Fey::Object::Iterator::Caching->new
             ( classes     => [ qw( R2::Schema::Person ), $membership_class ],
-              handle      => $sth,
+              dbh         => $dbh,
+              select      => $select,
               bind_params => [ $self->pk_values() ],
             );
 }
@@ -82,7 +81,7 @@ sub _build_member_count
 
     my $dbh = $self->_dbh($select);
 
-    return $dbh->selectrow_arrayref( $select->sql($dbh), {}, $self->_pk_vals() )->[0];
+    return $dbh->selectrow_arrayref( $select->sql($dbh), {}, $self->pk_values_list() )->[0];
 }
 
 # Can't have class attributes in a role yet
@@ -106,28 +105,6 @@ sub _build_member_count
 
         return $MemberCount{$class} ||= $class->_BuildMemberCount();
     }
-}
-
-sub pk_hash
-{
-    my $self = shift;
-
-    return
-        ( map { $_ => $self->$_() }
-          map { $_->name() }
-          @{ $self->Table()->primary_key() }
-        );
-}
-
-sub pk_values
-{
-    my $self = shift;
-
-    return
-        ( map { $self->$_() }
-          map { $_->name() }
-          @{ $self->Table()->primary_key() }
-        );
 }
 
 sub _BuildMembersSelect

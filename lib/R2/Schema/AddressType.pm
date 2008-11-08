@@ -72,7 +72,7 @@ with 'R2::Role::DataValidator';
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _cannot_unapply _applies_to_something ) ] },
+          default => sub { [ qw( _applies_to_something _cannot_unapply ) ] },
         );
 }
 
