@@ -443,12 +443,16 @@ CREATE TABLE "Donation" (
        amount             NUMERIC(13,2)      NOT NULL,
        donation_date      DATE               NOT NULL,
        contact_id         INT8               NOT NULL,
+       value_for_donor    NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
+       transaction_cost   NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        is_recurring       BOOL               NOT NULL DEFAULT FALSE,
        donation_source_id INT8               NOT NULL,
        donation_target_id INT8               NOT NULL,
        payment_type_id    INT8               NOT NULL,
        note               TEXT               NOT NULL DEFAULT '',
-       CONSTRAINT valid_amount CHECK ( amount > 0.00 )
+       CONSTRAINT valid_amount CHECK ( amount > 0.00 ),
+       CONSTRAINT valid_value_for_donor CHECK ( value_for_donor >= 0.00 ),
+       CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 ),
 );
 
 CREATE TABLE "DonationSource" (
