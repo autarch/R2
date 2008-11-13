@@ -33,7 +33,7 @@ with 'R2::Role::DataValidator';
                 ( 'COUNT', @{ $foreign_table->primary_key() } );
 
         $select->select($count)
-               ->from( $schema->tables( 'Address', 'Contact' ),  )
+               ->from( $schema->tables( 'Address', 'Contact' ) )
                ->from( $schema->table('Contact'), $foreign_table )
                ->where( $schema->table('Address')->column('address_type_id'),
                         '=', Fey::Placeholder->new() );
@@ -55,7 +55,7 @@ with 'R2::Role::DataValidator';
             ( 'COUNT', @{ $schema->table('Contact')->primary_key() } );
 
     $select->select($count)
-           ->from( $schema->tables( 'Address', 'Contact' ),  )
+           ->from( $schema->table('Address') )
            ->where( $schema->table('Address')->column('address_type_id'),
                     '=', Fey::Placeholder->new() );
 
