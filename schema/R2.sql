@@ -231,7 +231,7 @@ CREATE TABLE "ContactNote" (
 CREATE TABLE "ContactNoteType" (
        contact_note_type_id  SERIAL          PRIMARY KEY,
        description        VARCHAR(255)       NOT NULL,
-       is_system_defined  BOOLEAN            DEFAULT FALSE,
+       is_system_defined  BOOLEAN            NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' ),
        CONSTRAINT description_account_id_ck UNIQUE ( description, account_id )
