@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More tests => 91;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
@@ -80,10 +80,7 @@ my $account;
           [ $account->account_id(), 3, 'theft' ],
         ];
 
-    $dbh->{mock_add_resultset} =
-        [ [ 'count' ],
-          [ 10 ],
-        ];
+    $dbh->{mock_add_resultset} = [[]];
 
     $dbh->{mock_add_resultset} =
         [ [ 'count' ],
@@ -100,7 +97,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::DonationSource');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::DonationSource' );
+        '4 actions for R2::Schema::DonationSource' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -149,10 +146,7 @@ my $account;
           [ $account->account_id(), 3, 'Unsavory Things' ],
         ];
 
-    $dbh->{mock_add_resultset} =
-        [ [ 'count' ],
-          [ 10 ],
-        ];
+    $dbh->{mock_add_resultset} = [[]];
 
     $dbh->{mock_add_resultset} =
         [ [ 'count' ],
@@ -169,7 +163,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::DonationTarget');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::DonationTarget' );
+        '4 actions for R2::Schema::DonationTarget' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -218,10 +212,7 @@ my $account;
           [ $account->account_id(), 'check', 3 ],
         ];
 
-    $dbh->{mock_add_resultset} =
-        [ [ 'count' ],
-          [ 10 ],
-        ];
+    $dbh->{mock_add_resultset} = [[]];
 
     $dbh->{mock_add_resultset} =
         [ [ 'count' ],
@@ -238,7 +229,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::PaymentType');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::PaymentType' );
+        '4 actions for R2::Schema::PaymentType' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -320,7 +311,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::AddressType');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::AddressType' );
+        '4 actions for R2::Schema::AddressType' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -414,7 +405,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::PhoneNumberType');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::PhoneNumberType' );
+        '4 actions for R2::Schema::PhoneNumberType' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -494,7 +485,7 @@ my $account;
     my @actions = $mock->recorder()->actions_for_class('R2::Schema::ContactNoteType');
 
     is( scalar @actions, 4,
-        '3 actions for R2::Schema::ContactNoteType' );
+        '4 actions for R2::Schema::ContactNoteType' );
 
     ok( $actions[0]->is_update(),
         '. first action for is an update' );
@@ -528,4 +519,135 @@ my $account;
                  is_system_defined => 0,
                },
                '.. inserted a new contact note type' );
+}
+
+{
+    $mock->recorder()->clear_all();
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} = [[]];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( account_id donation_source_id name ) ],
+        ];
+
+    # this is cached iterator so we want to avoid getting the old data
+    $account->_clear_donation_sources();
+
+    $account->update_or_add_donation_sources
+        ( {},
+          [ { name => 'lemonade stand' } ],
+        );
+
+    my @actions = $mock->recorder()->actions_for_class('R2::Schema::DonationSource');
+
+    is( scalar @actions, 1,
+        '1 action for R2::Schema::DonationSource' );
+    ok( $actions[0]->is_insert(),
+        'can insert but not update via update_or_add_donation_sources' );
+}
+
+{
+    $mock->recorder()->clear_all();
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} = [[]];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( account_id donation_source_id name ) ],
+          [ $account->account_id(), 1, 'mail' ],
+        ];
+
+    $account->_clear_donation_sources();
+
+    $account->update_or_add_donation_sources
+        ( { 1 => { name => 'male' },
+          },
+        );
+
+    my @actions = $mock->recorder()->actions_for_class('R2::Schema::DonationSource');
+
+    is( scalar @actions, 1,
+        '1 action for R2::Schema::DonationSource' );
+    ok( $actions[0]->is_update(),
+        'can update but not insert via update_or_add_donation_sources' );
+}
+
+{
+    $mock->recorder()->clear_all();
+
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} = [[]];
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( account_id donation_source_id name ) ],
+          [ $account->account_id(), 1, 'mail' ],
+          [ $account->account_id(), 2, 'online' ],
+        ];
+
+    $dbh->{mock_add_resultset} = [[]];
+
+    $dbh->{mock_add_resultset} =
+        [ [ 'count' ],
+          [ 10 ],
+        ];
+
+    $account->_clear_donation_sources();
+
+    $account->update_or_add_donation_sources
+        ( { 1 => { name => 'male' },
+          },
+        );
+
+    my @actions = $mock->recorder()->actions_for_class('R2::Schema::DonationSource');
+
+    is( scalar @actions, 1,
+        '1 action for R2::Schema::DonationSource (did not attempt to delete undeleteable source)' );
+    ok( $actions[0]->is_update(),
+        'can update but not insert via update_or_add_donation_sources' );
+}
+
+{
+    eval { $account->update_or_add_donation_sources( {}, [] ) };
+
+    like( $@, qr/\QYou must have at least one donation source./,
+          'Cannot call update_or_add_donation_sources with nothing to update or add' );
+}
+
+{
+    $mock->seed_class
+        ( 'R2::Schema::ContactNoteType' =>
+          { account_id           => $account->account_id(),
+            contact_note_type_id => 5,
+          },
+        );
+
+    my $type = $account->_build_made_a_note_contact_note_type();
+
+    is( $type->description(), 'Made a note',
+        '_build_made_a_note_contact_note_type returns something sane' );
+}
+
+
+{
+    $dbh->{mock_clear_history} = 1;
+
+    $dbh->{mock_add_resultset} =
+        [ [ qw( account_id is_default iso_code iso_code name ) ],
+          [ 1, 1, 'us', 'us', 'United States' ],
+          [ 1, 0, 'ca', 'ca', 'Canada' ],
+        ];
+
+    my @countries = $account->_build_countries()->all();
+
+    is( scalar @countries, 2,
+        'found two countries for this account' );
+}
+
+{
+    is( $account->_base_uri_path(), '/account/1',
+        '_base_uri_path() is /account/1' );
 }
