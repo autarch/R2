@@ -123,7 +123,7 @@ sub _cannot_unapply
     {
         my $key = 'applies_to_' . $contact_type;
 
-        if ( exists $p->{$key} && ! $p->{$key} )
+        if ( exists $p->{$key} && ! $p->{$key} && $self->$key() )
         {
             my $meth = 'can_unapply_from_' . $contact_type;
 
