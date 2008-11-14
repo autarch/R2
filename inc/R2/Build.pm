@@ -63,6 +63,7 @@ my %Requires =
       'Net::OpenID::Consumer'                    => '0',
       'Path::Class'                              => '0',
       'Params::Validate'                         => '0',
+      'Sub::Name'                                => '0',
       'Sys::Hostname'                            => '0',
       'Time::HiRes'                              => '0',
       'URI::FromHash'                            => '0',
