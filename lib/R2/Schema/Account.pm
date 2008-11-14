@@ -26,6 +26,7 @@ use R2::Schema::Person;
 use R2::Schema;
 use R2::Types;
 use R2::Util qw( string_is_empty );
+use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -113,12 +114,17 @@ sub insert
     my $class = shift;
     my %p     = @_;
 
-    my $sub = sub { my $account = $class->SUPER::insert(%p);
+    my $sub =
+        subname( 'R2::Schema::insert-initialize' =>
+                 sub
+                 {
+                     my $account = $class->SUPER::insert(%p);
 
-                    $account->_initialize();
+                     $account->_initialize();
 
-                    return $account;
-                  };
+                     return $account;
+                 }
+               );
 
     return R2::Schema->RunInTransaction($sub);
 }
@@ -188,41 +194,12 @@ sub update_or_add_donation_sources
     my $existing = shift;
     my $new      = shift;
 
-    unless ( @{ $new }
-             || any { ! string_is_empty($_) } values %{ $existing } )
-    {
-        error 'You must have at least one donation source.';
-    }
-
-    my $sub =
-        sub { for my $source ( $self->donation_sources()->all() )
-              {
-                  my $new_name = $existing->{ $source->donation_source_id() };
-
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $source->is_deleteable();
-
-                      $source->delete();
-                  }
-                  else
-                  {
-                      $source->update( name => $new_name );
-                  }
-              }
-
-              for my $name ( @{ $new } )
-              {
-                  R2::Schema::DonationSource->insert
-                      ( name       => $name,
-                        account_id => $self->account_id(),
-                      );
-              }
-            };
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'donation_source',
+          'name',
+        );
 }
 
 sub update_or_add_donation_targets
@@ -231,41 +208,12 @@ sub update_or_add_donation_targets
     my $existing = shift;
     my $new      = shift;
 
-    unless ( @{ $new }
-             || any { ! string_is_empty($_) } values %{ $existing } )
-    {
-        error 'You must have at least one donation target.';
-    }
-
-    my $sub =
-        sub { for my $target ( $self->donation_targets()->all() )
-              {
-                  my $new_name = $existing->{ $target->donation_target_id() };
-
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $target->is_deleteable();
-
-                      $target->delete();
-                  }
-                  else
-                  {
-                      $target->update( name => $new_name );
-                  }
-              }
-
-              for my $name ( @{ $new } )
-              {
-                  R2::Schema::DonationTarget->insert
-                      ( name       => $name,
-                        account_id => $self->account_id(),
-                      );
-              }
-            };
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'donation_target',
+          'name',
+        );
 }
 
 sub update_or_add_payment_types
@@ -274,41 +222,12 @@ sub update_or_add_payment_types
     my $existing = shift;
     my $new      = shift;
 
-    unless ( @{ $new }
-             || any { ! string_is_empty($_) } values %{ $existing } )
-    {
-        error 'You must have at least one payment type.';
-    }
-
-    my $sub =
-        sub { for my $type ( $self->payment_types()->all() )
-              {
-                  my $new_name = $existing->{ $type->payment_type_id() };
-
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $type->is_deleteable();
-
-                      $type->delete();
-                  }
-                  else
-                  {
-                      $type->update( name => $new_name );
-                  }
-              }
-
-              for my $name ( @{ $new } )
-              {
-                  R2::Schema::PaymentType->insert
-                      ( name       => $name,
-                        account_id => $self->account_id(),
-                      );
-              }
-            };
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'payment_type',
+          'name',
+        );
 }
 
 sub update_or_add_address_types
@@ -317,41 +236,12 @@ sub update_or_add_address_types
     my $existing = shift;
     my $new      = shift;
 
-    unless ( @{ $new }
-             || any { ! string_is_empty( $_->{name} ) } values %{ $existing } )
-    {
-        error 'You must have at least one address type.';
-    }
-
-    my $sub =
-        sub { for my $type ( $self->address_types()->all() )
-              {
-                  my $new_name = $existing->{ $type->address_type_id() }{name};
-
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $type->is_deleteable();
-
-                      $type->delete();
-                  }
-                  else
-                  {
-                      $type->update( %{ $existing->{ $type->address_type_id() } } );
-                  }
-              }
-
-              for my $type ( @{ $new } )
-              {
-                  R2::Schema::AddressType->insert
-		      ( %{ $type },
-			account_id => $self->account_id(),
-		      );
-              }
-            };
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'address_type',
+          'name',
+        );
 }
 
 sub update_or_add_phone_number_types
@@ -360,41 +250,12 @@ sub update_or_add_phone_number_types
     my $existing = shift;
     my $new      = shift;
 
-    unless ( @{ $new }
-             || any { ! string_is_empty( $_->{name} ) } values %{ $existing } )
-    {
-        error 'You must have at least one phone number type.';
-    }
-
-    my $sub =
-        sub { for my $type ( $self->phone_number_types()->all() )
-              {
-                  my $new_name = $existing->{ $type->phone_number_type_id() }{name};
-
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $type->is_deleteable();
-
-                      $type->delete();
-                  }
-                  else
-                  {
-                      $type->update( %{ $existing->{ $type->phone_number_type_id() } } );
-                  }
-              }
-
-              for my $type ( @{ $new } )
-              {
-                  R2::Schema::PhoneNumberType->insert
-		      ( %{ $type },
-			account_id => $self->account_id(),
-		      );
-              }
-            };
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'phone_number_type',
+          'name',
+        );
 }
 
 sub update_or_add_contact_note_types
@@ -403,38 +264,66 @@ sub update_or_add_contact_note_types
     my $existing = shift;
     my $new      = shift;
 
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'contact_note_type',
+          'description',
+        );
+}
+
+sub _update_or_add_things
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+    my $thing    = shift;
+    my $name_col = shift;
+
+    my $id_col = $thing . '_id';
+    ( my $thing_name = $thing ) =~ s/_/ /g;
+
+    my $thing_pl = $thing . q{s};
+
+    my $class = 'R2::Schema::' . ( join '', map { ucfirst } split /_/, $thing );
+
     unless ( @{ $new }
-             || any { ! string_is_empty($_) } values %{ $existing } )
+             ||
+             any { ! string_is_empty( $_->{$name_col} ) }
+             values %{ $existing } )
     {
-        error 'You must have at least one contact note type.';
+        error "You must have at least one $thing_name.";
     }
 
     my $sub =
-        sub { for my $type ( $self->user_defined_contact_note_types()->all() )
-              {
-                  my $new_name = $existing->{ $type->contact_note_type_id() };
+        subname( 'R2::Schema::_update_or_add_things-' . $thing =>
+                 sub
+                 {
+                     for my $thing ( $self->$thing_pl()->all() )
+                     {
+                         my $updated_thing = $existing->{ $thing->$id_col() };
 
-                  if ( string_is_empty($new_name) )
-                  {
-                      next unless $type->is_deleteable();
+                         if ( string_is_empty( $updated_thing->{$name_col} ) )
+                         {
+                             next unless $thing->is_deleteable();
 
-                      $type->delete();
-                  }
-                  else
-                  {
-                      $type->update( description =>
-                                     $existing->{ $type->contact_note_type_id() } );
-                  }
-              }
+                             $thing->delete();
+                         }
+                         else
+                         {
+                             $thing->update( %{ $updated_thing } );
+                         }
+                     }
 
-              for my $type ( @{ $new } )
-              {
-                  R2::Schema::ContactNoteType->insert
-		      ( description => $type,
-			account_id  => $self->account_id(),
-		      );
-              }
-            };
+                     for my $new_thing ( @{ $new } )
+                     {
+                         $class->insert
+                             ( %{ $new_thing },
+                               account_id => $self->account_id(),
+                             );
+                     }
+                 }
+               );
 
     R2::Schema->RunInTransaction($sub);
 

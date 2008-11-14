@@ -58,12 +58,13 @@ sub donation_sources
     my $params = $self->params();
 
     my %existing =
-        ( map  { /^donation_source_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
+        ( map  { /^donation_source_name_(\d+)/ ? ( $1 => { name => $params->{$_} } ) : () }
           keys %{ $params }
         );
 
     my @new =
-        ( grep { ! string_is_empty($_) }
+        ( map  { +{ name => $_ } }
+          grep { ! string_is_empty($_) }
           map  { $params->{$_} }
           grep { /^donation_source_name_new/ }
           keys %{ $params }
@@ -79,12 +80,13 @@ sub donation_targets
     my $params = $self->params();
 
     my %existing =
-        ( map  { /^donation_target_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
+        ( map  { /^donation_target_name_(\d+)/ ? ( $1 => { name => $params->{$_} } ) : () }
           keys %{ $params }
         );
 
     my @new =
-        ( grep { ! string_is_empty($_) }
+        ( map  { +{ name => $_ } }
+          grep { ! string_is_empty($_) }
           map  { $params->{$_} }
           grep { /^donation_target_name_new/ }
           keys %{ $params }
@@ -100,12 +102,13 @@ sub payment_types
     my $params = $self->params();
 
     my %existing =
-        ( map  { /^payment_type_name_(\d+)/ ? ( $1 => $params->{$_} ) : () }
+        ( map  { /^payment_type_name_(\d+)/ ? ( $1 => { name => $params->{$_} } ) : () }
           keys %{ $params }
         );
 
     my @new =
-        ( grep { ! string_is_empty($_) }
+        ( map  { +{ name => $_ } }
+          grep { ! string_is_empty($_) }
           map  { $params->{$_} }
           grep { /^payment_type_name_new/ }
           keys %{ $params }
@@ -204,13 +207,14 @@ sub contact_history_types
 
     my %existing =
         ( map  { /^(contact_history_type_description_(\d+))/
-                 ? ( $2 => $params->{$1}  )
+                 ? ( $2 => { description => $params->{$1} }  )
                  : () }
           keys %{ $params }
         );
 
     my @new =
-        ( grep { ! string_is_empty($_) }
+        ( map  { +{ description => $_ } }
+          grep { ! string_is_empty($_) }
 	  map  { /^(contact_history_type_description_new\d+)/
                  ? $params->{$1}
                  : () }
