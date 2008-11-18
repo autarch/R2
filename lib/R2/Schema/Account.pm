@@ -287,10 +287,10 @@ sub _update_or_add_things
 
     my $class = 'R2::Schema::' . ( join '', map { ucfirst } split /_/, $thing );
 
-    unless ( @{ $new }
+    unless ( @{ $new || [] }
              ||
              any { ! string_is_empty( $_->{$name_col} ) }
-             values %{ $existing } )
+             values %{ $existing || {} } )
     {
         error "You must have at least one $thing_name.";
     }
