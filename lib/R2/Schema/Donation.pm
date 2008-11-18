@@ -84,7 +84,7 @@ sub _valid_donation_date
     my $p         = shift;
     my $is_insert = shift;
 
-    my $format = delete $p->{date_format};
+    my $format = delete $p->{date_format} || '%y-%m-%d';
 
     return if string_is_empty( $p->{donation_date} );
 
