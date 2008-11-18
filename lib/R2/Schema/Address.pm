@@ -44,8 +44,12 @@ sub _build_city_region_postal_code
     my $self = shift;
 
     my $c_r_pc = join ', ', grep { ! string_is_empty($_) } $self->city(), $self->region();
-    $c_r_pc .= q{ } if $c_r_pc;
-    $c_r_pc .= $self->postal_code() if ! string_is_empty( $self->postal_code() );
+
+    if ( ! string_is_empty( $self->postal_code() ) )
+    {
+        $c_r_pc .= q{ } if $c_r_pc;
+        $c_r_pc .= $self->postal_code();
+    }
 
     return $c_r_pc;
 }
@@ -54,7 +58,10 @@ sub _build_summary
 {
     my $self = shift;
 
-    return first { defined } map { $self->$_() } qw( street_1 city_region_postal_code );
+    my $summary =
+        first { ! string_is_empty($_) } map { $self->$_() } qw( street_1 city_region_postal_code );
+
+    return $summary || q{};
 }
 
 no Fey::ORM::Table;
