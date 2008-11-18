@@ -7,6 +7,13 @@ use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
 
 use R2::Schema::Contact;
+# Contact should load these but can't because of circular dep fun
+use R2::Schema::Account;
+use R2::Schema::ContactNote;
+use R2::Schema::Donation;
+use R2::Schema::Household;
+use R2::Schema::Organization;
+use R2::Schema::Person;
 
 
 my $mock = mock_schema();

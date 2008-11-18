@@ -16,6 +16,14 @@ use R2::Schema::Website;
 use R2::Types;
 use R2::Util qw( string_is_empty );
 
+# cannot load these because of circular dependency problems
+#use R2::Schema::Account;
+#use R2::Schema::ContactNote;
+#use R2::Schema::Donation;
+#use R2::Schema::Household;
+#use R2::Schema::Organization;
+#use R2::Schema::Person;
+
 use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validatep );
 use MooseX::ClassAttribute;
@@ -399,14 +407,6 @@ sub _base_uri_path
 no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
-
-# cannot load these earlier because of circular dependency problems
-require R2::Schema::ContactNote;
-require R2::Schema::Donation;
-require R2::Schema::Household;
-require R2::Schema::Organization;
-require R2::Schema::Person;
-require R2::Schema::Account;
 
 1;
 
