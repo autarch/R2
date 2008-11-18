@@ -163,6 +163,8 @@ my $contact =
 }
 
 {
+    $mock->seed_class( 'R2::Schema::Account' => { account_id => 42 } );
+
     is( $contact->_base_uri_path(),
         '/account/42/contact/' . $contact->contact_id(),
         '_base_uri_path' );
