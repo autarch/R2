@@ -8,9 +8,12 @@
     <tr>
       <th>Date</th>
       <th>Amount</th>
+      <th>Gift</th>
+      <th>Transaction</th>
       <th>Source</th>
       <th>Target</th>
-      <th>Payment Type</th>
+      <th>Payment</th>
+      <th>Receipt</th>
 %   if ($can_edit_donations) {
       <th></th>
       <th></th>
@@ -22,9 +25,12 @@
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
       <td>$<% $donation->amount() %></td>
+      <td>$<% $donation->value_for_donor() %></td>
+      <td>$<% $donation->transaction_cost() %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->target()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
+      <td><% $donation->receipt_sent() ? 'yes' : 'no' %></td>
 %     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
