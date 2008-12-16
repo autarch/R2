@@ -532,8 +532,8 @@ my $account;
         [ [ qw( account_id donation_source_id name ) ],
         ];
 
-    # this is cached iterator so we want to avoid getting the old data
-    $account->_clear_donation_sources();
+    # this is a cached iterator so we want to avoid getting the old data
+    $account->donation_sources()->_clear_cached_results();
 
     $account->update_or_add_donation_sources
         ( {},
@@ -560,7 +560,8 @@ my $account;
           [ $account->account_id(), 1, 'mail' ],
         ];
 
-    $account->_clear_donation_sources();
+    $account->donation_sources()->_clear_cached_results();
+    $account->donation_sources()->Fey::Object::Iterator::reset();
 
     $account->update_or_add_donation_sources
         ( { 1 => { name => 'male' },
@@ -595,7 +596,8 @@ my $account;
           [ 10 ],
         ];
 
-    $account->_clear_donation_sources();
+    $account->donation_sources()->_clear_cached_results();
+    $account->donation_sources()->Fey::Object::Iterator::reset();
 
     $account->update_or_add_donation_sources
         ( { 1 => { name => 'male' },
