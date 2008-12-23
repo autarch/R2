@@ -46,7 +46,7 @@ sub add_member
 
     my $class = (ref $self) . 'Member';
 
-    $class->insert( $self->pk_hash(),
+    $class->insert( $self->pk_values_hash(),
                     person_id => $person_id,
                     position  => $position,
                     user      => $user,
@@ -69,7 +69,7 @@ sub _build_members
             ( classes     => [ qw( R2::Schema::Person ), $membership_class ],
               dbh         => $dbh,
               select      => $select,
-              bind_params => [ $self->pk_values() ],
+              bind_params => [ $self->pk_values_list() ],
             );
 }
 
