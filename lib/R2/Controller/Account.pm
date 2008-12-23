@@ -66,7 +66,7 @@ sub account_PUT : Private
 
     $c->add_message( 'The ' . $account->name() . ' account has been updated' );
 
-    $c->redirect_and_detach( $account->uri() );
+    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
 sub settings : Chained('_set_account') : PathPart('settings') : Args(0) { }
@@ -200,7 +200,7 @@ sub address_type_POST : Private
 
     $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri() );
+    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
 sub countries_form : Chained('_set_account') : PathPart('countries_form') : Args(0) { }
@@ -243,39 +243,39 @@ sub phone_number_type_POST : Private
 
     $c->add_message( 'The phone number types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri() );
+    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub contact_history_types_form : Chained('_set_account') : PathPart('contact_history_types_form') : Args(0) { }
+sub contact_note_types_form : Chained('_set_account') : PathPart('contact_note_types_form') : Args(0) { }
 
-sub contact_history_type : Chained('_set_account') : PathPart('contact_history_type') : Args(0) : ActionClass('+R2::Action::REST') { }
+sub contact_note_type : Chained('_set_account') : PathPart('contact_note_type') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub contact_history_type_POST : Private
+sub contact_note_type_POST : Private
 {
     my $self = shift;
     my $c    = shift;
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->contact_history_types();
+    my ( $existing, $new ) = $c->request()->contact_note_types();
 
     eval
     {
-        $account->update_or_add_contact_history_types( $existing, $new );
+        $account->update_or_add_contact_note_types( $existing, $new );
     };
 
     if ( my $e = $@ )
     {
         $c->_redirect_with_error
             ( error  => $e,
-              uri    => $account->uri( view => 'contact_history_types_form' ),
+              uri    => $account->uri( view => 'contact_note_types_form' ),
               params => $c->request()->params(),
             );
     }
 
     $c->add_message( 'The contact history types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri() );
+    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
 1;

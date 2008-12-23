@@ -199,14 +199,14 @@ sub _phone_number_type_params
 	   };
 }
 
-sub contact_history_types
+sub contact_note_types
 {
     my $self = shift;
 
     my $params = $self->params();
 
     my %existing =
-        ( map  { /^(contact_history_type_description_(\d+))/
+        ( map  { /^(contact_note_type_description_(\d+))/
                  ? ( $2 => { description => $params->{$1} }  )
                  : () }
           keys %{ $params }
@@ -215,7 +215,7 @@ sub contact_history_types
     my @new =
         ( map  { +{ description => $_ } }
           grep { ! string_is_empty($_) }
-	  map  { /^(contact_history_type_description_new\d+)/
+	  map  { /^(contact_note_type_description_new\d+)/
                  ? $params->{$1}
                  : () }
           keys %{ $params }

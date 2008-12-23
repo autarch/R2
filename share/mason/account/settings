@@ -39,9 +39,9 @@
     <& /lib/help-text/phone-number-type.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'contact_history_types_form' ) %>"
-       title="Edit contact history types">Edit contact history types</a>
-    <& /lib/help-text/contact-history-type.mas &>
+    <a href="<% $account->uri( view => 'contact_note_types_form' ) %>"
+       title="Edit contact history types">Edit contact note types</a>
+    <& /lib/help-text/contact-note-type.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'message_providers_form' ) %>"

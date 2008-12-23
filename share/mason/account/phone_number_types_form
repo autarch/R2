@@ -5,7 +5,7 @@
 </div>
 
 <p>
-<a href="<% $account->uri() %>" title="Account settings">back to the account</a>
+<a href="<% $account->uri( view => 'settings' ) %>" title="Account settings">back to account settings</a>
 </p>
 
 <& /lib/help-text/phone-number-type.mas &>
