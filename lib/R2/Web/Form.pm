@@ -185,6 +185,8 @@ sub _collapse_single_option_selects
     my @to_collapse;
     for my $select ( @{ $self->_dom()->getElementsByTagName('select') } )
     {
+        next if $select->id() =~ /^wpms-/;
+
         my @options = $select->options();
 
         next if @options != 1;
