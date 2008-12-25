@@ -292,7 +292,7 @@ CREATE TABLE "Person" (
        gender             gender             NULL
 );
 
-CREATE TABLE "PersonMessaging" (
+CREATE TABLE "PersonMessagingProvider" (
        person_id          INT8               NOT NULL,
        messaging_provider_id  INT8           NOT NULL,
        screen_name        VARCHAR(200)       NOT NULL,
@@ -301,13 +301,18 @@ CREATE TABLE "PersonMessaging" (
 
 CREATE TABLE "MessagingProvider" (
        messaging_provider_id  SERIAL8        PRIMARY KEY,
-       name                   VARCHAR(255)   NOT NULL,
+       name                   VARCHAR(255)   UNIQUE  NOT NULL,
        add_uri_template       VARCHAR(255)   NOT NULL DEFAULT '',
        chat_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
        call_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
        video_uri_template     VARCHAR(255)   NOT NULL DEFAULT '',
-       status_uri_template    VARCHAR(255)   NOT NULL DEFAULT '',
-       account_id             INT8           NOT NULL
+       status_uri_template    VARCHAR(255)   NOT NULL DEFAULT ''
+);
+
+CREATE TABLE "AccountMessagingProvider" (
+       account_id         INT8               NOT NULL,
+       messaging_provider_id  INT8           NOT NULL,
+       PRIMARY KEY (account_id, messaging_provider_id)
 );
 
 CREATE TABLE "Household" (
@@ -684,16 +689,20 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PersonMessaging" ADD CONSTRAINT "PersonMessaging_person_id"
+ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "PersonMessaging" ADD CONSTRAINT "PersonMessaging_messaging_provider_id"
+ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_messaging_provider_id"
   FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "MessagingProvider" ADD CONSTRAINT "MessagingProvider_account_id"
+ALTER TABLE "AccountMessagingProvider" ADD CONSTRAINT "AccountMessagingProvider_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "AccountMessagingProvider" ADD CONSTRAINT "AccountMessagingProvider_messaging_provider_id"
+  FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "Household" ADD CONSTRAINT "Household_household_id"
