@@ -82,4 +82,6 @@ sub person_POST
     $c->redirect_and_detach( $person->contact()->uri() );
 }
 
+no Moose;
+
 1;

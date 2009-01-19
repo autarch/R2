@@ -48,4 +48,6 @@ sub household_POST
     $c->redirect_and_detach( $household->uri() );
 }
 
+no Moose;
+
 1;

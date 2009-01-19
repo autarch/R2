@@ -48,4 +48,6 @@ sub organization_POST
     $c->redirect_and_detach( $organization->uri() );
 }
 
+no Moose;
+
 1;
