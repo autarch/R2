@@ -97,7 +97,7 @@ my $types = $account->address_types();
 </%init>
 
 <%method title>
-Address Types for <% $account->name() %>
+Address types for <% $account->name() %>
 <%args>
 $account
 </%args>

@@ -67,7 +67,7 @@ my $types = $account->contact_note_types();
 </%init>
 
 <%method title>
-Contact Note Types for <% $account->name() %>
+Contact note types for <% $account->name() %>
 <%args>
 $account
 </%args>

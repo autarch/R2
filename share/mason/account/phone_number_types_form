@@ -97,7 +97,7 @@ my $types = $account->phone_number_types();
 </%init>
 
 <%method title>
-Phone Number Types for <% $account->name() %>
+Phone number types for <% $account->name() %>
 <%args>
 $account
 </%args>
