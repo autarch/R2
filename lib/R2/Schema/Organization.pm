@@ -10,7 +10,7 @@ use R2::Schema::OrganizationMember;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DVAAC', 'R2::Role::HasMembers';
+with 'R2::Role::DVAAC';
 
 {
     my $schema = R2::Schema->Schema();
@@ -41,8 +41,8 @@ with 'R2::Role::DVAAC', 'R2::Role::HasMembers';
           sub { [ $schema->table('Organization')->column('name') ] },
         );
 
-    my $mt = $schema->table('OrganizationMember');
-    sub _MembershipTable { $mt }
+    with 'R2::Role::HasMembers' =>
+        { membership_table => $schema->table('OrganizationMember') };
 }
 
 sub display_name

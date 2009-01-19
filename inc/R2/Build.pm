@@ -59,6 +59,7 @@ my %Requires =
       'Moose'                                    => '0.58',
       'MooseX::ClassAttribute'                   => '0.05',
       'MooseX::Params::Validate'                 => '0.07',
+      'MooseX::Role::Parameterized'              => '0.03',
       'MooseX::Singleton'                        => '0.12',
       'Net::OpenID::Consumer'                    => '0',
       'Path::Class'                              => '0',
