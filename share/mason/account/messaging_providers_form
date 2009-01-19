@@ -56,7 +56,7 @@ my @providers = R2::Schema::MessagingProvider->All()->all();
 </%init>
 
 <%method title>
-Instant Messaging Providers for <% $account->name() %>
+Instant messaging providers for <% $account->name() %>
 <%args>
 $account
 </%args>
