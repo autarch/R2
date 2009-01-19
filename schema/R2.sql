@@ -584,6 +584,14 @@ ALTER TABLE "CustomFieldDateValue" ADD CONSTRAINT "CustomFieldDateValue_contact_
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "CustomFieldDateTimeValue" ADD CONSTRAINT "CustomFieldDateTimeValue_custom_field_id"
+  FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "CustomFieldDateTimeValue" ADD CONSTRAINT "CustomFieldDateTimeValue_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "CustomFieldTextValue" ADD CONSTRAINT "CustomFieldTextValue_custom_field_id"
   FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
