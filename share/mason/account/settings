@@ -11,46 +11,46 @@
 <ul>
   <li>
     <a href="<% $account->uri( view => 'edit_form' ) %>"
-       title="Edit name, billing, etc.">Edit basic settings</a>
+       title="Name, billing, etc.">Basic settings</a>
     <p>
       Account name, default time zone, etc.
     </p>
   </li>
   <li>
     <a href="<% $account->uri( view => 'donation_settings' ) %>"
-       title="Edit donation settings">Edit donation settings</a>
+       title="Donation sources, targets, etc.">Donation settings</a>
     <p>
       Donation sources and targets, as well as allowed payment types.
     </p>
   </li>
   <li>
     <a href="<% $account->uri( view => 'address_types_form' ) %>"
-       title="Edit address types">Edit address types</a>
+       title="Address types">Address types</a>
     <& /lib/help-text/address-type.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'countries_form' ) %>"
-       title="Edit countries for addresses">Edit countries for addresses</a>
+       title="Countries for addresses">Countries for addresses</a>
     <& /lib/help-text/countries.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'phone_number_types_form' ) %>"
-       title="Edit phone numbers types">Edit phone number types</a>
+       title="Phone numbers types">Phone number types</a>
     <& /lib/help-text/phone-number-type.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'contact_note_types_form' ) %>"
-       title="Edit contact history types">Edit contact note types</a>
+       title="Contact note types">Contact note types</a>
     <& /lib/help-text/contact-note-type.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'messaging_providers_form' ) %>"
-       title="Edit instant messaging providers">Edit instant messaging providers</a>
+       title="Instant messaging providers">Instant messaging providers</a>
     <& /lib/help-text/messaging-providers.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'users' ) %>"
-       title="Edit instant messaging providers">Edit users</a>
+       title="Account users">Account users</a>
     <p>
       Add, edit, or delete users for this account.
     </p>
