@@ -22,10 +22,6 @@ with 'R2::Role::DataValidator';
 
     for my $type ( qw( Person Household Organization ) )
     {
-        my $pl_type = PL_N($type);
-
-        my $class = 'R2::Schema::' . $type;
-
         my $foreign_table = $schema->table($type);
 
         my $select = R2::Schema->SQLFactoryClass()->new_select();
