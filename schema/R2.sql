@@ -114,7 +114,6 @@ CREATE DOMAIN pos_int AS INTEGER
 CREATE TABLE "CustomFieldGroup" (
        custom_field_group_id          SERIAL8      PRIMARY KEY,
        name                           VARCHAR(255) NOT NULL,
-       description                    TEXT         NOT NULL DEFAULT '',
        display_order                  pos_int      NOT NULL,
        applies_to_person              BOOLEAN      NOT NULL DEFAULT TRUE,
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
