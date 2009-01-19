@@ -32,9 +32,9 @@ with 'R2::Role::DataValidator';
 
         $select->select($count)
                ->from( $schema->tables( 'Address', 'Contact' ) )
-               ->from( $schema->table('Contact'), $foreign_table )
                ->where( $schema->table('Address')->column('address_type_id'),
-                        '=', Fey::Placeholder->new() );
+                        '=', Fey::Placeholder->new() )
+               ->and( $schema->table('Contact')->column('contact_type'), '=', $type );
 
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
