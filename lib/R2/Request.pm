@@ -380,6 +380,47 @@ sub members
     return \@members;
 }
 
+sub custom_field_groups
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my %existing =
+        ( map  { /^custom_field_group_name_(\d+)/
+                 ? ( $1 => $self->_custom_field_group_params($1) )
+                 : () }
+          keys %{ $params }
+        );
+
+    my @new =
+        ( grep { ! string_is_empty( $_->{name} ) }
+	  map  { /^custom_field_group_name_(new\d+)/
+                 ? $self->_custom_field_group_params($1)
+                 : () }
+          keys %{ $params }
+        );
+
+    return ( \%existing, \@new );
+}
+
+sub _custom_field_group_params
+{
+    my $self = shift;
+    my $id   = shift;
+
+    my $params = $self->params();
+
+    my $name = $params->{ 'custom_field_group_name_' . $id };
+    return {} if string_is_empty($name);
+
+    return { name                    => $name,
+	     applies_to_person       => _bool( $params->{ 'applies_to_person_' . $id } ),
+	     applies_to_household    => _bool( $params->{ 'applies_to_household_' . $id } ),
+	     applies_to_organization => _bool( $params->{ 'applies_to_organization_' . $id } ),
+	   };
+}
+
 sub _bool
 {
     return $_[0] ? 1 : 0;

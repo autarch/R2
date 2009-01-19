@@ -1,0 +1,118 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<a href="<% $account->uri( view => 'settings' ) %>" title="Account settings">back to account settings</a>
+</p>
+
+<&| /lib/filter/form.mas &>
+<form action="<% $account->uri( view => 'custom_field_group' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Custom Field Groups</legend>
+
+% if ($count) {
+%   while ( my $group = $groups->next() ) {
+    <div class="form-item">
+      <input class="text medium no-label" type="text" name="custom_field_group_name_<% $group->custom_field_group_id() %>"
+             value="<% $group->name() %>" />
+      <label>Applies to ...</label>
+      <input type="checkbox" name="applies_to_person_<% $group->custom_field_group_id() %>"
+             id="applies_to_person_<% $group->custom_field_group_id() %>"
+             value="1" <% $group->applies_to_person() ? q{checked="checked"} : '' %>
+%     if ( $group->applies_to_person() && ! $group->can_unapply_from_person() ) {
+             disabled="disabled"
+%     }
+            >
+      <label class="for-checkbox" for="applies_to_person_<% $group->custom_field_group_id() %>">People</label>
+
+      <input type="checkbox" name="applies_to_household_<% $group->custom_field_group_id() %>"
+             id="applies_to_household_<% $group->custom_field_group_id() %>"
+             value="1" <% $group->applies_to_household() ? q{checked="checked"} : '' %>
+%     if ( $group->applies_to_household() && ! $group->can_unapply_from_household() ) {
+             disabled="disabled"
+%     }
+            >
+      <label class="for-checkbox" for="applies_to_household_<% $group->custom_field_group_id() %>">Household</label>
+
+      <input type="checkbox" name="applies_to_organization_<% $group->custom_field_group_id() %>"
+             id="applies_to_organization_<% $group->custom_field_group_id() %>"
+             value="1" <% $group->applies_to_organization() ? q{checked="checked"} : '' %>
+%     if ( $group->applies_to_organization() && ! $group->can_unapply_from_organization() ) {
+             disabled="disabled"
+%     }
+            >
+      <label class="for-checkbox" for="applies_to_organization_<% $group->custom_field_group_id() %>">Organizations</label>
+
+      <p>
+        <a href="<% $account->uri( view => 'custom_field_group/' . $group->custom_field_group_id() ) %>"
+           >Edit the fields in this group</a>
+        (currently has <% $group->custom_field_count() %> fields)
+      </p>
+    </div>
+%   }
+% } else {
+    <p>
+      You don't have any custom field groups yet. To add custom fields, you
+      first need to make a field <em>group</em> for the fields to live in.
+    </p>
+% }
+
+    <h3>Add New Groups</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-custom-field-group">
+      <div class="form-item">
+        <input class="text medium no-label" type="text" name="custom_field_group_name_new1"
+               id="custom_field_group_name_new1" />
+
+        <label>Applies to ...</label>
+
+        <input type="checkbox" name="applies_to_person_new1"
+               id="applies_to_person_new1"
+               value="1" checked="checked">
+        <label class="for-checkbox" for="applies_to_person_new1">People</label>
+
+        <input type="checkbox" name="applies_to_household_new1"
+               id="applies_to_household_new1"
+               value="1">
+        <label class="for-checkbox" for="applies_to_household_new1">Household</label>
+
+        <input type="checkbox" name="applies_to_organization_new1"
+               id="applies_to_organization_new1"
+               value="1">
+        <label class="for-checkbox" for="applies_to_organization_new1">Organizations</label>
+
+      </div>
+    </div>
+
+    <a href="#" class="add-another" id="custom-field-group-repeater">Add another group</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $count = $account->custom_field_group_count();
+my $groups;
+$groups = $account->custom_field_groups() if $count;
+</%init>
+
+<%method title>
+Custom field groups for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
+

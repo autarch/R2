@@ -310,4 +310,36 @@ sub messaging_provider_POST : Private
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
+sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) { }
+
+sub custom_field_group : Chained('_set_account') : PathPart('custom_field_group') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub custom_field_group_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my ( $existing, $new ) = $c->request()->custom_field_groups();
+
+    eval
+    {
+        $account->update_or_add_custom_field_groups( $existing, $new );
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error  => $e,
+              uri    => $account->uri( view => 'custom_field_groups_form' ),
+              params => $c->request()->params(),
+            );
+    }
+
+    $c->add_message( 'The custom field groups for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
+}
+
 1;

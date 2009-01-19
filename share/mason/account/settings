@@ -49,10 +49,17 @@
     <& /lib/help-text/messaging-providers.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'users' ) %>"
+    <a href="<% $account->uri( view => 'users_form' ) %>"
        title="Account users">Account users</a>
     <p>
       Add, edit, or delete users for this account.
+    </p>
+  </li>
+  <li>
+    <a href="<% $account->uri( view => 'custom_field_groups_form' ) %>"
+       title="Custom fields">Custom fields</a>
+    <p>
+      Add, edit, or delete contact custom fields.
     </p>
   </li>
 </ul>

@@ -14,6 +14,7 @@ use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
 use R2::Schema::Country;
+use R2::Schema::CustomFieldGroup;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
 use R2::Schema::DonationTarget;
@@ -78,6 +79,12 @@ with 'R2::Role::URIMaker';
           cache       => 1,
           select      => __PACKAGE__->_BuildMessagingProvidersSelect(),
           bind_params => sub { $_[0]->account_id() },
+        );
+
+    has_many 'custom_field_groups' =>
+        ( table    => $schema->table('CustomFieldGroup'),
+          cache    => 1,
+          order_by => [ $schema->table('CustomFieldGroup')->column('display_order') ],
         );
 
     has '_messaging_provider_id_hash' =>
@@ -274,6 +281,26 @@ sub update_or_add_contact_note_types
           $new,
           'contact_note_type',
           'description',
+        );
+}
+
+sub update_or_add_custom_field_groups
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+
+    my $order = $self->custom_field_group_count() + 1;
+    for my $new ( @{ $new } )
+    {
+        $new->{display_order} = $order++;
+    }
+
+    $self->_update_or_add_things
+        ( $existing,
+          $new,
+          'custom_field_group',
+          'name',
         );
 }
 
@@ -488,6 +515,25 @@ sub _AddSQLMethods
                                  $_[0]->phone_number_types()->all() ] },
             );
     }
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $cfg_table = $schema->table('CustomFieldGroup');
+
+    my $count = Fey::Literal::Function->new( 'COUNT', @{ $cfg_table->primary_key() } );
+
+    $select->select($count)
+           ->from( $cfg_table )
+           ->where( $cfg_table->column('account_id'), '=', Fey::Placeholder->new() );
+
+    has 'custom_field_group_count' =>
+        ( metaclass   => 'FromSelect',
+          is          => 'ro',
+          isa         => 'R2.Type.PosOrZeroInt',
+          lazy        => 1,
+          select      => $select,
+          bind_params => sub { $_[0]->account_id() },
+        );
 }
 
 sub _base_uri_path
