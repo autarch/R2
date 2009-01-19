@@ -38,7 +38,7 @@ role
         my ( $person_id, $position, $user ) =
             validatep( \@_,
                        person_id => { isa => 'Int' },
-                       position  => { isa => 'Str', default => undef },
+                       position  => { isa => 'Str', default => q{} },
                        user      => { isa => 'R2::Schema::User' },
                      );
 
