@@ -53,7 +53,6 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
        innerHTML */
 
     var html = this.html.replace( /new1/g, "new" + this.repeat_count )
-                        .replace( /checked="checked"/g, "" )
                         .replace( /class="for-radio selected"/g, "class=\"for-radio\"" )
                         /* this is for the "delete this group" piece */
                         .replace( /display: none/g, "" );
