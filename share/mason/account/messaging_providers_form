@@ -1,0 +1,63 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<a href="<% $account->uri( view => 'settings' ) %>" title="Account settings">back to account settings</a>
+</p>
+
+<& /lib/help-text/messaging-providers.mas &>
+
+<&| /lib/filter/form.mas &>
+<form action="<% $account->uri( view => 'messaging_provider' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Messaging Providers</legend>
+
+    <div id="wpms-messaging_provider_id-container">
+      <select name="possible-messaging_provider_id"
+              id="wpms-messaging_provider_id-first"
+              multiple="1">
+        <optgroup label="Click to select">
+% for my $provider ( grep { ! $account->has_messaging_provider($_) } @providers ) {
+          <option value="<% $provider->messaging_provider_id() %>"
+                  ><% $provider->name() %></option>
+% }
+<option>foo</option>
+
+        </optgroup>
+      </select>
+
+      <select name="messaging_provider_id"
+              id="wpms-messaging_provider_id-second"
+              multiple="1">
+        <optgroup label="Selected messaging providers">
+% for my $provider ( grep { $account->has_messaging_provider($_) } @providers ) {
+          <option value="<% $provider->messaging_provider_id() %>"
+                  ><% $provider->name() %></option>
+% }
+        </optgroup>
+      </select>
+    </div>
+
+  </fieldset>
+</form>
+</&>
+
+<%args>
+$account
+</%args>
+
+<%init>
+my @providers = R2::Schema::MessagingProvider->All()->all();
+</%init>
+
+<%method title>
+Instant Messaging Providers for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

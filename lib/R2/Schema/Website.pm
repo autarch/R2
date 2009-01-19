@@ -19,6 +19,8 @@ with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('Website') );
 
     has_one( $schema->table('Contact') );

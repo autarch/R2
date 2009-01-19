@@ -12,6 +12,8 @@ use MooseX::ClassAttribute;
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('Role') );
 
     for my $role ( qw( Member Editor Admin ) )

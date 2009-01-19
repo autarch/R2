@@ -3,7 +3,6 @@ package R2::Schema::Donation;
 use strict;
 use warnings;
 
-use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
 use R2::Schema::DonationSource;
 use R2::Schema::DonationTarget;
@@ -20,11 +19,9 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Donation') );
+    has_policy 'R2::Schema::Policy';
 
-    transform 'donation_date' =>
-        deflate { blessed $_[1] ? DateTime::Format::Pg->format_date( $_[1] ) : $_[1] },
-        inflate { defined $_[1] ? DateTime::Format::Pg->parse_date( $_[1] ) : $_[1] };
+    has_table( $schema->table('Donation') );
 
     has_one source =>
         ( table => $schema->table('DonationSource') );
@@ -32,8 +29,7 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
     has_one target =>
         ( table => $schema->table('DonationTarget') );
 
-    has_one payment_type =>
-        ( table => $schema->table('PaymentType') );
+    has_one( $schema->table('PaymentType') );
 
     has_one( $schema->table('Contact') );
 

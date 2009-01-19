@@ -2,6 +2,7 @@ JSAN.use('DOM.Find');
 JSAN.use('DOM.Utils');
 JSAN.use('R2.FormWidget.LabeledRadioButton');
 JSAN.use('R2.FormWidget.RepeatableGroup');
+JSAN.use('R2.FormWidget.PairedMultiSelect');
 
 
 if ( typeof R2 == "undefined" ) {
@@ -13,6 +14,7 @@ R2.Form = function (form) {
     this.seen = {};
 
     this.instrumentRadioButtons();
+    this._instrumentPairedMultiSelects();
     this._instrumentRepeatableGroups();
 };
 
@@ -47,10 +49,36 @@ R2.Form.prototype.instrumentRadioButtons = function () {
 };
 
 R2.Form.prototype._instrumentRepeatableGroups = function () {
-    var divs = DOM.Find.getElementsByAttributes( { tagName:   "DIV",
-                                                   className: /JS-repeatable-group/ }, this.form );
+    var divs =
+        DOM.Find.getElementsByAttributes
+            ( { tagName:   "DIV",
+                className: /JS-repeatable-group/ }, this.form );
 
     for ( var i = 0; i < divs.length; i++ ) {
         new R2.FormWidget.RepeatableGroup( divs[i], this );
+    }
+};
+
+R2.Form.prototype._instrumentPairedMultiSelects = function () {
+    var selects =
+        DOM.Find.getElementsByAttributes
+            ( { tagName: "SELECT",
+                id:      /^wpms-/ }, this.form );
+
+    var ids = {};
+    for ( var i = 0; i < selects.length; i++ ) {
+        var matches = selects[i].id.match( /^(wpms-\w+)-/ );
+
+        if ( ! matches ) {
+            continue;
+        }
+
+        if ( ids[ matches[1] ] ) {
+            continue;
+        }
+
+        ids[ matches[1] ] = 1;
+
+        R2.FormWidget.PairedMultiSelect.newFromPrefix( matches[1] );
     }
 };

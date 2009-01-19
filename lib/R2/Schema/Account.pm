@@ -3,13 +3,13 @@ package R2::Schema::Account;
 use strict;
 use warnings;
 
-use DateTime::Format::Pg;
 use Fey::Literal;
 use Fey::Object::Iterator::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
 use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
+use R2::Schema::AccountMessagingProvider;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
@@ -18,7 +18,6 @@ use R2::Schema::Domain;
 use R2::Schema::DonationSource;
 use R2::Schema::DonationTarget;
 use R2::Schema::Household;
-use R2::Schema::MessagingProvider;
 use R2::Schema::Organization;
 use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
@@ -38,11 +37,9 @@ with 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('Account') );
+    has_policy 'R2::Schema::Policy';
 
-    transform 'creation_datetime' =>
-        deflate { blessed $_[1] ? DateTime::Format::Pg->format_datetime( $_[1] ) : $_[1] },
-        inflate { defined $_[1] ? DateTime::Format::Pg->parse_datetime( $_[1] ) : $_[1] };
+    has_table( $schema->table('Account') );
 
     has_one( $schema->table('Domain') );
 
@@ -77,9 +74,17 @@ with 'R2::Role::URIMaker';
         );
 
     has_many 'messaging_providers' =>
-        ( table    => $schema->table('MessagingProvider'),
-          cache    => 1,
-          order_by => [ $schema->table('MessagingProvider')->column('name') ],
+        ( table       => $schema->table('MessagingProvider'),
+          cache       => 1,
+          select      => __PACKAGE__->_BuildMessagingProvidersSelect(),
+          bind_params => sub { $_[0]->account_id() },
+        );
+
+    has '_messaging_provider_id_hash' =>
+        ( is         => 'ro',
+          isa        => 'HashRef',
+          lazy_build => 1,
+          init_arg   => undef,
         );
 
     has_many 'contact_note_types' =>
@@ -141,7 +146,7 @@ sub _initialize
 
     R2::Schema::DonationTarget->CreateDefaultsForAccount($self);
 
-    R2::Schema::MessagingProvider->CreateDefaultsForAccount($self);
+    R2::Schema::AccountMessagingProvider->CreateDefaultsForAccount($self);
 
     R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
@@ -330,6 +335,24 @@ sub _update_or_add_things
     return;
 }
 
+sub has_messaging_provider
+{
+    my $self     = shift;
+    my $provider = shift;
+
+    return
+        $self->_messaging_provider_id_hash()
+             ->{ $provider->messaging_provider_id() };
+}
+
+sub _build__messaging_provider_id_hash
+{
+    my $self = shift;
+
+    return { map { $_->messaging_provider_id() => 1 }
+             $self->messaging_providers()->all() };
+}
+
 sub _build_made_a_note_contact_note_type
 {
     my $self = shift;
@@ -355,6 +378,25 @@ sub _build_countries
               select      => $select,
               bind_params => [ $self->account_id() ],
             );
+}
+
+sub _BuildMessagingProvidersSelect
+{
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->tables( 'MessagingProvider' ) )
+           ->from( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
+           ->where( $schema->table('AccountMessagingProvider')->column('account_id'),
+                    '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('MessagingProvider')->column('name'),
+                       'ASC',
+                     );
+
+    return $select;
 }
 
 sub _BuildCountriesSelect

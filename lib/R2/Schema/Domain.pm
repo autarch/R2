@@ -19,6 +19,8 @@ with 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('Domain') );
 
     has_many 'accounts' =>

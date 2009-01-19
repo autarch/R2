@@ -13,6 +13,8 @@ use MooseX::ClassAttribute;
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('ContactHistoryType') );
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();

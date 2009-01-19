@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 91;
+use Test::More tests => 89;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
@@ -34,7 +34,7 @@ my $account;
                                    );
 
     for my $table ( qw( DonationSource DonationTarget PaymentType
-                        AddressType PhoneNumberType MessagingProvider
+                        AddressType PhoneNumberType
                         AccountCountry ) )
     {
         my @actions =

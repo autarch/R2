@@ -278,4 +278,36 @@ sub contact_note_type_POST : Private
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
+sub messaging_providers_form : Chained('_set_account') : PathPart('messaging_providers_form') : Args(0) { }
+
+sub messaging_provider : Chained('_set_account') : PathPart('messaging_provider') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub messaging_provider_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my ( $existing, $new ) = $c->request()->messaging_providers();
+
+    eval
+    {
+        $account->update_or_add_messaging_providers( $existing, $new );
+    };
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error  => $e,
+              uri    => $account->uri( view => 'messaging_providers_form' ),
+              params => $c->request()->params(),
+            );
+    }
+
+    $c->add_message( 'The instant messaging providers for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+}
+
 1;

@@ -3,9 +3,8 @@ package R2::Schema::ContactHistory;
 use strict;
 use warnings;
 
-use List::Util qw( first );
-use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
+use List::Util qw( first );
 use R2::Schema;
 use R2::Schema::Contact;
 
@@ -17,11 +16,9 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('ContactHistory') );
+    has_policy 'R2::Schema::Policy';
 
-    transform 'history_datetime' =>
-        deflate { blessed $_[1] ? DateTime::Format::Pg->format_datetime( $_[1] ) : $_[1] },
-        inflate { defined $_[1] ? DateTime::Format::Pg->parse_datetime( $_[1] ) : $_[1] };
+    has_table( $schema->table('ContactHistory') );
 
     has_one type =>
         ( table => $schema->table('ContactHistoryType') );

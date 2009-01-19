@@ -1,3 +1,4 @@
+JSAN.use('Data.Dump');
 JSAN.use('DOM.Ready');
 JSAN.use('R2.Form');
 JSAN.use('R2.FormWithMemberSearch');

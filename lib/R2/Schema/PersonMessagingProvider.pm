@@ -1,4 +1,4 @@
-package R2::Schema::PersonMessaging;
+package R2::Schema::PersonMessagingProvider;
 
 use strict;
 use warnings;
@@ -12,7 +12,9 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('PersonMessaging') );
+    has_policy 'R2::Schema::Policy';
+
+    has_table( $schema->table('PersonMessagingProvider') );
 
     has_one( $schema->table('Person') );
 

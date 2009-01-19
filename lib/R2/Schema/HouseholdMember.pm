@@ -16,6 +16,8 @@ with 'R2::Role::HistoryRecorder';
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('HouseholdMember') );
 
     has_one( $schema->table('Household') );

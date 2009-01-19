@@ -242,8 +242,11 @@ form div.form-item div.help-text {
     clear: both;
 }
 
-form div.help-text p {
+.help-text {
     font-size: 85%;
+}
+
+.help-text p {
     margin-bottom: 0em;
 }
 

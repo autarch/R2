@@ -21,6 +21,8 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('User') );
 
     has_one 'person' =>

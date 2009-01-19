@@ -8,10 +8,13 @@ use R2::Util qw( string_is_empty );
 use URI::Template;
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( validatep );
 
 {
     my $schema = R2::Schema->Schema();
+
+    has_policy 'R2::Schema::Policy';
 
     has_table( $schema->table('MessagingProvider') );
 
@@ -33,10 +36,16 @@ use MooseX::Params::Validate qw( validatep );
     transform @uri_types
         => inflate { return if string_is_empty( $_[1] ); URI::Template->new( $_[1] ) }
         => deflate { defined $_[1] && ref $_[1] ? $_[1]->as_string() : $_[1] };
+
+    class_has '_SelectAllSQL' =>
+        ( is         => 'ro',
+          isa        => 'Fey::SQL::Select',
+          lazy_build => 1,
+        );
 }
 
 {
-    my @Defaults =
+    my @Providers =
         ( { name                 => 'Yahoo',
             chat_uri_template    => 'ymsgr:sendim?{screen_name}',
             status_uri_template  => 'http://opi.yahoo.com/yahooonline/u={screen_name}/m=g/t=2/l=us/opi.jpg',
@@ -65,16 +74,13 @@ use MooseX::Params::Validate qw( validatep );
           },
         );
 
-    sub CreateDefaultsForAccount
+    sub MakeDefaultProviders
     {
-        my $class   = shift;
-        my $account = shift;
-
-        for my $def (@Defaults)
+        for my $provider (@Providers)
         {
-            $class->insert( %{ $def },
-                            account_id => $account->account_id(),
-                          );
+            next if __PACKAGE__->new( name => $provider->{name} );
+
+            __PACKAGE__->insert( %{ $provider } );
         }
     }
 }
@@ -113,6 +119,37 @@ sub _fill_uri
     }
 
     $template->process_to_string(%vars);
+}
+
+sub All
+{
+    my $class = shift;
+
+    my $select = $class->_SelectAllSQL();
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    return
+        Fey::Object::Iterator->new( classes => $class,
+                                    dbh     => $dbh,
+                                    select  => $select,
+                                  );
+}
+
+sub _build__SelectAllSQL
+{
+    my $class = __PACKAGE__;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    $select->select( $schema->table('MessagingProvider') )
+           ->from( $schema->tables( 'MessagingProvider') )
+           ->order_by( $schema->table('MessagingProvider')->column('name') );
+
+    return $select;
+
 }
 
 no Fey::ORM::Table;

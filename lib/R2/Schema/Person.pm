@@ -3,11 +3,10 @@ package R2::Schema::Person;
 use strict;
 use warnings;
 
-use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
 use R2::Schema;
 use R2::Schema::Contact;
-use R2::Schema::PersonMessaging;
+use R2::Schema::PersonMessagingProvider;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
 
@@ -20,13 +19,11 @@ with qw( R2::Role::DVAAC );
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     my $person_t = $schema->table('Person');
 
     has_table $person_t;
-
-    transform 'birth_date' =>
-        deflate { blessed $_[1] ? DateTime::Format::Pg->format_date( $_[1] ) : $_[1] },
-        inflate { defined $_[1] ? DateTime::Format::Pg->parse_date( $_[1] ) : $_[1] };
 
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
@@ -50,7 +47,7 @@ with qw( R2::Role::DVAAC );
     # XXX - this'd be nicer if it selected the messaging provider in
     # the same query
     has_many 'messaging' =>
-        ( table       => $schema->table('PersonMessaging'),
+        ( table       => $schema->table('PersonMessagingProvider'),
           cache       => 1,
           select      => __PACKAGE__->_MessagingSelect(),
           bind_params => sub { $_[0]->person_id() },
@@ -166,9 +163,9 @@ sub _MessagingSelect
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('PersonMessaging') )
-           ->from( $schema->tables( 'PersonMessaging', 'MessagingProvider' ) )
-           ->where( $schema->table('PersonMessaging')->column('person_id'),
+    $select->select( $schema->table('PersonMessagingProvider') )
+           ->from( $schema->tables( 'PersonMessagingProvider', 'MessagingProvider' ) )
+           ->where( $schema->table('PersonMessagingProvider')->column('person_id'),
                     '=', Fey::Placeholder->new() )
            ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' );
 

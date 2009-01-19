@@ -15,6 +15,8 @@ use Fey::ORM::Table;
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('AccountUserRole') );
 
     has_one( $schema->table('Account') );

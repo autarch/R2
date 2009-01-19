@@ -18,11 +18,9 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
 {
     my $schema = R2::Schema->Schema();
 
-    has_table( $schema->table('ContactNote') );
+    has_policy 'R2::Schema::Policy';
 
-    transform 'note_datetime' =>
-        deflate { blessed $_[1] ? DateTime::Format::Pg->format_datetime( $_[1] ) : $_[1] },
-        inflate { defined $_[1] ? DateTime::Format::Pg->parse_datetime( $_[1] ) : $_[1] };
+    has_table( $schema->table('ContactNote') );
 
     has_one ( $schema->table('User') );
 

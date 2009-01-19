@@ -15,6 +15,8 @@ with 'R2::Role::DVAAC', 'R2::Role::HasMembers';;
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('Household') );
 
     has_one 'contact' =>

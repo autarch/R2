@@ -35,6 +35,8 @@ with qw( R2::Role::DataValidator
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     has_table( $schema->table('Contact') );
 
     has_one 'account' =>

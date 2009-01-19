@@ -17,6 +17,8 @@ use MooseX::ClassAttribute;
 {
     my $schema = R2::Schema->Schema();
 
+    has_policy 'R2::Schema::Policy';
+
     my $file_t = $schema->table('File');
 
     has_table $file_t;

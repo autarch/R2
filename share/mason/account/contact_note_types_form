@@ -16,6 +16,7 @@
 
   <fieldset>
     <legend>Contact Note Types</legend>
+
 % while ( my $type = $types->next() ) {
 %   if ( $type->is_system_defined() ) {
       <% $type->description() %>
@@ -27,7 +28,8 @@
 %     next;
 %   }
 
-      <input class="text medium no-label" type="text" name="contact_note_type_description_<% $type->contact_note_type_id() %>"
+      <input class="text medium no-label" type="text"
+             name="contact_note_type_description_<% $type->contact_note_type_id() %>"
              value="<% $type->description() %>" />
 %   if ( ! $type->is_deleteable() ) {
       <div class="help-text">

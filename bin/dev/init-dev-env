@@ -25,6 +25,8 @@ system( "$FindBin::Bin/rebuild-schema" )
 
     make_countries();
 
+    make_messaging_providers();
+
     make_time_zones();
 
     my $domain = make_domain();
@@ -77,6 +79,13 @@ sub make_countries
                                      name     => code2country($code),
                                    );
     }
+}
+
+sub make_messaging_providers
+{
+    require R2::Schema::MessagingProvider;
+
+    R2::Schema::MessagingProvider->MakeDefaultProviders()
 }
 
 sub make_time_zones
