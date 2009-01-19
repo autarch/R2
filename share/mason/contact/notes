@@ -1,5 +1,5 @@
 <div id="summary">
-  <h1><& SELF:title, %ARGS &></h1>
+  <h1><& SELF:title, %ARGS &> <& /lib/contact-view/contact-icon.mas, contact => $contact &></h1>
 </div>
 
 % if ($count) {

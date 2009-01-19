@@ -28,6 +28,8 @@ with 'R2::Role::DVAAC';
                            uri
                          ),
                        ( grep { ! __PACKAGE__->meta()->has_attribute($_) }
+                         grep { $_ !~ /^(?:person|household|organization)$/ }
+                         grep { ! /^_/ }
                          R2::Schema::Contact->meta()->get_attribute_list(),
                        )
                      ],

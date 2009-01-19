@@ -19,7 +19,6 @@ with 'R2::Role::DVAAC';
 
     has_table( $schema->table('Organization') );
 
-    # Should be in ActsAsContact role
     has_one 'contact' =>
         ( table   => $schema->table('Contact'),
           handles => [ qw( email_addresses primary_email_address
@@ -28,8 +27,11 @@ with 'R2::Role::DVAAC';
                            phone_numbers primary_phone_number
                            uri
                          ),
-                       grep { ! __PACKAGE__->meta()->has_attribute($_) }
-                       R2::Schema::Contact->meta()->get_attribute_list(),
+                       ( grep { ! __PACKAGE__->meta()->has_attribute($_) }
+                         grep { $_ !~ /^(?:person|household|organization)$/ }
+                         grep { ! /^_/ }
+                         R2::Schema::Contact->meta()->get_attribute_list(),
+                       )
                      ],
         );
 
