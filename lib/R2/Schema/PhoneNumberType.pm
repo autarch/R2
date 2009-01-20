@@ -11,7 +11,7 @@ use R2::Types;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
 
 {
     my $schema = R2::Schema->Schema();
@@ -22,19 +22,17 @@ with 'R2::Role::DataValidator';
 
     for my $type ( qw( Person Household Organization ) )
     {
-        my $foreign_table = $schema->table($type);
-
         my $select = R2::Schema->SQLFactoryClass()->new_select();
 
         my $count =
             Fey::Literal::Function->new
-                ( 'COUNT', @{ $foreign_table->primary_key() } );
+                ( 'COUNT', $schema->table('Contact')->column('contact_id') );
 
         $select->select($count)
-               ->from( $schema->tables( 'PhoneNumber', 'Contact' ),  )
+               ->from( $schema->tables( 'PhoneNumber', 'Contact' ) )
                ->where( $schema->table('PhoneNumber')->column('phone_number_type_id'),
                         '=', Fey::Placeholder->new() )
-               ->and( $schema->table('Contact')->column('contact_type'), '=', $type );
+               ->and( $schema->table('Contact')->column('contact_type'), '=', Fey::Placeholder->new() );
 
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
@@ -42,7 +40,7 @@ with 'R2::Role::DataValidator';
               isa         => 'R2.Type.PosOrZeroInt',
               lazy        => 1,
               select      => $select,
-              bind_params => sub { $_[0]->phone_number_type_id() },
+              bind_params => sub { $_[0]->phone_number_type_id(), $type },
             );
     }
 
@@ -100,90 +98,6 @@ sub CreateDefaultsForAccount
                     applies_to_organization => 0,
                     account_id              => $account->account_id(),
                   );
-}
-
-sub _cannot_unapply
-{
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
-
-    return if $is_insert;
-
-    for my $contact_type ( qw( person household organization ) )
-    {
-        my $key = 'applies_to_' . $contact_type;
-
-        if ( exists $p->{$key} && ! $p->{$key} )
-        {
-            my $meth = 'can_unapply_from_' . $contact_type;
-
-            delete $p->{$key}
-                unless $self->$meth();
-        }
-    }
-
-    return;
-}
-
-sub _applies_to_something
-{
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
-
-    my @keys = map { 'applies_to_' . $_ } qw( person household organization );
-
-    if ($is_insert)
-    {
-        return if
-            any { exists $p->{$_} && $p->{$_} } @keys;
-    }
-    else
-    {
-        for my $key (@keys)
-        {
-            if ( exists $p->{$key} )
-            {
-                return if $p->{$key};
-            }
-            else
-            {
-                return if $self->$key();
-            }
-        }
-    }
-
-    return { message =>
-             'A phone number type must apply to a person, household, or organization.' };
-}
-
-sub can_unapply_from_person
-{
-    my $self = shift;
-
-    return ! $self->person_count();
-}
-
-sub can_unapply_from_household
-{
-    my $self = shift;
-
-    return ! $self->household_count();
-}
-
-sub can_unapply_from_organization
-{
-    my $self = shift;
-
-    return ! $self->organization_count();
-}
-
-sub is_deleteable
-{
-    my $self = shift;
-
-    return ! $self->contact_count();
 }
 
 no Fey::ORM::Table;

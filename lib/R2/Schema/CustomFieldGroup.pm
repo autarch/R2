@@ -12,7 +12,7 @@ use R2::Types;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with qw( R2::Role::DataValidator );
+with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
 
 
 {
@@ -138,7 +138,7 @@ with qw( R2::Role::DataValidator );
         ( is      => 'ro',
           isa     => 'ArrayRef[Str]',
           lazy    => 1,
-          default => sub { [ qw( _display_order_is_unique _applies_to_something ) ] },
+          default => sub { [ qw( _display_order_is_unique _applies_to_something _cannot_unapply ) ] },
         );
 }
 
@@ -146,66 +146,6 @@ with qw( R2::Role::DataValidator );
 sub _display_order_is_unique
 {
     return;
-}
-
-sub _applies_to_something
-{
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
-
-    my @keys = map { 'applies_to_' . $_ } qw( person household organization );
-
-    if ($is_insert)
-    {
-        return if
-            any { exists $p->{$_} && $p->{$_} } @keys;
-    }
-    else
-    {
-        for my $key (@keys)
-        {
-            if ( exists $p->{$key} )
-            {
-                return if $p->{$key};
-            }
-            else
-            {
-                return if $self->$key();
-            }
-        }
-    }
-
-    return { message =>
-             'A custom field group must apply to a person, household, or organization.' };
-}
-
-sub can_unapply_from_person
-{
-    my $self = shift;
-
-    return ! $self->person_count();
-}
-
-sub can_unapply_from_household
-{
-    my $self = shift;
-
-    return ! $self->household_count();
-}
-
-sub can_unapply_from_organization
-{
-    my $self = shift;
-
-    return ! $self->organization_count();
-}
-
-sub is_deleteable
-{
-    my $self = shift;
-
-    return ! $self->contact_count();
 }
 
 no Fey::ORM::Table;
