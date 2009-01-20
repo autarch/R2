@@ -62,10 +62,9 @@ with qw( R2::Role::DVAAC );
         );
 
     class_has 'GenderValues' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef',
-          lazy    => 1,
-          default => \&_GetGenderValues,
+        ( is         => 'ro',
+          isa        => 'ArrayRef',
+          lazy_build => 1,
         );
 
     class_has '_ValidationSteps' =>
@@ -86,7 +85,7 @@ with qw( R2::Role::DVAAC );
         );
 }
 
-sub _GetGenderValues
+sub _build_GenderValues
 {
     my $class = shift;
 
