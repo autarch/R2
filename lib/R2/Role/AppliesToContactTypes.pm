@@ -3,6 +3,7 @@ package R2::Role::AppliesToContactTypes;
 use strict;
 use warnings;
 
+use List::MoreUtils qw( any );
 use R2::Util qw( studly_to_calm );
 
 use Moose::Role;
