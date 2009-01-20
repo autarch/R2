@@ -33,9 +33,13 @@ sub _build_Types
 {
     my $class = shift;
 
-    my $schema = R2::Schema->Schema();
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    return [ map { $_->name() =~ /^CustomField(\w+)Value/ ? $1 : () } $schema->tables() ];
+    my $sth = $dbh->column_info( '', '', 'CustomField', 'type' );
+
+    my $col_info = $sth->fetchall_arrayref({})->[0];
+
+    return $col_info->{pg_enum_values} || [];
 }
 
 no Fey::ORM::Table;

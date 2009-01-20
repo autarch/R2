@@ -125,16 +125,19 @@ CREATE TABLE "CustomFieldGroup" (
 --                  INITIALLY DEFERRED
 );
 
+CREATE TYPE custom_field_type AS
+       ENUM ( 'Integer', 'Float', 'Date', 'DateTime', 'Text', 'Binary', 'SingleSelect', 'MultiSelect' );
+
 CREATE TABLE "CustomField" (
        custom_field_id          SERIAL8      PRIMARY KEY,
        label                    VARCHAR(255) NOT NULL,
        description              TEXT         NOT NULL DEFAULT '',
-       custom_field_type_id     INTEGER      NOT NULL,
+       type                     custom_field_type  NOT NULL,
        account_id               INT8         NOT NULL,
        is_required              BOOLEAN      DEFAULT FALSE,
        html_widget_type_id      INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
-       custom_field_group_id  INT8   NOT NULL
+       custom_field_group_id    INT8         NOT NULL
 --       CONSTRAINT custom_field_group_id_display_order_ck
 --                  UNIQUE ( custom_field_group_id, display_order )
 --                  INITIALLY DEFERRED
@@ -144,12 +147,6 @@ CREATE TABLE "HTMLWidgetType" (
        html_widget_type_id      SERIAL       PRIMARY KEY,
        name                     VARCHAR(255) NOT NULL,
        description              VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE "CustomFieldType" (
-       custom_field_type_id     SERIAL8      PRIMARY KEY,
-       -- something like Integer, Float, Select, etc
-       name                     VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE "CustomFieldIntegerValue" (
@@ -554,10 +551,6 @@ ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_custom_field_group_id"
 
 ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_html_widget_type_id"
   FOREIGN KEY ("html_widget_type_id") REFERENCES "HTMLWidgetType" ("html_widget_type_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_custom_field_type_id"
-  FOREIGN KEY ("custom_field_type_id") REFERENCES "CustomFieldType" ("custom_field_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "CustomFieldIntegerValue" ADD CONSTRAINT "CustomFieldIntegerValue_custom_field_id"
