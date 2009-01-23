@@ -107,7 +107,7 @@ sub _fill_uri
             die "Invalid config key: $key"
                 unless R2::Config->can($key);
 
-            $vars{$var} = R2::Config->$key();
+            $vars{$var} = R2::Config->instance()->$key();
 
             die "No value for config key: $key"
                 unless defined $vars{$var};
