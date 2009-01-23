@@ -9,7 +9,7 @@ use base 'Catalyst::View::Mason';
     package R2::Mason;
 
     use Lingua::EN::Inflect qw( PL_N );
-    use R2::Util qw( string_is_empty );
+    use R2::Util qw( string_is_empty english_list );
     use R2::URI qw( static_uri );
     use R2::Web::Util qw( format_note );
 }
