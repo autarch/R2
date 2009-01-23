@@ -133,20 +133,21 @@ CREATE TABLE "CustomField" (
        label                    VARCHAR(255) NOT NULL,
        description              TEXT         NOT NULL DEFAULT '',
        type                     custom_field_type  NOT NULL,
-       account_id               INT8         NOT NULL,
        is_required              BOOLEAN      DEFAULT FALSE,
-       html_widget_type_id      INTEGER      NOT NULL,
+       html_widget_id           INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
+       account_id               INT8         NOT NULL,
        custom_field_group_id    INT8         NOT NULL
 --       CONSTRAINT custom_field_group_id_display_order_ck
 --                  UNIQUE ( custom_field_group_id, display_order )
 --                  INITIALLY DEFERRED
 );
 
-CREATE TABLE "HTMLWidgetType" (
-       html_widget_type_id      SERIAL       PRIMARY KEY,
+CREATE TABLE "HTMLWidget" (
+       html_widget_id           SERIAL       PRIMARY KEY,
        name                     VARCHAR(255) NOT NULL,
-       description              VARCHAR(255) NOT NULL
+       description              VARCHAR(255) NOT NULL,
+       type                     custom_field_type  NOT NULL
 );
 
 CREATE TABLE "CustomFieldIntegerValue" (
@@ -549,8 +550,8 @@ ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_custom_field_group_id"
   FOREIGN KEY ("custom_field_group_id") REFERENCES "CustomFieldGroup" ("custom_field_group_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_html_widget_type_id"
-  FOREIGN KEY ("html_widget_type_id") REFERENCES "HTMLWidgetType" ("html_widget_type_id")
+ALTER TABLE "CustomField" ADD CONSTRAINT "CustomField_html_widget_id"
+  FOREIGN KEY ("html_widget_id") REFERENCES "HTMLWidget" ("html_widget_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "CustomFieldIntegerValue" ADD CONSTRAINT "CustomFieldIntegerValue_custom_field_id"
