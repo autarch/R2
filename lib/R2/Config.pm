@@ -208,6 +208,7 @@ sub _build_config_file
             Log::Dispatch
             RedirectAndDetach
             SubRequest
+            Unicode
           );
 
     sub _build_catalyst_imports
