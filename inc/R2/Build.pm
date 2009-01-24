@@ -53,8 +53,7 @@ my %Requires =
       'JSAN::ServerSide'                         => '0.04',
       'JSON::XS'                                 => '0',
       'Lingua::EN::Inflect'                      => '0',
-      'List::MoreUtils'                          => '0',
-      'List::Util'                               => '0',
+      'List::AllUtils'                           => '0',
       'Locale::Country'                          => '0',
       'LWPx::ParanoidAgent'                      => '0',
       'Moose'                                    => '0.58',
@@ -90,6 +89,12 @@ sub new
           build_requires       => \%BuildRequires,
           script_files         => [ glob('bin/*.pl') ],
           recursive_test_files => 1,
+          meta_merge =>
+              { resources =>
+                    { homepage   => 'http://www.rapportware.org/',
+                      repository => 'http://hg.urth.org/hg/R2',
+                    },
+              },
         );
 }
 
