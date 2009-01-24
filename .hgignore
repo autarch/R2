@@ -1,9 +1,16 @@
 syntax: glob
-*~
-t/lib/R2/Test/Schema.pm
 .\#*
 \#*\#
 blib*
 cover_db*
 Build
 _build
+MANIFEST
+META.yml
+Makefile.PL
+README
+Debian_CPANTS.txt
+Makefile.PL
+Makefile
+Makefile.old
+pm_to_blib*
