@@ -4,8 +4,8 @@ use warnings;
 use Test::More tests => 39;
 
 use HTML::DOM;
-use List::MoreUtils qw( any );
-use List::Util qw( first );
+use List::AllUtils qw( any );
+use List::AllUtils qw( first );
 use R2::Web::Form;
 use R2::Web::FormData;
 

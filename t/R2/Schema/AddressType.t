@@ -6,7 +6,7 @@ use Test::More tests => 7;
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
 
-use List::Util qw( first );
+use List::AllUtils qw( first );
 use R2::Schema::AddressType;
 
 

@@ -7,7 +7,7 @@ use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
 
 use File::Slurp qw( read_file );
-use List::Util qw( first );
+use List::AllUtils qw( first );
 
 use R2::Test::Config;
 use R2::Config;
