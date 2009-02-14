@@ -421,6 +421,47 @@ sub _custom_field_group_params
 	   };
 }
 
+sub custom_fields
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    my %existing =
+        ( map  { /^custom_field_label_(\d+)/
+                 ? ( $1 => $self->_custom_field_params($1) )
+                 : () }
+          keys %{ $params }
+        );
+
+    my @new =
+        ( grep { ! string_is_empty( $_->{label} ) }
+	  map  { /^custom_field_label_(new\d+)/
+                 ? $self->_custom_field_params($1)
+                 : () }
+          keys %{ $params }
+        );
+
+    return ( \%existing, \@new );
+}
+
+sub _custom_field_params
+{
+    my $self = shift;
+    my $id   = shift;
+
+    my $params = $self->params();
+
+    my $label = $params->{ 'custom_field_label_' . $id };
+    return {} if string_is_empty($label);
+
+    return { label       => $label,
+             description => $params->{ 'custom_field_description_' . $id },
+             type        => $params->{ 'custom_field_type_' . $id },
+             is_required => $params->{ 'custom_field_is_required_' . $id },
+           };
+}
+
 sub _bool
 {
     return $_[0] ? 1 : 0;

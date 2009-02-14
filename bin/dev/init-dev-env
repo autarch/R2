@@ -29,6 +29,8 @@ system( "$FindBin::Bin/rebuild-schema" )
 
     make_time_zones();
 
+    make_html_widgets();
+
     my $domain = make_domain();
     make_accounts($domain);
 }
@@ -113,6 +115,13 @@ sub make_domain
 EOF
 
     return $domain
+}
+
+sub make_html_widgets
+{
+    require R2::Schema::HTMLWidget;
+
+    R2::Schema::HTMLWidget->CreateDefaultWidgets();
 }
 
 sub make_accounts

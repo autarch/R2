@@ -3,7 +3,7 @@ package R2::Model::Authz;
 use strict;
 use warnings;
 
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 use R2::Schema;
 use R2::Schema::Account;
 use R2::Schema::Contact;
@@ -15,10 +15,10 @@ sub user_can_view_account
 {
     my $self = shift;
     my ( $user, $account ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   account => { isa => 'R2::Schema::Account' },
-                 );
+        validated_list( \@_,
+                        user    => { isa => 'R2::Schema::User' },
+                        account => { isa => 'R2::Schema::Account' },
+                      );
 
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Admin' );
 }
@@ -27,10 +27,10 @@ sub user_can_edit_account
 {
     my $self = shift;
     my ( $user, $account ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   account => { isa => 'R2::Schema::Account' },
-                 );
+        validated_list( \@_,
+                        user    => { isa => 'R2::Schema::User' },
+                        account => { isa => 'R2::Schema::Account' },
+                      );
 
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Admin' );
 }
@@ -39,10 +39,10 @@ sub user_can_view_contact
 {
     my $self = shift;
     my ( $user, $contact ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   contact => { isa => 'R2::Schema::Contact' },
-                 );
+        validated_list( \@_,
+                        user    => { isa => 'R2::Schema::User' },
+                        contact => { isa => 'R2::Schema::Contact' },
+                      );
 
     return $self->_require_at_least( $user->user_id(), $contact->account_id(), 'Member' );
 }
@@ -51,10 +51,10 @@ sub user_can_edit_contact
 {
     my $self = shift;
     my ( $user, $contact ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   contact => { isa => 'R2::Schema::Contact' },
-                 );
+        validated_list( \@_,
+                        user    => { isa => 'R2::Schema::User' },
+                        contact => { isa => 'R2::Schema::Contact' },
+                      );
 
     return 0 unless $user->account_id() == $contact->account_id();
 
@@ -65,10 +65,10 @@ sub user_can_add_contact
 {
     my $self = shift;
     my ( $user, $account ) =
-        validatep( \@_,
-                   user    => { isa => 'R2::Schema::User' },
-                   account => { isa => 'R2::Schema::Account' },
-                 );
+        validated_list( \@_,
+                        user    => { isa => 'R2::Schema::User' },
+                        account => { isa => 'R2::Schema::Account' },
+                      );
 
     return $self->_require_at_least( $user->user_id(), $account->account_id(), 'Editor' );
 }

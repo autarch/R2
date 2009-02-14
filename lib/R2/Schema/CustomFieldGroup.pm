@@ -5,9 +5,12 @@ use warnings;
 
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
+use R2::CustomFieldType;
 use R2::Schema;
+use R2::Schema::HTMLWidget;
 use R2::Schema::CustomField;
 use R2::Types;
+use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -46,7 +49,7 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
           init_arg => undef,
         );
 
-    my $cf_types = R2::Schema::CustomField->Types();
+    my @cf_types = R2::CustomFieldType->All();
 
     for my $contact_type ( qw( Person Household Organization ) )
     {
@@ -61,9 +64,9 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
             my $schema = R2::Schema->Schema();
 
             my $count = 0;
-            for my $cf_type ( @{ $cf_types } )
+            for my $cf_type ( map { $_->type() } $self->custom_fields()->all() )
             {
-                my $cf_value_table = $schema->table( 'CustomField' . $cf_type . 'Value' );
+                my $cf_value_table = $schema->table( $cf_type->table() );
 
                 my $select = R2::Schema->SQLFactoryClass()->new_select();
 
@@ -77,7 +80,7 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
                                 @{ $self->custom_field_ids() } )
                        ->and( $schema->table('Contact')->column('contact_type'), '=', $contact_type );
 
-                my $dbh = R2::Schema->DBIManager()->source_for_sql($select);
+                my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
                 $count += $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
             }
@@ -103,9 +106,9 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
         my $schema = R2::Schema->Schema();
 
         my $count = 0;
-        for my $cf_type ( @{ $cf_types } )
+        for my $cf_type ( @cf_types )
         {
-            my $cf_value_table = $schema->table( 'CustomField' . $cf_type . 'Value' );
+            my $cf_value_table = $schema->table( $cf_type->table() );
 
             my $select = R2::Schema->SQLFactoryClass()->new_select();
 
@@ -118,7 +121,7 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
                    ->where( $cf_value_table->column('custom_field_id'), 'IN',
                             @{ $self->custom_field_ids() } );
 
-            my $dbh = R2::Schema->DBIManager()->source_for_sql($select);
+            my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
             $count += $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
         }
@@ -146,6 +149,56 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
 sub _display_order_is_unique
 {
     return;
+}
+
+sub update_or_add_custom_fields
+{
+    my $self     = shift;
+    my $existing = shift;
+    my $new      = shift;
+
+    my @fields = $self->custom_fields()->all();
+
+    my $display_order = scalar @fields;
+
+    my $sub =
+        subname( 'R2::Schema::_update_or_add_custom_fields' =>
+                 sub
+                 {
+                     for my $field (@fields)
+                     {
+                         my $updated_field = $existing->{ $field->custom_field_id() };
+
+                         if ( string_is_empty( $updated_field->{name} ) )
+                         {
+                             next unless $field->is_deleteable();
+
+                             $field->delete();
+                         }
+                         else
+                         {
+                             $field->update( %{ $updated_field } );
+                         }
+                     }
+
+                     for my $new_field ( @{ $new } )
+                     {
+                         my $widget =
+                             R2::Schema::HTMLWidget->new( name => $new_field->{type} );
+
+                         R2::Schema::CustomField->insert
+                             ( %{ $new_field },
+                               display_order         => ++$display_order,
+                               html_widget_id        => $widget->html_widget_id(),
+                               custom_field_group_id => $self->custom_field_group_id(),
+                               account_id            => $self->account_id(),
+                             );
+                     }
+                 }
+               );
+
+    R2::Schema->RunInTransaction($sub);
+
 }
 
 no Fey::ORM::Table;

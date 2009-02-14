@@ -3,6 +3,8 @@ package R2::Controller::Account;
 use strict;
 use warnings;
 
+use R2::Schema::Account;
+use R2::Schema::CustomFieldGroup;
 use R2::URI qw( dynamic_uri );
 
 use base 'R2::Controller::Base';
@@ -25,6 +27,18 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
     {
         $c->_redirect_with_error
             ( error => 'You are not authorized to view this account',
+              uri   => dynamic_uri( path => '/' ),
+            );
+    }
+
+    unless ( uc $c->request()->method() eq 'GET'
+             ||
+             $c->model('Authz')->user_can_edit_account( user    => $c->user(),
+                                                        account => $account,
+                                                      ) )
+    {
+        $c->_redirect_with_error
+            ( error => 'You are not authorized to edit this account',
               uri   => dynamic_uri( path => '/' ),
             );
     }
@@ -312,9 +326,9 @@ sub messaging_provider_POST : Private
 
 sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) { }
 
-sub custom_field_group : Chained('_set_account') : PathPart('custom_field_group') : Args(0) : ActionClass('+R2::Action::REST') { }
+sub custom_field_group_collection : Chained('_set_account') : PathPart('custom_field_group') : Args(0) : ActionClass('+R2::Action::REST') { }
 
-sub custom_field_group_POST : Private
+sub custom_field_group_collection_POST : Private
 {
     my $self = shift;
     my $c    = shift;
@@ -338,6 +352,60 @@ sub custom_field_group_POST : Private
     }
 
     $c->add_message( 'The custom field groups for ' . $account->name() . ' have been updated' );
+
+    $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
+}
+
+sub _set_custom_field_group : Chained('_set_account') : PathPart('custom_field_group') : CaptureArgs(1)
+{
+    my $self                  = shift;
+    my $c                     = shift;
+    my $custom_field_group_id = shift;
+
+    my $group = R2::Schema::CustomFieldGroup->new( custom_field_group_id => $custom_field_group_id );
+
+    $c->redirect_and_detach('/')
+        unless $group;
+
+    $c->stash()->{group} = $group;
+}
+
+sub custom_field_group : Chained('_set_custom_field_group') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') { }
+
+sub custom_field_group_GET_html : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{template} = '/account/custom_field_group';
+}
+
+sub custom_field_group_POST : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my ( $existing, $new ) = $c->request()->custom_fields();
+
+    my $group = $c->stash()->{group};
+
+    eval
+    {
+        $group->update_or_add_custom_fields( $existing, $new );
+    };
+
+    my $account = $c->stash()->{account};
+
+    if ( my $e = $@ )
+    {
+        $c->_redirect_with_error
+            ( error  => $e,
+              uri    => $account->uri( view => 'custom_field_group/' . $group->custom_field_group_id() ),
+              params => $c->request()->params(),
+            );
+    }
+
+    $c->add_message( 'The custom fields for ' . $group->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
 }
