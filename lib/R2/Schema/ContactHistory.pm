@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use DateTime::Format::Strptime;
-use List::Util qw( first );
+use List::AllUtils qw( first );
 use R2::Schema;
 use R2::Schema::Contact;
 
