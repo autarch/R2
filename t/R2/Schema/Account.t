@@ -280,7 +280,7 @@ my $account;
           [ $account->account_id(), 3, 0, 0, 1, 'Work' ],
         ];
 
-    for ( 1..3 )
+    for ( 1..7 )
     {
         $dbh->{mock_add_resultset} =
             [ [ 'count' ],
