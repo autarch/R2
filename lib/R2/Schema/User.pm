@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw( sha512_base64 );
 use Fey::ORM::Exceptions qw( no_such_row );
-use List::Util qw( first );
+use List::AllUtils qw( first );
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
