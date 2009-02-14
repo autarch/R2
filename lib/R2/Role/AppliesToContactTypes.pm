@@ -3,6 +3,7 @@ package R2::Role::AppliesToContactTypes;
 use strict;
 use warnings;
 
+use Lingua::EN::Inflect qw( A );
 use List::MoreUtils qw( any );
 use R2::Util qw( studly_to_calm );
 
@@ -11,6 +12,8 @@ use Moose::Role;
 # these are attributes
 #requires qw( person_count household_count organization_count contact_count );
 
+
+my @ContactTypes = qw( person household organization );
 
 # These two subs are data validation steps
 sub _cannot_unapply
@@ -21,7 +24,7 @@ sub _cannot_unapply
 
     return if $is_insert;
 
-    for my $contact_type ( qw( person household organization ) )
+    for my $contact_type (@ContactTypes)
     {
         my $key = 'applies_to_' . $contact_type;
 
@@ -43,7 +46,7 @@ sub _applies_to_something
     my $p         = shift;
     my $is_insert = shift;
 
-    my @keys = map { 'applies_to_' . $_ } qw( person household organization );
+    my @keys = map { 'applies_to_' . $_ } @ContactTypes;
 
     if ($is_insert)
     {
@@ -65,13 +68,26 @@ sub _applies_to_something
         }
     }
 
-    ( my $thing = (ref $self) ) =~ s/R2::Schema:://;
+    ( my $thing = (ref $self || $self) ) =~ s/R2::Schema:://;
 
     $thing = studly_to_calm($thing);
     $thing =~ s/_/ /g;
 
+    my $articled_thing = ucfirst A($thing);
+
     return { message =>
-             "A $thing must apply to a person, household, or organization." };
+             "$articled_thing must apply to a person, household, or organization." };
+}
+
+sub types_applied_to
+{
+    my $self = shift;
+
+    return
+        ( map { ucfirst $_ }
+          grep { my $meth = 'applies_to_' . $_; $self->$meth() }
+          @ContactTypes
+        );
 }
 
 sub can_unapply_from_person
