@@ -3,7 +3,7 @@ package R2::Schema::Address;
 use strict;
 use warnings;
 
-use List::Util qw( first );
+use List::AllUtils qw( first );
 use R2::Schema::AddressType;
 use R2::Schema::Contact;
 use R2::Schema;
