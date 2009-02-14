@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Image::Magick;
-use List::Util qw( min );
+use List::AllUtils qw( min );
 use Path::Class ();
 use R2::Schema::File;
 use R2::Types;
