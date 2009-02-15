@@ -16,96 +16,49 @@ parameter 'membership_table' =>
       required => 1,
     );
 
-role
+
+has 'members' =>
+    ( is         => 'ro',
+      isa        => 'Fey::Object::Iterator::Caching',
+      lazy_build => 1,
+    );
+
+has 'member_count' =>
+    ( is         => 'ro',
+      isa        => 'Int',
+      lazy_build => 1,
+    );
+
+sub add_member
 {
-    my $p = shift;
+    my $self = shift;
+    my ( $person_id, $position, $user ) =
+        validatep( \@_,
+                   person_id => { isa => 'Int' },
+                   position  => { isa => 'Str', default => q{} },
+                   user      => { isa => 'R2::Schema::User' },
+                 );
 
-    has 'members' =>
-        ( is         => 'ro',
-          isa        => 'Fey::Object::Iterator::Caching',
-          lazy_build => 1,
-        );
+    my $person = R2::Schema::Person->new( person_id => $person_id );
 
-    has 'member_count' =>
-        ( is         => 'ro',
-          isa        => 'Int',
-          lazy_build => 1,
-        );
-
-    method 'add_member' => sub
+    if ( $person->account_id() != $self->account_id() )
     {
-        my $self = shift;
-        my ( $person_id, $position, $user ) =
-            validatep( \@_,
-                       person_id => { isa => 'Int' },
-                       position  => { isa => 'Str', default => q{} },
-                       user      => { isa => 'R2::Schema::User' },
-                     );
-
-        my $person = R2::Schema::Person->new( person_id => $person_id );
-
-        if ( $person->account_id() != $self->account_id() )
-        {
-            data_validation_error 'Cannot add a person from a different account.';
-        }
-
-        my $class = (ref $self) . 'Member';
-
-        $class->insert( $self->pk_values_hash(),
-                        person_id => $person_id,
-                        position  => $position,
-                        user      => $user,
-                      );
-    };
-
-    my $membership_table = $p->membership_table();
-    my $membership_class = Fey::Meta::Class::Table->ClassForTable($membership_table);
-
-    my $for_class = _find_r2_class();
-
-    my $members_select = _make_members_select( $for_class, $membership_table );
-
-    method '_build_members' => sub
-    {
-        my $self = shift;
-
-        my $dbh = $self->_dbh($members_select);
-
-        return
-            Fey::Object::Iterator::Caching->new
-                ( classes     => [ qw( R2::Schema::Person ), $membership_class ],
-                  dbh         => $dbh,
-                  select      => $members_select,
-                  bind_params => [ $self->pk_values_list() ],
-                );
-    };
-
-    my $count_select = _make_member_count_select( $for_class, $membership_table );
-
-    method '_build_member_count' => sub
-    {
-        my $self = shift;
-
-        my $dbh = $self->_dbh($count_select);
-
-        return $dbh->selectrow_arrayref( $count_select->sql($dbh), {}, $self->pk_values_list() )->[0];
-    };
-};
-
-# This is a really nasty hack that should be replaced by some proper
-# API in MX::Role::Parameterized
-sub _find_r2_class
-{
-    my $x = 0;
-    while ( my $package = caller($x++) )
-    {
-        return $package if $package =~ /^R2::Schema::/;
+        data_validation_error 'Cannot add a person from a different account.';
     }
 
-    die 'Cannot find the R2 class to which this role is being applied';
+    my $class = (ref $self) . 'Member';
+
+    $class->insert( $self->pk_values_hash(),
+                    person_id => $person_id,
+                    position  => $position,
+                    user      => $user,
+                  );
 }
 
-sub _make_members_select
+# If these were regular subs they'd end up getting composed into the
+# consuming classes, but they're just for internal use in the role
+# block below.
+my $_make_members_select = sub
 {
     my $class = shift;
     my $table = shift;
@@ -126,9 +79,9 @@ sub _make_members_select
     $select->order_by( @{ R2::Schema::Person->DefaultOrderBy() } );
 
     return $select;
-}
+};
 
-sub _make_member_count_select
+my $_make_member_count_select = sub
 {
     my $class = shift;
     my $table = shift;
@@ -147,6 +100,47 @@ sub _make_member_count_select
     }
 
     return $select;
-}
+};
+
+role
+{
+    my $p     = shift;
+    my %extra = @_;
+
+    my $membership_table = $p->membership_table();
+    my $membership_class = Fey::Meta::Class::Table->ClassForTable($membership_table);
+
+    my $for_class = $extra{consumer}->name();
+
+    my $members_select = $_make_members_select->( $for_class, $membership_table );
+
+    method '_build_members' => sub
+    {
+        my $self = shift;
+
+        my $dbh = $self->_dbh($members_select);
+
+        return
+            Fey::Object::Iterator::Caching->new
+                ( classes     => [ qw( R2::Schema::Person ), $membership_class ],
+                  dbh         => $dbh,
+                  select      => $members_select,
+                  bind_params => [ $self->pk_values_list() ],
+                );
+    };
+
+    my $count_select = $_make_member_count_select->( $for_class, $membership_table );
+
+    method '_build_member_count' => sub
+    {
+        my $self = shift;
+
+        my $dbh = $self->_dbh($count_select);
+
+        return $dbh->selectrow_arrayref( $count_select->sql($dbh), {}, $self->pk_values_list() )->[0];
+    };
+};
+
+no MooseX::Role::Parameterized;
 
 1;
