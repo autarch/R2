@@ -28,9 +28,8 @@ use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validatep );
 use MooseX::ClassAttribute;
 
-with qw( R2::Role::DataValidator
-         R2::Role::URIMaker
-       );
+with 'R2::Role::DataValidator';
+with 'R2::Role::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();

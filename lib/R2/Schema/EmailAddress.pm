@@ -9,9 +9,10 @@ use R2::Schema::Contact;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _valid_email_address ) ] };
+with 'R2::Role::HistoryRecorder';
 
 
 {
@@ -22,13 +23,6 @@ with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
     has_table( $schema->table('EmailAddress') );
 
     has_one( $schema->table('Contact') );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _valid_email_address ) ] },
-        );
 }
 
 

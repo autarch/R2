@@ -9,9 +9,10 @@ use R2::Schema;
 use R2::Types;
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _applies_to_something _cannot_unapply ) ] };
+with 'R2::Role::AppliesToContactTypes';
 
 {
     my $schema = R2::Schema->Schema();
@@ -65,13 +66,6 @@ with 'R2::Role::DataValidator', 'R2::Role::AppliesToContactTypes';
           select      => $select,
           bind_params => sub { $_[0]->address_type_id() },
         );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _applies_to_something _cannot_unapply ) ] },
-        );
 }
 
 
@@ -110,7 +104,6 @@ sub CreateDefaultsForAccount
 }
 
 no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -11,9 +11,10 @@ use URI;
 use URI::http;
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _validate_and_canonicalize_uri ) ] };
+with 'R2::Role::HistoryRecorder';
 
 
 {
@@ -28,13 +29,6 @@ with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
     transform 'uri' =>
         deflate { blessed $_[1] ? $_[1]->canonical() . '' : $_[1] },
         inflate { defined $_[1] ? URI->new( $_[1] ) : $_[1] };
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _validate_and_canonicalize_uri ) ] },
-        );
 }
 
 

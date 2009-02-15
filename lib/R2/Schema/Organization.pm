@@ -10,7 +10,8 @@ use R2::Schema::OrganizationMember;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DVAAC';
+with 'R2::Role::ActsAsContact'
+    => { steps => [] };
 
 {
     my $schema = R2::Schema->Schema();

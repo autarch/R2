@@ -10,9 +10,10 @@ use R2::Schema::Contact;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _valid_note_datetime ) ] };
+with 'R2::Role::URIMaker';
 
 
 {
@@ -28,14 +29,6 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
         ( table => $schema->table('ContactNoteType') );
 
     has_one( $schema->table('Contact') );
-
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _valid_note_datetime ) ] },
-        );
 }
 
 sub _valid_note_datetime

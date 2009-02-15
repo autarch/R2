@@ -13,7 +13,8 @@ use Scalar::Util qw( blessed );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with qw( R2::Role::DVAAC );
+with 'R2::Role::ActsAsContact'
+    => { steps => [ qw( _require_some_name _valid_birth_date ) ] };
 
 
 {
@@ -65,13 +66,6 @@ with qw( R2::Role::DVAAC );
         ( is         => 'ro',
           isa        => 'ArrayRef',
           lazy_build => 1,
-        );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _require_some_name _valid_birth_date ) ] },
         );
 
     class_has 'DefaultOrderBy' =>

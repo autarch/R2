@@ -6,7 +6,12 @@ use warnings;
 use Lingua::EN::Inflect qw( A );
 use R2::Exceptions qw( data_validation_error );
 
-use Moose::Role;
+use MooseX::Role::Parameterized;
+
+parameter 'steps' =>
+    ( isa     => 'ArrayRef[Str]',
+      default => sub { [] },
+    );
 
 
 around 'insert' => sub
@@ -43,26 +48,6 @@ sub _clean_and_validate_data
 
     data_validation_error errors => \@errors
         if @errors;
-}
-
-sub _validation_errors
-{
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
-
-    my @errors;
-    if ( $self->can('_ValidationSteps') )
-    {
-        for my $step ( @{ $self->_ValidationSteps() } )
-        {
-            push @errors, $self->$step( $p, $is_insert );
-        }
-    }
-
-    push @errors, $self->_check_non_nullable_columns( $p, $is_insert );
-
-    return @errors;
 }
 
 sub _check_non_nullable_columns
@@ -120,6 +105,53 @@ sub validate_for_update
     return $self->_validation_errors(\%p);
 }
 
-no Moose::Role;
+role
+{
+    my $params = shift;
+    my %extra  = @_;
+
+    # XXX - this is because parameterized roles don't allow you to
+    # exclude or alias methods on import.
+    return
+        if $extra{consumer}->can('does_role')
+           && $extra{consumer}->does_role('R2::Role::ActsAsContact' );
+
+    my @steps = @{ $params->steps() };
+
+    if (@steps)
+    {
+        method _validation_errors => sub
+        {
+            my $self      = shift;
+            my $p         = shift;
+            my $is_insert = shift;
+
+            return $self->_check_validation_steps( $p, $is_insert ),
+                   $self->_check_non_nullable_columns( $p, $is_insert );
+        };
+
+        method _check_validation_steps => sub
+        {
+            my $self      = shift;
+            my $p         = shift;
+            my $is_insert = shift;
+
+            return map { $self->$_( $p, $is_insert ) } @steps;
+        };
+    }
+    else
+    {
+        method _validation_errors => sub
+        {
+            my $self      = shift;
+            my $p         = shift;
+            my $is_insert = shift;
+
+            return $self->_check_non_nullable_columns( $p, $is_insert );
+        };
+    }
+};
+
+no MooseX::Role::Parameterized;
 
 1;

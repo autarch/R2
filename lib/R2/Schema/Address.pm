@@ -11,7 +11,8 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
-with qw( R2::Role::DataValidator R2::Role::HistoryRecorder );
+with 'R2::Role::DataValidator';
+with 'R2::Role::HistoryRecorder';
 
 
 {

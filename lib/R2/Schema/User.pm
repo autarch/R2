@@ -13,9 +13,10 @@ use R2::Schema::Person;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _validate_password _require_username_or_email ) ] };
+with 'R2::Role::URIMaker';
 
 
 {
@@ -43,13 +44,6 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
           # comes before the time, but it's probably okay for the US &
           # Canada.
           default => sub { $_[0]->date_format() . q{ } . $_[0]->time_format() },
-        );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _validate_password _require_username_or_email ) ] },
         );
 }
 

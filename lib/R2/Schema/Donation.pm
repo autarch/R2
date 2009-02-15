@@ -11,10 +11,10 @@ use R2::Util qw( string_is_empty );
 use Scalar::Util qw( looks_like_number );
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
-
+with 'R2::Role::DataValidator' =>
+         { steps => [ qw( _validate_amount _valid_donation_date ) ] };
+with 'R2::Role::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();
@@ -32,13 +32,6 @@ with 'R2::Role::DataValidator', 'R2::Role::URIMaker';
     has_one( $schema->table('PaymentType') );
 
     has_one( $schema->table('Contact') );
-
-    class_has '_ValidationSteps' =>
-        ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
-          lazy    => 1,
-          default => sub { [ qw( _validate_amount _valid_donation_date ) ] },
-        );
 }
 
 sub _validate_amount

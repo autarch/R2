@@ -9,7 +9,7 @@ use Scalar::Util qw( blessed );
 
 use Fey::ORM::Table;
 
-with qw( R2::Role::DataValidator );
+with 'R2::Role::DataValidator';
 
 
 {
