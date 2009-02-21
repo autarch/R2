@@ -10,6 +10,7 @@ use R2::Schema;
 use R2::Schema::HTMLWidget;
 use R2::Schema::CustomField;
 use R2::Types;
+use R2::Util qw( string_is_empty );
 use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
