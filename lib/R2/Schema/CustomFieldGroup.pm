@@ -175,7 +175,7 @@ sub update_or_add_custom_fields
 
                          if ( string_is_empty( $updated_field->{name} ) )
                          {
-                             next unless $field->is_deleteable();
+                             next unless $field->is_deletable();
 
                              $field->delete();
                          }

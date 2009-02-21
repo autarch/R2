@@ -111,7 +111,7 @@ sub can_unapply_from_organization
     return ! $self->organization_count();
 }
 
-sub is_deleteable
+sub is_deletable
 {
     my $self = shift;
 

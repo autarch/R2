@@ -63,7 +63,7 @@ sub _BuildDonationCountSelect
     return $select;
 }
 
-sub is_deleteable
+sub is_deletable
 {
     my $self = shift;
 

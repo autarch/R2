@@ -66,7 +66,7 @@ sub is_updateable
     return ! $self->is_system_defined();
 }
 
-sub is_deleteable
+sub is_deletable
 {
     my $self = shift;
 

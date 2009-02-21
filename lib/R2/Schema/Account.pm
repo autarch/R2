@@ -337,7 +337,7 @@ sub _update_or_add_things
 
                          if ( string_is_empty( $updated_thing->{$name_col} ) )
                          {
-                             next unless $thing->is_deleteable();
+                             next unless $thing->is_deletable();
 
                              $thing->delete();
                          }
