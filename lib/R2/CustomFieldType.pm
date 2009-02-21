@@ -24,14 +24,9 @@ my @Types =
 
 my %Descriptions = map { @{$_} } @Types;
 
-subtype 'R2.Type.CustomFieldTypeName'
-    => as 'Str'
-    => where { exists $Descriptions{$_} }
-    => message { "$_ is not a valid custom field type name" };
-
 has 'type' =>
     ( is       => 'ro',
-      isa      => 'R2.Type.CustomFieldTypeName',
+      isa      => ( enum [ map { $_->[0] } @Types ] ),
       required => 1,
     );
 
