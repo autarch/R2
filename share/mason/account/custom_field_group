@@ -21,8 +21,10 @@ This group applies to <% english_list( map { PL_N($_) } $group->types_applied_to
     <legend>Custom Fields for This Group</legend>
 
 % if ($count) {
-%   while ( my $fields = $fields->next() ) {
-
+%   while ( my $field = $fields->next() ) {
+    <div class="custom-field">
+<& .custom_field, field => $field, id => $field->custom_field_id() &>
+    </div>
 %   }
 % } else {
     <p>
@@ -33,41 +35,9 @@ This group applies to <% english_list( map { PL_N($_) } $group->types_applied_to
     <h3>Add New Fields</h3>
 
     <div class="JS-repeatable-group JS-repeatable-group-custom-field">
-
-      <div class="form-item">
-        <label class="for-field" for="custom_field_label_new1">Label:</label>
-        <input class="text medium" type="text" name="custom_field_label_new1"
-               id="custom_field_label_new1" />
-        <a class="delete-repeated-group" style="display: none" href="#" title="delete this field">X</a>
+      <div class="custom-field">
+<& .custom_field, id => 'new1' &>
       </div>
-
-      <div class="form-item">
-        <label class="secondary" for="custom_field_description_new1">Description:</label>
-        <input class="text wide" type="text" name="custom_field_description_new1"
-               id="custom_field_description_new1" />
-
-        <div class="help-text">
-          <p>
-            This description will be shown as help text (just like this) on contact forms.
-          </p>
-        </div>
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="custom_field_type_new1">Type:</label>
-        <select name="custom_field_type_new1" id="custom_field_type_new1">
-% for my $type (@types) {
-          <option value="<% $type->type() %>"><% $type->type() %> - <% $type->description() %></option>
-% }
-        </select>
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="custom_field_is_required_new1">Required?</label>
-        <input class="checkbox" type="checkbox" name="custom_field_is_required_new1"
-               value="1" id="custom_field_is_required_new1" />
-      </div>
-
     </div>
 
     <a href="#" class="add-another" id="custom-field-repeater">Add another field</a>
@@ -85,17 +55,67 @@ $group
 $account
 </%args>
 
+<%once>
+my @types = R2::CustomFieldType->All();
+</%once>
+
 <%init>
 my $count = $group->custom_field_count();
 my $fields;
 $fields = $group->custom_fields() if $count;
-
-my @types = R2::CustomFieldType->All();
 </%init>
 
 <%method title>
-Custom field: <% $group->name() %>
+Custom fields in <% $group->name() %> group
 <%args>
 $group
 </%args>
 </%method>
+
+<%def .custom_field>
+    <div class="form-item">
+      <label class="for-field" for="custom_field_label_<% $id %>">Label:</label>
+      <input class="text medium" type="text" name="custom_field_label_<% $id %>"
+             value="<% $field ? $field->label() : '' %>"
+             id="custom_field_label_<% $id %>" />
+% unless ($field) {
+      <a class="delete-repeated-group" style="display: none" href="#" title="delete this field">X</a>
+% }
+    </div>
+
+    <div class="form-item">
+      <label class="secondary" for="custom_field_description_<% $id %>">Description:</label>
+      <input class="text wide" type="text" name="custom_field_description_<% $id %>"
+             value="<% $field ? $field->description() : '' %>"
+             id="custom_field_description_<% $id %>" />
+
+      <div class="help-text">
+        <p>
+          This description will be shown as help text (just like this) on contact forms.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="secondary" for="custom_field_type_<% $id %>">Type:</label>
+      <select name="custom_field_type_<% $id %>" id="custom_field_type_<% $id %>">
+% for my $type (@types) {
+        <option value="<% $type->type() %>"
+                <% $field && $field->type()->type() eq $type->type() ? 'selected="selected"' : '' %>
+          ><% $type->type() %> - <% $type->description() %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="secondary" for="custom_field_is_required_<% $id %>">Required?</label>
+      <input class="checkbox" type="checkbox" name="custom_field_is_required_<% $id %>"
+             <% $field && $field->is_required() ? 'checked="checked"' : '' %>
+             value="1" id="custom_field_is_required_<% $id %>" />
+    </div>
+
+<%args>
+$field => undef
+$id
+</%args>
+</%def>

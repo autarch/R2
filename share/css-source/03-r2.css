@@ -436,3 +436,7 @@ form.inline {
 form.inline input.submit {
     margin-top: 0.1em;
 }
+
+div.custom-field {
+    margin-bottom: 0.5em;
+}
