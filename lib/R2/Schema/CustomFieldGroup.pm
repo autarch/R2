@@ -173,7 +173,7 @@ sub update_or_add_custom_fields
                      {
                          my $updated_field = $existing->{ $field->custom_field_id() };
 
-                         if ( string_is_empty( $updated_field->{name} ) )
+                         if ( string_is_empty( $updated_field->{label} ) )
                          {
                              next unless $field->is_deletable();
 
