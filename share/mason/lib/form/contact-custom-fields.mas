@@ -20,10 +20,13 @@ my $groups = $c->account()->$meth();
 
 % while ( my $field = $fields->next() ) {
   <div class="form-item">
-    <label class="for-field" for="custom_field_<% $field->custom_field_id() %>"><% $field->label() %>:</label>
-    <input type="text"
-           name="custom_field_<% $field->custom_field_id() %>"
-           id="custom_field_<% $field->custom_field_id() %>" />
+    <label class="for-field" for="custom_field_<% $field->custom_field_id() %>">
+      <% $field->label() %><% $field->label() =~ /[\?:]$/ ? q{} : q{:} %>
+    </label>
+    <& '/lib/form/custom-field-widgets/' . $field->widget_name() . '.mas', field => $field &>
+%   if ( $field->is_required() ) {
+    <span class="required" title="field is required">*</span>
+%   }
 %   if ( defined $field->description() ) {
       <div class="help-text">
         <p>

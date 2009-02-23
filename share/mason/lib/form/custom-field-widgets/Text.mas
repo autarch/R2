@@ -1,0 +1,8 @@
+    <input type="text"
+           class="medium"
+           name="custom_field_<% $field->custom_field_id() %>"
+           id="custom_field_<% $field->custom_field_id() %>" />
+
+<%args>
+$field
+</%args>

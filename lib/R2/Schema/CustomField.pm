@@ -22,6 +22,11 @@ with 'R2::Role::DataValidator';
     has_one 'group' =>
         ( table => $schema->table('CustomFieldGroup') );
 
+    has_one 'widget' =>
+        ( table   => $schema->table('HTMLWidget'),
+          handles => { widget_name => 'name' },
+        );
+
     transform 'type'
         => inflate { R2::CustomFieldType->new( type => $_[1] ) }
         => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };

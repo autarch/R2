@@ -290,6 +290,11 @@ form label.selected {
     color: black;
 }
 
+form div.form-item span.required {
+    font-size: 80%;
+    font-weight: bold;
+}
+
 form input.checkbox {
     margin-top: 0.2em;
 }
