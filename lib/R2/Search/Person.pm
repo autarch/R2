@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Fey::Literal::Function;
-use Fey::Object::Iterator;
+use Fey::Object::Iterator::FromSelect;
 use R2::Schema;
 
 use Moose;
@@ -32,7 +32,7 @@ sub people
     $self->_limit($select);
 
     return
-        Fey::Object::Iterator->new
+        Fey::Object::Iterator::FromSelect->new
             ( classes     => 'R2::Schema::Person',
               dbh         => $dbh,
               select      => $select,

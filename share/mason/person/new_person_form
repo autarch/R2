@@ -81,6 +81,8 @@
 
 <& /lib/form/contact-addresses.mas, contact_type => 'person' &>
 
+<& /lib/form/contact-custom-fields.mas, contact_type => 'person' &>
+
   <div class="form-item">
     <input class="submit" type="submit" value="Submit" />
   </div>

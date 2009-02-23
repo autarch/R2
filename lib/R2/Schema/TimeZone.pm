@@ -3,7 +3,7 @@ package R2::Schema::TimeZone;
 use strict;
 use warnings;
 
-use Fey::Object::Iterator;
+use Fey::Object::Iterator::FromSelect;
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -79,11 +79,12 @@ sub ByCountry
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
     return
-        Fey::Object::Iterator->new( classes     => $class,
-                                    dbh         => $dbh,
-                                    select      => $select,
-                                    bind_params => [ $iso_code ],
-                                  );
+        Fey::Object::Iterator::FromSelect->new
+            ( classes     => $class,
+              dbh         => $dbh,
+              select      => $select,
+              bind_params => [ $iso_code ],
+            );
 }
 
 sub _MakeSelectByCountrySQL

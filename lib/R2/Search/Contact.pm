@@ -5,7 +5,7 @@ use warnings;
 
 use Fey::Literal::Function;
 use Fey::Literal::Term;
-use Fey::Object::Iterator;
+use Fey::Object::Iterator::FromSelect;
 use R2::Schema;
 use R2::Types;
 
@@ -72,7 +72,7 @@ sub contacts
     }
 
     return
-        Fey::Object::Iterator->new
+        Fey::Object::Iterator::FromSelect->new
             ( classes     => 'R2::Schema::Contact',
               dbh         => $dbh,
               select      => $select,

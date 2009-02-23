@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Fey::Literal;
-use Fey::Object::Iterator::Caching;
+use Fey::Object::Iterator::FromArray;
+use Fey::Object::Iterator::FromSelect::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::MoreUtils qw( any );
 use R2::Exceptions qw( error );
@@ -87,6 +88,27 @@ with 'R2::Role::URIMaker';
           order_by => [ $schema->table('CustomFieldGroup')->column('display_order') ],
         );
 
+    for my $type ( qw( person household organization ) )
+    {
+        my $meth = 'applies_to_' . $type;
+
+        my $default =
+            sub { my @groups = grep { $_->$meth() } $_[0]->custom_field_groups()->all();
+                  return
+                      Fey::Object::Iterator::FromArray->new
+                          ( classes => 'R2::Schema::CustomFieldGroup',
+                            objects => \@groups,
+                          );
+                };
+
+        has 'custom_field_groups_for_' . $type =>
+            ( is      => 'ro',
+              isa     => 'Fey::Object::Iterator::FromArray',
+              lazy    => 1,
+              default => $default,
+            );
+    }
+
     has '_messaging_provider_id_hash' =>
         ( is         => 'ro',
           isa        => 'HashRef',
@@ -107,7 +129,7 @@ with 'R2::Role::URIMaker';
 
     has 'countries' =>
         ( is         => 'ro',
-          isa        => 'Fey::Object::Iterator::Caching',
+          isa        => 'Fey::Object::Iterator::FromSelect::Caching',
           lazy_build => 1,
         );
 
@@ -399,7 +421,7 @@ sub _build_countries
     my $dbh = $self->_dbh($select);
 
     return
-        Fey::Object::Iterator::Caching->new
+        Fey::Object::Iterator::FromSelect::Caching->new
             ( classes     => [ qw( R2::Schema::AccountCountry R2::Schema::Country  ) ],
               dbh         => $dbh,
               select      => $select,

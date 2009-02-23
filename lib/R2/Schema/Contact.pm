@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Fey::Literal::String;
-use Fey::Object::Iterator::Caching;
+use Fey::Object::Iterator::FromSelect::Caching;
 use Fey::Placeholder;
 use R2::Image;
 use R2::Schema;
@@ -181,7 +181,7 @@ with 'R2::Role::URIMaker';
 
     has 'history' =>
         ( is         => 'ro',
-          isa        => 'Fey::Object::Iterator::Caching',
+          isa        => 'Fey::Object::Iterator::FromSelect::Caching',
           lazy_build => 1,
         );
 }
@@ -368,7 +368,7 @@ sub _build_history
     my $dbh = $self->_dbh($select);
 
     return
-        Fey::Object::Iterator::Caching->new
+        Fey::Object::Iterator::FromSelect::Caching->new
             ( classes     =>
                   [ qw( R2::Schema::ContactHistory R2::Schema::ContactHistoryType ) ],
               dbh         => $dbh,

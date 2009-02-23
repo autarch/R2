@@ -159,7 +159,7 @@ my $contact =
 {
     my $iterator = $contact->_build_history();
 
-    isa_ok( $iterator, 'Fey::Object::Iterator::Caching' );
+    isa_ok( $iterator, 'Fey::Object::Iterator::FromSelect::Caching' );
 }
 
 {

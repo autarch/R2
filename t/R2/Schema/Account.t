@@ -561,7 +561,7 @@ my $account;
         ];
 
     $account->donation_sources()->_clear_cached_results();
-    $account->donation_sources()->Fey::Object::Iterator::reset();
+    $account->donation_sources()->reset();
 
     $account->update_or_add_donation_sources
         ( { 1 => { name => 'male' },
@@ -597,7 +597,7 @@ my $account;
         ];
 
     $account->donation_sources()->_clear_cached_results();
-    $account->donation_sources()->Fey::Object::Iterator::reset();
+    $account->donation_sources()->reset();
 
     $account->update_or_add_donation_sources
         ( { 1 => { name => 'male' },

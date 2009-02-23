@@ -19,7 +19,7 @@ parameter 'membership_table' =>
 
 has 'members' =>
     ( is         => 'ro',
-      isa        => 'Fey::Object::Iterator::Caching',
+      isa        => 'Fey::Object::Iterator::FromSelect::Caching',
       lazy_build => 1,
     );
 
@@ -121,7 +121,7 @@ role
         my $dbh = $self->_dbh($members_select);
 
         return
-            Fey::Object::Iterator::Caching->new
+            Fey::Object::Iterator::FromSelect::Caching->new
                 ( classes     => [ qw( R2::Schema::Person ), $membership_class ],
                   dbh         => $dbh,
                   select      => $members_select,
