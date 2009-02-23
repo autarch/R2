@@ -25,7 +25,7 @@ my $groups = $c->account()->$meth();
     </label>
     <& '/lib/form/custom-field-widgets/' . $field->widget_name() . '.mas', field => $field &>
 %   if ( $field->is_required() ) {
-    <span class="required" title="field is required">*</span>
+    <span class="required" title="this field is required">*</span>
 %   }
 %   if ( defined $field->description() ) {
       <div class="help-text">
