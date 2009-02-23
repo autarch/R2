@@ -1,4 +1,4 @@
-  <fieldset class="last">
+  <fieldset>
     <legend>Addresses</legend>
 
     <div class="JS-repeatable-group JS-repeatable-group-address">
