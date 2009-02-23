@@ -1,0 +1,44 @@
+% while ( my $group = $groups->next() ) {
+<fieldset>
+  <legend><% $group->name() %></legend>
+
+<& .fields, group => $group &>
+
+</fieldset>
+% }
+
+<%args>
+$contact_type
+</%args>
+
+<%init>
+my $meth = 'custom_field_groups_for_' . $contact_type;
+my $groups = $c->account()->$meth();
+</%init>
+
+<%def .fields>
+
+% while ( my $field = $fields->next() ) {
+  <div class="form-item">
+    <label class="for-field" for="custom_field_<% $field->custom_field_id() %>"><% $field->label() %>:</label>
+    <input type="text"
+           name="custom_field_<% $field->custom_field_id() %>"
+           id="custom_field_<% $field->custom_field_id() %>" />
+%   if ( defined $field->description() ) {
+      <div class="help-text">
+        <p>
+          <% $field->description() %>
+        </p>
+      </div>
+%   }
+  </div>
+% }
+
+<%args>
+$group
+</%args>
+
+<%init>
+my $fields = $group->custom_fields();
+</%init>
+</%def>
