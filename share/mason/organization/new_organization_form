@@ -32,6 +32,8 @@
 
 <& /lib/form/contact-addresses.mas, contact_type => 'organization' &>
 
+<& /lib/form/contact-custom-fields.mas, contact_type => 'organization' &>
+
   <div class="form-item">
     <input class="submit" type="submit" value="Submit" />
   </div>
