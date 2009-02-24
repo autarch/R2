@@ -31,7 +31,7 @@ use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 
 with 'R2::Role::URIMaker';
 
@@ -194,10 +194,10 @@ sub add_user
 {
     my $self            = shift;
     my ( $user, $role ) =
-        validatep( \@_,
-                   user => { isa => 'R2::Schema::User' },
-                   role => { isa => 'R2::Schema::Role' },
-                 );
+        validated_list( \@_,
+                        user => { isa => 'R2::Schema::User' },
+                        role => { isa => 'R2::Schema::Role' },
+                      );
 
     R2::Schema::AccountUserRole->insert
         ( account_id => $self->account_id(),
@@ -210,10 +210,10 @@ sub add_country
 {
     my $self      = shift;
     my ( $country, $is_default ) =
-        validatep( \@_,
-                   country    => { isa => 'R2::Schema::Country' },
-                   is_default => { isa => 'Bool' },
-                 );
+        validated_list( \@_,
+                        country    => { isa => 'R2::Schema::Country' },
+                        is_default => { isa => 'Bool' },
+                      );
 
     R2::Schema::AccountCountry->insert
         ( account_id => $self->account_id(),

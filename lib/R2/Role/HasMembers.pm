@@ -7,7 +7,7 @@ use Fey::Placeholder;
 use R2::Exceptions qw( data_validation_error );
 use R2::Schema;
 use R2::Schema::Person;
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 
 use MooseX::Role::Parameterized;
 
@@ -33,11 +33,11 @@ sub add_member
 {
     my $self = shift;
     my ( $person_id, $position, $user ) =
-        validatep( \@_,
-                   person_id => { isa => 'Int' },
-                   position  => { isa => 'Str', default => q{} },
-                   user      => { isa => 'R2::Schema::User' },
-                 );
+        validated_list( \@_,
+                        person_id => { isa => 'Int' },
+                        position  => { isa => 'Str', default => q{} },
+                        user      => { isa => 'R2::Schema::User' },
+                      );
 
     my $person = R2::Schema::Person->new( person_id => $person_id );
 

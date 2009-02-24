@@ -9,7 +9,7 @@ use URI::Template;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 
 {
     my $schema = R2::Schema->Schema();
@@ -90,7 +90,7 @@ sub _fill_uri
     my $self = shift;
     my $type = shift;
 
-    my ($screen_name) = validatep( \@_, screen_name => { isa => 'Str' } );
+    my ($screen_name) = validated_list( \@_, screen_name => { isa => 'Str' } );
 
     my $template = $self->$type();
 

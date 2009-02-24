@@ -25,7 +25,7 @@ use R2::Util qw( string_is_empty );
 #use R2::Schema::Person;
 
 use Fey::ORM::Table;
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 use MooseX::ClassAttribute;
 
 with 'R2::Role::DataValidator';

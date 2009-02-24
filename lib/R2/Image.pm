@@ -11,7 +11,7 @@ use R2::Types;
 
 use Moose;
 use MooseX::StrictConstructor;
-use MooseX::Params::Validate qw( validatep );
+use MooseX::Params::Validate qw( validated_list );
 use Moose::Util::TypeConstraints;
 
 
@@ -51,10 +51,10 @@ sub resize
 {
     my $self = shift;
     my ( $height, $width ) =
-        validatep( \@_,
-                   height => { isa => 'Int' },
-                   width  => { isa => 'Int' },
-                 );
+        validated_list( \@_,
+                        height => { isa => 'Int' },
+                        width  => { isa => 'Int' },
+                      );
 
     ( $height, $width ) = $self->_new_dimensions( $height, $width );
 
