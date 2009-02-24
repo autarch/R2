@@ -124,6 +124,41 @@ sub _get_phone_numbers
     return [ values %{ $numbers } ];
 }
 
+sub _get_custom_fields
+{
+    my $self   = shift;
+    my $c      = shift;
+    my $errors = shift;
+
+    my $values = $c->request()->custom_field_values();
+
+    my @fields;
+    for my $id ( keys %{ $values } )
+    {
+        my $field = R2::Schema::CustomField->new( custom_field_id => $id );
+
+        $values->{$id} = $field->clean_value( $values->{$id} );
+
+        if ( my @e = $field->validate_value( $values->{$id} ) )
+        {
+            push @{ $errors }, @e;
+            next;
+        }
+
+        if ( $field->is_required() && string_is_empty( $values->{$id} ) )
+        {
+            push @{ $errors },
+                { message => 'The ' . $field->label() . ' field is required.',
+                  field   => 'custom_field_' . $field->custom_field_id(),
+                };
+        }
+
+        push @fields, [ $field, $values->{$id} ];
+    }
+
+    return \@fields
+}
+
 sub _apply_suffix_to_fields_in_errors
 {
     my $self    = shift;
@@ -157,6 +192,8 @@ sub _insert_contact
 
     my $phone_numbers = $self->_get_phone_numbers( $c, $errors );
 
+    my $custom_fields = $self->_get_custom_fields( $c, $errors );
+
     my $members;
     if ( $class->can('members') )
     {
@@ -183,6 +220,7 @@ sub _insert_contact
                                  $addresses,
                                  $phone_numbers,
                                  $members,
+                                 $custom_fields,
                                );
 
     return R2::Schema->RunInTransaction($insert_sub);
@@ -193,13 +231,14 @@ sub _make_insert_sub
     my $self          = shift;
     my $c             = shift;
     my $class         = shift;
-    my $p             = shift;
+    my $contact_p     = shift;
     my $image         = shift;
     my $emails        = shift;
     my $websites      = shift;
     my $addresses     = shift;
     my $phone_numbers = shift;
     my $members       = shift;
+    my $custom_fields = shift;
 
     my $user    = $c->user();
     my $account = $c->account();
@@ -214,13 +253,13 @@ sub _make_insert_sub
                         ( filename   => $image->basename(),
                           contents   => scalar $image->slurp(),
                           mime_type  => $image->type(),
-                          account_id => $p->{account_id},
+                          account_id => $contact_p->{account_id},
                         );
 
-                $p->{image_file_id} = $file->file_id();
+                $contact_p->{image_file_id} = $file->file_id();
             }
 
-            my $thing = $class->insert( %{ $p }, user => $user );
+            my $thing = $class->insert( %{ $contact_p }, user => $user );
             my $contact = $thing->contact();
 
             for my $email ( @{ $emails } )
@@ -261,6 +300,13 @@ sub _make_insert_sub
                                   ->contact_note_type_id(),
                       user_id => $c->user()->user_id(),
                     );
+            }
+
+            for my $pair ( @{ $custom_fields } )
+            {
+                my $field = $pair->[0];
+
+                
             }
 
             return $thing;

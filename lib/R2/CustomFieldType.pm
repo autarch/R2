@@ -59,6 +59,18 @@ has 'html_widgets' =>
       lazy_build => 1,
     );
 
+has '_cleaner' =>
+    ( is      => 'ro',
+      isa     => 'CodeRef',
+      default => sub { sub { $_[1] } },
+    );
+
+has '_validator' =>
+    ( is      => 'ro',
+      isa     => 'CodeRef',
+      default => sub { sub { 1 } },
+    );
+
 class_has 'Types' =>
     ( is         => 'ro',
       isa        => 'ArrayRef',
@@ -102,6 +114,16 @@ sub _build_default_html_widgets
 sub _build_html_widgets
 {
     return [];
+}
+
+sub clean_value
+{
+    return $_[0]->_cleaner()->( $_[1] );
+}
+
+sub value_is_valid
+{
+    return $_[0]->_validator()->( $_[1] );
 }
 
 no Moose;

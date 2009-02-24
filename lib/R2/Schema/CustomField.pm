@@ -87,6 +87,31 @@ sub _build__value_count_select
     return $select;
 }
 
+# XXX - Fey::ORM doesn't allow handles for transformed column-based
+# attributes
+sub clean_value
+{
+    return $_[0]->type()->clean_value( $_[1] );
+}
+
+sub validate_value
+{
+    my $self = shift;
+
+    unless ( $self->type()->validate_value( $_[1] ) )
+    {
+        my $message = 'The value provided for '
+                      . $self->label() . ' was not a valid '
+                      . $self->type()->name() . q{.};
+
+        return { message => $message,
+                 field   => 'custom_field_' . $self->custom_field_id(),
+               };
+    }
+
+    return;
+}
+
 no Fey::ORM::Table;
 no MooseX::ClassAttribute;
 

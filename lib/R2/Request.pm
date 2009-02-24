@@ -356,6 +356,15 @@ sub new_phone_number_param_sets
     return \%numbers;
 }
 
+sub custom_field_values
+{
+    my $self = shift;
+
+    my $params = $self->params();
+
+    return map { /custom_field_(\d+)/ ? ( $1 => $params->{$_} ) : () } keys %{ $params };
+}
+
 sub members
 {
     my $self = shift;
