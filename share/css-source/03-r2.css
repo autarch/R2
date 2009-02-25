@@ -79,6 +79,7 @@ body {
 #tabs li.selected a {
     background-color: white;
     border-bottom: 1px solid white;
+    padding: 0.5em 1.2em;
 }
 
 /* This makes sure that the header is the same height with our without
