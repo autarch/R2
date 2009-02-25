@@ -246,7 +246,7 @@ sub new_email_address_param_sets
 
         if ( ! string_is_empty( $params->{ 'email_address_note' . q{-} . $suffix } ) )
         {
-            $email{notes} = $params->{ 'email_address_note' . q{-} . $suffix }
+            $email{note} = $params->{ 'email_address_note' . q{-} . $suffix }
         }
 
         $email{is_preferred} = $params->{'email_address_is_preferred'} eq $suffix ? 1 : 0;
@@ -279,7 +279,7 @@ sub new_website_param_sets
 
         if ( ! string_is_empty( $params->{ 'website_note' . q{-} . $suffix } ) )
         {
-            $website{notes} = $params->{ 'website_note' . q{-} . $suffix }
+            $website{note} = $params->{ 'website_note' . q{-} . $suffix }
         }
 
         $websites{$suffix} = \%website;
@@ -313,7 +313,7 @@ sub new_address_param_sets
 
         if ( ! string_is_empty( $params->{ 'address_note' . q{-} . $suffix } ) )
         {
-            $address{notes} = $params->{ 'address_note' . q{-} . $suffix }
+            $address{note} = $params->{ 'address_note' . q{-} . $suffix }
         }
 
         $addresses{$suffix} = \%address;
@@ -347,7 +347,7 @@ sub new_phone_number_param_sets
 
         if ( ! string_is_empty( $params->{ 'phone_number_note' . q{-} . $suffix } ) )
         {
-            $number{notes} = $params->{ 'phone_number_note' . q{-} . $suffix }
+            $number{note} = $params->{ 'phone_number_note' . q{-} . $suffix }
         }
 
         $numbers{$suffix} = \%number;
