@@ -5,9 +5,18 @@ use warnings;
 
 use R2::CustomFieldType;
 use R2::Schema;
+use R2::Schema::CustomFieldDateValue;
+use R2::Schema::CustomFieldDateTimeValue;
+use R2::Schema::CustomFieldDecimalValue;
+use R2::Schema::CustomFieldFileValue;
+use R2::Schema::CustomFieldIntegerValue;
+use R2::Schema::CustomFieldMultiSelectValue;
+use R2::Schema::CustomFieldSingleSelectValue;
+use R2::Schema::CustomFieldTextValue;
 use Scalar::Util qw( blessed );
 
 use Fey::ORM::Table;
+use MooseX::Params::Validate qw( validated_list );
 
 with 'R2::Role::DataValidator';
 
@@ -29,6 +38,11 @@ with 'R2::Role::DataValidator';
 
     transform 'type'
         => inflate { R2::CustomFieldType->new( type => $_[1] ) }
+        => handles { clean_value => 'clean_value',
+                     is_select   => 'is_select',
+                     table       => 'table',
+                     type_name   => 'type',
+                   }
         => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };
 
     has 'value_count' =>
@@ -87,18 +101,11 @@ sub _build__value_count_select
     return $select;
 }
 
-# XXX - Fey::ORM doesn't allow handles for transformed column-based
-# attributes
-sub clean_value
-{
-    return $_[0]->type()->clean_value( $_[1] );
-}
-
 sub validate_value
 {
     my $self = shift;
 
-    unless ( $self->type()->validate_value( $_[1] ) )
+    unless ( $self->type()->value_is_valid( $_[1] ) )
     {
         my $message = 'The value provided for '
                       . $self->label() . ' was not a valid '
@@ -110,6 +117,15 @@ sub validate_value
     }
 
     return;
+}
+
+sub set_value_for_contact
+{
+    my $self = shift;
+
+    my $class = Fey::Meta::Class::Table->ClassForTable( $self->table() );
+
+    $class->replace_value_for_contact( field => $self, @_ );
 }
 
 no Fey::ORM::Table;

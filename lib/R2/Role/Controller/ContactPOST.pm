@@ -130,30 +130,34 @@ sub _get_custom_fields
     my $c      = shift;
     my $errors = shift;
 
-    my $values = $c->request()->custom_field_values();
+    my %values = $c->request()->custom_field_values();
 
     my @fields;
-    for my $id ( keys %{ $values } )
+    for my $id ( keys %values )
     {
         my $field = R2::Schema::CustomField->new( custom_field_id => $id );
 
-        $values->{$id} = $field->clean_value( $values->{$id} );
+        $values{$id} = $field->clean_value( $values{$id} );
 
-        if ( my @e = $field->validate_value( $values->{$id} ) )
+        if ( my @e = $field->validate_value( $values{$id} ) )
         {
             push @{ $errors }, @e;
             next;
         }
 
-        if ( $field->is_required() && string_is_empty( $values->{$id} ) )
+        if ( $field->is_required() && string_is_empty( $values{$id} ) )
         {
             push @{ $errors },
                 { message => 'The ' . $field->label() . ' field is required.',
                   field   => 'custom_field_' . $field->custom_field_id(),
                 };
+
+            next;
         }
 
-        push @fields, [ $field, $values->{$id} ];
+        next if string_is_empty( $values{$id} );
+
+        push @fields, [ $field, $values{$id} ];
     }
 
     return \@fields
@@ -304,9 +308,7 @@ sub _make_insert_sub
 
             for my $pair ( @{ $custom_fields } )
             {
-                my $field = $pair->[0];
-
-                
+                $pair->[0]->set_value_for_contact( contact => $contact, value => $pair->[1] );
             }
 
             return $thing;

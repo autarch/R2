@@ -14,7 +14,7 @@ use Moose::Util::TypeConstraints;
 my @Types =
     ( [ 'Text'     => 'text of any sort' ],
       [ 'Integer'  => 'an integer (1, 42, 0, -210, etc.)' ],
-      [ 'Float'    => 'a decimal number (1.0, 610.42, -0.02, etc.)' ],
+      [ 'Decimal'  => 'a decimal number (1.0, 610.42, -0.02, etc.)' ],
       [ 'Date'     => 'a date without a time' ],
       [ 'DateTime' => 'a date and time' ],
       [ 'File'     => 'an attachment (image, Word doc, PDF, etc.)' ],
@@ -40,9 +40,9 @@ has 'description' =>
 
 has 'table' =>
     ( is       => 'ro',
-      isa      => 'Str',
+      isa      => 'Fey::Table',
       lazy     => 1,
-      default  => sub { 'CustomField' . $_[0]->type() . 'Value' },
+      default  => sub { R2::Schema->Schema()->table( 'CustomField' . $_[0]->type() . 'Value' ) },
       required => 1,
       init_arg => undef,
     );
@@ -59,16 +59,10 @@ has 'html_widgets' =>
       lazy_build => 1,
     );
 
-has '_cleaner' =>
+has 'is_select' =>
     ( is      => 'ro',
-      isa     => 'CodeRef',
-      default => sub { sub { $_[1] } },
-    );
-
-has '_validator' =>
-    ( is      => 'ro',
-      isa     => 'CodeRef',
-      default => sub { sub { 1 } },
+      isa     => 'Bool',
+      default => sub { $_[0]->type() =~ /Select/ ? 1 : 0 },
     );
 
 class_has 'Types' =>
@@ -118,12 +112,12 @@ sub _build_html_widgets
 
 sub clean_value
 {
-    return $_[0]->_cleaner()->( $_[1] );
+    return $_[1];
 }
 
 sub value_is_valid
 {
-    return $_[0]->_validator()->( $_[1] );
+    return 1;
 }
 
 no Moose;

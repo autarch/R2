@@ -126,7 +126,7 @@ CREATE TABLE "CustomFieldGroup" (
 );
 
 CREATE TYPE custom_field_type AS
-       ENUM ( 'Integer', 'Float', 'Date', 'DateTime', 'Text', 'File', 'SingleSelect', 'MultiSelect' );
+       ENUM ( 'Integer', 'Decimal', 'Date', 'DateTime', 'Text', 'File', 'SingleSelect', 'MultiSelect' );
 
 CREATE TABLE "CustomField" (
        custom_field_id          SERIAL8      PRIMARY KEY,
@@ -157,7 +157,7 @@ CREATE TABLE "CustomFieldIntegerValue" (
        PRIMARY KEY ( custom_field_id, contact_id )
 );
 
-CREATE TABLE "CustomFieldFloatValue" (
+CREATE TABLE "CustomFieldDecimalValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    FLOAT8       NOT NULL,
@@ -562,11 +562,11 @@ ALTER TABLE "CustomFieldIntegerValue" ADD CONSTRAINT "CustomFieldIntegerValue_co
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "CustomFieldFloatValue" ADD CONSTRAINT "CustomFieldFloatValue_custom_field_id"
+ALTER TABLE "CustomFieldDecimalValue" ADD CONSTRAINT "CustomFieldDecimalValue_custom_field_id"
   FOREIGN KEY ("custom_field_id") REFERENCES "CustomField" ("custom_field_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "CustomFieldFloatValue" ADD CONSTRAINT "CustomFieldFloatValue_contact_id"
+ALTER TABLE "CustomFieldDecimalValue" ADD CONSTRAINT "CustomFieldDecimalValue_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
