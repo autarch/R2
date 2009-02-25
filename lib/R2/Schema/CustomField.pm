@@ -128,6 +128,15 @@ sub set_value_for_contact
     $class->replace_value_for_contact( field => $self, @_ );
 }
 
+sub value_object
+{
+    my $self = shift;
+
+    my $class = Fey::Meta::Class::Table->ClassForTable( $self->table() );
+
+    return $class->new( @_, _from_query => 1 );
+}
+
 no Fey::ORM::Table;
 no MooseX::ClassAttribute;
 

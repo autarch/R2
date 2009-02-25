@@ -47,7 +47,7 @@ sub All
 
     my $select = $class->_SelectAllSQL();
 
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+    my $dbh = $class->_dbh($select);
 
     return
         Fey::Object::Iterator::FromSelect->new

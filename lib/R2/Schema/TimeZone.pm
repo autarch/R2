@@ -76,7 +76,7 @@ sub ByCountry
 
     my $select = $class->_SelectByCountrySQL();
 
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+    my $dbh = $class->_dbh($select);
 
     return
         Fey::Object::Iterator::FromSelect->new

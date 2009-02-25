@@ -1,0 +1,21 @@
+% for my $group (@groups) {
+%   next unless $contact->has_custom_field_values_for_group($group);
+<h2><% $group->name() %></h2>
+
+%   for my $field ( $group->custom_fields()->all() ) {
+%     my $value = $contact->custom_field_value( $field->custom_field_id() ) or next;
+
+<div class="contact-custom-field">
+  <span class="label"><% $field->label() %><% $field->label() =~ /[\?:]$/ ? q{} : q{:} %></span>
+  <span class="value"><% $value->value() %></span>
+</div>
+%   }
+% }
+<%args>
+$contact
+</%args>
+
+<%init>
+my @groups = $contact->account()->custom_field_groups_for_person()->all()
+    or return;
+</%init>

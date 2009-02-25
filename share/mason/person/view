@@ -16,6 +16,8 @@ Birth date: <% $c->user()->format_date($dt) %>
 
 <& /lib/contact-view/addresses.mas, contact => $person &>
 
+<& /lib/contact-view/custom-fields.mas, contact => $person &>
+
 </div>
 
 <%args>

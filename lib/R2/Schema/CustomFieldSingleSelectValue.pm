@@ -13,10 +13,20 @@ with 'R2::Role::DataValidator';
     has_policy 'R2::Schema::Policy';
 
     has_table( $schema->table('CustomFieldSingleSelectValue') );
+
+    has_one 'option' =>
+        ( table => $schema->table('CustomFieldSelectOption'),
+        );
+
+    has 'value' =>
+        ( is  => 'ro',
+          isa => 'Str',
+        );
 }
 
 with 'R2::Role::CustomFieldValue'
     => { value_column => 'custom_field_select_option_id' };
+
 
 no Fey::ORM::Table;
 

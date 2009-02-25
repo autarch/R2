@@ -62,7 +62,7 @@ sub _replace_value_for_contact
     my $contact_id      = shift;
     my $value           = shift;
 
-    my $dbh = R2::Schema->DBIManager()->source_for_sql($delete)->dbh();
+    my $dbh = $class->_dbh($delete);
 
     $dbh->do( $delete->sql($dbh), {},
               $custom_field_id, $contact_id );

@@ -70,7 +70,7 @@ with 'R2::Role::AppliesToContactTypes';
             my $count = 0;
             for my $cf_type ( map { $_->type() } $self->custom_fields()->all() )
             {
-                my $cf_value_table = $schema->table( $cf_type->table() );
+                my $cf_value_table = $cf_type->table();
 
                 my $select = R2::Schema->SQLFactoryClass()->new_select();
 
@@ -84,7 +84,7 @@ with 'R2::Role::AppliesToContactTypes';
                                 @{ $self->custom_field_ids() } )
                        ->and( $schema->table('Contact')->column('contact_type'), '=', $contact_type );
 
-                my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+                my $dbh = $self->_dbh($select);
 
                 $count += $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
             }
@@ -112,7 +112,7 @@ with 'R2::Role::AppliesToContactTypes';
         my $count = 0;
         for my $cf_type ( @cf_types )
         {
-            my $cf_value_table = $schema->table( $cf_type->table() );
+            my $cf_value_table = $cf_type->table();
 
             my $select = R2::Schema->SQLFactoryClass()->new_select();
 
@@ -125,7 +125,7 @@ with 'R2::Role::AppliesToContactTypes';
                    ->where( $cf_value_table->column('custom_field_id'), 'IN',
                             @{ $self->custom_field_ids() } );
 
-            my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+            my $dbh = $self->_dbh($select);
 
             $count += $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
         }

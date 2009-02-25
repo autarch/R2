@@ -134,6 +134,15 @@ body {
     font-style: italic;
 }
 
+div.contact-custom-field {
+   margin-bottom: 0.5em;
+}
+
+div.contact-custom-field span.label {
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
 /* === Tables === */
 
 table.standard-table {

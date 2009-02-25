@@ -6,7 +6,9 @@ use warnings;
 use Fey::Literal::String;
 use Fey::Object::Iterator::FromSelect::Caching;
 use Fey::Placeholder;
+use List::AllUtils qw( any uniq );
 use R2::Image;
+use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::Address;
 use R2::Schema::EmailAddress;
@@ -26,6 +28,7 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
+use MooseX::Params::Validate qw( pos_validated_list );
 
 with 'R2::Role::DataValidator';
 with 'R2::Role::URIMaker';
@@ -114,8 +117,13 @@ with 'R2::Role::URIMaker';
         );
 
     has_many 'phone_numbers' =>
-        ( table => $schema->table('PhoneNumber'),
-          cache => 1,
+        ( table    => $schema->table('PhoneNumber'),
+          cache    => 1,
+          order_by => [ $schema->table('PhoneNumber')->column('is_preferred'),
+                        'DESC',
+                        $schema->table('PhoneNumber')->column('phone_number_type_id'),
+                        'ASC',
+                      ],
         );
 
     has_one 'preferred_phone_number' =>
@@ -182,6 +190,17 @@ with 'R2::Role::URIMaker';
         ( is         => 'ro',
           isa        => 'Fey::Object::Iterator::FromSelect::Caching',
           lazy_build => 1,
+        );
+
+    has '_custom_field_values' =>
+        ( metaclass  => 'Collection::Hash',
+          is         => 'ro',
+          isa        => 'HashRef',
+          lazy_build => 1,
+          provides   => { 'get' => 'custom_field_value',
+                          'set' => '_set_custom_field_value',
+                        },
+          init_arg   => undef,
         );
 }
 
@@ -356,6 +375,85 @@ sub add_note
             ( contact_id => $self->contact_id(),
               @_,
             );
+}
+
+sub has_custom_field_values_for_group
+{
+    my $self = shift;
+    my ($group) = pos_validated_list( \@_, { isa => 'R2::Schema::CustomFieldGroup' } );
+
+    return
+        any { $self->custom_field_value( $_->custom_field_id() ) }
+        $group->custom_fields()->all();
+}
+
+{
+    my $schema = R2::Schema->Schema();
+
+    my %Selects;
+    for my $type ( R2::CustomFieldType->All() )
+    {
+        my $type_table = $type->table();
+
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        if ( $type_table->name() =~ /Select/ )
+        {
+            my $value_table = $schema->table('CustomFieldSelectOption');
+            $select->select( $type_table->column('custom_field_id'), $value_table->column('value') )
+                   ->from( $type_table, $value_table )
+                   ->order_by( $type_table->column('custom_field_id'),
+                               $value_table->column('display_order' ) );
+        }
+        else
+        {
+            $select->select( $type_table->columns( 'custom_field_id', 'value' ) )
+                   ->from($type_table);
+        }
+
+        $select->where( $type_table->column('contact_id'), '=', Fey::Placeholder->new() );
+
+        $Selects{ $type_table->name() } = $select;
+    }
+
+    sub _build__custom_field_values
+    {
+        my $self = shift;
+
+        my %fields =
+            map { $_->custom_field_id() => $_ }
+            map { $_->custom_fields()->all() }
+            $self->account()->custom_field_groups()->all();
+
+        my %values;
+        for my $table ( uniq map { $_->table() } values %fields )
+        {
+            my $select = $Selects{ $table->name() };
+
+            my $dbh = $self->_dbh($select);
+
+            for my $row ( @{ $dbh->selectall_arrayref( $select->sql($dbh), {}, $self->contact_id() ) } )
+            {
+                push @{ $values{ $row->[0] } }, $row->[1];
+            }
+        }
+
+        my %return;
+        for my $id ( keys %values )
+        {
+            my $field = $fields{$id};
+
+            $return{$id} =
+                $field->value_object
+                    ( contact_id      => $self->contact_id(),
+                      custom_field_id => $id,
+                      value           =>
+                          ( @{ $values{$id} } == 1 ? $values{$id}[0] : $values{$id} ),
+                    );
+        }
+
+        return \%return;
+    }
 }
 
 sub _build_history
