@@ -3,10 +3,11 @@ package R2::Schema;
 use strict;
 use warnings;
 
-use Fey::ORM::Schema;
 use Fey::DBIManager::Source;
 use Fey::Loader;
 use R2::Config;
+
+use Fey::ORM::Schema;
 
 
 my $source;
