@@ -3,6 +3,7 @@ package R2::Web::CombinedStaticFiles;
 use strict;
 use warnings;
 
+use autodie;
 use DateTime;
 use File::Copy qw( move );
 use File::Slurp qw( read_file );

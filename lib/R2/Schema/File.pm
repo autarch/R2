@@ -3,6 +3,7 @@ package R2::Schema::File;
 use strict;
 use warnings;
 
+use autodie;
 use Digest::SHA qw( sha512_hex );
 use File::LibMagic ();
 use File::Slurp qw( read_file );
@@ -99,14 +100,9 @@ sub _build_path
 
     $path->dir()->mkpath( 0, 0755 );
 
-    open my $fh, '>', $path
-        or die "Cannot write to $path: $!";
-
-    print {$fh} $self->contents()
-        or die "Cannot write to $path: $!";
-
-    close $fh
-        or die "Cannot write to $path: $!";
+    open my $fh, '>', $path;
+    print {$fh} $self->contents();
+    close $fh;
 
     return $path;
 }

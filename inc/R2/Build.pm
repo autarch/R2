@@ -7,7 +7,8 @@ use base 'Module::Build';
 
 
 my %Requires =
-    ( 'Catalyst'                                 => '5.7007',
+    ( 'autodie'                                  => '0',
+      'Catalyst'                                 => '5.7007',
       'Catalyst::Action::REST'                   => '0.5',
       'Catalyst::DR'                             => '0',
       'Catalyst::Plugin::AuthenCookie'           => '0.01',
