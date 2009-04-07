@@ -2,13 +2,14 @@ use strict;
 use warnings;
 
 use Test::Exception;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
 
 use Digest::SHA;
 use File::Slurp qw( read_file );
+use Image::Size qw( imgsize );
 use R2::Test::Config;
 use R2::Config;
 use R2::Image;
@@ -64,9 +65,9 @@ my $image_data = read_file( 't/files/shoe.jpg' );
     is( $resized->file()->unique_name(), '1-100x100',
         'resized file has expected unique_name' );
 
-    is( Digest::SHA->new()->addfile( $resized->path()->stringify() )->b64digest(),
-        'qyiMDI4bKHAezS/IGxneuUuOfp4',
-        'file contents hash to expected digest value' );
+    my ( $x, $y ) = imgsize( $resized->path()->stringify() );
+    is( $x, 100, 'resized x is 100' );
+    is( $y, 100, 'resized y is 100' );
 }
 
 # Re-run the tests faking that the resized file is already in the

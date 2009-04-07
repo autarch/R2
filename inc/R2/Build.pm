@@ -75,6 +75,7 @@ my %Requires =
 my %BuildRequires =
     ( 'DBD::Mock'       => '1.39',
       'Fey::ORM::Mock'  => '0',
+      'Image::Size'     => '0',
       'Test::Exception' => '0',
       'Test::More'      => '0',
     );
