@@ -40,7 +40,7 @@ with 'R2::Role::DataValidator';
         => inflate { R2::CustomFieldType->new( type => $_[1] ) }
         => handles { clean_value => 'clean_value',
                      is_select   => 'is_select',
-                     table       => 'table',
+                     type_table  => 'table',
                      type_name   => 'type',
                    }
         => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };
@@ -88,7 +88,7 @@ sub _build__value_count_select
 
     my $schema = R2::Schema->Schema();
 
-    my $value_table = $schema->table( $self->type()->table() );
+    my $value_table = $schema->table( $self->type_table() );
 
     my $count =
         Fey::Literal::Function->new( 'COUNT', $value_table->column('custom_field_id') );
@@ -123,7 +123,7 @@ sub set_value_for_contact
 {
     my $self = shift;
 
-    my $class = Fey::Meta::Class::Table->ClassForTable( $self->table() );
+    my $class = Fey::Meta::Class::Table->ClassForTable( $self->type_table() );
 
     $class->replace_value_for_contact( field => $self, @_ );
 }
@@ -132,7 +132,7 @@ sub value_object
 {
     my $self = shift;
 
-    my $class = Fey::Meta::Class::Table->ClassForTable( $self->table() );
+    my $class = Fey::Meta::Class::Table->ClassForTable( $self->type_table() );
 
     return $class->new( @_, _from_query => 1 );
 }

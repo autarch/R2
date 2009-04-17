@@ -13,30 +13,15 @@ parameter 'steps' =>
       default => sub { [] },
     );
 
+parameter 'validate_on_insert' =>
+    ( isa     => 'Bool',
+      default => 1,
+    );
 
-around 'insert' => sub
-{
-    my $orig  = shift;
-    my $class = shift;
-    my %p     = @_;
-
-    $class->_clean_and_validate_data( \%p, 'is insert' );
-
-    return $class->$orig(%p);
-};
-
-around 'update' => sub
-{
-    my $orig = shift;
-    my $self = shift;
-    my %p    = @_;
-
-    $self->_clean_and_validate_data(\%p);
-
-    return unless keys %p;
-
-    return $self->$orig(%p);
-};
+parameter 'validate_on_update' =>
+    ( isa     => 'Bool',
+      default => 1,
+    );
 
 sub _clean_and_validate_data
 {
@@ -109,6 +94,36 @@ role
 {
     my $params = shift;
     my %extra  = @_;
+
+    if ( $params->validate_on_insert() )
+    {
+        around 'insert' => sub
+        {
+            my $orig  = shift;
+            my $class = shift;
+            my %p     = @_;
+
+            $class->_clean_and_validate_data( \%p, 'is insert' );
+
+            return $class->$orig(%p);
+        };
+    }
+
+    if ( $params->validate_on_update() )
+    {
+        around 'update' => sub
+        {
+            my $orig = shift;
+            my $self = shift;
+            my %p    = @_;
+
+            $self->_clean_and_validate_data(\%p);
+
+            return unless keys %p;
+
+            return $self->$orig(%p);
+        };
+    }
 
     # XXX - this is because parameterized roles don't allow you to
     # exclude or alias methods on import.

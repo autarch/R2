@@ -27,6 +27,21 @@ with 'R2::Role::DataValidator';
         );
 }
 
+sub _ValidateValue
+{
+    my $class = shift;
+    my $p     = shift;
+
+    my $orig = $p->{value};
+
+    # XXX - need validation!
+    return;
+
+    return { field   => 'custom_field_' . $p->{custom_field_id},
+             message => '', # XXX
+           };
+}
+
 sub _replace_value_for_contact
 {
     my $class           = shift;

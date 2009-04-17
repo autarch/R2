@@ -15,6 +15,18 @@ with 'R2::Role::DataValidator';
     has_table( $schema->table('CustomFieldTextValue') );
 }
 
+sub _ValidateValue
+{
+    my $class = shift;
+    my $p     = shift;
+
+    return if defined $p->{value} && length $p->{value};
+
+    return { field   => 'custom_field_' . $p->{custom_field_id},
+             message => 'The text field was empty.',
+           };
+}
+
 with 'R2::Role::CustomFieldValue';
 
 no Fey::ORM::Table;

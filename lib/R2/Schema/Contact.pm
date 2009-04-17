@@ -426,7 +426,7 @@ sub has_custom_field_values_for_group
             $self->account()->custom_field_groups()->all();
 
         my %values;
-        for my $table ( uniq map { $_->table() } values %fields )
+        for my $table ( uniq map { $_->type_table() } values %fields )
         {
             my $select = $Selects{ $table->name() };
 

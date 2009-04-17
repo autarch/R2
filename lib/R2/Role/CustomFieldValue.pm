@@ -8,11 +8,17 @@ use Fey::Placeholder;
 use MooseX::Role::Parameterized;
 use MooseX::Params::Validate qw( validated_list );
 
+requires '_ValidateValue';
+
+with 'R2::Role::DataValidator' => { validate_on_insert => 0,
+                                    validate_on_update => 0,
+                                    steps              => [ '_ValidateValue' ],
+                                  };
+
 parameter 'value_column' =>
     ( isa     => 'Str',
       default => 'value',
     );
-
 
 role
 {
@@ -40,6 +46,13 @@ role
                             value   => { isa => 'Defined' },
                           );
 
+        my %p = ( value           => $value,
+                  contact_id      => $contact->contact_id(),
+                  custom_field_id => $field->custom_field_id()
+                );
+
+        $class->_clean_and_validate_data( \%p, 'is insert' );
+
         R2::Schema->RunInTransaction
             ( sub
               {
@@ -47,7 +60,7 @@ role
                       ( $delete,
                         $field->custom_field_id(),
                         $contact->contact_id(),
-                        $value,
+                        $p{value},
                       );
               }
             );
