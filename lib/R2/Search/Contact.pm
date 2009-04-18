@@ -32,13 +32,8 @@ has 'page' =>
 
 my $Schema = R2::Schema->Schema();
 
-sub contacts
 {
-    my $self = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
     my $order_by_func =
         Fey::Literal::Term->new
@@ -53,31 +48,42 @@ sub contacts
               . $Schema->table('Household')->column('name')->sql_or_alias($dbh)
               . q{ ELSE }
               . $Schema->table('Organization')->column('name')->sql_or_alias($dbh)
-              . q{ END AS _orderable_name}
+              . q{ END}
             );
 
-    $select->select( $Schema->table('Contact'), $order_by_func );
+    $order_by_func->set_alias_name('_orderable_name');
 
-    $self->_contact_join($select);
-    $self->_where_clauses($select);
-
-    $select->order_by( Fey::Literal::Term->new('_orderable_name') );
-
-    if ( $self->limit() )
+    sub contacts
     {
-        my @limit = $self->limit();
-        push @limit, ( $self->page() - 1 ) * $self->limit();
+        my $self = shift;
 
-        $select->limit(@limit);
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+
+        $select->select( $Schema->table('Contact'), $order_by_func );
+
+        $self->_contact_join($select);
+        $self->_where_clauses($select);
+
+        $select->order_by( Fey::Literal::Term->new('_orderable_name') );
+
+        if ( $self->limit() )
+        {
+            my @limit = $self->limit();
+            push @limit, ( $self->page() - 1 ) * $self->limit();
+
+            $select->limit(@limit);
+        }
+
+        return
+            Fey::Object::Iterator::FromSelect->new
+                ( classes     => 'R2::Schema::Contact',
+                  dbh         => $dbh,
+                  select      => $select,
+                  bind_params => [ $select->bind_params() ],
+                );
     }
-
-    return
-        Fey::Object::Iterator::FromSelect->new
-            ( classes     => 'R2::Schema::Contact',
-              dbh         => $dbh,
-              select      => $select,
-              bind_params => [ $select->bind_params() ],
-            );
 }
 
 sub contact_count
