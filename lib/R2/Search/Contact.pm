@@ -39,7 +39,6 @@ my $Schema = R2::Schema->Schema();
         Fey::Literal::Term->new
             ( 'CASE '
               . $Schema->table('Contact')->column('contact_type')->sql_or_alias($dbh)
-              . q{ }
               . q{ WHEN 'Person' THEN }
               . $Schema->table('Person')->column('last_name')->sql_or_alias($dbh)
               . q{ || ' ' || }
