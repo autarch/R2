@@ -18,12 +18,10 @@ has 'name' =>
 
 my $Schema = R2::Schema->Schema();
 
-sub _where_clauses
+sub _apply_where_clauses
 {
     my $self   = shift;
     my $select = shift;
-
-    $self->SUPER::_where_clauses($select);
 
     # The theory is that if there's more than 2 parts then it's
     # probably a last name with a space in it, as opposed to someone

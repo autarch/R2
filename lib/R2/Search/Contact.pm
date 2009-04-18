@@ -6,10 +6,14 @@ use warnings;
 use Fey::Literal::Function;
 use Fey::Literal::Term;
 use Fey::Object::Iterator::FromSelect;
+use Fey::Placeholder;
 use R2::Schema;
 use R2::Types;
 
 use Moose;
+use MooseX::ClassAttribute;
+
+extends 'R2::Search';
 
 has 'account' =>
     ( is       => 'ro',
@@ -17,70 +21,76 @@ has 'account' =>
       required => 1,
     );
 
-has 'limit' =>
-    ( is      => 'ro',
-      isa     => 'R2.Type.PosOrZeroInt',
-      default => 0,
-    );
-
-has 'page' =>
-    ( is      => 'ro',
-      isa     => 'R2.Type.PosInt',
-      default => 1,
-    );
-
-
-my $Schema = R2::Schema->Schema();
 
 {
+    my $schema = R2::Schema->Schema();
+
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    my $order_by_func =
-        Fey::Literal::Term->new
-            ( 'CASE '
-              . $Schema->table('Contact')->column('contact_type')->sql_or_alias($dbh)
-              . q{ WHEN 'Person' THEN }
-              . $Schema->table('Person')->column('last_name')->sql_or_alias($dbh)
-              . q{ || ' ' || }
-              . $Schema->table('Person')->column('first_name')->sql_or_alias($dbh)
-              . q{ WHEN 'Household' THEN }
-              . $Schema->table('Household')->column('name')->sql_or_alias($dbh)
-              . q{ ELSE }
-              . $Schema->table('Organization')->column('name')->sql_or_alias($dbh)
-              . q{ END}
-            );
+    my $select_base = R2::Schema->SQLFactoryClass()->new_select();
 
-    $order_by_func->set_alias_name('_orderable_name');
+    $select_base->from( $schema->table('Contact'), 'left', $schema->table('Person') )
+                ->from( $schema->table('Contact'), 'left', $schema->table('Household') )
+                ->from( $schema->table('Contact'), 'left', $schema->table('Organization') );
+
+    $select_base->where( $schema->table('Contact')->column('account_id'),
+                         '=', Fey::Placeholder->new() );
+
+    class_has '_SelectBase' =>
+        ( is      => 'ro',
+          isa     => 'Fey::SQL::Select',
+          default => sub { $select_base },
+        );
+}
+
+{
+    my $order_by_func =
+        do
+        {
+            my $schema = R2::Schema->Schema();
+
+            my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+            my $term =
+                Fey::Literal::Term->new
+                    ( 'CASE '
+                      . $schema->table('Contact')->column('contact_type')->sql_or_alias($dbh)
+                      . q{ WHEN 'Person' THEN }
+                      . $schema->table('Person')->column('last_name')->sql_or_alias($dbh)
+                      . q{ || ' ' || }
+                      . $schema->table('Person')->column('first_name')->sql_or_alias($dbh)
+                      . q{ WHEN 'Household' THEN }
+                      . $schema->table('Household')->column('name')->sql_or_alias($dbh)
+                      . q{ ELSE }
+                      . $schema->table('Organization')->column('name')->sql_or_alias($dbh)
+                      . q{ END}
+                    );
+
+            $term->set_alias_name('_orderable_name');
+
+            $term;
+        };
 
     sub contacts
     {
         my $self = shift;
 
-        my $select = R2::Schema->SQLFactoryClass()->new_select();
+        my $schema = R2::Schema->Schema();
 
-        my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+        my $select = $self->_SelectBase->clone();
 
-        $select->select( $Schema->table('Contact'), $order_by_func );
-
-        $self->_contact_join($select);
-        $self->_where_clauses($select);
+        $select->select( $schema->table('Contact'), $order_by_func );
 
         $select->order_by($order_by_func);
 
-        if ( $self->limit() )
-        {
-            my @limit = $self->limit();
-            push @limit, ( $self->page() - 1 ) * $self->limit();
-
-            $select->limit(@limit);
-        }
+        $self->_apply_limit($select);
 
         return
             Fey::Object::Iterator::FromSelect->new
                 ( classes     => 'R2::Schema::Contact',
-                  dbh         => $dbh,
+                  dbh         => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
                   select      => $select,
-                  bind_params => [ $select->bind_params() ],
+                  bind_params => [ $self->account()->account_id() ],
                 );
     }
 }
@@ -89,56 +99,26 @@ sub contact_count
 {
     my $self = shift;
 
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
+    my $schema = R2::Schema->Schema();
 
     my $count =
         Fey::Literal::Function->new
-            ( 'COUNT', $Schema->table('Contact')->column('contact_id') );
+            ( 'COUNT', $schema->table('Contact')->column('contact_id') );
+
+    my $select = $self->_SelectBase->clone();
 
     $select->select($count);
 
-    $self->_contact_join($select);
-    $self->_where_clauses($select);
+    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
-    return $dbh->selectrow_arrayref( $select->sql($dbh), {}, $select->bind_params() )->[0];
-}
-
-sub _contact_join
-{
-    my $self   = shift;
-    my $select = shift;
-
-    $select->from( $Schema->table('Contact'), 'left', $Schema->table('Person') )
-           ->from( $Schema->table('Contact'), 'left', $Schema->table('Household') )
-           ->from( $Schema->table('Contact'), 'left', $Schema->table('Organization') );
-}
-
-sub _where_clauses
-{
-    my $self   = shift;
-    my $select = shift;
-
-    $select->where( $Schema->table('Contact')->column('account_id'),
-                    '=', $self->account()->account_id() );
-}
-
-sub _limit
-{
-    my $self   = shift;
-    my $select = shift;
-
-    return unless $self->limit();
-
-    my @limit = $self->limit();
-    push @limit, ( $self->page() - 1 ) * $self->limit();
-
-    $select->limit(@limit);
+    return
+        $dbh->selectrow_arrayref
+            ( $select->sql($dbh), {}, $self->account()->account_id() )->[0];
 }
 
 __PACKAGE__->meta()->make_immutable();
 
 no Moose;
+no MooseX::ClassAttribute;
 
 1;
