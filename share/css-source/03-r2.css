@@ -150,6 +150,10 @@ div.contact-custom-field span.label {
     margin-right: 0.5em;
 }
 
+ul.donation-totals li {
+    font-weight: bold;
+}
+
 /* === Tables === */
 
 table.standard-table {

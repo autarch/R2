@@ -377,6 +377,39 @@ sub add_note
             );
 }
 
+{
+    my $select_base = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $sum = Fey::Literal::Function->new( 'SUM', $schema->table('Donation')->column('amount') );
+    $select_base->select($sum)
+                ->from( $schema->table('Donation') )
+                ->where( $schema->table('Donation')->column('contact_id'), '=', Fey::Placeholder->new() );
+
+    sub donations_total
+    {
+        my $self   = shift;
+        my ($date) = pos_validated_list( \@_, { isa => 'DateTime', optional => 1 } );
+
+        my $select = $select_base->clone();
+
+        if ($date)
+        {
+            $select->where( $schema->table('Donation')->column('donation_date'),
+                            '>=',
+                            DateTime::Format::Pg->format_date($date) );
+        }
+
+        my $dbh = $self->_dbh($select);
+
+        my $row = $dbh->selectrow_arrayref( $select->sql($dbh), {},
+                                            $self->contact_id(), $select->bind_params() );
+
+        return $row ? $row->[0] : 0;
+    }
+}
+
 sub has_custom_field_values_for_group
 {
     my $self = shift;
