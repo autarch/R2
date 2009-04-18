@@ -29,8 +29,8 @@ sub _where_clauses
     # probably a last name with a space in it, as opposed to someone
     # giving us first, middle & last names.
     #
-    # Also note that this would completely break for Asian names,
-    # which are written without spaces.
+    # Also note that this would completely break for names written in
+    # Chinese characters, which are written without spaces.
     my @parts = split /\s+/, lc $self->name(), 2;
     if ( @parts == 1 )
     {
