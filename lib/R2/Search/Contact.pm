@@ -65,7 +65,7 @@ my $Schema = R2::Schema->Schema();
         $self->_contact_join($select);
         $self->_where_clauses($select);
 
-        $select->order_by( Fey::Literal::Term->new('_orderable_name') );
+        $select->order_by($order_by_func);
 
         if ( $self->limit() )
         {
