@@ -13,7 +13,6 @@ BEGIN { extends 'R2::Controller::Base' }
 __PACKAGE__->config()->{namespace} = '';
 
 
-
 sub root : Path('/') : Args(0)
 {
     my $self = shift;
