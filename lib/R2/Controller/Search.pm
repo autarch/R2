@@ -3,9 +3,11 @@ package R2::Controller::Search;
 use strict;
 use warnings;
 
-use base 'R2::Controller::Base';
-
 use R2::Search::Contact;
+
+use Moose;
+
+BEGIN { extends 'R2::Controller::Base' }
 
 
 sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Args(0)
@@ -21,5 +23,9 @@ sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Ar
 
     $c->stash()->{template} = '/search/contact_list';
 }
+
+no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;

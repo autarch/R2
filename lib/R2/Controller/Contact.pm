@@ -3,8 +3,6 @@ package R2::Controller::Contact;
 use strict;
 use warnings;
 
-use base 'R2::Controller::Base';
-
 use R2::Schema;
 use R2::Schema::Address;
 use R2::Schema::Contact;
@@ -13,6 +11,10 @@ use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
 use R2::Web::Tab;
+
+use Moose;
+
+BEGIN { extends 'R2::Controller::Base' }
 
 
 sub new_person_form : Local

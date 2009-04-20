@@ -3,13 +3,15 @@ package R2::Controller::Base;
 use strict;
 use warnings;
 
-use base 'Catalyst::Controller::REST';
-
 use R2::Config;
 use R2::JSON;
 use R2::Schema::File;
 use R2::Web::CSS;
 use R2::Web::Javascript;
+
+use Moose;
+
+BEGIN { extends 'Catalyst::Controller::REST' }
 
 
 sub begin : Private
@@ -89,5 +91,9 @@ sub _require_authen
 
     $c->redirect_and_detach( '/user/login_form' );
 }
+
+no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;

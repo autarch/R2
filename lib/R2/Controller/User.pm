@@ -3,12 +3,14 @@ package R2::Controller::User;
 use strict;
 use warnings;
 
-use base 'R2::Controller::Base';
-
 use LWPx::ParanoidAgent;
 use Net::OpenID::Consumer;
 use R2::Schema::User;
 use R2::Util qw( string_is_empty );
+
+use Moose;
+
+BEGIN { extends 'R2::Controller::Base' }
 
 
 sub login_form : Local { }
@@ -219,5 +221,9 @@ sub _login_user
 
     $c->redirect_and_detach( $c->request()->parameters()->{return_to} || '/' );
 }
+
+no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;

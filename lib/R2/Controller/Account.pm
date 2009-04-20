@@ -7,7 +7,9 @@ use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
 use R2::URI qw( dynamic_uri );
 
-use base 'R2::Controller::Base';
+use Moose;
+
+BEGIN { extends 'R2::Controller::Base' }
 
 
 sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
@@ -409,5 +411,9 @@ sub custom_field_group_POST : Private
 
     $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
 }
+
+no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
