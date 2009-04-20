@@ -1,4 +1,4 @@
-package R2::Plugin::Account;
+package R2::AppRole::Account;
 
 use strict;
 use warnings;

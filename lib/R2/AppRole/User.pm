@@ -1,4 +1,4 @@
-package R2::Plugin::User;
+package R2::AppRole::User;
 
 use strict;
 use warnings;

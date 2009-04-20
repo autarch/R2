@@ -231,9 +231,9 @@ sub _build_config_file
 
 {
     my @StandardRoles =
-        qw( R2::Plugin::Account
-            R2::Plugin::Domain
-            R2::Plugin::User
+        qw( R2::AppRole::Account
+            R2::AppRole::Domain
+            R2::AppRole::User
          );
 
     sub _build_catalyst_roles

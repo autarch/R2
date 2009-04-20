@@ -1,4 +1,4 @@
-package R2::Plugin::Domain;
+package R2::AppRole::Domain;
 
 use strict;
 use warnings;
