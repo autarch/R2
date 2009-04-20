@@ -7,7 +7,7 @@ use Exporter qw( import );
 
 our @EXPORT_OK = qw( dynamic_uri static_uri );
 
-use List::MoreUtils qw( all );
+use List::AllUtils qw( all );
 use R2::Util qw( string_is_empty );
 use URI::FromHash ();
 

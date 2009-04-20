@@ -10,7 +10,7 @@ use File::Slurp qw( read_file );
 use File::Temp qw( tempfile );
 use JavaScript::Squish;
 use JSAN::ServerSide 0.04;
-use List::MoreUtils qw( all );
+use List::AllUtils qw( all );
 use Path::Class;
 use R2::Config;
 use R2::Util qw( string_is_empty );

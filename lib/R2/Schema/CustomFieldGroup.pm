@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Lingua::EN::Inflect qw( PL_N );
-use List::MoreUtils qw( any );
+use List::AllUtils qw( any );
 use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::HTMLWidget;

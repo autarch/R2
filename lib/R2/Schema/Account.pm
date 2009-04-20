@@ -7,7 +7,7 @@ use Fey::Literal;
 use Fey::Object::Iterator::FromArray;
 use Fey::Object::Iterator::FromSelect::Caching;
 use Lingua::EN::Inflect qw( PL_N );
-use List::MoreUtils qw( any );
+use List::AllUtils qw( any );
 use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
 use R2::Schema::AccountMessagingProvider;

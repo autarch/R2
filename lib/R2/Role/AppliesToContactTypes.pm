@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Lingua::EN::Inflect qw( A );
-use List::MoreUtils qw( any );
+use List::AllUtils qw( any );
 use R2::Util qw( studly_to_calm );
 
 use Moose::Role;

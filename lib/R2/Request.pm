@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Catalyst::Request::REST::ForBrowsers';
 
-use List::MoreUtils qw( false );
+use List::AllUtils qw( false );
 use R2::Util qw( string_is_empty );
 
 
