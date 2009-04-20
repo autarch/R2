@@ -27,7 +27,7 @@ sub dispatch
         }
     }
 
-    return $self->NEXT::dispatch($c);
+    return $self->next::method($c);
 }
 
 1;

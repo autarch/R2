@@ -5,22 +5,27 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use Catalyst;
-use Catalyst::Runtime '5.70';
+use Moose;
+
+extends 'Catalyst';
+
 use R2::Request;
 
 use R2::Config;
 use R2::Schema;
-BEGIN { R2::Schema->LoadAllClasses() }
 
+BEGIN { R2::Schema->LoadAllClasses() }
 
 my $Config;
 BEGIN
 {
     $Config = R2::Config->new();
 
+    require Catalyst;
     Catalyst->import( @{ $Config->catalyst_imports() } );
 }
+
+with @{ $Config->catalyst_roles() };
 
 __PACKAGE__->config( name => 'R2',
                      %{ $Config->catalyst_config() },
@@ -33,31 +38,9 @@ R2::Schema->EnableObjectCaches();
 
 __PACKAGE__->setup();
 
-{
-package Catalyst::Engine::HTTP::Restarter::Watcher;
+no Moose;
 
-use IPC::Run3 qw( run3 );
-
-# The existing test attempts to reload the file in the current
-# process, which blows up for Moose classes made immutable, and all
-# sorts of other things.
-no warnings 'redefine';
-sub _test {
-    my ( $self, $file ) = @_;
-
-    my @inc = map { ( '-I', $_ ) } @INC;
-
-    my $err;
-
-    run3( [ $^X, @inc, '-c', $file ],
-          undef,
-          undef,
-          \$err,
-        );
-
-    return $err =~ /syntax OK/ ? 0 : $err;
-}
-}
+__PACKAGE__->meta()->make_immutable;
 
 1;
 

@@ -5,17 +5,16 @@ use warnings;
 
 use R2::Schema::Account;
 
+use Moose::Role;
 
-sub account
-{
-    my $self = shift;
+has 'account' =>
+    ( is         => 'ro',
+      isa        => 'R2::Schema::Account|Undef',
+      lazy_build => 1,
+    );
 
-    return exists $self->{'R2::Plugin::User::account'}
-           ? $self->{'R2::Plugin::User::account'}
-           : $self->{'R2::Plugin::User::account'} ||= $self->_account_for_request();
-}
 
-sub _account_for_request
+sub _build_account
 {
     my $self = shift;
 

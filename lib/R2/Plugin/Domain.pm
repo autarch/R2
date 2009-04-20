@@ -5,23 +5,22 @@ use warnings;
 
 use R2::Schema::Domain;
 
+use Moose::Role;
 
-sub domain
-{
-    my $self = shift;
+has 'domain' =>
+    ( is         => 'ro',
+      isa        => 'R2::Schema::Domain',
+      lazy_build => 1,
+    );
 
-    return $self->{'R2::Plugin::Domain::domain'} ||= $self->_domain_for_request();
-}
 
-sub _domain_for_request
+sub _build_domain
 {
     my $self = shift;
 
     my $host = $self->request()->uri()->host();
-    my $domain = R2::Schema::Domain->new( web_hostname => $host )
+    return R2::Schema::Domain->new( web_hostname => $host )
         or die "No domain found for hostname ($host)\n";
-
-    return $domain;
 }
 
 1;

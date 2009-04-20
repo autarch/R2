@@ -64,6 +64,13 @@ has 'catalyst_imports' =>
       builder => '_build_catalyst_imports',
     );
 
+has 'catalyst_roles' =>
+    ( is      => 'ro',
+      isa     => 'ArrayRef[Str]',
+      lazy    => 1,
+      builder => '_build_catalyst_roles',
+    );
+
 has 'catalyst_config' =>
     ( is      => 'ro',
       isa     => 'HashRef',
@@ -198,14 +205,10 @@ sub _build_config_file
 {
     my @StandardImports =
         qw( AuthenCookie
-            +R2::Plugin::Account
-            +R2::Plugin::Domain
-            +R2::Plugin::User
             +R2::Plugin::ErrorHandling
             DR::Session
             DR::Session::State::URI
             +R2::Plugin::Session::Store::R2
-            Log::Dispatch
             RedirectAndDetach
             SubRequest
             Unicode
@@ -223,6 +226,19 @@ sub _build_config_file
             unless $self->is_production() || $self->is_profiling();
 
         return \@imports;
+    }
+}
+
+{
+    my @StandardRoles =
+        qw( R2::Plugin::Account
+            R2::Plugin::Domain
+            R2::Plugin::User
+         );
+
+    sub _build_catalyst_roles
+    {
+        return \@StandardRoles;
     }
 }
 

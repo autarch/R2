@@ -8,7 +8,7 @@ use base 'Module::Build';
 
 my %Requires =
     ( 'autodie'                                  => '0',
-      'Catalyst'                                 => '5.7007',
+      'Catalyst'                                 => '5.8001',
       'Catalyst::Action::REST'                   => '0.5',
       'Catalyst::DR'                             => '0',
       'Catalyst::Plugin::AuthenCookie'           => '0.01',
@@ -18,8 +18,8 @@ my %Requires =
       'Catalyst::Plugin::Session::State'         => '0',
       'Catalyst::Plugin::Session::Store'         => '0',
       'Catalyst::Plugin::Session::Store::DBI'    => '0',
-      'Catalyst::Plugin::StackTrace'             => '0',
-      'Catalyst::Plugin::Static::Simple'         => '0',
+      'Catalyst::Plugin::StackTrace'             => '0.10',
+      'Catalyst::Plugin::Static::Simple'         => '0.21',
       'Catalyst::Plugin::SubRequest'             => '0',
       'Catalyst::Plugin::Unicode'                => '0',
       'Catalyst::Request::REST::ForBrowsers'     => '0',

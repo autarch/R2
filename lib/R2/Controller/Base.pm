@@ -53,7 +53,7 @@ sub end : Private
     my $self = shift;
     my $c    = shift;
 
-    return $self->NEXT::end($c)
+    return $self->next::method($c)
         if $c->stash()->{rest};
 
     if ( ( ! $c->response()->status()
