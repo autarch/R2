@@ -7,7 +7,7 @@ our $VERSION = '0.01';
 
 use Moose;
 
-extends 'Catalyst';
+BEGIN { extends 'Catalyst' }
 
 use R2::Request;
 
