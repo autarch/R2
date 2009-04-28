@@ -5,24 +5,23 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use Moose;
-
-BEGIN { extends 'Catalyst' }
-
-use R2::Request;
-
 use R2::Config;
+use R2::Request;
 use R2::Schema;
 
-BEGIN { R2::Schema->LoadAllClasses() }
+use Moose;
 
 my $Config;
+
 BEGIN
 {
+    extends 'Catalyst';
+
     $Config = R2::Config->new();
 
-    require Catalyst;
     Catalyst->import( @{ $Config->catalyst_imports() } );
+
+    R2::Schema->LoadAllClasses();
 }
 
 with @{ $Config->catalyst_roles() };
