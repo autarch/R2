@@ -118,6 +118,11 @@ sub ACTION_missing
     print "\n";
 }
 
+sub ACTION_prereq_list
+{
+    print "$_\n" for sort keys %Requires;
+}
+
 sub valid_licenses
 {
     my $self = shift;
