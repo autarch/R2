@@ -14,6 +14,7 @@ use R2::Web::FormData;
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
+use MooseX::StrictConstructor;
 
 has 'html' =>
     ( is       => 'ro',
@@ -60,6 +61,13 @@ has 'make_pretty' =>
       isa     => 'Bool',
       default => 0,
     );
+
+has 'is_fragment' =>
+    ( is      => 'ro',
+      isa     => 'Bool',
+      default => 0,
+    );
+
 
 sub _fill_in_form
 {
@@ -223,6 +231,9 @@ sub _collapse_single_option_select
 sub _form_html_from_dom
 {
     my $self = shift;
+
+    return $self->_dom()->documentElement()->as_HTML( undef, q{}, {} )
+        if $self->is_fragment();
 
     my $form = $self->_dom()->getElementsByTagName('form')->[0];
 
