@@ -5,6 +5,7 @@ use warnings;
 
 our $VERSION = '0.01';
 
+use Catalyst::App::RoleApplicator;
 use R2::Config;
 use R2::Request;
 use R2::Schema;
@@ -30,8 +31,8 @@ __PACKAGE__->config( name => 'R2',
                      %{ $Config->catalyst_config() },
                    );
 
-__PACKAGE__->request_class( 'R2::Request' );
-#__PACKAGE__->response_class( 'R2::Response' );
+__PACKAGE__->request_class('Catalyst::Request::REST::ForBrowsers');
+__PACKAGE__->apply_request_class_roles( 'R2::Request' );
 
 R2::Schema->EnableObjectCaches();
 

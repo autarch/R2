@@ -3,7 +3,7 @@ package R2::Request;
 use strict;
 use warnings;
 
-use base 'Catalyst::Request::REST::ForBrowsers';
+use Moose::Role;
 
 use List::AllUtils qw( false );
 use R2::Util qw( string_is_empty );
@@ -518,5 +518,7 @@ sub _params_for_classes
 
     return %found;
 }
+
+no Moose::Role;
 
 1;
