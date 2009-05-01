@@ -1,4 +1,4 @@
-package R2::Role::HasMembers;
+package R2::Role::Schema::HasMembers;
 
 use strict;
 use warnings;

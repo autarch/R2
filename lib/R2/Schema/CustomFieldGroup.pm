@@ -16,10 +16,10 @@ use Sub::Name qw( subname );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _display_order_is_unique
                           _applies_to_something _cannot_unapply ) ] };
-with 'R2::Role::AppliesToContactTypes';
+with 'R2::Role::Schema::AppliesToContactTypes';
 
 
 {

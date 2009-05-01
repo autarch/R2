@@ -10,7 +10,7 @@ use R2::Schema::OrganizationMember;
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::ActsAsContact'
+with 'R2::Role::Schema::ActsAsContact'
     => { steps => [] };
 
 {
@@ -44,7 +44,7 @@ with 'R2::Role::ActsAsContact'
           sub { [ $schema->table('Organization')->column('name') ] },
         );
 
-    with 'R2::Role::HasMembers' =>
+    with 'R2::Role::Schema::HasMembers' =>
         { membership_table => $schema->table('OrganizationMember') };
 }
 

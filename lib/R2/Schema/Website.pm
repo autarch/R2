@@ -12,9 +12,9 @@ use URI::http;
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _validate_and_canonicalize_uri ) ] };
-with 'R2::Role::HistoryRecorder';
+with 'R2::Role::Schema::HistoryRecorder';
 
 
 {

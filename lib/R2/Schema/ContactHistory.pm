@@ -10,8 +10,8 @@ use R2::Schema::Contact;
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator';
-with 'R2::Role::URIMaker';
+with 'R2::Role::Schema::DataValidator';
+with 'R2::Role::Schema::URIMaker';
 
 
 {

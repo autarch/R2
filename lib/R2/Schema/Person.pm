@@ -13,7 +13,7 @@ use Scalar::Util qw( blessed );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::ActsAsContact'
+with 'R2::Role::Schema::ActsAsContact'
     => { steps => [ qw( _require_some_name _valid_birth_date ) ] };
 
 

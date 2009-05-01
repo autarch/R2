@@ -12,9 +12,9 @@ use Scalar::Util qw( looks_like_number );
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _validate_amount _valid_donation_date ) ] };
-with 'R2::Role::URIMaker';
+with 'R2::Role::Schema::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();

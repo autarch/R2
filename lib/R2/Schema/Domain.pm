@@ -13,7 +13,7 @@ use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validate );
 use MooseX::ClassAttribute;
 
-with 'R2::Role::URIMaker';
+with 'R2::Role::Schema::URIMaker';
 
 
 {

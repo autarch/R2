@@ -14,9 +14,9 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _validate_password _require_username_or_email ) ] };
-with 'R2::Role::URIMaker';
+with 'R2::Role::Schema::URIMaker';
 
 
 {

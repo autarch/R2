@@ -18,7 +18,7 @@ use Scalar::Util qw( blessed );
 use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validated_list );
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::Schema::DataValidator';
 
 
 {

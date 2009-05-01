@@ -1,4 +1,4 @@
-package R2::Role::URIMaker;
+package R2::Role::Schema::URIMaker;
 
 use strict;
 use warnings;

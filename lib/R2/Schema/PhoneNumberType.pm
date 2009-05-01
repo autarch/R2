@@ -10,9 +10,9 @@ use R2::Types;
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _cannot_unapply _applies_to_something ) ] };
-with 'R2::Role::AppliesToContactTypes';
+with 'R2::Role::Schema::AppliesToContactTypes';
 
 {
     my $schema = R2::Schema->Schema();

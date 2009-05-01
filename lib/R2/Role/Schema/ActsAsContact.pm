@@ -1,4 +1,4 @@
-package R2::Role::ActsAsContact;
+package R2::Role::Schema::ActsAsContact;
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use R2::Schema::Contact;
 
 use MooseX::Role::Parameterized;
 
-with 'R2::Role::HistoryRecorder';
+with 'R2::Role::Schema::HistoryRecorder';
 
 # Can't use Fey::ORM::Table in a role yet
 #
@@ -97,7 +97,7 @@ role
 
     my @steps = @{ $params->steps() };
 
-    with 'R2::Role::DataValidator' => { steps => \@steps };
+    with 'R2::Role::Schema::DataValidator' => { steps => \@steps };
 
     my $pk_name;
 

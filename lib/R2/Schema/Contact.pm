@@ -30,8 +30,8 @@ use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( pos_validated_list );
 
-with 'R2::Role::DataValidator';
-with 'R2::Role::URIMaker';
+with 'R2::Role::Schema::DataValidator';
+with 'R2::Role::Schema::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();
@@ -63,7 +63,7 @@ with 'R2::Role::URIMaker';
 
     has 'real_contact' =>
         ( is         => 'ro',
-          does       => 'R2::Role::ActsAsContact',
+          does       => 'R2::Role::Schema::ActsAsContact',
           lazy_build => 1,
           init_arg   => undef,
         );

@@ -9,8 +9,8 @@ use R2::Schema;
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator';
-with 'R2::Role::HistoryRecorder';
+with 'R2::Role::Schema::DataValidator';
+with 'R2::Role::Schema::HistoryRecorder';
 
 
 {

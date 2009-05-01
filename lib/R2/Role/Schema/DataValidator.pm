@@ -1,4 +1,4 @@
-package R2::Role::DataValidator;
+package R2::Role::Schema::DataValidator;
 
 use strict;
 use warnings;
@@ -129,7 +129,7 @@ role
     # exclude or alias methods on import.
     return
         if $extra{consumer}->can('does_role')
-           && $extra{consumer}->does_role('R2::Role::ActsAsContact' );
+           && $extra{consumer}->does_role('R2::Role::Schema::ActsAsContact' );
 
     my @steps = @{ $params->steps() };
 

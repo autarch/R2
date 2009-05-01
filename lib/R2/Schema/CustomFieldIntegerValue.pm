@@ -30,7 +30,7 @@ sub _ValidateValue
            };
 }
 
-with 'R2::Role::CustomFieldValue';
+with 'R2::Role::Schema::CustomFieldValue';
 
 no Fey::ORM::Table;
 

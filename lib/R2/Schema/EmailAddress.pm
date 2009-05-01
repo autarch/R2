@@ -10,9 +10,9 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator' =>
+with 'R2::Role::Schema::DataValidator' =>
          { steps => [ qw( _valid_email_address ) ] };
-with 'R2::Role::HistoryRecorder';
+with 'R2::Role::Schema::HistoryRecorder';
 
 
 {

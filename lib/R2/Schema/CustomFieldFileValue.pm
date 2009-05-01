@@ -5,7 +5,7 @@ use warnings;
 
 use Fey::ORM::Table;
 
-with 'R2::Role::DataValidator';
+with 'R2::Role::Schema::DataValidator';
 
 {
     my $schema = R2::Schema->Schema();
@@ -27,7 +27,7 @@ sub _ValidateValue
            };
 }
 
-with 'R2::Role::CustomFieldValue';
+with 'R2::Role::Schema::CustomFieldValue';
 
 no Fey::ORM::Table;
 

@@ -1,4 +1,4 @@
-package R2::Role::AppliesToContactTypes;
+package R2::Role::Schema::AppliesToContactTypes;
 
 use strict;
 use warnings;

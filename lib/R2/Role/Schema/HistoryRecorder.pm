@@ -1,4 +1,4 @@
-package R2::Role::HistoryRecorder;
+package R2::Role::Schema::HistoryRecorder;
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ around 'insert' => sub
 
     my $type;
     my $description;
-    if ( $row->does('R2::Role::ActsAsContact' ) )
+    if ( $row->does('R2::Role::Schema::ActsAsContact' ) )
     {
         $type = R2::Schema::ContactHistoryType->Created();
 

@@ -1,4 +1,4 @@
-package R2::Role::CustomFieldValue;
+package R2::Role::Schema::CustomFieldValue;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use MooseX::Params::Validate qw( validated_list );
 
 requires '_ValidateValue';
 
-with 'R2::Role::DataValidator' => { validate_on_insert => 0,
+with 'R2::Role::Schema::DataValidator' => { validate_on_insert => 0,
                                     validate_on_update => 0,
                                     steps              => [ '_ValidateValue' ],
                                   };
