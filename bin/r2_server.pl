@@ -54,7 +54,10 @@ if ( $debug ) {
 # need to be reloaded for each restart.
 require Catalyst;
 
-$| = 1; # necessary for resta
+# If this isn't done, then the Catalyst::Devel tests for the restarter
+# fail.
+$| = 1 if $ENV{HARNESS_ACTIVE};
+
 my $runner = sub {
     # This is require instead of use so that the above environment
     # variables can be set at runtime.
@@ -78,15 +81,13 @@ if ( $restart ) {
         if $background;
 
     my %args;
-    $args{server_host} = $host
-        if defined $host;
-    $args{server_port} = $port
-        if defined $port;
-    $args{watch_directory} = $watch_directory
+    $args{follow_symlinks} = 1
+        if $follow_symlinks;
+    $args{directories} = $watch_directory
         if defined $watch_directory;
-    $args{check_interval} = $check_interval
+    $args{interval} = $check_interval
         if defined $check_interval;
-    $args{file_regex} = qr/$file_regex/
+    $args{regex} = qr/$file_regex/
         if defined $file_regex;
 
     my $restarter = Catalyst::Restarter->new(
@@ -121,6 +122,7 @@ r2_server.pl [options]
    -r -restart        restart when files get modified
                       (defaults to false)
    -rd -restartdelay  delay between file checks
+                      (ignored if you have Linux::Inotify2 installed)
    -rr -restartregex  regex match files that trigger
                       a restart when modified
                       (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
