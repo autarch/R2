@@ -2,7 +2,7 @@ Search
 
 - search on any field
 - include any (reasonable) field in search results
-- do something with search results (email, delete, tag, group, etc)
+- do something with search results (email, delete, tag, group, add note, etc)
 - order search results by any orderable field
 
 Edit
@@ -13,6 +13,8 @@ Edit
 Emails
 
 - templated
+- bounce handling
+- incoming email processing
 
 Reports
 
@@ -36,3 +38,7 @@ Import tool
 
 - contacts
 - donations
+
+Groups & Tags
+
+- no UI yet
