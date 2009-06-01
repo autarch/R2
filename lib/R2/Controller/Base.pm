@@ -30,8 +30,8 @@ sub begin : Private
 
     unless ( $config->is_production() || $config->is_profiling() )
     {
-        $class->new()->create_single_file()
-            for my $class qw( R2::Web::CSS R2::Web::Javascript );
+        $_->new()->create_single_file()
+            for qw( R2::Web::CSS R2::Web::Javascript );
     }
 
     return 1;
