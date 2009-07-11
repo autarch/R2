@@ -85,7 +85,7 @@ if ( $restart ) {
 
     my $subclass = Catalyst::Restarter->pick_subclass;
 
-    my %args;
+    my %args = ( argv => \@argv );
     $args{follow_symlinks} = 1
         if $follow_symlinks;
     $args{directories} = $watch_directory
