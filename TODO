@@ -15,6 +15,10 @@ Emails
 - templated
 - bounce handling
 - incoming email processing
+- get on FBL (feedback loops) and process spam reports as auto-unsubscribe
+- CAN-SPAM compliance
+- limit size of created lists somehow? add a confirm-via-email step for any list larger than X?
+- DKIM and SPF for bigger email senders?
 
 Reports
 
