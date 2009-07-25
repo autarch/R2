@@ -140,6 +140,10 @@ sub _finalize_error_with_debug {
         my $i = 0;
         for my $dump ( $c->dump_these ) {
             my $name  = $dump->[0];
+
+            # stored in there for classes with an anon metaclass.
+            delete $dump->[1]{__MOP__} if ref $dump->[1];
+
             my $value = encode_entities( dump( $dump->[1] ));
             push @infos, sprintf <<"EOF", $name, $value;
 <h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
