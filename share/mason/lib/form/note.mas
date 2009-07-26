@@ -19,7 +19,7 @@
     <div class="form-item">
       <label class="for-field" for="note_datetime">When?</label>
       <input type="text" class="text medium" name="note_datetime" id="note_datetime"
-             value="<% $c->user()->format_datetime( $note ? $note->note_datetime() : DateTime->now( time_zone => $c->user()->timezone() ) ) %>" />
+             value="<% $c->user()->format_datetime( $note ? $note->note_datetime() : DateTime->now() ) %>" />
       <input type="hidden" name="datetime_format" value="<% $c->user()->datetime_format() %>" />
       <div class="help-text">
         <p>

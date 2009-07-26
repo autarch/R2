@@ -154,7 +154,7 @@ sub format_date
     my $self = shift;
     my $dt   = shift;
 
-    return $dt->format_cldr( $self->date_format() );
+    return $dt->clone()->set_time_zone( $self->time_zone() )->format_cldr( $self->date_format() );
 }
 
 sub format_datetime
@@ -162,7 +162,7 @@ sub format_datetime
     my $self = shift;
     my $dt   = shift;
 
-    return $dt->format_cldr( $self->datetime_format() );
+    return $dt->clone()->set_time_zone( $self->time_zone() )->format_cldr( $self->datetime_format() );
 }
 
 sub _base_uri_path

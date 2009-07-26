@@ -18,7 +18,7 @@ CREATE TABLE "User" (
        username           VARCHAR(255)       UNIQUE NOT NULL,
        -- SHA512 in Base64 encoding
        password           VARCHAR(86)        NOT NULL,
-       timezone           VARCHAR(50)        NOT NULL DEFAULT 'UTC',
+       time_zone          VARCHAR(50)        NOT NULL DEFAULT 'UTC',
        date_format        VARCHAR(12)        NOT NULL DEFAULT 'MM-dd-YYYY',
        time_format        VARCHAR(12)        NOT NULL DEFAULT 'hh:mm a',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -49,7 +49,7 @@
 %   }
 </table>
 
-<ul class="donation-totals">
+<ul class="table-summary donation-totals">
   <li>Total for the last 12 months: <% $contact->donations_total( DateTime->today()->subtract( months => 12 ) ) %></li>
   <li>Total for all time: <% $contact->donations_total() %></li>
 </ul>
