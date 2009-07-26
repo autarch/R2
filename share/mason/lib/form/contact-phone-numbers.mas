@@ -18,12 +18,10 @@
         <input type="text" class="text wide" name="phone_number_note-new1" id="phone_number_note-new1" />
       </div>
 
-      <div class="form-item">
-        <div class="no-label">
-          <input type="radio" name="phone_number_is_preferred" value="new1" checked="checked" id="phone_number_is_preferred-new1" />
-          <label class="for-radio selected" for="phone_number_is_preferred-new1"
-                 id="for-phone_number_is_preferred-new1">This is the preferred number</label>
-        </div>
+      <div class="form-item no-label">
+        <input type="radio" name="phone_number_is_preferred" value="new1" checked="checked" id="phone_number_is_preferred-new1" />
+        <label class="for-radio selected" for="phone_number_is_preferred-new1"
+               id="for-phone_number_is_preferred-new1">This is the preferred number</label>
       </div>
     </div>
 

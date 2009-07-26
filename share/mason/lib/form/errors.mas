@@ -1,15 +1,13 @@
-      <fieldset id="errors">
-       <legend>Errors</legend>
-
-       <ul>
-%   for my $e (@errors) {
-        <li><% $e | h %></li>
+<div class="form-error">
+%   for my $e ( $form->form_errors() ) {
+  <p class="error-message"><span><% $e->message() | h %></span></p>
 %   }
-       </ul>
+</div>
 
-      </fieldset>
+<%args>
+$form
+</%args>
 
 <%init>
-my @errors = @{ $c->session()->{errors} || [] };
-return unless @errors;
+return unless $form->has_form_errors();
 </%init>

@@ -1,0 +1,56 @@
+<form action="<% $form->action() %>" method="<% $form->method() %>">
+
+% if ($show_form_errors) {
+  <& /lib/form/errors.mas, form => $form &>
+% }
+
+% for my $fs ( $form->fieldsets() ) {
+%   unless ( $fs->is_implicit() ) {
+  <fieldset>
+    <legend><% $fs->name () %></legend>
+%   }
+
+%   for my $fg ( $fs->groups() ) {
+%     for my $field ( $fg->fields() ) {
+%       my @errors = $show_form_errors ? $form->errors_for_field($field) : ();
+%       if ( $field->render_as() ne 'hidden' ) {
+    <div class="form-item <% @errors ? 'error' : q{} %>">
+      <label class="for-field" for="<% $field->html_name() %>"><% $field->label() %>:</label>
+%       }
+      <input type="<% $field->render_as() %>"
+             class="<% $field->render_as() eq 'checkbox' ? 'checkbox' : q{} %>"
+             name="<% $field->html_name() %>"
+%       if ( $field->render_as() eq 'checkbox' || $field->render_as() eq 'radio' ) {
+             value="1"
+             <% $form->param( $field->html_name() ) ? q{checked="checked"} : q{} %>
+%       } else {
+             value="<% $form->param( $field->html_name() ) | h %>" />
+%       }
+%       if ( $field->render_as() ne 'hidden' ) {
+%         for my $e (@errors) {
+      <p class="error-message"><% $e->message() | h %></p>
+%         }
+    </div>
+%       }
+%     }
+%   }
+
+%   unless ( $fs->is_implicit() ) {
+  </fieldset>
+%   }
+% }
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+
+<%args>
+$form
+</%args>
+
+<%init>
+my $show_form_errors = $c->session_object()->has_form();
+</%init>
+

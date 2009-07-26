@@ -206,8 +206,8 @@ sub _build_config_file
     my @StandardImports =
         qw( AuthenCookie
             +R2::Plugin::ErrorHandling
-            DR::Session
-            DR::Session::State::URI
+            Session::AsObject
+            Session::State::URI
             +R2::Plugin::Session::Store::R2
             RedirectAndDetach
             SubRequest
@@ -233,6 +233,7 @@ sub _build_config_file
     my @StandardRoles =
         qw( R2::AppRole::Account
             R2::AppRole::Domain
+            R2::AppRole::RedirectWithError
             R2::AppRole::User
          );
 
@@ -326,11 +327,14 @@ sub _build_catalyst_config
     my %config =
         ( default_view   => 'Mason',
 
-          session        =>
-          { expires        => ( 60 * 5 ),
+          session =>
+          { expires => ( 60 * 5 ),
             # Need to quote it for Pg
-            dbi_table      => q{"Session"},
-            dbi_dbh        => 'R2::Plugin::Session::Store::R2',
+            dbi_table        => q{"Session"},
+            dbi_dbh          => 'R2::Plugin::Session::Store::R2',
+            object_class     => 'R2::Web::Session',
+            rewrite_body     => 0,
+            rewrite_redirect => 1,
           },
 
           authen_cookie =>

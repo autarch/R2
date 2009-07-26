@@ -28,7 +28,7 @@ Animation.Fade.prototype._initialize = function (params) {
 
 Animation.Fade.prototype._setParams = function (params) {
     if ( ! params.elementId ) {
-        throw new Error("Animation.Resize requires an elementId parameter");
+        throw new Error("Animation.Fade requires an elementId parameter");
     }
 
     if ( typeof params.targetOpacity == "undefined" ) {

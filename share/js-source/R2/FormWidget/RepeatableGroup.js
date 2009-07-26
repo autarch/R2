@@ -3,7 +3,7 @@ JSAN.use('DOM.Events');
 JSAN.use('DOM.Find');
 JSAN.use('DOM.Utils');
 JSAN.use('R2.Element');
-
+JSAN.use('R2.FormWidget.DivDeleter');
 
 if ( typeof R2 == "undefined" ) {
     R2 = {};
@@ -86,6 +86,8 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
         window.scrollTo( 0, to );
     }
 
+    div.style.opacity = 0;
+
     Animation.Fade.fade( { "elementId":     div.id,
                            "targetOpacity": 1 } );
 }
@@ -99,27 +101,5 @@ R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
         return;
     }
 
-    DOM.Events.addListener( deleter,
-                            "click",
-                            this._makeGroupDeleter(div)
-                          );
-};
-
-R2.FormWidget.RepeatableGroup.prototype._makeGroupDeleter = function (div) {
-    var func = function (e) {
-        e.preventDefault();
-        if ( e.stopPropogation ) {
-            e.stopPropagation();
-        }
-
-        Animation.Fade.fade( { "elementId":     div.id,
-                               "targetOpacity": 0 ,
-                               onFinish:        function () {
-                                   div.parentNode.removeChild(div);
-                               }
-                             }
-                           );
-    };
-
-    return func;
+    new R2.FormWidget.DivDeleter( div, deleter );
 };

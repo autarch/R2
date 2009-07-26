@@ -6,6 +6,7 @@ use warnings;
 use LWPx::ParanoidAgent;
 use Net::OpenID::Consumer;
 use R2::Schema::User;
+use R2::Web::Form::Login;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -13,7 +14,21 @@ use Moose;
 BEGIN { extends 'R2::Controller::Base' }
 
 
-sub login_form : Local { }
+sub login_form : Local
+{
+    my $self = shift;
+    my $c    = shift;
+
+    $self->_set_form
+        ( $c,
+          'Login',
+          '/user/authentication',
+          {
+           return_to => $c->request()->parameters->{'return_to'}
+           || $c->domain()->application_uri( path => q{} ),
+          },
+        );
+}
 
 sub authentication : Local : ActionClass('+R2::Action::REST') { }
 
@@ -40,27 +55,16 @@ sub authentication_POST
     my $self = shift;
     my $c    = shift;
 
-    my $uri      = $c->request()->param('openid_uri');
-    my $username = $c->request()->param('username');
-    my $pw       = $c->request()->param('password');
+    my $form = R2::Web::Form::Login->new( action => '/user/authentication',
+                                          params => $c->request()->params(),
+                                        );
+
+    my $username = $form->param('username');
+    my $pw       = $form->param('password');
 
     my $user;
 
-    if ( ! string_is_empty($uri) )
-    {
-        $self->_authenticate_openid( $c, $uri );
-        return;
-    }
-
-    my @errors;
-
-    push @errors, 'You must provide a username or an OpenID URL.'
-        if string_is_empty($username);
-    push @errors, { field   => 'password',
-                    message => 'You must provide a password.' }
-        if string_is_empty($pw);
-
-    unless (@errors)
+    if ( $form->is_valid() )
     {
         $user = R2::Schema::User->new( username => $username,
                                        password => $pw,
@@ -68,21 +72,15 @@ sub authentication_POST
 
         unless ($user)
         {
-            push @errors,
-                'The username or password you provided was not valid.';
+            $form->add_error( message => 'The username or password you provided was not valid.' );
         }
     }
 
-    if (@errors)
+    unless ($user)
     {
-        my $e = R2::Exception::DataValidation->new( errors => \@errors );
-
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
-              params => { username  => $username,
-                          return_to => $c->request()->parameters()->{return_to},
-                        },
+        $c->redirect_with_error
+            ( form => $form,
+              uri  => $c->domain()->application_uri( path => '/user/login_form' ),
             );
     }
 
@@ -145,9 +143,10 @@ sub authentication_DELETE
 
     $c->unset_authen_cookie();
 
-    $c->add_message( 'You have been logged out.' );
+    $c->session_object()->add_message( 'You have been logged out.' );
 
-    $c->redirect_and_detach( $c->request()->parameters()->{return_to} || '/' );
+    my $redirect = $c->request()->parameters()->{return_to} || $c->domain()->application_uri( path => q{} );
+    $c->redirect_and_detach($redirect);
 }
 
 sub openid_authentication : Local
@@ -217,7 +216,7 @@ sub _login_user
                            %expires,
                          );
 
-    $c->add_message( 'Welcome to the site, ' . $user->first_name() );
+    $c->session_object()->add_message( 'Welcome to the site, ' . $user->first_name() );
 
     $c->redirect_and_detach( $c->request()->parameters()->{return_to} || '/' );
 }

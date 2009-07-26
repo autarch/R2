@@ -1,0 +1,18 @@
+<div id="contact-edit-form">
+
+<& /lib/contact-view/summary.mas, contact => $person &>
+
+<& /lib/form/person.mas, person => $person &>
+
+</div>
+
+<%args>
+$person
+</%args>
+
+<%method title>
+Edit <% $person->full_name() %>
+<%args>
+$person
+</%args>
+</%method>

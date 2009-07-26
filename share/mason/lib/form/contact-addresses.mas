@@ -50,12 +50,10 @@
         <input type="text" class="text wide" name="address_note-new1" id="address_note-new1" />
       </div>
 
-      <div class="form-item">
-        <div class="no-label">
-          <input type="radio" name="address_is_preferred" value="new1" checked="checked" id="address_is_preferred-new1" />
-          <label class="for-radio selected" for="address_is_preferred-new1"
-                 id="for-address_is_preferred-new1">This is the preferred address</label>
-        </div>
+      <div class="form-item no-label">
+        <input type="radio" name="address_is_preferred" value="new1" checked="checked" id="address_is_preferred-new1" />
+        <label class="for-radio selected" for="address_is_preferred-new1"
+               id="for-address_is_preferred-new1">This is the preferred address</label>
       </div>
     </div>
 

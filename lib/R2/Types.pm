@@ -27,6 +27,22 @@ subtype 'R2.Type.NonEmptyStr'
     => where { length $_ >= 0 }
     => message { 'This string must not be empty' };
 
+subtype 'R2.Type.ErrorForSession'
+    => as 'Value'
+    => where { return 1 unless ref $_[0];
+               return 1 if eval { @{ $_[0] } } && ! grep { ref } @{ $_[0] };
+               return 0 unless blessed $_[0];
+               return 1 if $_[0]->can('messages') || $_[0]->can('message');
+               return 0;
+             };
+
+subtype 'R2.Type.URIStr'
+    => as 'R2.Type.NonEmptyStr';
+
+coerce 'R2.Type.URIStr'
+    => from class_type('URI')
+    => via { $_->canonical() };
+
 no Moose::Util::TypeConstraints;
 
 1;

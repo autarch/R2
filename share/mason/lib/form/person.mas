@@ -1,0 +1,34 @@
+<&| /lib/filter/form.mas, objects => $person ? [ $person ] : [] &>
+<form class="JS-standard-form"
+      action="<% $action %>"
+      method="post"
+      enctype="multipart/form-data">
+
+% if ($person) {
+<input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
+<& /lib/form/person-basics.mas, person => $person &>
+
+<& /lib/form/contact-email-website.mas, contact => $person &>
+
+<& /lib/form/contact-phone-numbers.mas, contact => $person, contact_type => 'person' &>
+
+<& /lib/form/contact-addresses.mas, contact => $person, contact_type => 'person' &>
+
+<& /lib/form/contact-custom-fields.mas, contact => $person, contact_type => 'person' &>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$person => undef
+</%args>
+
+<%init>
+my $action = $person ? $person->uri() : $c->account()->uri( view => 'person' );
+</%init>

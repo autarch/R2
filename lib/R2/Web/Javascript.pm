@@ -22,6 +22,9 @@ sub _files
 {
     my $dir = dir( R2::Config->new()->share_dir(), 'js-source' );
 
+    # Works around an error that comes from JSAN::Parse::FileDeps
+    # attempting to assign $_, which is somehow read-only.
+    local $_;
     my $js =
         JSAN::ServerSide->new( js_dir     => $dir->stringify(),
                                # This is irrelevant, as we won't be

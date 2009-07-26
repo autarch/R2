@@ -14,8 +14,9 @@ R2.Form = function (form) {
     this.seen = {};
 
     this.instrumentRadioButtons();
-    this._instrumentPairedMultiSelects();
     this._instrumentRepeatableGroups();
+    this._instrumentDivDeleters();
+    this._instrumentPairedMultiSelects();
 };
 
 R2.Form.instrumentAllForms = function () {
@@ -56,6 +57,19 @@ R2.Form.prototype._instrumentRepeatableGroups = function () {
 
     for ( var i = 0; i < divs.length; i++ ) {
         new R2.FormWidget.RepeatableGroup( divs[i], this );
+    }
+};
+
+R2.Form.prototype._instrumentDivDeleters = function () {
+    var anchors =
+        DOM.Find.getElementsByAttributes
+            ( { tagName:   "A",
+                className: /JS-delete-div/ }, this.form );
+
+    for ( var i = 0; i < anchors.length; i++ ) {
+        var div = R2.Utils.firstParentWithTagName( anchors[i], "DIV" );
+
+        new R2.FormWidget.DivDeleter( div.parentNode, anchors[i] );
     }
 };
 

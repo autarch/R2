@@ -1,41 +1,13 @@
-<&| /lib/filter/form.mas &>
-<form action="/user/authentication" method="post">
-  <input type="hidden" name="return_to" value="<% $return_to | h %>" />
-
-  <fieldset>
-    <legend>Your login info</legend>
-
-    <div class="form-item">
-      <label class="for-field" for="username">Username:</label>
-      <input id="username" class="text medium" type="text" name="username" value="" />
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="password">Password:</label>
-      <input id="password" class="text" type="password" name="password" />
-    </div>
-
-    <div class="form-item">
-      <label class="for-field" for="remember" class="inline">Remember me:</label>
-      <input id="remember" class="checkbox" type="checkbox" name="remember" />
-    </div>
-
-  </fieldset>
-
-  <div class="form-item">
-    <input class="submit" type="submit" value="Submit" />
-  </div>
-
-</form>
-</&>
+<& /lib/form.mas, form => $form &>
 
 <p>
-  <a href="/user/forgot_password_form?return_to=<% $return_to | uh %>">Forgot your password</a>?
+  <a href="/user/forgot_password_form?return_to=<% $form->param('return_to') | uh %>">Forgot your password</a>?
 </p>
 
-<%init>
-my $return_to = $c->request()->param('return_to') || $c->session()->{saved_params}{return_to} || '/';
-</%init>
+<%args>
+$form
+$show_form_errors => 1
+</%args>
 
 <%method title>
 Log In

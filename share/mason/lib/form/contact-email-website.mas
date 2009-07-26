@@ -18,26 +18,16 @@
       </div>
     </div>
 
+% if ($emails) {
+%   while ( my $email = $emails->next() ) {
+    <div id="JS-email-address-<% $email->email_address_id() %>">
+      <& .email_address, email_address => $email, id => $email->email_address_id(), is_preferred => $email->is_preferred() &>
+    </div>
+%   }
+% }
+
     <div class="JS-repeatable-group JS-repeatable-group-email-address">
-
-      <div class="form-item">
-        <label class="for-field" for="email_address-new1">Email address:</label>
-        <input type="text" class="text medium" name="email_address-new1" id="email_address-new1" />
-        <a class="delete-repeated-group" style="display: none" href="#" title="delete this email address">X</a>
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="email_address_note-new1">Note:</label>
-        <input type="text" class="text wide" name="email_address_note-new1" id="email_address_note-new1" />
-      </div>
-
-      <div class="form-item">
-        <div class="no-label">
-          <input type="radio" name="email_address_is_preferred" value="new1" checked="checked" id="email_address_is_preferred-new1" />
-          <label class="for-radio selected" for="email_address_is_preferred-new1"
-                 id="for-email_address_is_preferred-new1">This is the preferred email address</label>
-        </div>
-      </div>
+      <& .email_address, id => 'new1', is_preferred => ! $emails &>
     </div>
 
     <a href="#" class="add-another" id="email-address-repeater">Add another email address</a>
@@ -46,25 +36,89 @@
   <fieldset>
     <legend>Websites</legend>
 
+% if ($websites) {
+%   while ( my $website = $websites->next() ) {
+    <div id="JS-website-<% $website->website_id() %>">
+      <& .website, website => $website, id => $website->website_id() &>
+    </div>
+%   }
+% }
+
     <div class="JS-repeatable-group JS-repeatable-group-website">
-
-      <div class="form-item">
-        <label class="for-field" for="label-new1">Label:</label>
-        <input type="text" class="text" name="label-new1" id="label-new1" value="Website" />
-        <a class="delete-repeated-group" style="display: none" href="#" title="delete this website">X</a>
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="uri-new1">URI:</label>
-        <input type="text" class="text medium" name="uri-new1" id="uri-new1" />
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="website_note-new1">Note:</label>
-        <input type="text" class="text wide" name="website_note-new1" id="website_note-new1" />
-      </div>
+      <& .website, id => 'new1' &>
     </div>
 
     <a href="#" class="add-another" id="website-repeater">Add another website</a>
-
   </fieldset>
+
+<%args>
+$contact => undef
+</%args>
+
+<%init>
+my $emails;
+$emails = $contact->email_addresses()
+    if $contact;
+
+my $websites;
+$websites = $contact->websites()
+    if $contact;
+</%init>
+
+<%def .email_address>
+      <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $email_address ? [ $email_address ] : [] &>
+      <div class="form-item">
+        <label class="for-field" for="email_address-<% $id %>">Email address:</label>
+        <input type="text" class="text medium" name="email_address-<% $id %>" id="email_address-<% $id %>" />
+        <a class="<% $email_address ? 'JS-delete-div' : 'delete-repeated-group' %>"
+           style="<% $email_address ? q{} : 'display: none' %>"
+           href="#"
+           title="delete this email address">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="email_address_note-<% $id %>">Note:</label>
+        <input type="text" class="text wide" name="email_address_note-<% $id %>" id="email_address_note-<% $id %>" />
+      </div>
+
+      <div class="form-item no-label">
+        <input type="radio" name="email_address_is_preferred" value="<% $id %>"
+               <% $is_preferred ? q{checked="checked"} : q{} %>
+               id="email_address_is_preferred-<% $id %>" />
+        <label class="for-radio selected" for="email_address_is_preferred-<% $id %>"
+               id="for-email_address_is_preferred-<% $id %>">This is the preferred email address</label>
+      </div>
+      </&>
+<%args>
+$id
+$email_address => undef
+$is_preferred => 0
+</%args>
+</%def>
+
+<%def .website>
+      <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $website ? [ $website ] : [] &>
+      <div class="form-item">
+        <label class="for-field" for="label-<% $id %>">Label:</label>
+        <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />
+        <a class="<% $website ? 'JS-delete-div' : 'delete-repeated-group' %>"
+           style="<% $website ? q{} : 'display: none' %>"
+           href="#"
+           title="delete this website">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="uri-<% $id %>">URI:</label>
+        <input type="text" class="text medium" name="uri-<% $id %>" id="uri-<% $id %>" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="website_note-<% $id %>">Note:</label>
+        <input type="text" class="text wide" name="website_note-<% $id %>" id="website_note-<% $id %>" />
+      </div>
+      </&>
+<%args>
+$id
+$website => undef
+</%args>
+</%def>

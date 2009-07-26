@@ -8,6 +8,8 @@ Birth date: <% $c->user()->format_date($dt) %>
 
 <& /lib/contact-view/summary.mas, contact => $person &>
 
+<& /lib/contact-view/edit-link.mas, contact => $person &>
+
 <& /lib/contact-view/email-addresses.mas, contact => $person &>
 
 <& /lib/contact-view/websites.mas, contact => $person &>

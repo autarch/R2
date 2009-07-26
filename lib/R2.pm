@@ -9,6 +9,7 @@ use Catalyst::App::RoleApplicator;
 use R2::Config;
 use R2::Request;
 use R2::Schema;
+use R2::Web::Session;
 
 use Moose;
 

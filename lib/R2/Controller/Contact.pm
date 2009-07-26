@@ -117,7 +117,7 @@ sub _contact_view_tabs
              },
              { uri     => $contact->uri( view => 'donations' ),
                label   => 'donations',
-               tooltip => 'Donations from this contact',
+               tooltip => 'Donations from this ' . lc $contact->contact_type(),
              },
              { uri     => $contact->uri( view => 'notes' ),
                label   => 'notes',
@@ -125,11 +125,11 @@ sub _contact_view_tabs
              },
              { uri     => $contact->uri( view => 'emails' ),
                label   => 'emails',
-               tooltip => 'Email to and from this contact',
+               tooltip => 'Email to and from this ' . lc $contact->contact_type(),
              },
              { uri     => $contact->uri( view => 'history' ),
                label   => 'history',
-               tooltip => 'Changes to contact data made via this system',
+               tooltip => 'Changes to this ' . lc $contact->contact_type() . q{'s data},
              },
            ];
 }
@@ -177,6 +177,18 @@ sub _display_organization
     $c->stash()->{organization} = $c->stash()->{contact}->organization();
 
     $c->stash()->{template} = '/organization/view';
+}
+
+sub edit_form : Chained('_set_contact') : PathPart('edit_form') : Args(0)
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $type = lc $c->stash->{contact}->contact_type();
+
+    $c->stash()->{$type} = $c->stash()->{contact}->$type();
+
+    $c->stash()->{template} = "/$type/edit_form";
 }
 
 sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') { }

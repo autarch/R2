@@ -54,7 +54,7 @@ show_side_nav => 1
 % }
 </div>
 <%init>
-my @messages = @{ $c->session()->{messages} || [] };
+my @messages = $c->session_object()->messages();
 
 return unless @messages;
 </%init>

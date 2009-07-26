@@ -1,7 +1,9 @@
 <%args>
-$data    => undef
-@objects => ()
-@exclude => ()
+$data        => undef
+@objects     => ()
+@exclude     => ()
+$is_fragment => 0
+$suffix      => q{}
 </%args>
 
 <%init>
@@ -12,12 +14,15 @@ push @data_sources, $params if keys %{ $params };
 push @data_sources, $data if defined $data;
 push @data_sources, grep { defined } @objects;
 
-my $form_data = R2::Web::FormData->new(@data_sources);
+my $form_data = R2::Web::FormData->new( sources => \@data_sources,
+                                        suffix  => $suffix,
+                                      );
 
 my $form = R2::Web::Form->new( html        => $m->content(),
                                errors      => ( $c->session()->{errors} || [] ),
                                form_data   => $form_data,
                                exclude     => \@exclude,
+                               is_fragment => $is_fragment,
                                make_pretty => ( ! R2::Config->new()->is_production() ),
                              );
 
