@@ -150,6 +150,10 @@ div.contact-custom-field span.label {
     margin-right: 0.5em;
 }
 
+ul.table-summary {
+    margin-top: 0;
+}
+
 ul.donation-totals li {
     font-weight: bold;
 }
