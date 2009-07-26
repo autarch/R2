@@ -42,7 +42,7 @@
     </tr>
 %      if ( my $note = $donation->note() ) {
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %> note">
-      <td colspan="<% $can_edit_donations ? 7 : 5 %>"><% format_note( $note ) | n %></td>
+      <td colspan="<% $can_edit_donations ? 10 : 8 %>"><% format_note( $note ) | n %></td>
     </tr>
 %      }
   </tbody>

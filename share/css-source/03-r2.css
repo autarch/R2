@@ -191,12 +191,13 @@ table.standard-table tr.note {
 }
 
 table.standard-table tr.note td {
-    padding-bottom: 0;
     padding-top: 0;
 }
 
 table.standard-table tr.note td p {
-    margin-left: 1em;
+    font-size: 90%;
+    margin-bottom: 0;
+    margin-left: 0.2em;
 }
 
 /* === Forms === */
