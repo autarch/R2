@@ -17,7 +17,8 @@
     <div class="form-item <% @errors ? 'error' : q{} %>">
       <label class="for-field" for="<% $field->html_name() %>"><% $field->label() %>:</label>
 %       }
-      <input type="<% $field->render_as() %>"
+      <input id="<% $field->html_name() %>"
+             type="<% $field->render_as() %>"
              class="<% $field->render_as() eq 'checkbox' ? 'checkbox' : q{} %>"
              name="<% $field->html_name() %>"
 %       if ( $field->render_as() eq 'checkbox' || $field->render_as() eq 'radio' ) {
