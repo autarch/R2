@@ -8,7 +8,7 @@ use base 'Module::Build';
 
 my %Requires =
     ( 'autodie'                                  => '0',
-      'Catalyst'                                 => '5.80001',
+      'Catalyst'                                 => '5.80007',
       'Catalyst::Action::REST'                   => '0.5',
       'Catalyst::App::RoleApplicator'            => '0',
       'Catalyst::DR'                             => '0',
@@ -16,6 +16,7 @@ my %Requires =
       'Catalyst::Plugin::Log::Dispatch'          => '0',
       'Catalyst::Plugin::RedirectAndDetach'      => '0',
       'Catalyst::Plugin::Session'                => '0.17',
+      'Catalyst::Plugin::Session::AsObject'      => '0',
       'Catalyst::Plugin::Session::State'         => '0',
       'Catalyst::Plugin::Session::State::URI'    => '0.11',
       'Catalyst::Plugin::Session::Store'         => '0',
@@ -64,6 +65,7 @@ my %Requires =
       'MooseX::Params::Validate'                 => '0.07',
       'MooseX::Role::Parameterized'              => '0.04',
       'MooseX::Singleton'                        => '0.12',
+      'MooseX::Types'                            => '0.16',
       'Net::OpenID::Consumer'                    => '0',
       'Path::Class'                              => '0',
       'Params::Validate'                         => '0',
