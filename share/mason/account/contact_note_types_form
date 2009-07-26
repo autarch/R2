@@ -31,7 +31,7 @@
       <input class="text medium no-label" type="text"
              name="contact_note_type_description_<% $type->contact_note_type_id() %>"
              value="<% $type->description() %>" />
-%   if ( ! $type->is_deleteable() ) {
+%   if ( ! $type->is_deletable() ) {
       <div class="help-text">
         <p>
           You can change this type's description, but it cannot be deleted because it is still associated with <% $type->note_count() %> note <% PL_N( 'note', $type->note_count() ) %>.

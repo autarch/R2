@@ -19,7 +19,7 @@
 % while ( my $source = $sources->next() ) {
       <input class="text medium no-label" type="text" name="donation_source_name_<% $source->donation_source_id() %>"
              value="<% $source->name() %>" />
-%   if ( ! $source->is_deleteable() ) {
+%   if ( ! $source->is_deletable() ) {
       <div class="help-text">
         <p>
           You can change this source's name, but it cannot be deleted because it is still associated with <% $source->donation_count() %> <% PL_N( 'donation', $source->donation_count() ) %>.
