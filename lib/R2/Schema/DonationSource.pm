@@ -6,7 +6,7 @@ use warnings;
 use R2::Schema::Account;
 use R2::Schema::Donation;
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( PosOrZeroInt );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -26,7 +26,7 @@ use MooseX::ClassAttribute;
     has 'donation_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => __PACKAGE__->_BuildDonationCountSelect(),
           bind_params => sub { $_[0]->donation_source_id() },

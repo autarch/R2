@@ -6,7 +6,6 @@ use warnings;
 use LWPx::ParanoidAgent;
 use Net::OpenID::Consumer;
 use R2::Schema::User;
-use R2::Web::Form::Login;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -19,15 +18,10 @@ sub login_form : Local
     my $self = shift;
     my $c    = shift;
 
-    $self->_set_form
-        ( $c,
-          'Login',
-          '/user/authentication',
-          {
-           return_to => $c->request()->parameters->{'return_to'}
-           || $c->domain()->application_uri( path => q{} ),
-          },
-        );
+    $c->stash()->{return_to}
+        = $c->request()->parameters->{return_to}
+          || $c->session_object()->form_data()->{return_to}
+          || $c->domain()->application_uri( path => q{} );
 }
 
 sub authentication : Local : ActionClass('+R2::Action::REST') { }
@@ -55,32 +49,32 @@ sub authentication_POST
     my $self = shift;
     my $c    = shift;
 
-    my $form = R2::Web::Form::Login->new( action => '/user/authentication',
-                                          params => $c->request()->params(),
-                                        );
+    my $username = $c->request()->param('username');
+    my $pw       = $c->request()->param('password');
 
-    my $username = $form->param('username');
-    my $pw       = $form->param('password');
+    my @errors;
+
+    push @errors, { field   => 'password',
+                    message => 'You must provide a password.' }
+        if string_is_empty($pw);
 
     my $user;
-
-    if ( $form->is_valid() )
+    unless (@errors)
     {
         $user = R2::Schema::User->new( username => $username,
                                        password => $pw,
                                      );
 
-        unless ($user)
-        {
-            $form->add_error( message => 'The username or password you provided was not valid.' );
-        }
+        push @errors, 'The username or password you provided was not valid.'
+            unless $user;
     }
 
     unless ($user)
     {
         $c->redirect_with_error
-            ( form => $form,
-              uri  => $c->domain()->application_uri( path => '/user/login_form' ),
+            ( error     => R2::Exception::DataValidation->new( errors => \@errors ),
+              uri       => $c->domain()->application_uri( path => '/user/login_form' ),
+              form_data => $c->request()->parameters(),
             );
     }
 
@@ -226,3 +220,4 @@ no Moose;
 __PACKAGE__->meta()->make_immutable();
 
 1;
+

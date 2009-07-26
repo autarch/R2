@@ -15,7 +15,7 @@ use R2::Schema::EmailAddress;
 use R2::Schema::File;
 use R2::Schema::PhoneNumber;
 use R2::Schema::Website;
-use R2::Types;
+use R2::Types qw( PosOrZeroInt Bool HashRef );
 use R2::Util qw( string_is_empty );
 
 # cannot load these because of circular dependency problems
@@ -54,7 +54,7 @@ with 'R2::Role::Schema::URIMaker';
 
         has 'is_' . $type =>
             ( is       => 'ro',
-              isa      => 'Bool',
+              isa      => Bool,
               lazy     => 1,
               default  => sub { $_[0]->contact_type() eq ucfirst $type ? 1 : 0 },
               init_arg => undef,
@@ -155,7 +155,7 @@ with 'R2::Role::Schema::URIMaker';
     has 'donation_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => __PACKAGE__->_BuildDonationCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
@@ -174,7 +174,7 @@ with 'R2::Role::Schema::URIMaker';
     has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => __PACKAGE__->_BuildNoteCountSelect(),
           bind_params => sub { $_[0]->contact_id() },
@@ -195,7 +195,7 @@ with 'R2::Role::Schema::URIMaker';
     has '_custom_field_values' =>
         ( metaclass  => 'Collection::Hash',
           is         => 'ro',
-          isa        => 'HashRef',
+          isa        => HashRef,
           lazy_build => 1,
           provides   => { 'get' => 'custom_field_value',
                           'set' => '_set_custom_field_value',

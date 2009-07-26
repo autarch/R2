@@ -3,7 +3,7 @@ package R2::Web::Session;
 use strict;
 use warnings;
 
-use R2::Types;
+use R2::Types qw( ArrayRef HashRef NonEmptyStr ErrorForSession );
 
 use Moose;
 use MooseX::AttributeHelpers;
@@ -11,16 +11,17 @@ use MooseX::Params::Validate qw( pos_validated_list );
 use MooseX::SemiAffordanceAccessor;
 use MooseX::StrictConstructor;
 
-has form =>
-    ( is        => 'rw',
-      isa       => 'Chloro::Object',
-      predicate => 'has_form',
+has form_data =>
+    ( is      => 'rw',
+      isa     => 'HashRef',
+      lazy    => 1,
+      default => sub { {} },
     );
 
 has _errors =>
     ( metaclass => 'Collection::Array',
       is        => 'ro',
-      isa       => 'ArrayRef[R2.Type.NonEmptyStr]',
+      isa       => ArrayRef[NonEmptyStr|HashRef],
       default   => sub { [] },
       init_arg  => undef,
       provides  => { push     => 'add_error',
@@ -31,7 +32,7 @@ has _errors =>
 has _messages =>
     ( metaclass => 'Collection::Array',
       is        => 'ro',
-      isa       => 'ArrayRef[R2.Type.NonEmptyStr]',
+      isa       => ArrayRef[NonEmptyStr],
       default   => sub { [] },
       init_arg  => undef,
       provides  => { push     => 'add_message',
@@ -50,7 +51,7 @@ around add_error => sub
 sub _error_text
 {
     my $self = shift;
-    my $e    = pos_validated_list( \@_, { isa => 'R2.Type.ErrorForSession' } );
+    my ($e)  = pos_validated_list( \@_, { isa => ErrorForSession } );
 
     if ( eval { $e->can('messages') } && $e->messages() )
     {

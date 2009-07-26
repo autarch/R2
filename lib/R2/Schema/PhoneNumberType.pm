@@ -6,7 +6,7 @@ use warnings;
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( PosOrZeroInt );
 
 use Fey::ORM::Table;
 
@@ -38,7 +38,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
               is          => 'ro',
-              isa         => 'R2.Type.PosOrZeroInt',
+              isa         => PosOrZeroInt,
               lazy        => 1,
               select      => $select,
               bind_params => sub { $_[0]->phone_number_type_id(), $type },
@@ -59,7 +59,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
     has 'contact_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->phone_number_type_id() },

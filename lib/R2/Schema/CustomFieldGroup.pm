@@ -9,7 +9,7 @@ use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::HTMLWidget;
 use R2::Schema::CustomField;
-use R2::Types;
+use R2::Types qw( ArrayRef Str PosOrZeroInt );
 use R2::Util qw( string_is_empty );
 use Sub::Name qw( subname );
 
@@ -39,7 +39,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     has 'custom_field_ids' =>
         ( is       => 'ro',
-          isa      => 'ArrayRef',
+          isa      => ArrayRef,
           lazy     => 1,
           default  => sub { [ map { $_->custom_field_id() } $_[0]->custom_fields()->all() ] },
           init_arg => undef,
@@ -47,7 +47,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     has 'custom_field_count' =>
         ( is       => 'ro',
-          isa      => 'R2.Type.PosOrZeroInt',
+          isa      => PosOrZeroInt,
           lazy     => 1,
           default  => sub { scalar @{ $_[0]->custom_field_ids() } },
           init_arg => undef,
@@ -94,7 +94,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
         has lc $contact_type . '_count' =>
             ( is       => 'ro',
-              isa      => 'R2.Type.PosOrZeroInt',
+              isa      => PosOrZeroInt,
               lazy     => 1,
               default  => $get_count,
               init_arg => undef,
@@ -135,7 +135,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     has 'contact_count' =>
         ( is       => 'ro',
-          isa      => 'R2.Type.PosOrZeroInt',
+          isa      => PosOrZeroInt,
           lazy     => 1,
           default  => $get_count,
           init_arg => undef,
@@ -143,7 +143,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     class_has '_ValidationSteps' =>
         ( is      => 'ro',
-          isa     => 'ArrayRef[Str]',
+          isa     => ArrayRef[Str],
           lazy    => 1,
           default => sub { [ qw( _display_order_is_unique _applies_to_something _cannot_unapply ) ] },
         );

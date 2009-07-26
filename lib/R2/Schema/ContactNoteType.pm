@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( PosOrZeroInt );
 
 use Fey::ORM::Table;
 
@@ -29,7 +29,7 @@ use Fey::ORM::Table;
     has 'note_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->contact_note_type_id() },

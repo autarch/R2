@@ -3,19 +3,19 @@ package R2::Search;
 use strict;
 use warnings;
 
-use R2::Types;
+use R2::Types qw( PosInt PosOrZeroInt );
 
 use Moose;
 
 has 'limit' =>
     ( is      => 'ro',
-      isa     => 'R2.Type.PosOrZeroInt',
+      isa     => PosOrZeroInt,
       default => 0,
     );
 
 has 'page' =>
     ( is      => 'ro',
-      isa     => 'R2.Type.PosInt',
+      isa     => PosInt,
       default => 1,
     );
 

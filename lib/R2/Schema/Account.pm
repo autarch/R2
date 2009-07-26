@@ -25,7 +25,7 @@ use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
 use R2::Schema::Person;
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( Bool ArrayRef HashRef PosOrZeroInt );
 use R2::Util qw( string_is_empty );
 use Sub::Name qw( subname );
 
@@ -111,7 +111,7 @@ with 'R2::Role::Schema::URIMaker';
 
     has '_messaging_provider_id_hash' =>
         ( is         => 'ro',
-          isa        => 'HashRef',
+          isa        => HashRef,
           lazy_build => 1,
           init_arg   => undef,
         );
@@ -212,7 +212,7 @@ sub add_country
     my ( $country, $is_default ) =
         validated_list( \@_,
                         country    => { isa => 'R2::Schema::Country' },
-                        is_default => { isa => 'Bool' },
+                        is_default => { isa => Bool },
                       );
 
     R2::Schema::AccountCountry->insert
@@ -513,7 +513,7 @@ sub _AddSQLMethods
         has lc $type . '_count' =>
             ( metaclass   => 'FromSelect',
               is          => 'ro',
-              isa         => 'R2.Type.PosOrZeroInt',
+              isa         => PosOrZeroInt,
               lazy        => 1,
               select      => __PACKAGE__->$build_count_meth(),
               bind_params => sub { $_[0]->account_id() },
@@ -523,7 +523,7 @@ sub _AddSQLMethods
 
         has lc $type . '_address_types' =>
             ( is      => 'ro',
-              isa     => 'ArrayRef[R2::Schema::AddressType]',
+              isa     => ArrayRef['R2::Schema::AddressType'],
               lazy    => 1,
               default => sub { [ grep { $_->$applies_meth() }
                                  $_[0]->address_types()->all() ] },
@@ -531,7 +531,7 @@ sub _AddSQLMethods
 
         has lc $type . '_phone_number_types' =>
             ( is      => 'ro',
-              isa     => 'ArrayRef[R2::Schema::PhoneNumberType]',
+              isa     => ArrayRef['R2::Schema::PhoneNumberType'],
               lazy    => 1,
               default => sub { [ grep { $_->$applies_meth() }
                                  $_[0]->phone_number_types()->all() ] },
@@ -551,7 +551,7 @@ sub _AddSQLMethods
     has 'custom_field_group_count' =>
         ( metaclass   => 'FromSelect',
           is          => 'ro',
-          isa         => 'R2.Type.PosOrZeroInt',
+          isa         => PosOrZeroInt,
           lazy        => 1,
           select      => $select,
           bind_params => sub { $_[0]->account_id() },

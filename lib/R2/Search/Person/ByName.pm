@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( NonEmptyStr );
 
 use Moose;
 
@@ -12,7 +12,7 @@ extends 'R2::Search::Person';
 
 has 'name' =>
     ( is  => 'ro',
-      isa => 'R2.Type.NonEmptyStr',
+      isa => NonEmptyStr,
     );
 
 

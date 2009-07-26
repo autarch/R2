@@ -7,7 +7,7 @@ use Image::Magick;
 use List::AllUtils qw( min );
 use Path::Class ();
 use R2::Schema::File;
-use R2::Types;
+use R2::Types qw( FileIsImage PosInt Int );
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -17,7 +17,7 @@ use Moose::Util::TypeConstraints;
 
 has 'file' =>
     ( is       => 'ro',
-      isa      => 'R2.Type.FileIsImage',
+      isa      => FileIsImage,
       required => 1,
       handles  => [ 'path', 'uri' ],
     );
@@ -33,7 +33,7 @@ has '_magick' =>
 
 has 'height' =>
     ( is       => 'ro',
-      isa      => 'R2.Type.PosInt',
+      isa      => PosInt,
       lazy     => 1,
       default  => sub { $_[0]->_magick()->get('height') },
       init_arg => undef,
@@ -41,7 +41,7 @@ has 'height' =>
 
 has 'width' =>
     ( is       => 'ro',
-      isa      => 'R2.Type.PosInt',
+      isa      => PosInt,
       lazy     => 1,
       default  => sub { $_[0]->_magick()->get('width') },
       init_arg => undef,
@@ -52,8 +52,8 @@ sub resize
     my $self = shift;
     my ( $height, $width ) =
         validated_list( \@_,
-                        height => { isa => 'Int' },
-                        width  => { isa => 'Int' },
+                        height => { isa => Int },
+                        width  => { isa => Int },
                       );
 
     ( $height, $width ) = $self->_new_dimensions( $height, $width );
