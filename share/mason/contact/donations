@@ -34,7 +34,7 @@
 %     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
-        <form class="inline" action="<% $donation->uri( view => 'confirm_deletion' ) %>" method="GET">
+        <form class="inline" action="<% $donation->uri( view => 'confirm_deletion' ) %>" method="get">
           <input type="submit" class="submit" value="Delete" />
         </form>
       </td>
