@@ -45,6 +45,7 @@
           <a href="<% $account->uri( view => 'search/organization' ) %>"
              title="Add a new organization">Organizations</a>
         </li>
+      </ul>
     </div>
 
 <%init>
