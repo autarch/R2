@@ -19,7 +19,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
 
     my $account = R2::Schema::Account->new( account_id => $account_id );
 
-    $c->redirect_and_detach('/')
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $account;
 
     unless ( $c->model('Authz')->user_can_view_account( user    => $c->user(),
@@ -28,7 +28,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
     {
         $c->redirect_with_error
             ( error => 'You are not authorized to view this account',
-              uri   => $c->domain()->application_uri( path => '/' ),
+              uri   => $c->domain()->application_uri( path => q{} ),
             );
     }
 
@@ -40,7 +40,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
     {
         $c->redirect_with_error
             ( error => 'You are not authorized to edit this account',
-              uri   => $c->domain()->application_uri( path => '/' ),
+              uri   => $c->domain()->application_uri( path => q{} ),
             );
     }
 
@@ -365,7 +365,7 @@ sub _set_custom_field_group : Chained('_set_account') : PathPart('custom_field_g
 
     my $group = R2::Schema::CustomFieldGroup->new( custom_field_group_id => $custom_field_group_id );
 
-    $c->redirect_and_detach('/')
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $group;
 
     $c->stash()->{group} = $group;

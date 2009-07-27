@@ -212,7 +212,11 @@ sub _login_user
 
     $c->session_object()->add_message( 'Welcome to the site, ' . $user->first_name() );
 
-    $c->redirect_and_detach( $c->request()->parameters()->{return_to} || '/' );
+    my $redirect_to =
+        $c->request()->parameters()->{return_to}
+        || $c->domain()->application_uri( path => q{} );
+
+    $c->redirect_and_detach($redirect_to);
 }
 
 no Moose;

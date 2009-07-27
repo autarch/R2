@@ -22,17 +22,12 @@ sub new_person_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
-
-    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $account,
-                                                     ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add contacts',
-              uri   => $account->uri(),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_add_contact',
+                         { account => $c->account() },
+                         'You are not allowed to add contacts.',
+                         $c->account()->uri(),
+                       );
 
     $c->stash()->{template} = '/person/new_person_form';
 }
@@ -42,17 +37,12 @@ sub new_household_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
-
-    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $account,
-                                                     ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add contacts',
-              uri   => $account->uri(),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_add_contact',
+                         { account => $c->account() },
+                         'You are not allowed to add contacts.',
+                         $c->account()->uri(),
+                       );
 
     $c->stash()->{template} = '/household/new_household_form';
 }
@@ -62,17 +52,12 @@ sub new_organization_form : Local
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
-
-    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $account,
-                                                     ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add contacts',
-              uri   => $account->uri(),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_add_contact',
+                         { account => $c->account() },
+                         'You are not allowed to add contacts.',
+                         $c->account()->uri(),
+                       );
 
     $c->stash()->{template} = '/organization/new_organization_form';
 }
@@ -85,18 +70,15 @@ sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : Capt
 
     my $contact = R2::Schema::Contact->new( contact_id => $contact_id );
 
-    $c->redirect_and_detach('/')
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $contact;
 
-    unless ( $c->model('Authz')->user_can_view_contact( user    => $c->user(),
-                                                        contact => $contact,
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not authorized to view this contact',
-              uri   => $c->account()->uri(),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_view_contact',
+                         { contact => $contact },
+                         'You are not authorized to view this contact',
+                         $c->account()->uri(),
+                       );
 
     $c->stash()->{tabs} = $self->_contact_view_tabs($contact);
 
@@ -213,18 +195,14 @@ sub donations_POST : Private
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add donations',
-              uri   => $contact->uri( view => 'donations' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to add donations.',
+                         $contact->uri( view => 'donations' ),
+                       );
 
     my %p = $c->request()->donation_params();
     $p{date_format} = $c->request()->params()->{date_format};
@@ -253,7 +231,7 @@ sub _set_donation : Chained('_set_contact') : PathPart('donation') : CaptureArgs
 
     my $donation = R2::Schema::Donation->new( donation_id => $donation_id );
 
-    $c->redirect_and_detach('/')
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $donation && $donation->contact_id() == $c->stash()->{contact}->contact_id();
 
     $c->stash()->{donation} = $donation;
@@ -264,18 +242,14 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to edit donations',
-              uri   => $contact->uri( view => 'donations' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to edit donations.',
+                         $contact->uri( view => 'donations' ),
+                       );
 
     $c->stash()->{template} = '/donation/edit_form';
 }
@@ -287,18 +261,14 @@ sub donation_PUT
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to edit donations',
-              uri   => $contact->uri( view => 'donations' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to edit donations.',
+                         $contact->uri( view => 'donations' ),
+                       );
 
     my %p = $c->request()->donation_params();
     $p{date_format} = $c->request()->params()->{date_format};
@@ -326,18 +296,14 @@ sub donation_DELETE
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to delete donations',
-              uri   => $contact->uri( view => 'donations' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to delete donations.',
+                         $contact->uri( view => 'donations' ),
+                       );
 
     my $donation = $c->stash()->{donation};
 
@@ -362,18 +328,14 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to delete donations',
-              uri   => $contact->uri( view => 'donations' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to delete donations.',
+                         $contact->uri( view => 'donations' ),
+                       );
 
     my $donation = $c->stash()->{donation};
 
@@ -391,7 +353,7 @@ sub _set_note : Chained('_set_contact') : PathPart('note') : CaptureArgs(1)
 
     my $note = R2::Schema::ContactNote->new( contact_note_id => $contact_note_id );
 
-    $c->redirect_and_detach('/')
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $note && $note->contact_id() == $c->stash()->{contact}->contact_id();
 
     $c->stash()->{note} = $note;
@@ -402,18 +364,14 @@ sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0)
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to edit notes',
-              uri   => $contact->uri( view => 'notes' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to edit notes.',
+                         $contact->uri( view => 'notes' ),
+                       );
 
     $c->stash()->{template} = '/note/edit_form';
 }
@@ -440,18 +398,14 @@ sub notes_POST : Private
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add notes',
-              uri   => $contact->uri( view => 'notes' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to add notes.',
+                         $contact->uri( view => 'notes' ),
+                       );
 
     my %p = $c->request()->note_params();
     $p{datetime_format} = $c->request()->params()->{datetime_format};
@@ -481,18 +435,14 @@ sub note_PUT
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to edit notes',
-              uri   => $contact->uri( view => 'notes' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to edit notes.',
+                         $contact->uri( view => 'notes' ),
+                       );
 
     my %p = $c->request()->note_params();
     $p{datetime_format} = $c->request()->params()->{datetime_format};
@@ -520,18 +470,14 @@ sub note_DELETE
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to delete notes',
-              uri   => $contact->uri( view => 'notes' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to delete notes.',
+                         $contact->uri( view => 'notes' ),
+                       );
 
     my $note = $c->stash()->{note};
 
@@ -556,18 +502,14 @@ sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') 
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
     my $contact = $c->stash()->{contact};
 
-    unless ( $c->model('Authz')->user_can_edit_contact( user    => $c->user(),
-                                                        contact => $c->stash()->{contact},
-                                                      ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to delete notes',
-              uri   => $contact->uri( view => 'notes' ),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { contact => $contact },
+                         'You are not allowed to delete notes.',
+                         $contact->uri( view => 'notes' ),
+                       );
 
     my $note = $c->stash()->{note};
 

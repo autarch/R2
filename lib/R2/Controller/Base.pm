@@ -112,6 +112,26 @@ sub _require_authen
     $c->redirect_and_detach( '/user/login_form' );
 }
 
+sub _check_authz
+{
+    my $self         = shift;
+    my $c            = shift;
+    my $authz_method = shift;
+    my $authz_params = shift;
+    my $error        = shift;
+    my $uri          = shift;
+
+    return if
+        $c->model('Authz')->$authz_method( user => $c->user(),
+                                           %{ $authz_params },
+                                         );
+
+    $c->redirect_with_error
+        ( error => $error,
+          uri   => $uri,
+        );
+}
+
 no Moose;
 
 __PACKAGE__->meta()->make_immutable();
