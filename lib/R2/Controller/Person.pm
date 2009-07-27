@@ -55,15 +55,12 @@ sub person_POST
 
     my $account = $c->account();
 
-    unless ( $c->model('Authz')->user_can_add_contact( user    => $c->user(),
-                                                       account => $account,
-                                                     ) )
-    {
-        $c->redirect_with_error
-            ( error => 'You are not allowed to add contacts',
-              uri   => $account->uri(),
-            );
-    }
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { account => $account },
+                         'You are not allowed to add contacts',
+                         $account->uri(),
+                       );
 
     my %p = $c->request()->person_params();
     $p{account_id} = $account->account_id();
