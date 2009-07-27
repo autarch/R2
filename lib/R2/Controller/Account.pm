@@ -5,7 +5,6 @@ use warnings;
 
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
-use R2::URI qw( dynamic_uri );
 
 use Moose;
 
@@ -27,9 +26,9 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
                                                         account => $account,
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not authorized to view this account',
-              uri   => dynamic_uri( path => '/' ),
+              uri   => $c->domain()->application_uri( path => '/' ),
             );
     }
 
@@ -39,9 +38,9 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1)
                                                         account => $account,
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not authorized to edit this account',
-              uri   => dynamic_uri( path => '/' ),
+              uri   => $c->domain()->application_uri( path => '/' ),
             );
     }
 
@@ -73,14 +72,14 @@ sub account_PUT : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'edit_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'edit_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The ' . $account->name() . ' account has been updated' );
+    $c->session_object()->add_message( 'The ' . $account->name() . ' account has been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
@@ -111,14 +110,14 @@ sub donation_source_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'donation_sources_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'donation_sources_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The donation sources for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The donation sources for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
@@ -143,14 +142,14 @@ sub donation_target_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'donation_targets_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'donation_targets_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The donation targets for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The donation targets for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
@@ -175,14 +174,14 @@ sub payment_type_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'payment_types_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'payment_types_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The payment types for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The payment types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
@@ -207,14 +206,14 @@ sub address_type_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'address_types_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'address_types_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The address types for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The address types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
@@ -250,14 +249,14 @@ sub phone_number_type_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'phone_number_types_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'phone_number_types_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The phone number types for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The phone number types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
@@ -282,14 +281,14 @@ sub contact_note_type_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'contact_note_types_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'contact_note_types_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The contact history types for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The contact history types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
@@ -314,14 +313,14 @@ sub messaging_provider_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'messaging_providers_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'messaging_providers_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The instant messaging providers for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The instant messaging providers for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
@@ -346,14 +345,14 @@ sub custom_field_group_collection_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'custom_field_groups_form' ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'custom_field_groups_form' ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The custom field groups for ' . $account->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The custom field groups for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
 }
@@ -400,14 +399,14 @@ sub custom_field_group_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
-            ( error  => $e,
-              uri    => $account->uri( view => 'custom_field_group/' . $group->custom_field_group_id() ),
-              params => $c->request()->params(),
+        $c->redirect_with_error
+            ( error     => $e,
+              uri       => $account->uri( view => 'custom_field_group/' . $group->custom_field_group_id() ),
+              form_data => $c->request()->params(),
             );
     }
 
-    $c->add_message( 'The custom fields for ' . $group->name() . ' have been updated' );
+    $c->session_object()->add_message( 'The custom fields for ' . $group->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'custom_field_groups_form' ) );
 }

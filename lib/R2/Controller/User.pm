@@ -103,10 +103,10 @@ sub authentication_POST
         {
             my $error = sprintf( $OpenIDErrors{ $csr->errcode() }, $uri );
 
-            $c->_redirect_with_error
-                ( error  => $error,
-                  uri    => $c->domain()->application_uri( path => '/user/login_form' ),
-                  params => { openid_uri => $uri },
+            $c->redirect_with_error
+                ( error     => $error,
+                  uri       => $c->domain()->application_uri( path => '/user/login_form' ),
+                  form_data => { openid_uri => $uri },
                 );
         }
 
@@ -156,18 +156,18 @@ sub openid_authentication : Local
     }
     elsif ( $csr->user_cancel() )
     {
-        $c->_redirect_with_error
-            ( error  => 'You can still login without OpenID, or make a new account',
-              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
+        $c->redirect_with_error
+            ( error => 'You can still login without OpenID, or make a new account',
+              uri   => $c->domain()->application_uri( path => '/user/login_form' ),
             );
     }
 
     my $identity = $csr->verified_identity();
     unless ($identity)
     {
-        $c->_redirect_with_error
-            ( error  => 'Something went mysteriously wrong trying to authenticate you with OpenID',
-              uri    => $c->domain()->application_uri( path => '/user/login_form' ),
+        $c->redirect_with_error
+            ( error => 'Something went mysteriously wrong trying to authenticate you with OpenID',
+              uri   => $c->domain()->application_uri( path => '/user/login_form' ),
             );
     }
 
@@ -176,10 +176,10 @@ sub openid_authentication : Local
     unless ($user)
     {
         # XXXXXXX?
-        $c->_redirect_with_error
-            ( error  => 'Now you need to create a Rapport account for your OpenID URL',
-              uri    => $c->domain()->application_uri( path => '/user/new_user_form' ),
-              params => { openid_uri => $identity->url() },
+        $c->redirect_with_error
+            ( error     => 'Now you need to create a Rapport account for your OpenID URL',
+              uri       => $c->domain()->application_uri( path => '/user/new_user_form' ),
+              form_data => { openid_uri => $identity->url() },
             );
     }
 

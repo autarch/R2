@@ -28,7 +28,7 @@ sub new_person_form : Local
                                                        account => $account,
                                                      ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to add contacts',
               uri   => $account->uri(),
             );
@@ -48,7 +48,7 @@ sub new_household_form : Local
                                                        account => $account,
                                                      ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to add contacts',
               uri   => $account->uri(),
             );
@@ -68,7 +68,7 @@ sub new_organization_form : Local
                                                        account => $account,
                                                      ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to add contacts',
               uri   => $account->uri(),
             );
@@ -92,7 +92,7 @@ sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : Capt
                                                         contact => $contact,
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not authorized to view this contact',
               uri   => $c->account()->uri(),
             );
@@ -220,7 +220,7 @@ sub donations_POST : Private
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to add donations',
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -236,7 +236,7 @@ sub donations_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -271,7 +271,7 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to edit donations',
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -294,7 +294,7 @@ sub donation_PUT
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to edit donations',
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -312,7 +312,7 @@ sub donation_PUT
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $donation->uri( view => 'edit_form' ),
             );
@@ -333,7 +333,7 @@ sub donation_DELETE
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to delete donations',
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -348,7 +348,7 @@ sub donation_DELETE
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -369,7 +369,7 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to delete donations',
               uri   => $contact->uri( view => 'donations' ),
             );
@@ -409,7 +409,7 @@ sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0)
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to edit notes',
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -447,7 +447,7 @@ sub notes_POST : Private
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to add notes',
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -465,7 +465,7 @@ sub notes_POST : Private
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -488,7 +488,7 @@ sub note_PUT
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to edit notes',
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -506,7 +506,7 @@ sub note_PUT
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $note->uri( view => 'edit_form' ),
             );
@@ -527,7 +527,7 @@ sub note_DELETE
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to delete notes',
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -542,7 +542,7 @@ sub note_DELETE
 
     if ( my $e = $@ )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => $e,
               uri   => $contact->uri( view => 'notes' ),
             );
@@ -563,7 +563,7 @@ sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') 
                                                         contact => $c->stash()->{contact},
                                                       ) )
     {
-        $c->_redirect_with_error
+        $c->redirect_with_error
             ( error => 'You are not allowed to delete notes',
               uri   => $contact->uri( view => 'notes' ),
             );

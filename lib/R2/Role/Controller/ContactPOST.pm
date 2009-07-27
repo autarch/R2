@@ -208,9 +208,9 @@ sub _insert_contact
     {
         my $e = R2::Exception::DataValidation->new( errors => $errors );
 
-        $c->_redirect_with_error( error  => $e,
-                                  uri    => '/contact/new_person_form',
-                                  params => $c->request()->params(),
+        $c->redirect_with_error( error     => $e,
+                                 uri       => '/contact/new_person_form',
+                                 form_data => $c->request()->params(),
                                 );
     }
 
