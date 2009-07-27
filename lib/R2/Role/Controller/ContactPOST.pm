@@ -40,9 +40,9 @@ sub _get_email_addresses
     {
         my @e =
             R2::Schema::EmailAddress->ValidateForInsert
-                    ( %{ $emails->{$suffix} },
-                      contact_id => 1,
-                    );
+                ( %{ $emails->{$suffix} },
+                  contact_id => 1,
+                );
 
         $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
 
