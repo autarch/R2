@@ -338,7 +338,7 @@ sub _build_catalyst_config
           },
 
           authen_cookie =>
-          { name       => 'VegGuide-user',
+          { name       => 'R2-user',
             path       => '/',
             mac_secret => $self->secret(),
           },
