@@ -6,6 +6,7 @@ use warnings;
 our $VERSION = '0.01';
 
 use Catalyst::App::RoleApplicator;
+use Catalyst::Request::REST::ForBrowsers;
 use R2::Config;
 use R2::Request;
 use R2::Schema;
