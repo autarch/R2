@@ -68,27 +68,6 @@ sub end : Private
     return;
 }
 
-sub _set_form
-{
-    my $self   = shift;
-    my $c      = shift;
-    my $name   = shift;
-    my $action = shift;
-    my $params = shift;
-
-    my $class = 'R2::Web::Form::' . $name;
-
-    my $session_form = $c->session_object()->form();
-    if ( $session_form && $session_form->isa($class) )
-    {
-        $c->stash()->{form} = $session_form;
-    }
-    else
-    {
-        $c->stash()->{form} = $class->new( action => $action, params => $params || {} );
-    }
-}
-
 sub _set_entity
 {
     my $self   = shift;
