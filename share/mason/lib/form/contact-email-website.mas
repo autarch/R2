@@ -66,6 +66,10 @@ $websites = $contact->websites()
 </%init>
 
 <%def .email_address>
+% if ($email_address) {
+      <input type="hidden" name="email_address_id" value="<% $id %>" />
+% }
+
       <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $email_address ? [ $email_address ] : [] &>
       <div class="form-item">
         <label class="for-field" for="email_address-<% $id %>">Email address:</label>
@@ -83,9 +87,9 @@ $websites = $contact->websites()
 
       <div class="form-item no-label">
         <input type="radio" name="email_address_is_preferred" value="<% $id %>"
-               <% $is_preferred ? q{checked="checked"} : q{} %>
+               <% $is_preferred ? q{checked="checked"} : q{} | n %>
                id="email_address_is_preferred-<% $id %>" />
-        <label class="for-radio selected" for="email_address_is_preferred-<% $id %>"
+        <label class="for-radio <% $is_preferred ? 'selected' : q{} %>" for="email_address_is_preferred-<% $id %>"
                id="for-email_address_is_preferred-<% $id %>">This is the preferred email address</label>
       </div>
       </&>
@@ -97,6 +101,10 @@ $is_preferred => 0
 </%def>
 
 <%def .website>
+% if ($website) {
+      <input type="hidden" name="website_id" value="<% $id %>" />
+% }
+
       <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $website ? [ $website ] : [] &>
       <div class="form-item">
         <label class="for-field" for="label-<% $id %>">Label:</label>

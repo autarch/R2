@@ -1,4 +1,4 @@
-package R2::Role::Controller::ContactPOST;
+package R2::Role::Controller::ContactCRUD;
 
 use strict;
 use warnings;
@@ -9,8 +9,26 @@ use R2::Util qw( string_is_empty );
 
 use Moose::Role;
 
+sub _contact_params_for_class
+{
+    my $self  = shift;
+    my $c     = shift;
+    my $class = shift;
 
-sub _get_image
+    my ($type) = $class =~ /^R2::Schema::(\w+)/;
+
+    my $params_method = lc $type . '_params';
+
+    my %p = $c->request()->$params_method();
+    $p{account_id} = $c->account()->account_id();
+
+    my $format = $c->request()->params()->{date_format};
+    $p{date_format} = $format if defined $format;
+
+    return \%p;
+}
+
+sub _new_image
 {
     my $self   = shift;
     my $c      = shift;
@@ -28,7 +46,7 @@ sub _get_image
     return $image;
 }
 
-sub _get_email_addresses
+sub _new_email_addresses
 {
     my $self   = shift;
     my $c      = shift;
@@ -52,7 +70,31 @@ sub _get_email_addresses
     return [ values %{ $emails } ];
 }
 
-sub _get_websites
+sub _updated_email_addresses
+{
+    my $self   = shift;
+    my $c      = shift;
+    my $errors = shift;
+
+    my $emails = $c->request()->new_email_address_param_sets();
+
+    for my $suffix ( keys %{ $emails } )
+    {
+        my @e =
+            R2::Schema::EmailAddress->ValidateForInsert
+                ( %{ $emails->{$suffix} },
+                  contact_id => 1,
+                );
+
+        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
+
+        push @{ $errors }, @e;
+    }
+
+    return [ values %{ $emails } ];
+}
+
+sub _new_websites
 {
     my $self   = shift;
     my $c      = shift;
@@ -76,7 +118,7 @@ sub _get_websites
     return [ values %{ $sites } ];
 }
 
-sub _get_addresses
+sub _new_addresses
 {
     my $self   = shift;
     my $c      = shift;
@@ -100,7 +142,7 @@ sub _get_addresses
     return [ values %{ $addresses } ];
 }
 
-sub _get_phone_numbers
+sub _new_phone_numbers
 {
     my $self   = shift;
     my $c      = shift;
@@ -124,7 +166,7 @@ sub _get_phone_numbers
     return [ values %{ $numbers } ];
 }
 
-sub _get_custom_fields
+sub _new_custom_fields
 {
     my $self   = shift;
     my $c      = shift;
@@ -183,20 +225,22 @@ sub _insert_contact
     my $self   = shift;
     my $c      = shift;
     my $class  = shift;
-    my $p      = shift;
-    my $errors = shift;
 
-    my $image = $self->_get_image( $c, $errors );
+    my $p = $self->_contact_params_for_class( $c, $class );
 
-    my $emails = $self->_get_email_addresses( $c, $errors );
+    my @errors = $class->ValidateForInsert( %{ $p } );
 
-    my $websites = $self->_get_websites( $c, $errors );
+    my $image = $self->_new_image( $c, \@errors );
 
-    my $addresses = $self->_get_addresses( $c, $errors );
+    my $emails = $self->_new_email_addresses( $c, \@errors );
 
-    my $phone_numbers = $self->_get_phone_numbers( $c, $errors );
+    my $websites = $self->_new_websites( $c, \@errors );
 
-    my $custom_fields = $self->_get_custom_fields( $c, $errors );
+    my $addresses = $self->_new_addresses( $c, \@errors );
+
+    my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
+
+    my $custom_fields = $self->_new_custom_fields( $c, \@errors );
 
     my $members;
     if ( $class->can('members') )
@@ -204,9 +248,9 @@ sub _insert_contact
         $members = $c->request()->members();
     }
 
-    if ( @{ $errors } )
+    if (@errors)
     {
-        my $e = R2::Exception::DataValidation->new( errors => $errors );
+        my $e = R2::Exception::DataValidation->new( errors => \@errors );
 
         $c->redirect_with_error( error     => $e,
                                  uri       => '/contact/new_person_form',
@@ -312,6 +356,142 @@ sub _make_insert_sub
             }
 
             return $thing;
+        };
+}
+
+sub _update_contact
+{
+    my $self    = shift;
+    my $c       = shift;
+    my $contact = shift;
+
+    my $p = $self->_contact_params_for_class( $c, ref $contact );
+
+    my @errors = $contact->validate_for_update( %{ $p } );
+
+    my $image = $self->_new_image( $c, \@errors );
+
+    my $emails = $self->_new_email_addresses( $c, \@errors );
+
+    my $websites = $self->_new_websites( $c, \@errors );
+
+    my $addresses = $self->_new_addresses( $c, \@errors );
+
+    my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
+
+    my $custom_fields = $self->_new_custom_fields( $c, \@errors );
+
+    my $members;
+    if ( $contact->can('members') )
+    {
+        $members = $c->request()->members();
+    }
+
+    if (@errors)
+    {
+        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+
+        $c->redirect_with_error( error     => $e,
+                                 uri       => '/contact/new_person_form',
+                                 form_data => $c->request()->params(),
+                                );
+    }
+
+    my $update_sub =
+        $self->_make_update_sub( $c,
+                                 $contact,
+                                 $p,
+                                 $image,
+                                 $emails,
+                                 $websites,
+                                 $addresses,
+                                 $phone_numbers,
+                                 $members,
+                                 $custom_fields,
+                               );
+
+    return R2::Schema->RunInTransaction($update_sub);
+}
+
+sub _make_update_sub
+{
+    my $self          = shift;
+    my $c             = shift;
+    my $contact       = shift;
+    my $contact_p     = shift;
+    my $image         = shift;
+    my $emails        = shift;
+    my $websites      = shift;
+    my $addresses     = shift;
+    my $phone_numbers = shift;
+    my $members       = shift;
+    my $custom_fields = shift;
+
+    my $user    = $c->user();
+    my $account = $c->account();
+
+    return
+        sub
+        {
+            if ($image)
+            {
+                my $file =
+                    R2::Schema::File->insert
+                        ( filename   => $image->basename(),
+                          contents   => scalar $image->slurp(),
+                          mime_type  => $image->type(),
+                          account_id => $contact_p->{account_id},
+                        );
+
+                $contact_p->{image_file_id} = $file->file_id();
+            }
+
+            $contact->update( %{ $contact_p }, user => $user );
+
+            for my $email ( @{ $emails } )
+            {
+                $contact->add_email_address( %{ $email }, user => $user );
+            }
+
+            for my $website ( @{ $websites } )
+            {
+                $contact->add_website( %{ $website }, user => $user );
+            }
+
+            for my $address ( @{ $addresses } )
+            {
+                $contact->add_address( %{ $address }, user => $user );
+            }
+
+            for my $number ( @{ $phone_numbers } )
+            {
+                $contact->add_phone_number( %{ $number }, user => $user );
+            }
+
+            if ($members)
+            {
+                for my $member ( @{ $members } )
+                {
+                    $contact->add_member( %{ $member }, user => $user );
+                }
+            }
+
+            my $note = $c->request()->params()->{note};
+            if ( ! string_is_empty($note) )
+            {
+                $contact->add_note
+                    ( note => $note,
+                      contact_note_type_id =>
+                          $account->made_a_note_contact_note_type()
+                                  ->contact_note_type_id(),
+                      user_id => $c->user()->user_id(),
+                    );
+            }
+
+            for my $pair ( @{ $custom_fields } )
+            {
+                $pair->[0]->set_value_for_contact( contact => $contact, value => $pair->[1] );
+            }
         };
 }
 

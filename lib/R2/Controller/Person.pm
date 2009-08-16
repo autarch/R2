@@ -15,7 +15,7 @@ use Moose;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-with 'R2::Role::Controller::ContactPOST';
+with 'R2::Role::Controller::ContactCRUD';
 
 
 sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) : ActionClass('+R2::Action::REST') { }
@@ -53,27 +53,17 @@ sub person_POST
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
-
     $self->_check_authz( $c,
-                         'user_can_edit_contact',
-                         { account => $account },
+                         'user_can_add_contact',
+                         { account => $c->account() },
                          'You are not allowed to add contacts.',
-                         $account->uri(),
+                         $c->account()->uri(),
                        );
-
-    my %p = $c->request()->person_params();
-    $p{account_id} = $account->account_id();
-    $p{date_format} = $c->request()->params()->{date_format};
-
-    my @errors = R2::Schema::Person->ValidateForInsert(%p);
 
     my $person =
         $self->_insert_contact
             ( $c,
               'R2::Schema::Person',
-              \%p,
-              \@errors,
             );
 
     $c->redirect_and_detach( $person->contact()->uri() );

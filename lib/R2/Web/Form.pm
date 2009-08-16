@@ -46,7 +46,7 @@ has 'errors' =>
 has 'form_data' =>
     ( is      => 'ro',
       isa     => 'R2::Web::FormData',
-      default => sub { R2::Web::FormData->new() },
+      default => sub { R2::Web::FormData->new( sources => [] ) },
     );
 
 has 'filled_in_form' =>

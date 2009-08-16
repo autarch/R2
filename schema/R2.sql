@@ -31,7 +31,7 @@ CREATE TABLE "Account" (
        account_id         SERIAL             PRIMARY KEY,
        name               VARCHAR(255)       UNIQUE  NOT NULL,
        domain_id          INTEGER            NOT NULL,
-       default_timezone   VARCHAR(50)        NOT NULL DEFAULT 'UTC',
+       default_time_zone  VARCHAR(50)        NOT NULL DEFAULT 'UTC',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_name CHECK ( name != '' )
 );

@@ -10,7 +10,7 @@ use Moose;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-with 'R2::Role::Controller::ContactPOST';
+with 'R2::Role::Controller::ContactCRUD';
 
 
 sub household : Chained('/account/_set_account') : PathPart('household') : Args(0) : ActionClass('+R2::Action::REST') { }
@@ -20,26 +20,17 @@ sub household_POST
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
-
     $self->_check_authz( $c,
-                         'user_can_edit_contact',
-                         { account => $account },
+                         'user_can_add_contact',
+                         { account => $c->account() },
                          'You are not allowed to add contacts.',
-                         $account->uri(),
+                         $c->account()->uri(),
                        );
-
-    my %p = $c->request()->household_params();
-    $p{account_id} = $account->account_id();
-
-    my @errors = R2::Schema::Household->ValidateForInsert(%p);
 
     my $household =
         $self->_insert_contact
             ( $c,
               'R2::Schema::Household',
-              \%p,
-              \@errors,
             );
 
     $c->redirect_and_detach( $household->uri() );

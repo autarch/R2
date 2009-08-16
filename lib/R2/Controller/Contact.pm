@@ -173,6 +173,37 @@ sub edit_form : Chained('_set_contact') : PathPart('edit_form') : Args(0)
     $c->stash()->{template} = "/$type/edit_form";
 }
 
+sub contact_PUT : Private
+{
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->account();
+
+    $self->_check_authz( $c,
+                         'user_can_edit_contact',
+                         { account => $account },
+                         'You are not allowed to edit contacts.',
+                         $account->uri(),
+                       );
+
+    my $contact = $c->stash()->{contact};
+
+    my $type = lc $contact->contact_type();
+
+    my %p = $c->request()->person_params();
+    $p{date_format} = $c->request()->params()->{date_format};
+
+    my @errors = R2::Schema::Person->ValidateForInsert(%p);
+
+    $self->_update_contact
+        ( $c,
+          'R2::Schema::Person',
+          \%p,
+          \@errors,
+        );
+}
+
 sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') { }
 
 sub donations_GET_html : Private
@@ -535,5 +566,9 @@ sub history_GET_html : Private
 
     $c->stash()->{template} = '/contact/history';
 }
+
+no Moose;
+
+__PACKAGE__->meta()->make_immutable();
 
 1;

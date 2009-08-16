@@ -5,7 +5,7 @@ use warnings;
 
 use Moose::Role;
 
-use List::AllUtils qw( false );
+use List::AllUtils qw( true );
 use R2::Util qw( string_is_empty );
 
 
@@ -224,136 +224,152 @@ sub contact_note_types
     return ( \%existing, \@new );
 }
 
+sub updated_email_address_param_sets
+{
+    my $self = shift;
+
+    return
+        $self->_updated_repeatable_param_sets
+            ( 'R2::Schema::EmailAddress',
+              'email_address_id',
+              'email_address',
+              sub { string_is_empty( $_[0]->{email_address} ) },
+              'has preferred',
+            );
+}
+
+sub _updated_repeatable_param_sets
+{
+    my $self           = shift;
+    my $class          = shift;
+    my $id_field       = shift;
+    my $key            = shift;
+    my $exclude_filter = shift;
+    my $has_preferred  = shift;
+
+    my %things;
+
+    my $params = $self->params();
+
+    for my $suffix ( $self->param($id_field) )
+    {
+        my %thing =
+            $self->_params_for_classes( [ $class ], $suffix );
+
+        next if $exclude_filter->( \%thing );
+
+        if ( ! string_is_empty( $params->{ $key . '_note' . q{-} . $suffix } ) )
+        {
+            $thing{note} = $params->{ $key . '_note' . q{-} . $suffix }
+        }
+
+        if ($has_preferred)
+        {
+            $thing{is_preferred} = $params->{ $key . '_is_preferred' } eq $suffix ? 1 : 0;
+        }
+
+        $things{$suffix} = \%thing;
+    }
+
+    return \%things;
+}
+
 sub new_email_address_param_sets
 {
     my $self = shift;
 
-    my $params = $self->params();
-
-    my %emails;
-
-    my $x = 1;
-    while (1)
-    {
-        my $suffix = 'new' . $x++;
-
-        last unless exists $params->{ 'email_address' . q{-} . $suffix };
-
-        my %email =
-            $self->_params_for_classes( [ 'R2::Schema::EmailAddress' ], $suffix );
-
-        next if string_is_empty( $email{email_address} );
-
-        if ( ! string_is_empty( $params->{ 'email_address_note' . q{-} . $suffix } ) )
-        {
-            $email{note} = $params->{ 'email_address_note' . q{-} . $suffix }
-        }
-
-        $email{is_preferred} = $params->{'email_address_is_preferred'} eq $suffix ? 1 : 0;
-
-        $emails{$suffix} = \%email;
-    }
-
-    return \%emails;
+    return
+        $self->_new_repeatable_param_sets
+            ( 'R2::Schema::EmailAddress',
+              'email_address',
+              'email_address',
+              sub { string_is_empty( $_[0]->{email_address} ) },
+              'has preferred',
+            );
 }
 
 sub new_website_param_sets
 {
     my $self = shift;
 
-    my $params = $self->params();
-
-    my %websites;
-
-    my $x = 1;
-    while (1)
-    {
-        my $suffix = 'new' . $x++;
-
-        last unless exists $params->{ 'uri' . q{-} . $suffix };
-
-        my %website =
-            $self->_params_for_classes( [ 'R2::Schema::Website' ], $suffix );
-
-        next if string_is_empty( $website{uri} );
-
-        if ( ! string_is_empty( $params->{ 'website_note' . q{-} . $suffix } ) )
-        {
-            $website{note} = $params->{ 'website_note' . q{-} . $suffix }
-        }
-
-        $websites{$suffix} = \%website;
-    }
-
-    return \%websites;
+    return
+        $self->_new_repeatable_param_sets
+            ( 'R2::Schema::Website',
+              'website',
+              'uri',
+              sub { string_is_empty( $_[0]->{uri} ) },
+            );
 }
 
 sub new_address_param_sets
 {
     my $self = shift;
 
-    my $params = $self->params();
-
-    my %addresses;
-
-    my $x = 1;
-    while (1)
-    {
-        my $suffix = 'new' . $x++;
-
-        last unless exists $params->{ 'address_type_id' . q{-} . $suffix };
-
-        my %address =
-            $self->_params_for_classes( [ 'R2::Schema::Address' ], $suffix );
-
-        # If it just has a type and country, we ignore it.
-        next unless ( false { string_is_empty($_) } values %address ) > 2;
-
-        $address{is_preferred} = $params->{'address_is_preferred'} eq $suffix ? 1 : 0;
-
-        if ( ! string_is_empty( $params->{ 'address_note' . q{-} . $suffix } ) )
-        {
-            $address{note} = $params->{ 'address_note' . q{-} . $suffix }
-        }
-
-        $addresses{$suffix} = \%address;
-    }
-
-    return \%addresses;
+    return
+        $self->_new_repeatable_param_sets
+            ( 'R2::Schema::Address',
+              'address',
+              'address_type_id',
+              # If it just has a type and country, we ignore it.
+              sub { ( true { ! string_is_empty($_) } values %{ $_[0] } ) <= 2 },
+              'has preferred',
+            );
 }
 
 sub new_phone_number_param_sets
 {
     my $self = shift;
 
+    return
+        $self->_new_repeatable_param_sets
+            ( 'R2::Schema::PhoneNumber',
+              'phone_number',
+              'phone_number_type_id',
+              # If it just has a type, we ignore it.
+              sub { ( true { ! string_is_empty($_) } values %{ $_[0] } ) <= 1 },
+              'has preferred',
+            );
+}
+
+sub _new_repeatable_param_sets
+{
+    my $self           = shift;
+    my $class          = shift;
+    my $key            = shift;
+    my $primary_field  = shift;
+    my $exclude_filter = shift;
+    my $has_preferred  = shift;
+
     my $params = $self->params();
 
-    my %numbers;
+    my %things;
 
     my $x = 1;
     while (1)
     {
         my $suffix = 'new' . $x++;
 
-        last unless exists $params->{ 'phone_number_type_id' . q{-} . $suffix };
+        last unless exists $params->{ $primary_field . q{-} . $suffix };
 
-        my %number =
-            $self->_params_for_classes( [ 'R2::Schema::PhoneNumber' ], $suffix );
+        my %thing =
+            $self->_params_for_classes( [ $class ], $suffix );
 
-        # If it just has a type, we ignore it.
-        next unless ( false { string_is_empty($_) } values %number ) > 1;
+        next if $exclude_filter->( \%thing );
 
-        $number{is_preferred} = $params->{'phone_number_is_preferred'} eq $suffix ? 1 : 0;
-
-        if ( ! string_is_empty( $params->{ 'phone_number_note' . q{-} . $suffix } ) )
+        if ( ! string_is_empty( $params->{ $key . '_note' . q{-} . $suffix } ) )
         {
-            $number{note} = $params->{ 'phone_number_note' . q{-} . $suffix }
+            $thing{note} = $params->{ $key . '_note' . q{-} . $suffix }
         }
 
-        $numbers{$suffix} = \%number;
+        if ($has_preferred)
+        {
+            $thing{is_preferred} = $params->{ $key . '_is_preferred' } eq $suffix ? 1 : 0;
+        }
+
+        $things{$suffix} = \%thing;
     }
 
-    return \%numbers;
+    return \%things;
 }
 
 sub custom_field_values

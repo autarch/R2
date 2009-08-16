@@ -108,12 +108,13 @@ EOF
 }
 
 {
-    my $data = R2::Web::FormData->new( { text1    => 't1',
-                                         text2    => 't2',
-                                         select1  => 1,
-                                         select2  => [ 2, 3 ],
-                                         textarea => 'tarea',
-                                       },
+    my $data = R2::Web::FormData->new( sources => [ { text1    => 't1',
+                                                      text2    => 't2',
+                                                      select1  => 1,
+                                                      select2  => [ 2, 3 ],
+                                                      textarea => 'tarea',
+                                                    },
+                                                  ],
                                      );
 
     my $form = form_elt_for( form_data => $data );
@@ -122,12 +123,13 @@ EOF
 }
 
 {
-    my $data = R2::Web::FormData->new( { text1    => 't1',
-                                         text2    => 't2',
-                                         select1  => 1,
-                                         select2  => [ 2, 3 ],
-                                         textarea => 'tarea',
-                                       },
+    my $data = R2::Web::FormData->new( sources => [ { text1    => 't1',
+                                                      text2    => 't2',
+                                                      select1  => 1,
+                                                      select2  => [ 2, 3 ],
+                                                      textarea => 'tarea',
+                                                    },
+                                                  ],
                                      );
 
     my $form = form_elt_for( errors    => [ { message => 'A generic error',
@@ -207,7 +209,7 @@ sub form_elt_for
     # just cannot isolate. Without it, we get a weird error because
     # the ownerDocument property of the form is set to itself, not the
     # HTML::DOM object.
-    my $x = $dom->as_HTML;
+#    my $x = $dom->as_HTML;
 
     return $dom->getElementsByTagName('form')->[0];
 }

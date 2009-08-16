@@ -22,8 +22,8 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="default_timezone">Default time zone:</label>
-      <select name="default_timezone">
+      <label class="for-field" for="default_time_zone">Default time zone:</label>
+      <select name="default_time_zone">
 % while ( my $zone = $zones->next() ) {
         <option value="<% $zone->olson_name() %>"><% $zone->description() %></option>
 % }
