@@ -50,7 +50,7 @@ sub CreateDefaultZones
                     [ 'America/Edmonton', 'Alberta' ],
                     [ 'America/Vancouver', 'British Columbia' ],
                     [ 'America/St_Johns', q{St. John's} ],
-                    [ 'America/Halifax', 'Halifax and New Brusnwick' ],
+                    [ 'America/Halifax', 'Halifax and New Brunswick' ],
                   ],
                 );
 
