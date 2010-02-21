@@ -9,8 +9,6 @@ use R2::Config;
 
 use Fey::ORM::Schema;
 
-
-my $source;
 if ($R2::Schema::TestSchema)
 {
     has_schema( $R2::Schema::TestSchema );
