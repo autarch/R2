@@ -11,10 +11,8 @@ use Locale::Country qw( all_country_codes code2country );
 use Path::Class;
 use Sys::Hostname qw( hostname );
 
-
-system( "$FindBin::Bin/rebuild-schema" )
+system("$FindBin::Bin/rebuild-schema")
     and die $!;
-
 
 {
     make_config_file();
@@ -35,8 +33,7 @@ system( "$FindBin::Bin/rebuild-schema" )
     make_accounts($domain);
 }
 
-sub make_config_file
-{
+sub make_config_file {
     my $dir = dir( File::HomeDir->my_home(), '.r2', 'etc' );
 
     $dir->mkpath( 1, 0755 );
@@ -49,62 +46,55 @@ sub make_config_file
     close $fh;
 }
 
-sub make_roles
-{
+sub make_roles {
     require R2::Schema::Role;
 
-    for my $attr ( R2::Schema::Role->meta()->get_all_class_attributes() )
-    {
+    for my $attr ( R2::Schema::Role->meta()->get_all_class_attributes() ) {
         my $role = $attr->name();
         R2::Schema::Role->$role();
     }
 }
 
-sub make_history_types
-{
+sub make_history_types {
     require R2::Schema::ContactHistoryType;
 
-    for my $attr ( R2::Schema::ContactHistoryType->meta()->get_all_class_attributes() )
-    {
+    for my $attr (
+        R2::Schema::ContactHistoryType->meta()->get_all_class_attributes() ) {
         my $name = $attr->name();
         R2::Schema::ContactHistoryType->$name();
     }
 }
 
-sub make_countries
-{
+sub make_countries {
     require R2::Schema::Country;
 
-    for my $code ( all_country_codes() )
-    {
-        R2::Schema::Country->insert( iso_code => $code,
-                                     name     => code2country($code),
-                                   );
+    for my $code ( all_country_codes() ) {
+        R2::Schema::Country->insert(
+            iso_code => $code,
+            name     => code2country($code),
+        );
     }
 }
 
-sub make_messaging_providers
-{
+sub make_messaging_providers {
     require R2::Schema::MessagingProvider;
 
-    R2::Schema::MessagingProvider->MakeDefaultProviders()
+    R2::Schema::MessagingProvider->MakeDefaultProviders();
 }
 
-sub make_time_zones
-{
+sub make_time_zones {
     require R2::Schema::TimeZone;
 
     R2::Schema::TimeZone->CreateDefaultZones();
 }
 
-sub make_domain
-{
+sub make_domain {
     require R2::Schema::Domain;
 
-    my $domain =
-        R2::Schema::Domain->insert( web_hostname   => hostname(),
-                                    email_hostname => hostname(),
-                                  );
+    my $domain = R2::Schema::Domain->insert(
+        web_hostname   => hostname(),
+        email_hostname => hostname(),
+    );
 
     my $hostname = $domain->web_hostname();
 
@@ -114,41 +104,38 @@ sub make_domain
 
 EOF
 
-    return $domain
+    return $domain;
 }
 
-sub make_html_widgets
-{
+sub make_html_widgets {
     require R2::Schema::HTMLWidget;
 
     R2::Schema::HTMLWidget->CreateDefaultWidgets();
 }
 
-sub make_accounts
-{
+sub make_accounts {
     my $domain = shift;
 
     require R2::Schema::User;
     require R2::Schema::Account;
 
-    for my $names ( [ q{People's Front of Judea}, q{John Cleese} ],
-                    [ q{Judean People's Front}, q{Eric Idle} ],
-                 )
-    {
-        make_account( $domain, @{ $names } );
+    for my $names (
+        [ q{People's Front of Judea}, q{John Cleese} ],
+        [ q{Judean People's Front},   q{Eric Idle} ],
+        ) {
+        make_account( $domain, @{$names} );
     }
 }
 
-sub make_account
-{
+sub make_account {
     my $domain       = shift;
     my $account_name = shift;
     my $user_name    = shift;
 
-    my $account =
-        R2::Schema::Account->insert( name      => $account_name,
-                                     domain_id => $domain->domain_id(),
-                                   );
+    my $account = R2::Schema::Account->insert(
+        name      => $account_name,
+        domain_id => $domain->domain_id(),
+    );
 
     my ( $first_name, $last_name ) = split / /, $user_name;
     ( my $email = lc $user_name ) =~ s/ /./g;
@@ -156,21 +143,21 @@ sub make_account
 
     my $password = 'password';
 
-    my $user =
-        R2::Schema::User->insert
-            ( password        => $password,
-              is_system_admin =>
-              ( R2::Schema::User->Count() ? 0 : 1 ),
-              email_address   => $email,
-              first_name      => $first_name,
-              last_name       => $last_name,
-              gender          => 'male',
-              account_id      => $account->account_id(),
-            );
+    my $user = R2::Schema::User->insert(
+        password => $password,
+        is_system_admin =>
+            ( R2::Schema::User->Count() ? 0 : 1 ),
+        email_address => $email,
+        first_name    => $first_name,
+        last_name     => $last_name,
+        gender        => 'male',
+        account_id    => $account->account_id(),
+    );
 
-    $account->add_user( user => $user,
-                        role => R2::Schema::Role->Admin(),
-                      );
+    $account->add_user(
+        user => $user,
+        role => R2::Schema::Role->Admin(),
+    );
 
     print <<"EOF";
 

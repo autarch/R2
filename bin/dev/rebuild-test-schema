@@ -9,20 +9,18 @@ use FindBin;
 use MIME::Base64 qw( encode_base64 );
 use Storable qw( nfreeze );
 
-
-unless ( grep { $_ eq '--existing' } @ARGV )
-{
-    system( "$FindBin::Bin/rebuild-schema" )
+unless ( grep { $_ eq '--existing' } @ARGV ) {
+    system("$FindBin::Bin/rebuild-schema")
         and die $!;
 }
 
 require R2::Schema;
 
-
 open my $fh, '>', 't/lib/R2/Test/Schema.pm'
     or die $!;
 
-print {$fh} sprintf( <<'EOF', encode_base64( nfreeze( R2::Schema->Schema() ) ) );
+print {$fh}
+    sprintf( <<'EOF', encode_base64( nfreeze( R2::Schema->Schema() ) ) );
 package R2::Test::Schema;
 
 use strict;
