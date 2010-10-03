@@ -11,68 +11,70 @@ use MooseX::ClassAttribute;
 use Moose::Util::TypeConstraints;
 
 # The array preserves a specific order (for use in forms and such)
-my @Types =
-    ( [ 'Text'     => 'text of any sort' ],
-      [ 'Integer'  => 'an integer (1, 42, 0, -210, etc.)' ],
-      [ 'Decimal'  => 'a decimal number (1.0, 610.42, -0.02, etc.)' ],
-      [ 'Date'     => 'a date without a time' ],
-      [ 'DateTime' => 'a date and time' ],
-      [ 'File'     => 'an attachment (image, Word doc, PDF, etc.)' ],
-      [ 'SingleSelect' => 'pick one option from a pre-defined list' ],
-      [ 'MultiSelect'  => 'pick any number of options from a pre-defined list' ],
-    );
+my @Types = (
+    [ 'Text'         => 'text of any sort' ],
+    [ 'Integer'      => 'an integer (1, 42, 0, -210, etc.)' ],
+    [ 'Decimal'      => 'a decimal number (1.0, 610.42, -0.02, etc.)' ],
+    [ 'Date'         => 'a date without a time' ],
+    [ 'DateTime'     => 'a date and time' ],
+    [ 'File'         => 'an attachment (image, Word doc, PDF, etc.)' ],
+    [ 'SingleSelect' => 'pick one option from a pre-defined list' ],
+    [ 'MultiSelect' => 'pick any number of options from a pre-defined list' ],
+);
 
 my %Descriptions = map { @{$_} } @Types;
 
-has 'type' =>
-    ( is       => 'ro',
-      isa      => ( enum [ map { $_->[0] } @Types ] ),
-      required => 1,
-    );
+has 'type' => (
+    is       => 'ro',
+    isa      => ( enum [ map { $_->[0] } @Types ] ),
+    required => 1,
+);
 
-has 'description' =>
-    ( is       => 'ro',
-      isa      => 'Str',
-      lazy     => 1,
-      default  => sub { $Descriptions{ $_[0]->type() } },
-      init_arg => undef,
-    );
+has 'description' => (
+    is       => 'ro',
+    isa      => 'Str',
+    lazy     => 1,
+    default  => sub { $Descriptions{ $_[0]->type() } },
+    init_arg => undef,
+);
 
-has 'table' =>
-    ( is       => 'ro',
-      isa      => 'Fey::Table',
-      lazy     => 1,
-      default  => sub { R2::Schema->Schema()->table( 'CustomField' . $_[0]->type() . 'Value' ) },
-      required => 1,
-      init_arg => undef,
-    );
+has 'table' => (
+    is      => 'ro',
+    isa     => 'Fey::Table',
+    lazy    => 1,
+    default => sub {
+        R2::Schema->Schema()
+            ->table( 'CustomField' . $_[0]->type() . 'Value' );
+    },
+    required => 1,
+    init_arg => undef,
+);
 
-has 'default_widget' =>
-    ( is         => 'ro',
-      isa        => 'R2::Schema::HTMLWidget',
-      lazy_build => 1,
-    );
+has 'default_widget' => (
+    is         => 'ro',
+    isa        => 'R2::Schema::HTMLWidget',
+    lazy_build => 1,
+);
 
-has 'html_widgets' =>
-    ( is         => 'ro',
-      isa        => 'ArrayRef[R2::Schema::HTMLWidget]',
-      lazy_build => 1,
-    );
+has 'html_widgets' => (
+    is         => 'ro',
+    isa        => 'ArrayRef[R2::Schema::HTMLWidget]',
+    lazy_build => 1,
+);
 
-has 'is_select' =>
-    ( is      => 'ro',
-      isa     => 'Bool',
-      default => sub { $_[0]->type() =~ /Select/ ? 1 : 0 },
-    );
+has 'is_select' => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => sub { $_[0]->type() =~ /Select/ ? 1 : 0 },
+);
 
-class_has 'Types' =>
-    ( is         => 'ro',
-      isa        => 'ArrayRef',
-      lazy_build => 1,
-    );
+class_has 'Types' => (
+    is         => 'ro',
+    isa        => 'ArrayRef',
+    lazy_build => 1,
+);
 
-sub _build_Types
-{
+sub _build_Types {
     my $class = shift;
 
     # It'd be more correct to look at the enum in the database, but
@@ -84,8 +86,7 @@ sub _build_Types
 {
     my @All;
 
-    sub All
-    {
+    sub All {
         my $class = shift;
 
         return @All if @All;
@@ -96,8 +97,7 @@ sub _build_Types
     }
 }
 
-sub _build_default_html_widgets
-{
+sub _build_default_html_widgets {
     my $self = shift;
 
     my $calm_name = studly_to_calm( $self->type() );
@@ -105,18 +105,15 @@ sub _build_default_html_widgets
     return first { $_->name() eq $calm_name } @{ $self->html_widgets() };
 }
 
-sub _build_html_widgets
-{
+sub _build_html_widgets {
     return [];
 }
 
-sub clean_value
-{
+sub clean_value {
     return $_[1];
 }
 
-sub value_is_valid
-{
+sub value_is_valid {
     return 1;
 }
 

@@ -12,24 +12,20 @@ use Moose::Role;
 # these are attributes
 #requires qw( person_count household_count organization_count contact_count );
 
-
 my @ContactTypes = qw( person household organization );
 
 # These two subs are data validation steps
-sub _cannot_unapply
-{
+sub _cannot_unapply {
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
 
     return if $is_insert;
 
-    for my $contact_type (@ContactTypes)
-    {
+    for my $contact_type (@ContactTypes) {
         my $key = 'applies_to_' . $contact_type;
 
-        if ( exists $p->{$key} && ! $p->{$key} )
-        {
+        if ( exists $p->{$key} && !$p->{$key} ) {
             my $meth = 'can_unapply_from_' . $contact_type;
 
             delete $p->{$key}
@@ -40,35 +36,29 @@ sub _cannot_unapply
     return;
 }
 
-sub _applies_to_something
-{
+sub _applies_to_something {
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
 
     my @keys = map { 'applies_to_' . $_ } @ContactTypes;
 
-    if ($is_insert)
-    {
-        return if
-            any { exists $p->{$_} && $p->{$_} } @keys;
+    if ($is_insert) {
+        return
+            if any { exists $p->{$_} && $p->{$_} } @keys;
     }
-    else
-    {
-        for my $key (@keys)
-        {
-            if ( exists $p->{$key} )
-            {
+    else {
+        for my $key (@keys) {
+            if ( exists $p->{$key} ) {
                 return if $p->{$key};
             }
-            else
-            {
+            else {
                 return if $self->$key();
             }
         }
     }
 
-    ( my $thing = (ref $self || $self) ) =~ s/R2::Schema:://;
+    ( my $thing = ( ref $self || $self ) ) =~ s/R2::Schema:://;
 
     $thing = studly_to_calm($thing);
     $thing =~ s/_/ /g;
@@ -76,46 +66,42 @@ sub _applies_to_something
     my $articled_thing = ucfirst A($thing);
 
     return { message =>
-             "$articled_thing must apply to a person, household, or organization." };
+            "$articled_thing must apply to a person, household, or organization."
+    };
 }
 
-sub types_applied_to
-{
+sub types_applied_to {
     my $self = shift;
 
-    return
-        ( map { ucfirst $_ }
-          grep { my $meth = 'applies_to_' . $_; $self->$meth() }
-          @ContactTypes
-        );
+    return (
+        map { ucfirst $_ }
+            grep { my $meth = 'applies_to_' . $_; $self->$meth() }
+            @ContactTypes
+    );
 }
 
-sub can_unapply_from_person
-{
+sub can_unapply_from_person {
     my $self = shift;
 
-    return ! $self->person_count();
+    return !$self->person_count();
 }
 
-sub can_unapply_from_household
-{
+sub can_unapply_from_household {
     my $self = shift;
 
-    return ! $self->household_count();
+    return !$self->household_count();
 }
 
-sub can_unapply_from_organization
-{
+sub can_unapply_from_organization {
     my $self = shift;
 
-    return ! $self->organization_count();
+    return !$self->organization_count();
 }
 
-sub is_deletable
-{
+sub is_deletable {
     my $self = shift;
 
-    return ! $self->contact_count();
+    return !$self->contact_count();
 }
 
 no Moose::Role;

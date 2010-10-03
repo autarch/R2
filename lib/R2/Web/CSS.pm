@@ -11,20 +11,21 @@ use Moose;
 
 extends 'R2::Web::CombinedStaticFiles';
 
-
-sub _files
-{
+sub _files {
     my $dir = dir( R2::Config->new()->share_dir(), 'css-source' );
 
-    return [ sort
-             grep { ! $_->is_dir()
-                    && $_->basename() =~ /^\d+/
-                    && $_->basename() =~ /\.css$/ }
-             $dir->children() ];
+    return [
+        sort
+            grep {
+                  !$_->is_dir()
+                && $_->basename() =~ /^\d+/
+                && $_->basename()
+                =~ /\.css$/
+            } $dir->children()
+    ];
 }
 
-sub _target_file
-{
+sub _target_file {
     my $css_dir = dir( R2::Config->new()->var_lib_dir(), 'css' );
 
     $css_dir->mkpath( 0, 0755 );
@@ -32,8 +33,7 @@ sub _target_file
     return file( $css_dir, 'r2-combined.css' );
 }
 
-sub _squish
-{
+sub _squish {
     my $self = shift;
     my $css  = shift;
 

@@ -10,16 +10,14 @@ use Moose;
 
 extends 'R2::Search::Person';
 
-has 'name' =>
-    ( is  => 'ro',
-      isa => NonEmptyStr,
-    );
-
+has 'name' => (
+    is  => 'ro',
+    isa => NonEmptyStr,
+);
 
 my $Schema = R2::Schema->Schema();
 
-sub _apply_where_clauses
-{
+sub _apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
@@ -30,30 +28,35 @@ sub _apply_where_clauses
     # Also note that this would completely break for names written in
     # Chinese characters, which are written without spaces.
     my @parts = split /\s+/, lc $self->name(), 2;
-    if ( @parts == 1 )
-    {
-        $select->where( '(' )
-               ->where( Fey::Literal::Function->new( 'LOWER', $Schema->table('Person')->column('first_name') ),
-                        'LIKE',
-                        lc $parts[0] . '%'
-                      )
-               ->where( 'or' )
-               ->where( Fey::Literal::Function->new( 'LOWER', $Schema->table('Person')->column('last_name') ),
-                        'LIKE',
-                        $parts[0] . '%'
-                      )
-               ->where( ')' );
+    if ( @parts == 1 ) {
+        $select->where('(')->where(
+            Fey::Literal::Function->new(
+                'LOWER', $Schema->table('Person')->column('first_name')
+            ),
+            'LIKE',
+            lc $parts[0] . '%'
+            )->where('or')->where(
+            Fey::Literal::Function->new(
+                'LOWER', $Schema->table('Person')->column('last_name')
+            ),
+            'LIKE',
+            $parts[0] . '%'
+            )->where(')');
     }
-    else
-    {
-        $select->where( Fey::Literal::Function->new( 'LOWER', $Schema->table('Person')->column('first_name') ),
-                        'LIKE',
-                        $parts[0] . '%'
-                      )
-               ->where( Fey::Literal::Function->new( 'LOWER', $Schema->table('Person')->column('last_name') ),
-                        'LIKE',
-                        $parts[1] . '%'
-                      );
+    else {
+        $select->where(
+            Fey::Literal::Function->new(
+                'LOWER', $Schema->table('Person')->column('first_name')
+            ),
+            'LIKE',
+            $parts[0] . '%'
+            )->where(
+            Fey::Literal::Function->new(
+                'LOWER', $Schema->table('Person')->column('last_name')
+            ),
+            'LIKE',
+            $parts[1] . '%'
+            );
     }
 }
 

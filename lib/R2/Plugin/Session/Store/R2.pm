@@ -7,9 +7,7 @@ use base 'Catalyst::Plugin::Session::Store::DBI';
 
 use R2::Schema;
 
-
-sub _session_dbic_connect
-{
+sub _session_dbic_connect {
     my $self = shift;
 
     $self->_session_dbh( R2::Schema->DBIManager()->default_source()->dbh() );

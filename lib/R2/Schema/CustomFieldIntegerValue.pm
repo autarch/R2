@@ -13,8 +13,7 @@ use Fey::ORM::Table;
     has_table( $schema->table('CustomFieldIntegerValue') );
 }
 
-sub _ValidateValue
-{
+sub _ValidateValue {
     my $class = shift;
     my $p     = shift;
 
@@ -25,9 +24,11 @@ sub _ValidateValue
 
     return if $p->{value} =~ /^-?\d+$/;
 
-    return { field   => 'custom_field_' . $p->{custom_field_id},
-             message => "The value you provided ($orig), does not look like an integer.",
-           };
+    return {
+        field => 'custom_field_' . $p->{custom_field_id},
+        message =>
+            "The value you provided ($orig), does not look like an integer.",
+    };
 }
 
 with 'R2::Role::Schema::CustomFieldValue';

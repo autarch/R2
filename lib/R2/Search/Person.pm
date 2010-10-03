@@ -13,7 +13,6 @@ use MooseX::ClassAttribute;
 
 extends 'R2::Search';
 
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -23,18 +22,19 @@ extends 'R2::Search';
 
     $select_base->from( $schema->table('Contact'), $schema->table('Person') );
 
-    $select_base->where( $schema->table('Contact')->column('account_id'),
-                         '=', Fey::Placeholder->new() );
+    $select_base->where(
+        $schema->table('Contact')->column('account_id'),
+        '=', Fey::Placeholder->new()
+    );
 
-    class_has '_SelectBase' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Select',
-          default => sub { $select_base },
-        );
+    class_has '_SelectBase' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        default => sub {$select_base},
+    );
 }
 
-sub people
-{
+sub people {
     my $self = shift;
 
     my $select = $self->_SelectBase->clone();
@@ -43,30 +43,28 @@ sub people
 
     $select->select( $schema->table('Person') );
 
-    $select->order_by( $schema->table('Person')->columns( 'last_name', 'first_name') );
+    $select->order_by(
+        $schema->table('Person')->columns( 'last_name', 'first_name' ) );
 
     $self->_apply_where_clauses($select);
 
     $self->_apply_limit($select);
 
-    return
-        Fey::Object::Iterator::FromSelect->new
-            ( classes     => 'R2::Schema::Person',
-              dbh         => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
-              select      => $select,
-              bind_params => [ $self->account()->account_id() ],
-            );
+    return Fey::Object::Iterator::FromSelect->new(
+        classes => 'R2::Schema::Person',
+        dbh     => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
+        select  => $select,
+        bind_params => [ $self->account()->account_id() ],
+    );
 }
 
-sub person_count
-{
+sub person_count {
     my $self = shift;
 
     my $schema = R2::Schema->Schema();
 
-    my $count =
-        Fey::Literal::Function->new
-            ( 'COUNT', $schema->table('Person')->column('contact_id') );
+    my $count = Fey::Literal::Function->new( 'COUNT',
+        $schema->table('Person')->column('contact_id') );
 
     my $select = $self->_SelectBase->clone();
 
@@ -76,9 +74,8 @@ sub person_count
 
     my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
-    return
-        $dbh->selectrow_arrayref
-            ( $select->sql($dbh), {}, $self->account()->account_id() )->[0];
+    return $dbh->selectrow_arrayref( $select->sql($dbh), {},
+        $self->account()->account_id() )->[0];
 }
 
 sub _apply_where_clauses { }

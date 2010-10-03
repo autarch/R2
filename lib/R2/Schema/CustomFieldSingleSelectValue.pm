@@ -14,18 +14,17 @@ with 'R2::Role::Schema::DataValidator';
 
     has_table( $schema->table('CustomFieldSingleSelectValue') );
 
-    has_one 'option' =>
-        ( table => $schema->table('CustomFieldSelectOption'),
-        );
+    has_one 'option' => (
+        table => $schema->table('CustomFieldSelectOption'),
+    );
 
-    has 'value' =>
-        ( is  => 'ro',
-          isa => 'Str',
-        );
+    has 'value' => (
+        is  => 'ro',
+        isa => 'Str',
+    );
 }
 
-sub _ValidateValue
-{
+sub _ValidateValue {
     my $class = shift;
     my $p     = shift;
 
@@ -34,14 +33,14 @@ sub _ValidateValue
     # XXX - need validation!
     return;
 
-    return { field   => 'custom_field_' . $p->{custom_field_id},
-             message => '', # XXX
-           };
+    return {
+        field   => 'custom_field_' . $p->{custom_field_id},
+        message => '',                                        # XXX
+    };
 }
 
-with 'R2::Role::Schema::CustomFieldValue'
-    => { value_column => 'custom_field_select_option_id' };
-
+with 'R2::Role::Schema::CustomFieldValue' =>
+    { value_column => 'custom_field_select_option_id' };
 
 no Fey::ORM::Table;
 

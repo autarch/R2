@@ -13,8 +13,7 @@ use Moose;
 
 BEGIN { extends 'Catalyst::Controller::REST' }
 
-sub begin : Private
-{
+sub begin : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -27,8 +26,7 @@ sub begin : Private
 
     my $config = R2::Config->new();
 
-    unless ( $config->is_production() || $config->is_profiling() )
-    {
+    unless ( $config->is_production() || $config->is_profiling() ) {
         $_->new()->create_single_file()
             for qw( R2::Web::CSS R2::Web::Javascript );
     }
@@ -36,40 +34,36 @@ sub begin : Private
     return 1;
 }
 
-sub _uri_requires_authen
-{
+sub _uri_requires_authen {
     my $self = shift;
     my $uri  = shift;
 
     return 0
-        if $uri->path() =~ m{^/user/(?:login_form|forgot_password_form|authentication)};
+        if $uri->path()
+            =~ m{^/user/(?:login_form|forgot_password_form|authentication)};
 
     return 0 if $uri->path() =~ m{^/(?:die|robots\.txt|exit)};
 
     return 1;
 }
 
-sub end : Private
-{
+sub end : Private {
     my $self = shift;
     my $c    = shift;
 
     return $self->next::method($c)
         if $c->stash()->{rest};
 
-    if ( ( ! $c->response()->status()
-           || $c->response()->status() == 200 )
-         && ! $c->response()->body()
-         && ! @{ $c->error() || [] } )
-    {
+    if (   ( !$c->response()->status() || $c->response()->status() == 200 )
+        && !$c->response()->body()
+        && !@{ $c->error() || [] } ) {
         $c->forward( $c->view() );
     }
 
     return;
 }
 
-sub _set_entity
-{
+sub _set_entity {
     my $self   = shift;
     my $c      = shift;
     my $entity = shift;
@@ -79,8 +73,7 @@ sub _set_entity
     return 1;
 }
 
-sub _require_authen
-{
+sub _require_authen {
     my $self = shift;
     my $c    = shift;
 
@@ -88,11 +81,10 @@ sub _require_authen
 
     return if $user;
 
-    $c->redirect_and_detach( '/user/login_form' );
+    $c->redirect_and_detach('/user/login_form');
 }
 
-sub _check_authz
-{
+sub _check_authz {
     my $self         = shift;
     my $c            = shift;
     my $authz_method = shift;
@@ -100,15 +92,16 @@ sub _check_authz
     my $error        = shift;
     my $uri          = shift;
 
-    return if
-        $c->model('Authz')->$authz_method( user => $c->user(),
-                                           %{ $authz_params },
-                                         );
-
-    $c->redirect_with_error
-        ( error => $error,
-          uri   => $uri,
+    return
+        if $c->model('Authz')->$authz_method(
+                user => $c->user(),
+                %{$authz_params},
         );
+
+    $c->redirect_with_error(
+        error => $error,
+        uri   => $uri,
+    );
 }
 
 no Moose;

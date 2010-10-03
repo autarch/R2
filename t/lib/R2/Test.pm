@@ -12,10 +12,9 @@ use Fey::ORM::Mock;
 use R2::Test::Schema;
 use R2::Schema;
 
-
 my $IsMocked = 0;
-sub mock_schema
-{
+
+sub mock_schema {
     require R2::Schema;
 
     $IsMocked = 1;
@@ -23,8 +22,7 @@ sub mock_schema
     return Fey::ORM::Mock->new( schema_class => 'R2::Schema' );
 }
 
-sub mock_dbh
-{
+sub mock_dbh {
     mock_schema unless $IsMocked;
 
     return R2::Schema->DBIManager()->default_source()->dbh();

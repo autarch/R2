@@ -13,9 +13,7 @@ use Moose::Role;
 
 requires qw( insert update delete );
 
-
-around 'insert' => sub
-{
+around 'insert' => sub {
     my $orig  = shift;
     my $class = shift;
     my %p     = @_;
@@ -26,11 +24,11 @@ around 'insert' => sub
 
     return $row unless $user;
 
-    my %history_p =
-        ( map { $_ => $row->$_() }
-          grep { $row->can($_) }
-          qw( contact_id email_address_id website_id address_id phone_number_id )
-        );
+    my %history_p = (
+        map { $_ => $row->$_() }
+            grep { $row->can($_) }
+            qw( contact_id email_address_id website_id address_id phone_number_id )
+    );
 
     $history_p{contact_id} = $row->contact_id_for_history()
         if $row->can('contact_id_for_history');
@@ -40,14 +38,12 @@ around 'insert' => sub
 
     my $type;
     my $description;
-    if ( $row->does('R2::Role::Schema::ActsAsContact' ) )
-    {
+    if ( $row->does('R2::Role::Schema::ActsAsContact') ) {
         $type = R2::Schema::ContactHistoryType->Created();
 
         $description = 'Created this contact';
     }
-    else
-    {
+    else {
         ( my $thing = $class ) =~ s/^R2::Schema:://;
 
         my $type_name = 'Add' . $thing;
@@ -60,24 +56,24 @@ around 'insert' => sub
 
     my @pk = map { $_->name() } @{ $class->Table()->primary_key() };
 
-    my $reversal = { class              => $class,
-                     constructor_params => { map { $_ => $row->$_() } @pk },
-                     method             => 'delete',
-                   };
+    my $reversal = {
+        class              => $class,
+        constructor_params => { map { $_ => $row->$_() } @pk },
+        method             => 'delete',
+    };
 
-    R2::Schema::ContactHistory->insert
-        ( %history_p,
-          user_id                 => $user->user_id(),
-          contact_history_type_id => $type->contact_history_type_id(),
-          description             => $description,
-          reversal_blob           => nfreeze($reversal),
-        );
+    R2::Schema::ContactHistory->insert(
+        %history_p,
+        user_id                 => $user->user_id(),
+        contact_history_type_id => $type->contact_history_type_id(),
+        description             => $description,
+        reversal_blob           => nfreeze($reversal),
+    );
 
     return $row;
 };
 
-sub _ClassDescription
-{
+sub _ClassDescription {
     my $class = ref $_[0] || $_[0];
 
     ( my $string = $class ) =~ s/R2::Schema:://;

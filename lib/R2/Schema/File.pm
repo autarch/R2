@@ -14,7 +14,6 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -24,58 +23,56 @@ use MooseX::ClassAttribute;
 
     has_table $file_t;
 
-    has 'path' =>
-        ( is       => 'ro',
-          isa      => 'Path::Class::File',
-          lazy     => 1,
-          builder  => '_build_path',
-          init_arg => undef,
-        );
+    has 'path' => (
+        is       => 'ro',
+        isa      => 'Path::Class::File',
+        lazy     => 1,
+        builder  => '_build_path',
+        init_arg => undef,
+    );
 
-    has extensionless_basename =>
-        ( is       => 'ro',
-          isa      => 'Str',
-          lazy     => 1,
-          builder  => '_build_extensionless_basename',
-          init_arg => undef,
-        );
+    has extensionless_basename => (
+        is       => 'ro',
+        isa      => 'Str',
+        lazy     => 1,
+        builder  => '_build_extensionless_basename',
+        init_arg => undef,
+    );
 
-    has 'extension' =>
-        ( is       => 'ro',
-          isa      => 'Str',
-          lazy     => 1,
-          builder  => '_build_extension',
-          init_arg => undef,
-        );
+    has 'extension' => (
+        is       => 'ro',
+        isa      => 'Str',
+        lazy     => 1,
+        builder  => '_build_extension',
+        init_arg => undef,
+    );
 
-    has 'uri' =>
-        ( is       => 'ro',
-          isa      => 'Str',
-          lazy     => 1,
-          builder  => '_build_uri',
-          init_arg => undef,
-        );
+    has 'uri' => (
+        is       => 'ro',
+        isa      => 'Str',
+        lazy     => 1,
+        builder  => '_build_uri',
+        init_arg => undef,
+    );
 
-    has '_cache_dir' =>
-        ( is       => 'ro',
-          isa      => 'Path::Class::Dir',
-          lazy     => 1,
-          builder  => '_build_cache_dir',
-          init_arg => undef,
-        );
+    has '_cache_dir' => (
+        is       => 'ro',
+        isa      => 'Path::Class::Dir',
+        lazy     => 1,
+        builder  => '_build_cache_dir',
+        init_arg => undef,
+    );
 
-    has 'is_image' =>
-        ( is       => 'ro',
-          isa      => 'Bool',
-          lazy     => 1,
-          builder  => '_build_is_image',
-          init_arg => undef,
-        );
+    has 'is_image' => (
+        is       => 'ro',
+        isa      => 'Bool',
+        lazy     => 1,
+        builder  => '_build_is_image',
+        init_arg => undef,
+    );
 }
 
-
-around 'insert' => sub
-{
+around 'insert' => sub {
     my $orig  = shift;
     my $class = shift;
     my %p     = @_;
@@ -89,8 +86,7 @@ around 'insert' => sub
     return $file;
 };
 
-sub _build_path
-{
+sub _build_path {
     my $self = shift;
 
     my $path = file( $self->_cache_dir(), $self->filename() );
@@ -107,8 +103,7 @@ sub _build_path
     return $path;
 }
 
-sub _build_extensionless_basename
-{
+sub _build_extensionless_basename {
     my $self = shift;
 
     my $path = $self->path();
@@ -122,8 +117,7 @@ sub _build_extensionless_basename
     return $basename;
 }
 
-sub _build_extension
-{
+sub _build_extension {
     my $self = shift;
 
     my $path = $self->path();
@@ -133,8 +127,7 @@ sub _build_extension
     return defined $ext ? $ext : '';
 }
 
-sub _build_uri
-{
+sub _build_uri {
     my $self = shift;
 
     my $path = $self->path();
@@ -146,30 +139,29 @@ sub _build_uri
     return $uri;
 }
 
-sub _build_cache_dir
-{
+sub _build_cache_dir {
     my $self = shift;
 
     my $config = R2::Config->new();
 
     my $hashed = sha512_hex( $self->file_id(), $config->secret() );
 
-    return dir( $config->cache_dir(), 'files',
-                substr( $hashed, 0, 2 ), $hashed );
+    return dir(
+        $config->cache_dir(), 'files',
+        substr( $hashed, 0, 2 ), $hashed
+    );
 }
 
 {
     my %ImageType = map { $_ => 1 } qw( image/gif image/jpeg image/png );
 
-    sub _build_is_image
-    {
+    sub _build_is_image {
         my $self = shift;
 
         return $ImageType{ $self->mime_type() };
     }
 
-    sub TypeIsImage
-    {
+    sub TypeIsImage {
         my $class = shift;
         my $type  = shift;
 

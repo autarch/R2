@@ -16,8 +16,7 @@ use Moose;
 
 my $Config;
 
-BEGIN
-{
+BEGIN {
     extends 'Catalyst';
 
     $Config = R2::Config->new();
@@ -29,12 +28,13 @@ BEGIN
 
 with @{ $Config->catalyst_roles() };
 
-__PACKAGE__->config( name => 'R2',
-                     %{ $Config->catalyst_config() },
-                   );
+__PACKAGE__->config(
+    name => 'R2',
+    %{ $Config->catalyst_config() },
+);
 
 __PACKAGE__->request_class('Catalyst::Request::REST::ForBrowsers');
-__PACKAGE__->apply_request_class_roles( 'R2::Request' );
+__PACKAGE__->apply_request_class_roles('R2::Request');
 
 R2::Schema->EnableObjectCaches();
 

@@ -6,9 +6,7 @@ use warnings;
 use File::Slurp qw( write_file );
 use File::Temp qw( tempdir );
 
-
-sub import
-{
+sub import {
     my $dir     = tempdir( CLEANUP => 1 );
     my $etc     = tempdir( CLEANUP => 1 );
     my $var_lib = tempdir( CLEANUP => 1 );

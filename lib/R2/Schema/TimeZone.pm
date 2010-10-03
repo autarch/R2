@@ -18,59 +18,57 @@ use MooseX::ClassAttribute;
 
     has_one( $schema->table('Country') );
 
-    class_has '_SelectByCountrySQL' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Select',
-          lazy    => 1,
-          default => \&_MakeSelectByCountrySQL,
-        );
+    class_has '_SelectByCountrySQL' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        lazy    => 1,
+        default => \&_MakeSelectByCountrySQL,
+    );
 }
 
-sub CreateDefaultZones
-{
+sub CreateDefaultZones {
     my $class = shift;
 
-    my %zones = ( us =>
-                  [ [ 'America/New_York', 'US East Coast' ],
-                    [ 'America/Chicago', 'US Midwest' ],
-                    [ 'America/Denver', 'US Mountain' ],
-                    [ 'America/Los_Angeles', 'US West Coast' ],
-                    [ 'America/Anchorage', 'Alaska (Anchorage, Juneau, Nome)' ],
-                    [ 'America/Adak', 'Alaska (Adak)' ],
-                    [ 'Pacific/Honolulu', 'Hawaii' ],
-                    [ 'America/Santo_Domingo', 'Puerto Rico' ],
-                    [ 'Pacific/Guam', 'Guam' ],
-                  ],
+    my %zones = (
+        us => [
+            [ 'America/New_York',      'US East Coast' ],
+            [ 'America/Chicago',       'US Midwest' ],
+            [ 'America/Denver',        'US Mountain' ],
+            [ 'America/Los_Angeles',   'US West Coast' ],
+            [ 'America/Anchorage',     'Alaska (Anchorage, Juneau, Nome)' ],
+            [ 'America/Adak',          'Alaska (Adak)' ],
+            [ 'Pacific/Honolulu',      'Hawaii' ],
+            [ 'America/Santo_Domingo', 'Puerto Rico' ],
+            [ 'Pacific/Guam',          'Guam' ],
+        ],
 
-                  ca =>
-                  [ [ 'America/Montreal', 'Quebec' ],
-                    [ 'America/Toronto', 'Ontario' ],
-                    [ 'America/Winnipeg', 'Manitoba' ],
-                    [ 'America/Regina', 'Sakatchewan' ],
-                    [ 'America/Edmonton', 'Alberta' ],
-                    [ 'America/Vancouver', 'British Columbia' ],
-                    [ 'America/St_Johns', q{St. John's} ],
-                    [ 'America/Halifax', 'Halifax and New Brunswick' ],
-                  ],
-                );
+        ca => [
+            [ 'America/Montreal',  'Quebec' ],
+            [ 'America/Toronto',   'Ontario' ],
+            [ 'America/Winnipeg',  'Manitoba' ],
+            [ 'America/Regina',    'Sakatchewan' ],
+            [ 'America/Edmonton',  'Alberta' ],
+            [ 'America/Vancouver', 'British Columbia' ],
+            [ 'America/St_Johns',  q{St. John's} ],
+            [ 'America/Halifax',   'Halifax and New Brunswick' ],
+        ],
+    );
 
-    for my $iso_code ( keys %zones )
-    {
+    for my $iso_code ( keys %zones ) {
         my $order = 1;
 
-        for my $zone ( @{ $zones{$iso_code} } )
-        {
-            $class->insert( olson_name    => $zone->[0],
-                            iso_code      => $iso_code,
-                            description   => $zone->[1],
-                            display_order => $order++,
-                          );
+        for my $zone ( @{ $zones{$iso_code} } ) {
+            $class->insert(
+                olson_name    => $zone->[0],
+                iso_code      => $iso_code,
+                description   => $zone->[1],
+                display_order => $order++,
+            );
         }
     }
 }
 
-sub ByCountry
-{
+sub ByCountry {
     my $class    = shift;
     my $iso_code = shift;
 
@@ -78,17 +76,15 @@ sub ByCountry
 
     my $dbh = $class->_dbh($select);
 
-    return
-        Fey::Object::Iterator::FromSelect->new
-            ( classes     => $class,
-              dbh         => $dbh,
-              select      => $select,
-              bind_params => [ $iso_code ],
-            );
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => $class,
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [$iso_code],
+    );
 }
 
-sub _MakeSelectByCountrySQL
-{
+sub _MakeSelectByCountrySQL {
     my $class = __PACKAGE__;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
@@ -96,15 +92,14 @@ sub _MakeSelectByCountrySQL
     my $schema = R2::Schema->Schema();
 
     $select->select( $schema->table('TimeZone') )
-           ->from( $schema->tables( 'TimeZone') )
-           ->where( $schema->table('TimeZone')->column('iso_code'),
-                    '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('TimeZone')->column('display_order') );
+        ->from( $schema->tables('TimeZone') )->where(
+        $schema->table('TimeZone')->column('iso_code'),
+        '=', Fey::Placeholder->new()
+        )->order_by( $schema->table('TimeZone')->column('display_order') );
 
     return $select;
 
 }
-
 
 no Fey::ORM::Table;
 no MooseX::ClassAttribute;

@@ -15,8 +15,7 @@ with 'R2::Role::Schema::DataValidator';
     has_table( $schema->table('CustomFieldDateValue') );
 }
 
-sub _ValidateValue
-{
+sub _ValidateValue {
     my $class = shift;
     my $p     = shift;
 
@@ -25,9 +24,11 @@ sub _ValidateValue
     # XXX - need validation!
     return;
 
-    return { field   => 'custom_field_' . $p->{custom_field_id},
-             message => "The value you provided ($orig), does not look like a date.",
-           };
+    return {
+        field => 'custom_field_' . $p->{custom_field_id},
+        message =>
+            "The value you provided ($orig), does not look like a date.",
+    };
 }
 
 with 'R2::Role::Schema::CustomFieldValue';

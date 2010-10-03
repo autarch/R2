@@ -17,54 +17,53 @@ BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
+sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) :
+    ActionClass('+R2::Action::REST') {
+}
 
-sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) : ActionClass('+R2::Action::REST') { }
-
-sub person_GET
-{
+sub person_GET {
     my $self = shift;
     my $c    = shift;
 
     my $name = $c->request()->parameters()->{person_name};
 
     my @people;
-    if ( ! string_is_empty($name) )
-    {
-        my $people = R2::Search::Person::ByName->new( account => $c->account(),
-                                                      name    => $name,
-                                                    )->people();
+    if ( !string_is_empty($name) ) {
+        my $people = R2::Search::Person::ByName->new(
+            account => $c->account(),
+            name    => $name,
+        )->people();
 
-        while ( my $person = $people->next() )
-        {
-            push @people, { name      => $person->full_name(),
-                            person_id => $person->person_id(),
-                          };
+        while ( my $person = $people->next() ) {
+            push @people, {
+                name      => $person->full_name(),
+                person_id => $person->person_id(),
+                };
         }
     }
 
-    return
-        $self->status_ok( $c,
-                          entity => \@people,
-                        );
+    return $self->status_ok(
+        $c,
+        entity => \@people,
+    );
 }
 
-sub person_POST
-{
+sub person_POST {
     my $self = shift;
     my $c    = shift;
 
-    $self->_check_authz( $c,
-                         'user_can_add_contact',
-                         { account => $c->account() },
-                         'You are not allowed to add contacts.',
-                         $c->account()->uri(),
-                       );
+    $self->_check_authz(
+        $c,
+        'user_can_add_contact',
+        { account => $c->account() },
+        'You are not allowed to add contacts.',
+        $c->account()->uri(),
+    );
 
-    my $person =
-        $self->_insert_contact
-            ( $c,
-              'R2::Schema::Person',
-            );
+    my $person = $self->_insert_contact(
+        $c,
+        'R2::Schema::Person',
+    );
 
     $c->redirect_and_detach( $person->contact()->uri() );
 }

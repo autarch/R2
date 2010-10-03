@@ -14,51 +14,49 @@ use MooseX::StrictConstructor;
 use MooseX::Params::Validate qw( validated_list );
 use Moose::Util::TypeConstraints;
 
-
-has 'file' =>
-    ( is       => 'ro',
-      isa      => FileIsImage,
-      required => 1,
-      handles  => [ 'path', 'uri' ],
-    );
+has 'file' => (
+    is       => 'ro',
+    isa      => FileIsImage,
+    required => 1,
+    handles  => [ 'path', 'uri' ],
+);
 
 class_type('Image::Magick');
 
-has '_magick' =>
-    ( is         => 'ro',
-      isa        => 'Image::Magick',
-      lazy_build => 1,
-      init_arg   => undef,
-    );
+has '_magick' => (
+    is         => 'ro',
+    isa        => 'Image::Magick',
+    lazy_build => 1,
+    init_arg   => undef,
+);
 
-has 'height' =>
-    ( is       => 'ro',
-      isa      => PosInt,
-      lazy     => 1,
-      default  => sub { $_[0]->_magick()->get('height') },
-      init_arg => undef,
-    );
+has 'height' => (
+    is       => 'ro',
+    isa      => PosInt,
+    lazy     => 1,
+    default  => sub { $_[0]->_magick()->get('height') },
+    init_arg => undef,
+);
 
-has 'width' =>
-    ( is       => 'ro',
-      isa      => PosInt,
-      lazy     => 1,
-      default  => sub { $_[0]->_magick()->get('width') },
-      init_arg => undef,
-    );
+has 'width' => (
+    is       => 'ro',
+    isa      => PosInt,
+    lazy     => 1,
+    default  => sub { $_[0]->_magick()->get('width') },
+    init_arg => undef,
+);
 
-sub resize
-{
+sub resize {
     my $self = shift;
-    my ( $height, $width ) =
-        validated_list( \@_,
-                        height => { isa => Int },
-                        width  => { isa => Int },
-                      );
+    my ( $height, $width ) = validated_list(
+        \@_,
+        height => { isa => Int },
+        width  => { isa => Int },
+    );
 
     ( $height, $width ) = $self->_new_dimensions( $height, $width );
 
-    my $dimensions = $width . q{x} . $height;
+    my $dimensions  = $width . q{x} . $height;
     my $unique_name = $self->file()->file_id() . q{-} . $dimensions;
 
     my $file = eval { R2::Schema::File->new( unique_name => $unique_name ) };
@@ -66,11 +64,11 @@ sub resize
     return R2::Image->new( file => $file )
         if $file;
 
-    $file = $self->_make_resized_image( $height, $width, $dimensions, $unique_name );
+    $file = $self->_make_resized_image( $height, $width, $dimensions,
+        $unique_name );
 }
 
-sub _new_dimensions
-{
+sub _new_dimensions {
     my $self   = shift;
     my $height = shift;
     my $width  = shift;
@@ -84,54 +82,53 @@ sub _new_dimensions
     my $height_r = $height / $orig_height;
     my $width_r  = $width / $orig_width;
 
-    my $ratio = min ( $height_r, $width_r );
+    my $ratio = min( $height_r, $width_r );
 
-    return ( int( $orig_height * $ratio ),
-             int( $orig_width * $ratio ),
-           );
+    return (
+        int( $orig_height * $ratio ),
+        int( $orig_width * $ratio ),
+    );
 }
 
-sub _make_resized_image
-{
+sub _make_resized_image {
     my $self        = shift;
     my $height      = shift;
     my $width       = shift;
     my $dimensions  = shift;
     my $unique_name = shift;
 
-    my $resized_file =
-        $self->file()->path()->dir()->file
-            ( $self->file()->extensionless_basename()
-              . q{-}
-              . $dimensions
-              . q{.} . $self->file()->extension() );
+    my $resized_file
+        = $self->file()->path()->dir()
+        ->file( $self->file()->extensionless_basename() . q{-}
+            . $dimensions . q{.}
+            . $self->file()->extension() );
 
     my $orig = $self->_magick();
-    my $new = $orig->Clone();
+    my $new  = $orig->Clone();
 
-    $new->Scale( height => $height,
-                 width  => $width,
-               );
+    $new->Scale(
+        height => $height,
+        width  => $width,
+    );
 
-    $new->write( filename => $resized_file->stringify(),
-                 quality  => $orig->get('quality'),
-                 type     => 'Palette',
-               );
+    $new->write(
+        filename => $resized_file->stringify(),
+        quality  => $orig->get('quality'),
+        type     => 'Palette',
+    );
 
-    my $file =
-        R2::Schema::File->insert
-            ( filename    => $resized_file->basename(),
-              contents    => scalar $resized_file->slurp(),
-              mime_type   => $self->file()->mime_type(),
-              account_id  => $self->file()->account_id(),
-              unique_name => $unique_name,
-            );
+    my $file = R2::Schema::File->insert(
+        filename    => $resized_file->basename(),
+        contents    => scalar $resized_file->slurp(),
+        mime_type   => $self->file()->mime_type(),
+        account_id  => $self->file()->account_id(),
+        unique_name => $unique_name,
+    );
 
-    return (ref $self)->new( file => $file );
+    return ( ref $self )->new( file => $file );
 }
 
-sub _build__magick
-{
+sub _build__magick {
     my $self = shift;
 
     my $img = Image::Magick->new();

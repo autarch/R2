@@ -13,7 +13,7 @@ use Scalar::Util qw( looks_like_number );
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
-         { steps => [ qw( _validate_amount _valid_donation_date ) ] };
+    { steps => [qw( _validate_amount _valid_donation_date )] };
 with 'R2::Role::Schema::URIMaker';
 
 {
@@ -23,19 +23,16 @@ with 'R2::Role::Schema::URIMaker';
 
     has_table( $schema->table('Donation') );
 
-    has_one source =>
-        ( table => $schema->table('DonationSource') );
+    has_one source => ( table => $schema->table('DonationSource') );
 
-    has_one target =>
-        ( table => $schema->table('DonationTarget') );
+    has_one target => ( table => $schema->table('DonationTarget') );
 
     has_one( $schema->table('PaymentType') );
 
     has_one( $schema->table('Contact') );
 }
 
-sub _validate_amount
-{
+sub _validate_amount {
     my $self = shift;
     my $p    = shift;
 
@@ -47,28 +44,27 @@ sub _validate_amount
 
     my $msg;
 
-    if ( ! looks_like_number( $p->{amount} ) )
-    {
-        $msg = "The amount you specified ($p->{amount}) does not seem to be a number.";
+    if ( !looks_like_number( $p->{amount} ) ) {
+        $msg
+            = "The amount you specified ($p->{amount}) does not seem to be a number.";
     }
-    elsif ( $p->{amount} <= 0 )
-    {
+    elsif ( $p->{amount} <= 0 ) {
         $msg = "You cannot have a negative amount for a donation.";
     }
-    elsif ( sprintf( '%.2f', $p->{amount} ) != $p->{amount} )
-    {
-        $msg = "You cannot have more than two digits to the right of the decimal point.";
+    elsif ( sprintf( '%.2f', $p->{amount} ) != $p->{amount} ) {
+        $msg
+            = "You cannot have more than two digits to the right of the decimal point.";
     }
 
     return unless $msg;
 
-    return { message => $msg,
-             field   => 'amount',
-           };
+    return {
+        message => $msg,
+        field   => 'amount',
+    };
 }
 
-sub _valid_donation_date
-{
+sub _valid_donation_date {
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
@@ -79,25 +75,29 @@ sub _valid_donation_date
 
     return if blessed $p->{donation_date};
 
-    my $parser = DateTime::Format::Strptime->new( pattern   => $format,
-                                                  time_zone => 'floating',
-                                                );
+    my $parser = DateTime::Format::Strptime->new(
+        pattern   => $format,
+        time_zone => 'floating',
+    );
 
     my $dt = $parser->parse_datetime( $p->{donation_date} );
 
-    return { field   => 'donation_date',
-             message => 'This does not seem to be a valid date.',
-           }
+    return {
+        field   => 'donation_date',
+        message => 'This does not seem to be a valid date.',
+        }
         unless $dt;
 
     return;
 }
 
-sub _base_uri_path
-{
+sub _base_uri_path {
     my $self = shift;
 
-    return $self->contact()->_base_uri_path() . '/donation/' . $self->donation_id();
+    return
+          $self->contact()->_base_uri_path()
+        . '/donation/'
+        . $self->donation_id();
 }
 
 no Fey::ORM::Table;

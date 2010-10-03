@@ -13,20 +13,19 @@ use R2::Types qw( ErrorForSession URIStr HashRef );
 # These are not available yet?
 #requires qw( redirect_and_detach session_object );
 
-
 my $JSON = JSON::XS->new();
 $JSON->pretty(1);
 $JSON->utf8(1);
 
-my %spec = ( uri       => { isa => URIStr, coerce => 1 },
-             error     => { isa => ErrorForSession, optional => 1 },
-             form_data => { isa => HashRef, optional => 1 },
-           );
+my %spec = (
+    uri       => { isa => URIStr,          coerce   => 1 },
+    error     => { isa => ErrorForSession, optional => 1 },
+    form_data => { isa => HashRef,         optional => 1 },
+);
 
-sub redirect_with_error
-{
+sub redirect_with_error {
     my $self = shift;
-    my %p    = validated_hash( \@_, %spec );
+    my %p = validated_hash( \@_, %spec );
 
     die "Must provide a form or error" unless $p{error} || $p{form};
 
@@ -35,12 +34,10 @@ sub redirect_with_error
     $self->session_object()->set_form_data( $p{form_data} )
         if $p{form_data};
 
-    if ( $self->request()->looks_like_browser() )
-    {
+    if ( $self->request()->looks_like_browser() ) {
         $self->redirect_and_detach( $p{uri} );
     }
-    else
-    {
+    else {
         my $uri = $self->uri_with_sessionid( $p{uri} );
 
         $self->response()->status(RC_OK);

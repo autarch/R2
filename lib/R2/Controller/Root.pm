@@ -12,39 +12,34 @@ BEGIN { extends 'R2::Controller::Base' }
 
 __PACKAGE__->config()->{namespace} = '';
 
-
-sub root : Path('/') : Args(0)
-{
+sub root : Path('/') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
     $c->redirect_and_detach( $c->account()->uri() );
 }
 
-sub exit : Path('/exit') : Args(0)
-{
+sub exit : Path('/exit') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
-    R2::Exception->throw( 'Naughty attempt to kill R2' )
+    R2::Exception->throw('Naughty attempt to kill R2')
         if R2::Config->new()->is_production();
 
     exit 0;
 }
 
-sub die : Path('/die') : Args(0)
-{
+sub die : Path('/die') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
-    R2::Exception->throw( 'Naughty attempt to kill R2' )
+    R2::Exception->throw('Naughty attempt to kill R2')
         if R2::Config->new()->is_production();
 
     die 'Dead';
 }
 
-sub robots_txt : Path('/robots.txt') : Args(0)
-{
+sub robots_txt : Path('/robots.txt') : Args(0) {
     my $self = shift;
     my $c    = shift;
 

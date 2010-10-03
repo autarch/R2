@@ -35,7 +35,6 @@ use MooseX::Params::Validate qw( validated_list );
 
 with 'R2::Role::Schema::URIMaker';
 
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -45,126 +44,122 @@ with 'R2::Role::Schema::URIMaker';
 
     has_one( $schema->table('Domain') );
 
-    has_many 'donation_sources' =>
-        ( table    => $schema->table('DonationSource'),
-          cache    => 1,
-          order_by => [ $schema->table('DonationSource')->column('name') ],
-        );
+    has_many 'donation_sources' => (
+        table    => $schema->table('DonationSource'),
+        cache    => 1,
+        order_by => [ $schema->table('DonationSource')->column('name') ],
+    );
 
-    has_many 'donation_targets' =>
-        ( table    => $schema->table('DonationTarget'),
-          cache    => 1,
-          order_by => [ $schema->table('DonationTarget')->column('name') ],
-        );
+    has_many 'donation_targets' => (
+        table    => $schema->table('DonationTarget'),
+        cache    => 1,
+        order_by => [ $schema->table('DonationTarget')->column('name') ],
+    );
 
-    has_many 'payment_types' =>
-        ( table    => $schema->table('PaymentType'),
-          cache    => 1,
-          order_by => [ $schema->table('PaymentType')->column('name') ],
-        );
+    has_many 'payment_types' => (
+        table    => $schema->table('PaymentType'),
+        cache    => 1,
+        order_by => [ $schema->table('PaymentType')->column('name') ],
+    );
 
-    has_many 'address_types' =>
-        ( table    => $schema->table('AddressType'),
-          cache    => 1,
-          order_by => [ $schema->table('AddressType')->column('name') ],
-        );
+    has_many 'address_types' => (
+        table    => $schema->table('AddressType'),
+        cache    => 1,
+        order_by => [ $schema->table('AddressType')->column('name') ],
+    );
 
-    has_many 'phone_number_types' =>
-        ( table    => $schema->table('PhoneNumberType'),
-          cache    => 1,
-          order_by => [ $schema->table('PhoneNumberType')->column('name') ],
-        );
+    has_many 'phone_number_types' => (
+        table    => $schema->table('PhoneNumberType'),
+        cache    => 1,
+        order_by => [ $schema->table('PhoneNumberType')->column('name') ],
+    );
 
-    has_many 'messaging_providers' =>
-        ( table       => $schema->table('MessagingProvider'),
-          cache       => 1,
-          select      => __PACKAGE__->_BuildMessagingProvidersSelect(),
-          bind_params => sub { $_[0]->account_id() },
-        );
+    has_many 'messaging_providers' => (
+        table       => $schema->table('MessagingProvider'),
+        cache       => 1,
+        select      => __PACKAGE__->_BuildMessagingProvidersSelect(),
+        bind_params => sub { $_[0]->account_id() },
+    );
 
-    has_many 'custom_field_groups' =>
-        ( table    => $schema->table('CustomFieldGroup'),
-          cache    => 1,
-          order_by => [ $schema->table('CustomFieldGroup')->column('display_order') ],
-        );
+    has_many 'custom_field_groups' => (
+        table => $schema->table('CustomFieldGroup'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('CustomFieldGroup')->column('display_order') ],
+    );
 
-    for my $type ( qw( person household organization ) )
-    {
+    for my $type (qw( person household organization )) {
         my $meth = 'applies_to_' . $type;
 
-        my $default =
-            sub { my @groups = grep { $_->$meth() } $_[0]->custom_field_groups()->all();
-                  return
-                      Fey::Object::Iterator::FromArray->new
-                          ( classes => 'R2::Schema::CustomFieldGroup',
-                            objects => \@groups,
-                          );
-                };
+        my $default = sub {
+            my @groups
+                = grep { $_->$meth() } $_[0]->custom_field_groups()->all();
+            return Fey::Object::Iterator::FromArray->new(
+                classes => 'R2::Schema::CustomFieldGroup',
+                objects => \@groups,
+            );
+        };
 
-        has 'custom_field_groups_for_' . $type =>
-            ( is      => 'ro',
-              isa     => 'Fey::Object::Iterator::FromArray',
-              lazy    => 1,
-              default => $default,
+        has 'custom_field_groups_for_'
+            . $type => (
+            is      => 'ro',
+            isa     => 'Fey::Object::Iterator::FromArray',
+            lazy    => 1,
+            default => $default,
             );
     }
 
-    has '_messaging_provider_id_hash' =>
-        ( is         => 'ro',
-          isa        => HashRef,
-          lazy_build => 1,
-          init_arg   => undef,
-        );
+    has '_messaging_provider_id_hash' => (
+        is         => 'ro',
+        isa        => HashRef,
+        lazy_build => 1,
+        init_arg   => undef,
+    );
 
-    has_many 'contact_note_types' =>
-        ( table => $schema->table('ContactNoteType'),
-          cache => 1,
-        );
+    has_many 'contact_note_types' => (
+        table => $schema->table('ContactNoteType'),
+        cache => 1,
+    );
 
-    has 'made_a_note_contact_note_type' =>
-        ( is         => 'ro',
-          isa        => 'R2::Schema::ContactNoteType',
-          lazy_build => 1,
-        );
+    has 'made_a_note_contact_note_type' => (
+        is         => 'ro',
+        isa        => 'R2::Schema::ContactNoteType',
+        lazy_build => 1,
+    );
 
-    has 'countries' =>
-        ( is         => 'ro',
-          isa        => 'Fey::Object::Iterator::FromSelect::Caching',
-          lazy_build => 1,
-        );
+    has 'countries' => (
+        is         => 'ro',
+        isa        => 'Fey::Object::Iterator::FromSelect::Caching',
+        lazy_build => 1,
+    );
 
-    class_has '_CountriesSelect' =>
-        ( is      => 'ro',
-          isa     => 'Fey::SQL::Select',
-          default => sub { __PACKAGE__->_BuildCountriesSelect() },
-        );
+    class_has '_CountriesSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        default => sub { __PACKAGE__->_BuildCountriesSelect() },
+    );
 
     __PACKAGE__->_AddSQLMethods();
 }
 
-
-sub insert
-{
+sub insert {
     my $class = shift;
     my %p     = @_;
 
-    my $sub =
-        subname( 'R2::Schema::insert-initialize' =>
-                 sub
-                 {
-                     my $account = $class->SUPER::insert(%p);
+    my $sub = subname(
+        'R2::Schema::insert-initialize' => sub {
+            my $account = $class->SUPER::insert(%p);
 
-                     $account->_initialize();
+            $account->_initialize();
 
-                     return $account;
-                 }
-               );
+            return $account;
+        }
+    );
 
     return R2::Schema->RunInTransaction($sub);
 }
 
-sub _initialize
-{
+sub _initialize {
     my $self = shift;
 
     R2::Schema::AddressType->CreateDefaultsForAccount($self);
@@ -181,153 +176,141 @@ sub _initialize
 
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
 
-    for my $code ( qw( us ca ) )
-    {
-        $self->add_country
-            ( country    => R2::Schema::Country->new( iso_code => $code ),
-              is_default => ( $code eq 'us' ? 1 : 0 ),
-            );
+    for my $code (qw( us ca )) {
+        $self->add_country(
+            country => R2::Schema::Country->new( iso_code => $code ),
+            is_default => ( $code eq 'us' ? 1 : 0 ),
+        );
     }
 }
 
-sub add_user
-{
-    my $self            = shift;
-    my ( $user, $role ) =
-        validated_list( \@_,
-                        user => { isa => 'R2::Schema::User' },
-                        role => { isa => 'R2::Schema::Role' },
-                      );
+sub add_user {
+    my $self = shift;
+    my ( $user, $role ) = validated_list(
+        \@_,
+        user => { isa => 'R2::Schema::User' },
+        role => { isa => 'R2::Schema::Role' },
+    );
 
-    R2::Schema::AccountUserRole->insert
-        ( account_id => $self->account_id(),
-          user_id    => $user->user_id(),
-          role_id    => $role->role_id(),
-        );
+    R2::Schema::AccountUserRole->insert(
+        account_id => $self->account_id(),
+        user_id    => $user->user_id(),
+        role_id    => $role->role_id(),
+    );
 }
 
-sub add_country
-{
-    my $self      = shift;
-    my ( $country, $is_default ) =
-        validated_list( \@_,
-                        country    => { isa => 'R2::Schema::Country' },
-                        is_default => { isa => Bool },
-                      );
+sub add_country {
+    my $self = shift;
+    my ( $country, $is_default ) = validated_list(
+        \@_,
+        country    => { isa => 'R2::Schema::Country' },
+        is_default => { isa => Bool },
+    );
 
-    R2::Schema::AccountCountry->insert
-        ( account_id => $self->account_id(),
-          iso_code   => $country->iso_code(),
-          is_default => $is_default,
-        );
+    R2::Schema::AccountCountry->insert(
+        account_id => $self->account_id(),
+        iso_code   => $country->iso_code(),
+        is_default => $is_default,
+    );
 }
 
-sub update_or_add_donation_sources
-{
+sub update_or_add_donation_sources {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'donation_source',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'donation_source',
+        'name',
+    );
 }
 
-sub update_or_add_donation_targets
-{
+sub update_or_add_donation_targets {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'donation_target',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'donation_target',
+        'name',
+    );
 }
 
-sub update_or_add_payment_types
-{
+sub update_or_add_payment_types {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'payment_type',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'payment_type',
+        'name',
+    );
 }
 
-sub update_or_add_address_types
-{
+sub update_or_add_address_types {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'address_type',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'address_type',
+        'name',
+    );
 }
 
-sub update_or_add_phone_number_types
-{
+sub update_or_add_phone_number_types {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'phone_number_type',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'phone_number_type',
+        'name',
+    );
 }
 
-sub update_or_add_contact_note_types
-{
+sub update_or_add_contact_note_types {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'contact_note_type',
-          'description',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'contact_note_type',
+        'description',
+    );
 }
 
-sub update_or_add_custom_field_groups
-{
+sub update_or_add_custom_field_groups {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
 
     my $order = $self->custom_field_group_count() + 1;
-    for my $new ( @{ $new } )
-    {
+    for my $new ( @{$new} ) {
         $new->{display_order} = $order++;
     }
 
-    $self->_update_or_add_things
-        ( $existing,
-          $new,
-          'custom_field_group',
-          'name',
-        );
+    $self->_update_or_add_things(
+        $existing,
+        $new,
+        'custom_field_group',
+        'name',
+    );
 }
 
-sub _update_or_add_things
-{
+sub _update_or_add_things {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
@@ -339,117 +322,104 @@ sub _update_or_add_things
 
     my $thing_pl = $thing . q{s};
 
-    my $class = 'R2::Schema::' . ( join '', map { ucfirst } split /_/, $thing );
+    my $class = 'R2::Schema::' . ( join '', map {ucfirst} split /_/, $thing );
 
     unless ( @{ $new || [] }
-             ||
-             any { ! string_is_empty( $_->{$name_col} ) }
-             values %{ $existing || {} } )
-    {
+        || any { !string_is_empty( $_->{$name_col} ) }
+        values %{ $existing || {} } ) {
         error "You must have at least one $thing_name.";
     }
 
-    my $sub =
-        subname( 'R2::Schema::_update_or_add_things-' . $thing =>
-                 sub
-                 {
-                     for my $thing ( $self->$thing_pl()->all() )
-                     {
-                         my $updated_thing = $existing->{ $thing->$id_col() };
+    my $sub = subname(
+        'R2::Schema::_update_or_add_things-' . $thing => sub {
+            for my $thing ( $self->$thing_pl()->all() ) {
+                my $updated_thing = $existing->{ $thing->$id_col() };
 
-                         if ( string_is_empty( $updated_thing->{$name_col} ) )
-                         {
-                             next unless $thing->is_deletable();
+                if ( string_is_empty( $updated_thing->{$name_col} ) ) {
+                    next unless $thing->is_deletable();
 
-                             $thing->delete();
-                         }
-                         else
-                         {
-                             $thing->update( %{ $updated_thing } );
-                         }
-                     }
+                    $thing->delete();
+                }
+                else {
+                    $thing->update( %{$updated_thing} );
+                }
+            }
 
-                     for my $new_thing ( @{ $new } )
-                     {
-                         $class->insert
-                             ( %{ $new_thing },
-                               account_id => $self->account_id(),
-                             );
-                     }
-                 }
-               );
+            for my $new_thing ( @{$new} ) {
+                $class->insert(
+                    %{$new_thing},
+                    account_id => $self->account_id(),
+                );
+            }
+        }
+    );
 
     R2::Schema->RunInTransaction($sub);
 
     return;
 }
 
-sub has_messaging_provider
-{
+sub has_messaging_provider {
     my $self     = shift;
     my $provider = shift;
 
-    return
-        $self->_messaging_provider_id_hash()
-             ->{ $provider->messaging_provider_id() };
+    return $self->_messaging_provider_id_hash()
+        ->{ $provider->messaging_provider_id() };
 }
 
-sub _build__messaging_provider_id_hash
-{
+sub _build__messaging_provider_id_hash {
     my $self = shift;
 
     return { map { $_->messaging_provider_id() => 1 }
-             $self->messaging_providers()->all() };
+            $self->messaging_providers()->all() };
 }
 
-sub _build_made_a_note_contact_note_type
-{
+sub _build_made_a_note_contact_note_type {
     my $self = shift;
 
-    return
-        R2::Schema::ContactNoteType->new( description => 'Made a note',
-                                          account_id  => $self->account_id(),
-                                        );
+    return R2::Schema::ContactNoteType->new(
+        description => 'Made a note',
+        account_id  => $self->account_id(),
+    );
 }
 
-sub _build_countries
-{
+sub _build_countries {
     my $self = shift;
 
     my $select = $self->_CountriesSelect();
 
     my $dbh = $self->_dbh($select);
 
-    return
-        Fey::Object::Iterator::FromSelect::Caching->new
-            ( classes     => [ qw( R2::Schema::AccountCountry R2::Schema::Country  ) ],
-              dbh         => $dbh,
-              select      => $select,
-              bind_params => [ $self->account_id() ],
-            );
+    return Fey::Object::Iterator::FromSelect::Caching->new(
+        classes => [qw( R2::Schema::AccountCountry R2::Schema::Country  )],
+        dbh     => $dbh,
+        select  => $select,
+        bind_params => [ $self->account_id() ],
+    );
 }
 
-sub _BuildMessagingProvidersSelect
-{
+sub _BuildMessagingProvidersSelect {
     my $class = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->tables( 'MessagingProvider' ) )
-           ->from( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
-           ->where( $schema->table('AccountMessagingProvider')->column('account_id'),
-                    '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('MessagingProvider')->column('name'),
-                       'ASC',
-                     );
+    $select->select( $schema->tables('MessagingProvider') )
+        ->from(
+        $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
+        ->where(
+        $schema->table('AccountMessagingProvider')->column('account_id'),
+        '=', Fey::Placeholder->new()
+        )->order_by(
+        $schema->table('MessagingProvider')->column('name'),
+        'ASC',
+        );
 
     return $select;
 }
 
-sub _BuildCountriesSelect
-{
+sub _BuildCountriesSelect {
     my $class = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
@@ -457,24 +427,23 @@ sub _BuildCountriesSelect
     my $schema = R2::Schema->Schema();
 
     $select->select( $schema->tables( 'AccountCountry', 'Country' ) )
-           ->from( $schema->tables( 'AccountCountry', 'Country' ) )
-           ->where( $schema->table('AccountCountry')->column('account_id'),
-                    '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('AccountCountry')->column('is_default'),
-                       'DESC',
-                       $schema->table('Country')->column('name'),
-                       'ASC',
-                     );
+        ->from( $schema->tables( 'AccountCountry', 'Country' ) )->where(
+        $schema->table('AccountCountry')->column('account_id'),
+        '=', Fey::Placeholder->new()
+        )->order_by(
+        $schema->table('AccountCountry')->column('is_default'),
+        'DESC',
+        $schema->table('Country')->column('name'),
+        'ASC',
+        );
 
     return $select;
 }
 
-sub _AddSQLMethods
-{
+sub _AddSQLMethods {
     my $schema = R2::Schema->Schema();
 
-    for my $type ( qw( Person Household Organization ) )
-    {
+    for my $type (qw( Person Household Organization )) {
         my $pl_type = PL_N($type);
 
         my $class = 'R2::Schema::' . $type;
@@ -484,82 +453,86 @@ sub _AddSQLMethods
         my $foreign_table = $schema->table($type);
 
         $select->select($foreign_table)
-               ->from( $schema->tables('Contact'), $foreign_table )
-               ->where( $schema->table('Contact')->column('account_id'),
-                        '=', Fey::Placeholder->new() )
-               ->order_by( @{ $class->DefaultOrderBy() } );
+            ->from( $schema->tables('Contact'), $foreign_table )->where(
+            $schema->table('Contact')->column('account_id'),
+            '=', Fey::Placeholder->new()
+            )->order_by( @{ $class->DefaultOrderBy() } );
 
-        has_many lc $pl_type =>
-            ( table       => $foreign_table,
-              select      => $select,
-              bind_params => sub { $_[0]->account_id() },
-            );
+        has_many lc $pl_type => (
+            table       => $foreign_table,
+            select      => $select,
+            bind_params => sub { $_[0]->account_id() },
+        );
 
         $select = R2::Schema->SQLFactoryClass()->new_select();
 
-        my $count =
-            Fey::Literal::Function->new
-                ( 'COUNT', @{ $foreign_table->primary_key() } );
+        my $count = Fey::Literal::Function->new( 'COUNT',
+            @{ $foreign_table->primary_key() } );
 
         $select->select($count)
-               ->from( $schema->tables('Contact'), $foreign_table )
-               ->where( $schema->table('Contact')->column('account_id'),
-                        '=', Fey::Placeholder->new() );
+            ->from( $schema->tables('Contact'), $foreign_table )->where(
+            $schema->table('Contact')->column('account_id'),
+            '=', Fey::Placeholder->new()
+            );
 
         my $build_count_meth = '_Build' . $type . 'CountSelect';
-        __PACKAGE__->meta()->add_method
-            ( $build_count_meth => sub { $select } );
+        __PACKAGE__->meta()->add_method( $build_count_meth => sub {$select} );
 
-        has lc $type . '_count' =>
-            ( metaclass   => 'FromSelect',
-              is          => 'ro',
-              isa         => PosOrZeroInt,
-              lazy        => 1,
-              select      => __PACKAGE__->$build_count_meth(),
-              bind_params => sub { $_[0]->account_id() },
+        has lc $type
+            . '_count' => (
+            metaclass   => 'FromSelect',
+            is          => 'ro',
+            isa         => PosOrZeroInt,
+            lazy        => 1,
+            select      => __PACKAGE__->$build_count_meth(),
+            bind_params => sub { $_[0]->account_id() },
             );
 
         my $applies_meth = 'applies_to_' . lc $type;
 
-        has lc $type . '_address_types' =>
-            ( is      => 'ro',
-              isa     => ArrayRef['R2::Schema::AddressType'],
-              lazy    => 1,
-              default => sub { [ grep { $_->$applies_meth() }
-                                 $_[0]->address_types()->all() ] },
-            );
+        has lc $type . '_address_types' => (
+            is      => 'ro',
+            isa     => ArrayRef ['R2::Schema::AddressType'],
+            lazy    => 1,
+            default => sub {
+                [ grep { $_->$applies_meth() }
+                        $_[0]->address_types()->all() ];
+            },
+        );
 
-        has lc $type . '_phone_number_types' =>
-            ( is      => 'ro',
-              isa     => ArrayRef['R2::Schema::PhoneNumberType'],
-              lazy    => 1,
-              default => sub { [ grep { $_->$applies_meth() }
-                                 $_[0]->phone_number_types()->all() ] },
-            );
+        has lc $type . '_phone_number_types' => (
+            is      => 'ro',
+            isa     => ArrayRef ['R2::Schema::PhoneNumberType'],
+            lazy    => 1,
+            default => sub {
+                [ grep { $_->$applies_meth() }
+                        $_[0]->phone_number_types()->all() ];
+            },
+        );
     }
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
     my $cfg_table = $schema->table('CustomFieldGroup');
 
-    my $count = Fey::Literal::Function->new( 'COUNT', @{ $cfg_table->primary_key() } );
+    my $count = Fey::Literal::Function->new( 'COUNT',
+        @{ $cfg_table->primary_key() } );
 
-    $select->select($count)
-           ->from( $cfg_table )
-           ->where( $cfg_table->column('account_id'), '=', Fey::Placeholder->new() );
+    $select->select($count)->from($cfg_table)
+        ->where( $cfg_table->column('account_id'), '=',
+        Fey::Placeholder->new() );
 
-    has 'custom_field_group_count' =>
-        ( metaclass   => 'FromSelect',
-          is          => 'ro',
-          isa         => PosOrZeroInt,
-          lazy        => 1,
-          select      => $select,
-          bind_params => sub { $_[0]->account_id() },
-        );
+    has 'custom_field_group_count' => (
+        metaclass   => 'FromSelect',
+        is          => 'ro',
+        isa         => PosOrZeroInt,
+        lazy        => 1,
+        select      => $select,
+        bind_params => sub { $_[0]->account_id() },
+    );
 }
 
-sub _base_uri_path
-{
+sub _base_uri_path {
     my $self = shift;
 
     return '/account/' . $self->account_id();

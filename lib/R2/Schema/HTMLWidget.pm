@@ -8,7 +8,6 @@ use R2::Schema;
 
 use Fey::ORM::Table;
 
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -17,16 +16,15 @@ use Fey::ORM::Table;
     has_table( $schema->table('HTMLWidget') );
 }
 
-sub CreateDefaultWidgets
-{
+sub CreateDefaultWidgets {
     my $class = shift;
 
-    for my $name ( map { $_->type() } R2::CustomFieldType->All() )
-    {
-        $class->insert( name        => $name,
-                        description => 'default input for ' . $name,
-                        type        => $name,
-                      );
+    for my $name ( map { $_->type() } R2::CustomFieldType->All() ) {
+        $class->insert(
+            name        => $name,
+            description => 'default input for ' . $name,
+            type        => $name,
+        );
     }
 }
 

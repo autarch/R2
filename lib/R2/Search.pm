@@ -7,20 +7,19 @@ use R2::Types qw( PosInt PosOrZeroInt );
 
 use Moose;
 
-has 'limit' =>
-    ( is      => 'ro',
-      isa     => PosOrZeroInt,
-      default => 0,
-    );
+has 'limit' => (
+    is      => 'ro',
+    isa     => PosOrZeroInt,
+    default => 0,
+);
 
-has 'page' =>
-    ( is      => 'ro',
-      isa     => PosInt,
-      default => 1,
-    );
+has 'page' => (
+    is      => 'ro',
+    isa     => PosInt,
+    default => 1,
+);
 
-sub _apply_limit
-{
+sub _apply_limit {
     my $self   = shift;
     my $select = shift;
 

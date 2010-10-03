@@ -20,20 +20,17 @@ use Fey::ORM::Table;
     has_one( $schema->table('MessagingProvider') );
 }
 
-
-sub CreateDefaultsForAccount
-{
+sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
     my $providers = R2::Schema::MessagingProvider->All();
 
-    while ( my $provider = $providers->next() )
-    {
-        $class->insert
-            ( account_id            => $account->account_id(),
-              messaging_provider_id => $provider->messaging_provider_id(),
-            );
+    while ( my $provider = $providers->next() ) {
+        $class->insert(
+            account_id            => $account->account_id(),
+            messaging_provider_id => $provider->messaging_provider_id(),
+        );
     }
 }
 

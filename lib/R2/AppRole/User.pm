@@ -7,15 +7,13 @@ use R2::Schema::User;
 
 use Moose::Role;
 
-has 'user' =>
-    ( is         => 'ro',
-      isa        => 'R2::Schema::User|Undef',
-      lazy_build => 1,
-    );
+has 'user' => (
+    is         => 'ro',
+    isa        => 'R2::Schema::User|Undef',
+    lazy_build => 1,
+);
 
-
-sub _build_user
-{
+sub _build_user {
     my $self = shift;
 
     my $cookie = $self->authen_cookie_value();

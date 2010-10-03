@@ -13,9 +13,8 @@ use URI::http;
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
-         { steps => [ qw( _validate_and_canonicalize_uri ) ] };
+    { steps => [qw( _validate_and_canonicalize_uri )] };
 with 'R2::Role::Schema::HistoryRecorder';
-
 
 {
     my $schema = R2::Schema->Schema();
@@ -31,9 +30,7 @@ with 'R2::Role::Schema::HistoryRecorder';
         inflate { defined $_[1] ? URI->new( $_[1] ) : $_[1] };
 }
 
-
-sub _validate_and_canonicalize_uri
-{
+sub _validate_and_canonicalize_uri {
     my $self = shift;
     my $p    = shift;
 
@@ -41,9 +38,10 @@ sub _validate_and_canonicalize_uri
 
     my $canonical = $self->_canonicalize_uri( $p->{uri} );
 
-    return { message => qq{"$p->{uri}" is not a valid web address.},
-             field   => 'uri',
-           }
+    return {
+        message => qq{"$p->{uri}" is not a valid web address.},
+        field   => 'uri',
+        }
         unless is_web_uri($canonical);
 
     $p->{uri} = $canonical;
@@ -51,20 +49,18 @@ sub _validate_and_canonicalize_uri
     return;
 }
 
-sub _canonicalize_uri
-{
+sub _canonicalize_uri {
     my $self = shift;
     my $uri  = shift;
 
-    $uri =
-        URI->new( $uri =~ /^https?/
-                  ? $uri
-                  : 'http://' . $uri
-                );
+    $uri = URI->new(
+          $uri =~ /^https?/
+        ? $uri
+        : 'http://' . $uri
+    );
 
     if ( ( $uri->scheme() && $uri->scheme() !~ /^https?/ )
-         || string_is_empty( $uri->host() ) )
-    {
+        || string_is_empty( $uri->host() ) ) {
         return undef;
     }
 

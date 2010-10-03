@@ -14,7 +14,6 @@ use Fey::ORM::Table;
 with 'R2::Role::Schema::DataValidator';
 with 'R2::Role::Schema::HistoryRecorder';
 
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -24,32 +23,30 @@ with 'R2::Role::Schema::HistoryRecorder';
 
     has_one( $schema->table('Contact') );
 
-    has_one 'type' =>
-        ( table => $schema->table('AddressType') );
+    has_one 'type' => ( table => $schema->table('AddressType') );
 
     has_one( $schema->table('Country') );
 
-    has 'city_region_postal_code' =>
-        ( is         => 'ro',
-          isa        => 'Str|Undef',
-          lazy_build => 1,
-        );
+    has 'city_region_postal_code' => (
+        is         => 'ro',
+        isa        => 'Str|Undef',
+        lazy_build => 1,
+    );
 
-    has 'summary' =>
-        ( is         => 'ro',
-          isa        => 'Str',
-          lazy_build => 1,
-        );
+    has 'summary' => (
+        is         => 'ro',
+        isa        => 'Str',
+        lazy_build => 1,
+    );
 }
 
-sub _build_city_region_postal_code
-{
+sub _build_city_region_postal_code {
     my $self = shift;
 
-    my $c_r_pc = join ', ', grep { ! string_is_empty($_) } $self->city(), $self->region();
+    my $c_r_pc = join ', ', grep { !string_is_empty($_) } $self->city(),
+        $self->region();
 
-    if ( ! string_is_empty( $self->postal_code() ) )
-    {
+    if ( !string_is_empty( $self->postal_code() ) ) {
         $c_r_pc .= q{ } if $c_r_pc;
         $c_r_pc .= $self->postal_code();
     }
@@ -57,12 +54,11 @@ sub _build_city_region_postal_code
     return $c_r_pc;
 }
 
-sub _build_summary
-{
+sub _build_summary {
     my $self = shift;
 
-    my $summary =
-        first { ! string_is_empty($_) } map { $self->$_() } qw( street_1 city_region_postal_code );
+    my $summary = first { !string_is_empty($_) }
+    map { $self->$_() } qw( street_1 city_region_postal_code );
 
     return $summary || q{};
 }

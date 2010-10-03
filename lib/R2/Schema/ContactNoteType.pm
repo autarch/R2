@@ -17,62 +17,62 @@ use Fey::ORM::Table;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $count =
-        Fey::Literal::Function->new
-            ( 'COUNT', @{ $schema->table('ContactNote')->primary_key() } );
+    my $count = Fey::Literal::Function->new( 'COUNT',
+        @{ $schema->table('ContactNote')->primary_key() } );
 
-    $select->select($count)
-           ->from( $schema->tables('ContactNote') )
-           ->where( $schema->table('ContactNote')->column('contact_note_type_id'),
-                    '=', Fey::Placeholder->new() );
+    $select->select($count)->from( $schema->tables('ContactNote') )->where(
+        $schema->table('ContactNote')->column('contact_note_type_id'),
+        '=', Fey::Placeholder->new()
+    );
 
-    has 'note_count' =>
-        ( metaclass   => 'FromSelect',
-          is          => 'ro',
-          isa         => PosOrZeroInt,
-          lazy        => 1,
-          select      => $select,
-          bind_params => sub { $_[0]->contact_note_type_id() },
-        );
+    has 'note_count' => (
+        metaclass   => 'FromSelect',
+        is          => 'ro',
+        isa         => PosOrZeroInt,
+        lazy        => 1,
+        select      => $select,
+        bind_params => sub { $_[0]->contact_note_type_id() },
+    );
 }
 
-sub CreateDefaultsForAccount
-{
+sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    $class->insert( description       => 'Made a note',
-                    account_id        => $account->account_id(),
-                    is_system_defined => 1,
-                  );
+    $class->insert(
+        description       => 'Made a note',
+        account_id        => $account->account_id(),
+        is_system_defined => 1,
+    );
 
-    $class->insert( description => 'Called this contact',
-                    account_id  => $account->account_id(),
-                  );
+    $class->insert(
+        description => 'Called this contact',
+        account_id  => $account->account_id(),
+    );
 
-    $class->insert( description => 'Met with this contact',
-                    account_id  => $account->account_id(),
-                  );
+    $class->insert(
+        description => 'Met with this contact',
+        account_id  => $account->account_id(),
+    );
 
-    $class->insert( description => 'Contact attended an event',
-                    account_id  => $account->account_id(),
-                  );
+    $class->insert(
+        description => 'Contact attended an event',
+        account_id  => $account->account_id(),
+    );
 }
 
-sub is_updateable
-{
+sub is_updateable {
     my $self = shift;
 
-    return ! $self->is_system_defined();
+    return !$self->is_system_defined();
 }
 
-sub is_deletable
-{
+sub is_deletable {
     my $self = shift;
 
     return 0 if $self->is_system_defined();
 
-    return ! $self->note_count();
+    return !$self->note_count();
 }
 
 no Fey::ORM::Table;

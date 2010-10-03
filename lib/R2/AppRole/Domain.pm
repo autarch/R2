@@ -7,15 +7,13 @@ use R2::Schema::Domain;
 
 use Moose::Role;
 
-has 'domain' =>
-    ( is         => 'ro',
-      isa        => 'R2::Schema::Domain',
-      lazy_build => 1,
-    );
+has 'domain' => (
+    is         => 'ro',
+    isa        => 'R2::Schema::Domain',
+    lazy_build => 1,
+);
 
-
-sub _build_domain
-{
+sub _build_domain {
     my $self = shift;
 
     my $host = $self->request()->uri()->host();

@@ -18,8 +18,7 @@ use Fey::ORM::Table;
 
     has_one( $schema->table('Person') );
 
-    has_one 'provider' =>
-        ( table => $schema->table('MessagingProvider') );
+    has_one 'provider' => ( table => $schema->table('MessagingProvider') );
 }
 
 no Fey::ORM::Table;
