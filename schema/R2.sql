@@ -3,33 +3,37 @@ SET CLIENT_MIN_MESSAGES = ERROR;
 CREATE DOMAIN email_address AS VARCHAR(255)
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
+-- Is there a way to ensure that this table only ever has one row?
+CREATE TABLE "Version" (
+       version                  INTEGER         PRIMARY KEY
+);
+
 CREATE TABLE "User" (
        -- will be the same as a person_id
-       user_id            INT8               PRIMARY KEY,
-       username           VARCHAR(255)       UNIQUE NOT NULL,
-       -- SHA512 in Base64 encoding
-       password           VARCHAR(86)        NOT NULL,
-       time_zone          VARCHAR(50)        NOT NULL DEFAULT 'UTC',
-       date_format        VARCHAR(12)        NOT NULL DEFAULT 'MM-dd-YYYY',
-       time_format        VARCHAR(12)        NOT NULL DEFAULT 'hh:mm a',
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       is_system_admin    BOOLEAN            DEFAULT FALSE,
+       user_id                  INT8            PRIMARY KEY,
+       username                 TEXT            UNIQUE NOT NULL,
+       -- RFC2307 Blowfish crypt
+       password                 VARCHAR(67)     NOT NULL,
+       time_zone                TEXT            NOT NULL DEFAULT 'UTC',
+       locale_code              TEXT            NOT NULL DEFAULT 'en_US',
+       creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       is_system_admin          BOOLEAN         DEFAULT FALSE,
        CONSTRAINT valid_username CHECK ( username != '' ),
        CONSTRAINT valid_password CHECK ( password != '' )
 );
 
 CREATE TABLE "Account" (
-       account_id         SERIAL             PRIMARY KEY,
-       name               VARCHAR(255)       UNIQUE  NOT NULL,
-       domain_id          INTEGER            NOT NULL,
-       default_time_zone  VARCHAR(50)        NOT NULL DEFAULT 'UTC',
-       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       account_id               SERIAL          PRIMARY KEY,
+       name                     TEXT            UNIQUE  NOT NULL,
+       domain_id                INTEGER         NOT NULL,
+       default_time_zone        TEXT            NOT NULL DEFAULT 'UTC',
+       creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "Role" (
-       role_id            SERIAL             PRIMARY KEY,
-       name               VARCHAR(30)        UNIQUE NOT NULL
+       role_id                  SERIAL          PRIMARY KEY,
+       name                     citext          UNIQUE  NOT NULL
 );
 
 CREATE TABLE "AccountUserRole" (
@@ -39,33 +43,40 @@ CREATE TABLE "AccountUserRole" (
        PRIMARY KEY ( account_id, user_id )
 );
 
+CREATE DOMAIN hostname AS citext
+       CONSTRAINT valid_hostname CHECK ( VALUE ~ E'^[^\\.]+(?:\\.[^\\.]+)+$' );
+
 CREATE TABLE "Domain" (
        domain_id          SERIAL             PRIMARY KEY,
-       web_hostname       VARCHAR(255)       UNIQUE NOT NULL,
-       email_hostname     VARCHAR(255)       UNIQUE NOT NULL,
+       web_hostname       hostname           UNIQUE  NOT NULL,
+       email_hostname     hostname           NOT NULL,
        requires_ssl       BOOLEAN            DEFAULT FALSE,
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_web_hostname CHECK ( web_hostname != '' ),
        CONSTRAINT valid_email_hostname CHECK ( email_hostname != '' )
 );
 
+CREATE DOMAIN filename AS citext
+       CONSTRAINT no_slashes CHECK ( VALUE ~ E'^[^\\\\/]+$' );
+
 CREATE TABLE "File" (
        file_id            SERIAL8            PRIMARY KEY,
-       mime_type          VARCHAR(100)       NOT NULL,
-       filename           TEXT               NOT NULL,
+       mime_type          citext             NOT NULL,
+       filename           filename           NOT NULL,
        -- This lets us look up a variation of a file (notably a
        -- resized image) by generating a file name from some other
        -- File row, rather than having to know its file_id. For most
        -- files, this will be the same as its file_id, but for resized
        -- images it will be something like 1234-100x100
-       unique_name        TEXT               UNIQUE NULL,
+       unique_name        citext             UNIQUE NULL,
        contents           BYTEA              NOT NULL,
+       creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        account_id         INT8               NOT NULL
 );
 
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
-CREATE DOMAIN uri AS VARCHAR(255)
+CREATE DOMAIN uri AS TEXT
        CONSTRAINT valid_uri CHECK ( VALUE ~ E'^https?://[\\w-_]+(\.[\\w-_]+)*\\.\\w{2,3}' );
 
 CREATE TABLE "Contact" (
@@ -79,13 +90,13 @@ CREATE TABLE "Contact" (
        image_file_id      INT8               NULL,
        -- an identifier from another app, probably created via an
        -- initial import from something else
-       external_id        VARCHAR(255)       UNIQUE NULL,
+       external_id        TEXT               UNIQUE NULL,
        account_id         INTEGER            NOT NULL
 );
 
 CREATE TABLE "Group" (
        group_id           SERIAL             PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               citext             NOT NULL,
        is_mailing_list    BOOLEAN            NOT NULL DEFAULT FALSE,
        applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -104,7 +115,7 @@ CREATE DOMAIN pos_int AS INTEGER
 
 CREATE TABLE "CustomFieldGroup" (
        custom_field_group_id          SERIAL8      PRIMARY KEY,
-       name                           VARCHAR(255) NOT NULL,
+       name                           citext       NOT NULL,
        display_order                  pos_int      NOT NULL,
        applies_to_person              BOOLEAN      NOT NULL DEFAULT TRUE,
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -121,7 +132,7 @@ CREATE TYPE custom_field_type AS
 
 CREATE TABLE "CustomField" (
        custom_field_id          SERIAL8      PRIMARY KEY,
-       label                    VARCHAR(255) NOT NULL,
+       label                    TEXT         NOT NULL,
        description              TEXT         NOT NULL DEFAULT '',
        type                     custom_field_type  NOT NULL,
        is_required              BOOLEAN      DEFAULT FALSE,
@@ -136,8 +147,8 @@ CREATE TABLE "CustomField" (
 
 CREATE TABLE "HTMLWidget" (
        html_widget_id           SERIAL       PRIMARY KEY,
-       name                     VARCHAR(255) UNIQUE NOT NULL,
-       description              VARCHAR(255) NOT NULL,
+       name                     TEXT         UNIQUE NOT NULL,
+       description              TEXT         NOT NULL,
        type                     custom_field_type  NOT NULL
 );
 
@@ -218,7 +229,7 @@ CREATE TABLE "ContactNote" (
 
 CREATE TABLE "ContactNoteType" (
        contact_note_type_id  SERIAL          PRIMARY KEY,
-       description        VARCHAR(255)       NOT NULL,
+       description        TEXT               NOT NULL,
        is_system_defined  BOOLEAN            NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' ),
@@ -246,8 +257,8 @@ CREATE TABLE "ContactHistory" (
 
 CREATE TABLE "ContactHistoryType" (
        contact_history_type_id  SERIAL       PRIMARY KEY,
-       system_name        VARCHAR(255)       UNIQUE  NOT NULL,
-       description        VARCHAR(255)       NOT NULL,
+       system_name        TEXT               UNIQUE  NOT NULL,
+       description        TEXT               NOT NULL,
        sort_order         pos_int            NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' )
 );
@@ -257,44 +268,39 @@ CREATE TABLE "ContactTag" (
        tag_id           INT8            NOT NULL
 );
 
-CREATE DOMAIN tag AS VARCHAR(255)
-       CONSTRAINT valid_tag CHECK ( VALUE ~ E'^\\S+$' );
-
 CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
-       tag              tag             NOT NULL,
+       tag              citext          NOT NULL,
        account_id       INT8            NOT NULL,
        CONSTRAINT tag_account_id_ck UNIQUE ( tag, account_id )
 );
 
-CREATE TYPE gender AS ENUM ( 'male', 'female', 'transgender' );
-
 CREATE TABLE "Person" (
        person_id          INT8               PRIMARY KEY,
-       salutation         VARCHAR(20)        NOT NULL DEFAULT '',
-       first_name         VARCHAR(255)       NOT NULL DEFAULT '',
-       middle_name        VARCHAR(255)       NOT NULL DEFAULT '',
-       last_name          VARCHAR(255)       NOT NULL DEFAULT '',
-       suffix             VARCHAR(20)        NOT NULL DEFAULT '',
+       salutation         citext             NOT NULL DEFAULT '',
+       first_name         citext             NOT NULL DEFAULT '',
+       middle_name        citext             NOT NULL DEFAULT '',
+       last_name          citext             NOT NULL DEFAULT '',
+       suffix             citext             NOT NULL DEFAULT '',
        birth_date         DATE               NULL,
-       gender             gender             NULL
+       gender             citext             NULL
 );
 
 CREATE TABLE "PersonMessagingProvider" (
        person_id          INT8               NOT NULL,
        messaging_provider_id  INT8           NOT NULL,
-       screen_name        VARCHAR(200)       NOT NULL,
+       screen_name        citext             NOT NULL,
        PRIMARY KEY ( person_id, messaging_provider_id )
 );
 
 CREATE TABLE "MessagingProvider" (
        messaging_provider_id  SERIAL8        PRIMARY KEY,
-       name                   VARCHAR(255)   UNIQUE  NOT NULL,
-       add_uri_template       VARCHAR(255)   NOT NULL DEFAULT '',
-       chat_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
-       call_uri_template      VARCHAR(255)   NOT NULL DEFAULT '',
-       video_uri_template     VARCHAR(255)   NOT NULL DEFAULT '',
-       status_uri_template    VARCHAR(255)   NOT NULL DEFAULT ''
+       name                   citext         UNIQUE  NOT NULL,
+       add_uri_template       TEXT           NOT NULL DEFAULT '',
+       chat_uri_template      TEXT           NOT NULL DEFAULT '',
+       call_uri_template      TEXT           NOT NULL DEFAULT '',
+       video_uri_template     TEXT           NOT NULL DEFAULT '',
+       status_uri_template    TEXT           NOT NULL DEFAULT ''
 );
 
 CREATE TABLE "AccountMessagingProvider" (
@@ -305,28 +311,28 @@ CREATE TABLE "AccountMessagingProvider" (
 
 CREATE TABLE "Household" (
        household_id       SERIAL8            PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               citext             NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "HouseholdMember" (
        household_id       INT8               NOT NULL,
        person_id          INT8               NOT NULL,
-       position           VARCHAR(255)       NOT NULL DEFAULT '',
+       position           citext             NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY ( household_id, person_id )
 );
 
 CREATE TABLE "Organization" (
        organization_id    INT8               PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               citext             NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "OrganizationMember" (
        organization_id    INT8               NOT NULL,
        person_id          INT8               NOT NULL,
-       position           VARCHAR(255)       NOT NULL DEFAULT '',
+       position           citext             NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        PRIMARY KEY ( organization_id, person_id )
 );
@@ -345,7 +351,7 @@ CREATE TABLE "EmailAddress" (
 CREATE TABLE "Website" (
        website_id         SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
-       label              VARCHAR(50)        NOT NULL DEFAULT 'Website',
+       label              TEXT               NOT NULL DEFAULT 'Website',
        uri                uri                NOT NULL,
        note               TEXT               NOT NULL DEFAULT ''
 );
@@ -355,11 +361,11 @@ CREATE TABLE "Address" (
        address_id         SERIAL8            PRIMARY KEY,
        contact_id         INTEGER            NOT NULL,
        address_type_id    INTEGER            NOT NULL,
-       street_1           VARCHAR(255)       NOT NULL DEFAULT '',
-       street_2           VARCHAR(255)       NOT NULL DEFAULT '',
-       city               VARCHAR(255)       NOT NULL DEFAULT '',
-       region             VARCHAR(255)       NOT NULL DEFAULT '',
-       postal_code        VARCHAR(20)        NOT NULL DEFAULT '',
+       street_1           citext             NOT NULL DEFAULT '',
+       street_2           citext             NOT NULL DEFAULT '',
+       city               citext             NOT NULL DEFAULT '',
+       region             citext             NOT NULL DEFAULT '',
+       postal_code        citext             NOT NULL DEFAULT '',
        iso_code           CHAR(2)            NOT NULL,
        latitude           FLOAT              NULL,
        longitude          FLOAT              NULL,
@@ -380,13 +386,13 @@ CREATE TABLE "AccountCountry" (
 
 CREATE TABLE "Country" (
        iso_code           CHAR(2)            PRIMARY KEY,
-       name               VARCHAR(255)       UNIQUE  NOT NULL,
+       name               TEXT               UNIQUE  NOT NULL,
        CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "TimeZone" (
-       olson_name         VARCHAR(255)       PRIMARY KEY,
+       olson_name         TEXT               PRIMARY KEY,
        iso_code           CHAR(2)            NOT NULL,
        description        VARCHAR(100)       NOT NULL,
        display_order      INTEGER            NOT NULL,
@@ -402,7 +408,7 @@ CREATE TABLE "TimeZone" (
 
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               TEXT               NOT NULL,
        applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -415,7 +421,7 @@ CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
        contact_id         INTEGER            NOT NULL,
        phone_number_type_id   INT8           NOT NULL,
-       phone_number       VARCHAR(30)        DEFAULT '',
+       phone_number       TEXT               DEFAULT '',
        is_preferred       BOOLEAN            DEFAULT FALSE,
        note               TEXT               NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -423,7 +429,7 @@ CREATE TABLE "PhoneNumber" (
 
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
-       name                  VARCHAR(255)    NOT NULL,
+       name                  TEXT            NOT NULL,
        applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
@@ -451,21 +457,21 @@ CREATE TABLE "Donation" (
 
 CREATE TABLE "DonationSource" (
        donation_source_id SERIAL8            PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "DonationTarget" (
        donation_target_id SERIAL8            PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
 CREATE TABLE "PaymentType" (
        payment_type_id    SERIAL8            PRIMARY KEY,
-       name               VARCHAR(255)       NOT NULL,
+       name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
@@ -509,7 +515,7 @@ ALTER TABLE "TimeZone" ADD CONSTRAINT "TimeZone_iso_code"
   FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "File" ADD CONSTRAINT "File_accont_id"
+ALTER TABLE "File" ADD CONSTRAINT "File_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -784,3 +790,5 @@ ALTER TABLE "Donation" ADD CONSTRAINT "Donation_payment_type_id"
 ALTER TABLE "PaymentType" ADD CONSTRAINT "PaymentType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
+
+INSERT INTO "Version" (version) VALUES (1);
