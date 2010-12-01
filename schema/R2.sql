@@ -1,14 +1,5 @@
 SET CLIENT_MIN_MESSAGES = ERROR;
 
-DROP DATABASE IF EXISTS "R2";
-
-CREATE DATABASE "R2"
-       ENCODING = 'UTF8';
-
-\connect "R2"
-
-SET CLIENT_MIN_MESSAGES = ERROR;
-
 CREATE DOMAIN email_address AS VARCHAR(255)
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
