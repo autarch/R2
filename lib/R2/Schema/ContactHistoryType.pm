@@ -36,10 +36,7 @@ use MooseX::ClassAttribute;
         bind_params => sub { $_[0]->contact_history_type_id() },
     );
 
-    my $x = 1;
     for my $type ( __PACKAGE__->_Types() ) {
-        $type->{sort_order} = $x++;
-
         my $name = $type->{system_name};
 
         class_has $name => (
@@ -52,11 +49,7 @@ use MooseX::ClassAttribute;
 }
 
 sub EnsureRequiredContactHistoryTypesExist {
-    for my $type ( __PACKAGE__->_Types() ) {
-        my $name = $type->{system_name};
-
-        __PACKAGE_->$name();
-    }
+    __PACKAGE__->_FindOrCreateType($_) for __PACKAGE__->_Types();
 }
 
 sub _FindOrCreateType {
@@ -70,8 +63,8 @@ sub _FindOrCreateType {
     return $obj;
 }
 
-sub _Types {
-    return (
+{
+    my @Types = (
         {
             system_name => 'Created',
             description => 'Contact was created',
@@ -152,6 +145,11 @@ sub _Types {
             description => 'A phone number for the contact was modified',
         },
     );
+
+    my $x = 1;
+    $_->{sort_order} = $x++ for @Types;
+
+    sub _Types {@Types}
 }
 
 no Fey::ORM::Table;

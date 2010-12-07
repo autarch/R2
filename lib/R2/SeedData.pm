@@ -118,3 +118,5 @@ sub make_account {
 
 EOF
 }
+
+1;

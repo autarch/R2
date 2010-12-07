@@ -11,12 +11,20 @@ use Fey::ORM::Schema;
 
 if ($R2::Schema::TestSchema) {
     has_schema($R2::Schema::TestSchema);
+
+    require DBD::Mock;
+
+    my $source = Fey::DBIManager::Source->new( dsn => 'dbi:Mock:' );
+
+    $source->dbh()->{HandleError} = sub { Carp::confess(shift); };
+
+    __PACKAGE__->DBIManager()->add_source($source);
 }
 else {
-    my $dbi_config = R2::Config->new()->dbi_config();
+    my $config = R2::Config->new()->database_connection();
 
     my $source = Fey::DBIManager::Source->new(
-        %{$dbi_config},
+        %{$config},
         post_connect => \&_set_dbh_attributes,
     );
 
@@ -32,7 +40,14 @@ sub _set_dbh_attributes {
 
     $dbh->{pg_enable_utf8} = 1;
 
+    # In an ideal world, this would cause all non-binary data to be marked as
+    # utf-8. See https://rt.cpan.org/Public/Bug/Display.html?id=40199 for
+    # details.
+    $dbh->do(q{SET CLIENT_ENCODING TO 'UTF8'});
+
     $dbh->do('SET TIME ZONE UTC');
+
+    $dbh->{HandleError} = sub { Carp::confess(shift) };
 
     return;
 }

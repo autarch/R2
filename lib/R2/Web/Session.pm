@@ -19,26 +19,26 @@ has form_data => (
 );
 
 has _errors => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => ArrayRef [ NonEmptyStr | HashRef ],
-    default   => sub { [] },
-    init_arg  => undef,
-    provides  => {
-        push     => 'add_error',
-        elements => 'errors',
+    traits   => ['Array'],
+    is       => 'ro',
+    isa      => ArrayRef [ NonEmptyStr | HashRef ],
+    default  => sub { [] },
+    init_arg => undef,
+    provides => {
+        add_error => 'push',
+        errors    => 'elements',
     },
 );
 
 has _messages => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => ArrayRef [NonEmptyStr],
-    default   => sub { [] },
-    init_arg  => undef,
-    provides  => {
-        push     => 'add_message',
-        elements => 'messages',
+    traits   => ['Array'],
+    is       => 'ro',
+    isa      => ArrayRef [NonEmptyStr],
+    default  => sub { [] },
+    init_arg => undef,
+    provides => {
+        add_message => 'push',
+        messages    => 'elements',
     },
 );
 

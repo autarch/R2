@@ -200,13 +200,13 @@ with 'R2::Role::Schema::URIMaker';
     );
 
     has '_custom_field_values' => (
-        metaclass  => 'Collection::Hash',
+        traits     => ['Hash'],
         is         => 'ro',
         isa        => HashRef,
         lazy_build => 1,
-        provides   => {
-            'get' => 'custom_field_value',
-            'set' => '_set_custom_field_value',
+        handles    => {
+            custom_field_value      => 'get',
+            _set_custom_field_value => 'set',
         },
         init_arg => undef,
     );

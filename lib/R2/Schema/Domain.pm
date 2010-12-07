@@ -3,10 +3,13 @@ package R2::Schema::Domain;
 use strict;
 use warnings;
 
+use Net::Interface;
 use R2::Schema::Account;
 use R2::Schema;
 use R2::Types;
 use R2::Util qw( string_is_empty );
+use Socket qw( AF_INET );
+use Sys::Hostname qw( hostname );
 use URI::FromHash ();
 
 use Fey::ORM::Table;
@@ -49,12 +52,24 @@ sub _FindOrCreateDefaultDomain {
     my $class = shift;
 
     my $hostname = $ENV{R2_HOSTNAME}
-        || R2::Config->new()->system_hostname();
+        || __PACKAGE__->_SystemHostname();
 
     my $domain = $class->new( web_hostname => $hostname );
     return $domain if $domain;
 
     return $class->insert( web_hostname => $hostname );
+}
+
+sub _SystemHostname {
+    for my $name (
+        hostname(),
+        map { scalar gethostbyaddr( $_->address(), AF_INET ) }
+        grep { $_->address() } Net::Interface->interfaces()
+        ) {
+        return $name if $name =~ /\.[^.]+$/;
+    }
+
+    die 'Cannot determine system hostname.';
 }
 
 sub All {
