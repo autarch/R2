@@ -17,6 +17,13 @@ use Fey::ORM::Table;
 use MooseX::Params::Validate qw( validate );
 use MooseX::ClassAttribute;
 
+with 'R2::Role::Schema::DataValidator' => {
+    steps => [
+        '_web_hostname_is_unique',
+        '_email_hostname_is_unique',
+    ],
+};
+
 with 'R2::Role::Schema::URIMaker';
 
 {
@@ -35,12 +42,69 @@ with 'R2::Role::Schema::URIMaker';
         init_arg   => undef,
     );
 
+    class_has DefaultDomain => (
+        is      => 'ro',
+        isa     => __PACKAGE__,
+        lazy    => 1,
+        default => sub { __PACKAGE__->_FindOrCreateDefaultDomain() },
+    );
+
     class_has '_SelectAllSQL' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
         lazy    => 1,
         default => \&_MakeSelectAllSQL,
     );
+}
+
+around insert => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my %p     = @_;
+
+    $p{email_hostname} //= $p{web_hostname};
+
+    return $class->$orig(%p);
+};
+
+sub _web_hostname_is_unique {
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    return
+        if !$is_insert
+            && exists $p->{web_hostname}
+            && $p->{web_hostname} eq $self->web_hostname();
+
+    return unless __PACKAGE__->new( web_hostname => $p->{web_hostname} );
+
+    return {
+        field   => 'web_hostname',
+        message => loc(
+            'The web hostname you provided is already in use by another domain.'
+        ),
+    };
+}
+
+sub _email_hostname_is_unique {
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    return
+        if !$is_insert
+            && exists $p->{email_hostname}
+            && $p->{email_hostname} eq $self->email_hostname();
+
+    return unless __PACKAGE__->new( email_hostname => $p->{email_hostname} );
+
+    return {
+        field   => 'email_hostname',
+        message => loc(
+            'The email hostname you provided is already in use by another domain.'
+        ),
+    };
 }
 
 sub EnsureRequiredDomainsExist {
