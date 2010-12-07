@@ -6,6 +6,11 @@ use warnings;
 use base 'MooseX::Types::Combine';
 
 __PACKAGE__->provide_types_from(
-    qw( R2::Types::Internal MooseX::Types::Moose ));
+    qw(
+        MooseX::Types::Moose
+        MooseX::Types::Path::Class
+        R2::Types::Internal
+        )
+);
 
 1;
