@@ -2,6 +2,7 @@ package R2::Schema::ContactHistoryType;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Types qw( PosOrZeroInt );
@@ -151,8 +152,6 @@ sub _FindOrCreateType {
 
     sub _Types {@Types}
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

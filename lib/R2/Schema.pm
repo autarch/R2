@@ -2,6 +2,7 @@ package R2::Schema;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::DBIManager::Source;
 use Fey::Loader;
@@ -64,9 +65,6 @@ sub LoadAllClasses {
         die $@ if $@ && $@ !~ /\Qcan't locate $path/i;
     }
 }
-
-no Fey::ORM::Schema;
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

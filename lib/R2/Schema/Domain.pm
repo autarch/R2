@@ -2,6 +2,7 @@ package R2::Schema::Domain;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Net::Interface;
 use R2::Schema::Account;
@@ -131,8 +132,6 @@ sub application_uri {
 }
 
 sub domain { $_[0] }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -2,6 +2,7 @@ package R2::Schema::ContactNoteType;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Types qw( PosOrZeroInt );
@@ -74,8 +75,6 @@ sub is_deletable {
 
     return !$self->note_count();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

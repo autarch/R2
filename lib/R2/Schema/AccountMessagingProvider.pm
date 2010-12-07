@@ -2,6 +2,7 @@ package R2::Schema::AccountMessagingProvider;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Account;
 use R2::Schema::MessagingProvider;
@@ -33,8 +34,6 @@ sub CreateDefaultsForAccount {
         );
     }
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

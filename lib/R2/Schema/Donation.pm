@@ -2,6 +2,7 @@ package R2::Schema::Donation;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use DateTime::Format::Strptime;
 use R2::Schema::DonationSource;
@@ -99,8 +100,6 @@ sub _base_uri_path {
         . '/donation/'
         . $self->donation_id();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

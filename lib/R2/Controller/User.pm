@@ -2,6 +2,7 @@ package R2::Controller::User;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use LWPx::ParanoidAgent;
 use Net::OpenID::Consumer;
@@ -217,8 +218,6 @@ sub _login_user {
 
     $c->redirect_and_detach($redirect_to);
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

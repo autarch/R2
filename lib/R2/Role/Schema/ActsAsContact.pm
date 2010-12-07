@@ -2,6 +2,7 @@ package R2::Role::Schema::ActsAsContact;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Contact;
 
@@ -139,7 +140,5 @@ role {
         return @errors;
     };
 };
-
-no MooseX::Role::Parameterized;
 
 1;

@@ -2,6 +2,7 @@ package R2::Web::Tab;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -31,6 +32,4 @@ has 'is_selected' => (
 );
 
 __PACKAGE__->meta()->make_immutable();
-no Moose;
-
 1;

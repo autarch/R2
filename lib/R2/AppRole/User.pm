@@ -2,6 +2,7 @@ package R2::AppRole::User;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::User;
 
@@ -22,7 +23,5 @@ sub _build_user {
 
     return R2::Schema::User->new( user_id => $cookie->{user_id} );
 }
-
-no Moose::Role;
 
 1;

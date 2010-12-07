@@ -2,6 +2,7 @@ package R2::Schema::ContactHistory;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use DateTime::Format::Strptime;
 use List::AllUtils qw( first );
@@ -57,8 +58,6 @@ sub _base_uri_path {
         . '/history/'
         . $self->contact_history_id();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

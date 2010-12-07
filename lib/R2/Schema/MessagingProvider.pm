@@ -2,6 +2,7 @@ package R2::Schema::MessagingProvider;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Util qw( string_is_empty );
@@ -149,8 +150,6 @@ sub _build__SelectAllSQL {
     return $select;
 
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

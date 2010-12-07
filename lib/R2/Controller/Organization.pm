@@ -2,6 +2,7 @@ package R2::Controller::Organization;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Organization;
 use R2::Util qw( string_is_empty );
@@ -35,8 +36,6 @@ sub organization_POST {
 
     $c->redirect_and_detach( $organization->uri() );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

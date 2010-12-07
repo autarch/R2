@@ -2,6 +2,7 @@ package R2::Schema::AddressType;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
@@ -104,8 +105,6 @@ sub CreateDefaultsForAccount {
         account_id              => $account->account_id(),
     );
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

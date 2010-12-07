@@ -2,6 +2,7 @@ package R2::Schema::File;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use autodie;
 use Digest::SHA qw( sha512_hex );
@@ -168,9 +169,6 @@ sub _build_cache_dir {
         return $ImageType{$type};
     }
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

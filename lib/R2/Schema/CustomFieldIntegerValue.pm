@@ -2,6 +2,7 @@ package R2::Schema::CustomFieldIntegerValue;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::ORM::Table;
 
@@ -32,8 +33,6 @@ sub _ValidateValue {
 }
 
 with 'R2::Role::Schema::CustomFieldValue';
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

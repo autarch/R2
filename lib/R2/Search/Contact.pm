@@ -2,6 +2,7 @@ package R2::Search::Contact;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Literal::Function;
 use Fey::Literal::Term;
@@ -117,8 +118,5 @@ sub contact_count {
 }
 
 __PACKAGE__->meta()->make_immutable();
-
-no Moose;
-no MooseX::ClassAttribute;
 
 1;

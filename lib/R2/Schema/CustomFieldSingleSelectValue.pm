@@ -2,6 +2,7 @@ package R2::Schema::CustomFieldSingleSelectValue;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::ORM::Table;
 
@@ -41,8 +42,6 @@ sub _ValidateValue {
 
 with 'R2::Role::Schema::CustomFieldValue' =>
     { value_column => 'custom_field_select_option_id' };
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

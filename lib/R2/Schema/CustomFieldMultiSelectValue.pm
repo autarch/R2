@@ -2,6 +2,7 @@ package R2::Schema::CustomFieldMultiSelectValue;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::ORM::Table;
 use Moose::Util::TypeConstraints;
@@ -63,9 +64,6 @@ sub _replace_value_for_contact {
 
 with 'R2::Role::Schema::CustomFieldValue' =>
     { value_column => 'custom_field_select_option_id' };
-
-no Fey::ORM::Table;
-no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta()->make_immutable();
 

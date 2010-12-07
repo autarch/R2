@@ -2,6 +2,7 @@ package R2::CustomFieldType;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 
@@ -116,10 +117,6 @@ sub clean_value {
 sub value_is_valid {
     return 1;
 }
-
-no Moose;
-no MooseX::ClassAttribute;
-no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta()->make_immutable();
 

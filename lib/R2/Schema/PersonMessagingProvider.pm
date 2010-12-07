@@ -2,6 +2,7 @@ package R2::Schema::PersonMessagingProvider;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::MessagingProvider;
 use R2::Schema::Person;
@@ -20,8 +21,6 @@ use Fey::ORM::Table;
 
     has_one 'provider' => ( table => $schema->table('MessagingProvider') );
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

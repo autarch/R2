@@ -2,6 +2,7 @@ package R2::Schema::User;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Digest::SHA qw( sha512_base64 );
 use Fey::ORM::Exceptions qw( no_such_row );
@@ -170,8 +171,6 @@ sub _base_uri_path {
 
     return '/user/' . $self->user_id();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

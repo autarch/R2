@@ -2,6 +2,7 @@ package R2::AppRole::RedirectWithError;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use HTTP::Status qw( RC_OK );
 use JSON::XS;
@@ -45,7 +46,5 @@ sub redirect_with_error {
         $self->detach();
     }
 }
-
-no Moose::Role;
 
 1;

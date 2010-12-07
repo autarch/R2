@@ -2,6 +2,7 @@ package R2::Image;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Image::Magick;
 use List::AllUtils qw( min );
@@ -136,9 +137,6 @@ sub _build__magick {
 
     return $img;
 }
-
-no Moose;
-no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta()->make_immutable();
 

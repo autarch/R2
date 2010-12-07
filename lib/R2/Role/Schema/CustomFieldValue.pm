@@ -2,6 +2,7 @@ package R2::Role::Schema::CustomFieldValue;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Placeholder;
 
@@ -87,7 +88,5 @@ sub _replace_value_for_contact {
         value           => $value,
     );
 }
-
-no MooseX::Role::Parameterized;
 
 1;

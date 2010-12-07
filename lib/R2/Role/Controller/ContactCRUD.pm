@@ -2,6 +2,7 @@ package R2::Role::Controller::ContactCRUD;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
@@ -442,7 +443,5 @@ sub _make_update_sub {
         }
     };
 }
-
-no Moose::Role;
 
 1;

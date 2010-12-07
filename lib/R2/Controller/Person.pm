@@ -2,6 +2,7 @@ package R2::Controller::Person;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Address;
 use R2::Schema::EmailAddress;
@@ -67,8 +68,6 @@ sub person_POST {
 
     $c->redirect_and_detach( $person->contact()->uri() );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

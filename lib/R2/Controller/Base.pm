@@ -2,6 +2,7 @@ package R2::Controller::Base;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Config;
 use R2::JSON;
@@ -103,8 +104,6 @@ sub _check_authz {
         uri   => $uri,
     );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -2,6 +2,7 @@ package R2::Role::Schema::AppliesToContactTypes;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Lingua::EN::Inflect qw( A );
 use List::AllUtils qw( any );
@@ -103,7 +104,5 @@ sub is_deletable {
 
     return !$self->contact_count();
 }
-
-no Moose::Role;
 
 1;

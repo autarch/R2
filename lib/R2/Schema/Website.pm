@@ -2,6 +2,7 @@ package R2::Schema::Website;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Data::Validate::URI qw( is_web_uri );
 use R2::Schema;
@@ -68,8 +69,6 @@ sub _canonicalize_uri {
 }
 
 sub summary { $_[0]->label() . q{: } . $_[0]->uri() }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

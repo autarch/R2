@@ -2,6 +2,7 @@ package R2::Search::Person::ByName;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Types qw( NonEmptyStr );
@@ -61,7 +62,5 @@ sub _apply_where_clauses {
 }
 
 __PACKAGE__->meta()->make_immutable();
-
-no Moose;
 
 1;

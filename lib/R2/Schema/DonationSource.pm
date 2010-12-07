@@ -2,6 +2,7 @@ package R2::Schema::DonationSource;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Account;
 use R2::Schema::Donation;
@@ -67,9 +68,6 @@ sub is_deletable {
 
     return !$self->donation_count();
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -2,6 +2,7 @@ package R2::Role::Schema::URIMaker;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use MooseX::Params::Validate qw( validate );
 use R2::Util qw( string_is_empty );
@@ -58,7 +59,5 @@ sub _host_params_for_uri {
 
     return %{ $self->domain()->uri_params() };
 }
-
-no Moose::Role;
 
 1;

@@ -2,6 +2,7 @@ package R2::Schema::Address;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use List::AllUtils qw( first );
 use R2::Schema::AddressType;
@@ -62,8 +63,6 @@ sub _build_summary {
 
     return $summary || q{};
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

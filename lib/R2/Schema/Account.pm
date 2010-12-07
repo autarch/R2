@@ -2,6 +2,7 @@ package R2::Schema::Account;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Literal;
 use Fey::Object::Iterator::FromArray;
@@ -537,9 +538,6 @@ sub _base_uri_path {
 
     return '/account/' . $self->account_id();
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

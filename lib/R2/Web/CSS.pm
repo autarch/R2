@@ -2,6 +2,7 @@ package R2::Web::CSS;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use CSS::Minifier qw( minify );
 use Path::Class;
@@ -39,8 +40,6 @@ sub _squish {
 
     return minify( input => $css );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

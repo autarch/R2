@@ -2,6 +2,7 @@ package R2::Role::Schema::HistoryRecorder;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::ContactHistory;
 use R2::Schema::ContactHistoryType;
@@ -82,7 +83,5 @@ sub _ClassDescription {
 
     return $string;
 }
-
-no Moose::Role;
 
 1;

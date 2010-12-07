@@ -2,6 +2,7 @@ package R2::Web::Session;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Types qw( ArrayRef HashRef NonEmptyStr ErrorForSession );
 
@@ -68,8 +69,6 @@ sub _error_text {
         return $e . q{};
     }
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

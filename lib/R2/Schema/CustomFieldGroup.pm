@@ -2,6 +2,7 @@ package R2::Schema::CustomFieldGroup;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
@@ -204,9 +205,6 @@ sub update_or_add_custom_fields {
     R2::Schema->RunInTransaction($sub);
 
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

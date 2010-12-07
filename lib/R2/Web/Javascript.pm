@@ -2,6 +2,7 @@ package R2::Web::Javascript;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use JavaScript::Squish;
 use JSAN::ServerSide 0.04;
@@ -63,8 +64,6 @@ sub _target_file {
         );
     }
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

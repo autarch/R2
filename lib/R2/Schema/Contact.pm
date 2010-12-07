@@ -2,6 +2,7 @@ package R2::Schema::Contact;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Literal::String;
 use Fey::Object::Iterator::FromSelect::Caching;
@@ -534,8 +535,6 @@ sub _base_uri_path {
         . '/contact/'
         . $self->contact_id();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

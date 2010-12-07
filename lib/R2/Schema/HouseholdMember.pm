@@ -2,6 +2,7 @@ package R2::Schema::HouseholdMember;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Schema::Household;
@@ -45,8 +46,6 @@ sub summary {
 
     return $summary;
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

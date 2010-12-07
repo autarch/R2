@@ -2,6 +2,7 @@ package R2::Controller::Account;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
@@ -441,8 +442,6 @@ sub custom_field_group_POST : Private {
     $c->redirect_and_detach(
         $account->uri( view => 'custom_field_groups_form' ) );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

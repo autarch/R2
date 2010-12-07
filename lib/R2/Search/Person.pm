@@ -2,6 +2,7 @@ package R2::Search::Person;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Literal::Function;
 use Fey::Object::Iterator::FromSelect;
@@ -81,8 +82,5 @@ sub person_count {
 sub _apply_where_clauses { }
 
 __PACKAGE__->meta()->make_immutable();
-
-no Moose;
-no MooseX::ClassAttribute;
 
 1;

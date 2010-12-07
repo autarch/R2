@@ -2,6 +2,7 @@ package R2::Schema::HTMLWidget;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::CustomFieldType;
 use R2::Schema;
@@ -27,8 +28,6 @@ sub EnsureRequiredHTMLWidgetsExist {
         );
     }
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

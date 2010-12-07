@@ -2,6 +2,7 @@ package R2::Controller::Household;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Household;
 use R2::Util qw( string_is_empty );
@@ -35,8 +36,6 @@ sub household_POST {
 
     $c->redirect_and_detach( $household->uri() );
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

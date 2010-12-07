@@ -2,6 +2,7 @@ package R2::Role::Schema::HasMembers;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Placeholder;
 use R2::Exceptions qw( data_validation_error );
@@ -138,7 +139,5 @@ role {
             $self->pk_values_list() )->[0];
     };
 };
-
-no MooseX::Role::Parameterized;
 
 1;

@@ -2,6 +2,7 @@ package R2::Schema::EmailAddress;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Data::Validate::Domain qw( is_domain );
 use R2::Schema;
@@ -45,8 +46,6 @@ sub _valid_email_address {
 }
 
 sub summary { $_[0]->email_address() }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

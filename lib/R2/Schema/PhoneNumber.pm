@@ -2,6 +2,7 @@ package R2::Schema::PhoneNumber;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Contact;
 use R2::Schema::PhoneNumberType;
@@ -25,8 +26,6 @@ with 'R2::Role::Schema::HistoryRecorder';
 }
 
 sub summary { $_[0]->type()->name() . q{: } . $_[0]->phone_number() }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

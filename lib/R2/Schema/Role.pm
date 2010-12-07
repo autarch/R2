@@ -2,6 +2,7 @@ package R2::Schema::Role;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 
@@ -41,10 +42,6 @@ sub _FindOrCreateRole {
 
     return $role;
 }
-
-no Fey::ORM::Table;
-no Moose;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

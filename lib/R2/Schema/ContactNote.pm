@@ -2,6 +2,7 @@ package R2::Schema::ContactNote;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use DateTime::Format::Pg;
 use DateTime::Format::Strptime;
@@ -62,8 +63,6 @@ sub _base_uri_path {
     return $self->contact()->_base_uri_path() . '/note/'
         . $self->contact_note_id();
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

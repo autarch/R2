@@ -2,6 +2,7 @@ package R2::Request;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Moose::Role;
 
@@ -545,7 +546,5 @@ sub _params_for_classes {
 
     return %found;
 }
-
-no Moose::Role;
 
 1;

@@ -2,6 +2,7 @@ package R2::Schema::Person;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use DateTime::Format::Strptime;
 use R2::Schema;
@@ -195,9 +196,6 @@ sub _build_full_name {
             qw( salutation first_name middle_name last_name suffix )
     );
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

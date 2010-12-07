@@ -2,6 +2,7 @@ package R2::Controller::Contact;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Schema::Address;
@@ -555,8 +556,6 @@ sub history_GET_html : Private {
 
     $c->stash()->{template} = '/contact/history';
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -2,6 +2,7 @@ package R2::Schema::Country;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Locale::Country qw( all_country_codes code2country );
 use R2::Schema;
@@ -26,8 +27,6 @@ sub EnsureRequiredCountriesExist {
         );
     }
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

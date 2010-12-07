@@ -2,6 +2,7 @@ package R2::Schema::AccountUserRole;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Account;
 use R2::Schema::Role;
@@ -23,8 +24,6 @@ use Fey::ORM::Table;
     has_one( $schema->table('User') );
     has_one( $schema->table('Role') );
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

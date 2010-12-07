@@ -2,6 +2,7 @@ package R2::Schema::CustomField;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::CustomFieldType;
 use R2::Schema;
@@ -128,9 +129,6 @@ sub value_object {
 
     return $class->new( @_, _from_query => 1 );
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

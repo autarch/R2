@@ -2,6 +2,7 @@ package R2::Controller::Search;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Search::Contact;
 
@@ -22,8 +23,6 @@ sub contact : Chained('/account/_set_account') : PathPart('search/contact') :
 
     $c->stash()->{template} = '/search/contact_list';
 }
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable();
 

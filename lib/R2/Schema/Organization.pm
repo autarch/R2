@@ -2,6 +2,7 @@ package R2::Schema::Organization;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema;
 use R2::Schema::Contact;
@@ -58,9 +59,6 @@ sub _build_friendly_name {
 
     return $self->name();
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 

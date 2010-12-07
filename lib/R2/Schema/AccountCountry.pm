@@ -2,6 +2,7 @@ package R2::Schema::AccountCountry;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use R2::Schema::Account;
 use R2::Schema::Country;
@@ -19,8 +20,6 @@ use Fey::ORM::Table;
     has_one( $schema->table('Account') );
     has_one( $schema->table('Country') );
 }
-
-no Fey::ORM::Table;
 
 __PACKAGE__->meta()->make_immutable();
 

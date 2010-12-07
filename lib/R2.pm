@@ -2,6 +2,7 @@ package R2;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 our $VERSION = '0.01';
 
@@ -39,8 +40,6 @@ __PACKAGE__->apply_request_class_roles('R2::Request');
 R2::Schema->EnableObjectCaches();
 
 __PACKAGE__->setup();
-
-no Moose;
 
 __PACKAGE__->meta()->make_immutable( replace_constructor => 1 );
 

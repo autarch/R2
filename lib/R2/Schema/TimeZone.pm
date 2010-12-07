@@ -2,6 +2,7 @@ package R2::Schema::TimeZone;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Fey::Object::Iterator::FromSelect;
 use R2::Schema;
@@ -100,9 +101,6 @@ sub _MakeSelectByCountrySQL {
     return $select;
 
 }
-
-no Fey::ORM::Table;
-no MooseX::ClassAttribute;
 
 __PACKAGE__->meta()->make_immutable();
 
