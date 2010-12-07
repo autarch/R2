@@ -17,6 +17,7 @@ CREATE TABLE "User" (
        time_zone                TEXT            NOT NULL DEFAULT 'UTC',
        locale_code              TEXT            NOT NULL DEFAULT 'en_US',
        creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       last_modified_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin          BOOLEAN         DEFAULT FALSE,
        is_disabled              BOOLEAN         DEFAULT FALSE,
        CONSTRAINT valid_username CHECK ( username != '' ),
