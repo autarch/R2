@@ -45,10 +45,7 @@ sub seed_data {
 sub make_domain {
     require R2::Schema::Domain;
 
-    my $domain = R2::Schema::Domain->insert(
-        web_hostname   => hostname(),
-        email_hostname => hostname(),
-    );
+    my $domain = R2::Schema::Domain->DefaultDomain();
 
     my $hostname = $domain->web_hostname();
 
