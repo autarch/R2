@@ -8,6 +8,7 @@ use Exporter qw( import );
 our @EXPORT_OK = qw( dynamic_uri static_uri );
 
 use List::AllUtils qw( all );
+use R2::Config;
 use R2::Util qw( string_is_empty );
 use URI::FromHash ();
 
@@ -20,11 +21,27 @@ sub dynamic_uri {
     return URI::FromHash::uri(%p);
 }
 
-sub static_uri {
-    my $path = shift;
+{
+    my $StaticPathPrefix;
 
-    return _prefixed_path( R2::Config->instance()->static_path_prefix(),
-        $path );
+    my $config = R2::Config->instance();
+    if ( $config->is_production() ) {
+        $StaticPathPrefix = $config->path_prefix();
+        $StaticPathPrefix .= q{/};
+        $StaticPathPrefix .= $R2::Config::VERSION || 'wc';
+    }
+    else {
+        $StaticPathPrefix = q{};
+    }
+
+    sub static_uri {
+        my $path = shift;
+
+        return _prefixed_path(
+            $StaticPathPrefix,
+            $path
+        );
+    }
 }
 
 sub _prefixed_path {
@@ -40,3 +57,5 @@ sub _prefixed_path {
 }
 
 1;
+
+# ABSTRACT: A utility module for generating URIs

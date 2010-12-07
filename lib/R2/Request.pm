@@ -9,6 +9,8 @@ use Moose::Role;
 use List::AllUtils qw( true );
 use R2::Util qw( string_is_empty );
 
+with 'Catalyst::TraitFor::Request::REST::ForBrowsers';
+
 sub person_params {
     my $self = shift;
 
