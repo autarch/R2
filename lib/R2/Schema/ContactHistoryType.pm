@@ -52,7 +52,7 @@ use MooseX::ClassAttribute;
 }
 
 sub EnsureRequiredContactHistoryTypesExist {
-    for my $type ( __PACKAGE__->Types() ) {
+    for my $type ( __PACKAGE__->_Types() ) {
         my $name = $type->{system_name};
 
         __PACKAGE_->$name();
