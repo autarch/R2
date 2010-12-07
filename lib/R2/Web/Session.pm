@@ -7,14 +7,13 @@ use namespace::autoclean;
 use R2::Types qw( ArrayRef HashRef NonEmptyStr ErrorForSession );
 
 use Moose;
-use MooseX::AttributeHelpers;
 use MooseX::Params::Validate qw( pos_validated_list );
 use MooseX::SemiAffordanceAccessor;
 use MooseX::StrictConstructor;
 
 has form_data => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef,
     lazy    => 1,
     default => sub { {} },
 );
@@ -25,7 +24,7 @@ has _errors => (
     isa      => ArrayRef [ NonEmptyStr | HashRef ],
     default  => sub { [] },
     init_arg => undef,
-    provides => {
+    handles  => {
         add_error => 'push',
         errors    => 'elements',
     },
@@ -37,7 +36,7 @@ has _messages => (
     isa      => ArrayRef [NonEmptyStr],
     default  => sub { [] },
     init_arg => undef,
-    provides => {
+    handles  => {
         add_message => 'push',
         messages    => 'elements',
     },
@@ -73,3 +72,5 @@ sub _error_text {
 __PACKAGE__->meta()->make_immutable();
 
 1;
+
+# ABSTRACT: An object for session data
