@@ -2,255 +2,316 @@ package R2::Config;
 
 use strict;
 use warnings;
+use namespace::autoclean;
+use autodie qw( :all );
 
-use Config::INI::Reader;
 use File::HomeDir;
+use File::Spec;
+use File::Temp qw( tempdir );
 use Path::Class;
+use R2::Types qw( Bool Str Int HashRef Dir File );
 use R2::Util qw( string_is_empty );
-use Sys::Hostname qw( hostname );
 
-use MooseX::Singleton;
+use Moose;
+use MooseX::Configuration;
+use MooseX::Params::Validate qw( validated_list );
 
-has 'is_production' => (
+has is_production => (
     is      => 'rw',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => sub { $_[0]->_config_hash()->{R2}{is_production} },
-
-    # for testing
+    isa     => Bool,
+    default => 0,
+    section => 'R2',
+    key     => 'is_production',
+    documentation =>
+        'A flag indicating whether or not this is a production install. This should probably be true unless you are actively developing R2.',
     writer => '_set_is_production',
 );
 
-has 'is_test' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => sub { $_[0]->_config_hash()->{R2}{is_test} },
-
-    # for testing
-    writer => '_set_is_test',
+has max_upload_size => (
+    is      => 'ro',
+    isa     => Int,
+    default => ( 10 * 1024 * 1024 ),
+    section => 'R2',
+    key     => 'max_upload_size',
+    documentation =>
+        'The maximum size of an upload in bytes.',
 );
 
-has 'is_profiling' => (
+has path_prefix => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    section => 'R2',
+    key     => 'path_prefix',
+    documentation =>
+        'The URI path prefix for your R2 install. By default, this is empty. This affects URI generation and resolution.',
+    writer => '_set_path_prefix',
+);
+
+has serve_static_files => (
+    is      => 'ro',
+    isa     => Bool,
+    builder => '_build_serve_static_files',
+    section => 'R2',
+    key     => 'static',
+    documentation =>
+        'If this is true, the R2 application will serve static files itself. Defaults to false when is_production is true.',
+);
+
+has secret => (
+    is      => 'ro',
+    isa     => Str,
+    builder => '_build_secret',
+    section => 'R2',
+    key     => 'secret',
+    documentation =>
+        'A secret used as salt for digests in some URIs and for user authentication cookies. Changing this will invalidate all existing cookies.',
+);
+
+has mod_rewrite_hack => (
+    is      => 'ro',
+    isa     => Bool,
+    default => q{},
+    section => 'R2',
+    key     => 'mod_rewrite_hack',
+    documentation =>
+        'The Apache mod_rewrite module does not pass the original path to the app server. Turn on this hack to work around that.',
+);
+
+has is_profiling => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => Bool,
     lazy    => 1,
     builder => '_build_is_profiling',
-
-    # for testing
-    writer => '_set_is_profiling',
+    writer  => '_set_is_profiling',
 );
 
-has '_config_hash' => (
+has database_connection => (
+    is      => 'ro',
+    isa     => HashRef,
+    lazy    => 1,
+    builder => '_build_database_connection',
+);
+
+has database_name => (
+    is      => 'ro',
+    isa     => Str,
+    default => 'R2',
+    section => 'database',
+    key     => 'name',
+    documentation =>
+        'The name of the database.',
+    writer => '_set_database_name',
+);
+
+has database_username => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    section => 'database',
+    key     => 'username',
+    documentation =>
+        'The username to use when connecting to the database. By default, this is empty.',
+    writer => '_set_database_username',
+);
+
+has database_password => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    section => 'database',
+    key     => 'password',
+    documentation =>
+        'The password to use when connecting to the database. By default, this is empty.',
+    writer => '_set_database_password',
+);
+
+has database_host => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    section => 'database',
+    key     => 'host',
+    documentation =>
+        'The host to use when connecting to the database. By default, this is empty.',
+    writer => '_set_database_host',
+);
+
+has database_port => (
+    is      => 'ro',
+    isa     => Str,
+    default => q{},
+    section => 'database',
+    key     => 'port',
+    documentation =>
+        'The port to use when connecting to the database. By default, this is empty.',
+    writer => '_set_database_port',
+);
+
+has share_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    coerce  => 1,
+    builder => '_build_share_dir',
+    section => 'dirs',
+    key     => 'share',
+    documentation =>
+        'The directory where share files are located. By default, these are installed in the Perl module directory tree, but you might want to change this to something like /usr/local/share/R2.',
+);
+
+has cache_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    coerce  => 1,
+    builder => '_build_cache_dir',
+    section => 'dirs',
+    key     => 'cache',
+    documentation =>
+        'The directory where generated files are stored. Defaults to /var/cache/silki.',
+);
+
+has var_lib_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    coerce  => 1,
+    builder => '_build_var_lib_dir',
+    section => 'dirs',
+    key     => 'var_lib',
+    documentation =>
+        'This directory stores files generated at install time (CSS and Javascript). Defaults to /var/lib/silki.',
+);
+
+has _home_dir => (
     is      => 'rw',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_config_hash',
-
-    # for testing
-    writer  => '_set_config_hash',
-    clearer => '_clear_config_hash',
-);
-
-has '_config_file' => (
-    is      => 'ro',
-    isa     => 'Path::Class::File',
-    lazy    => 1,
-    builder => '_build_config_file',
-
-    # for testing
-    clearer => '_clear_config_file',
-);
-
-has 'catalyst_imports' => (
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    lazy    => 1,
-    builder => '_build_catalyst_imports',
-);
-
-has 'catalyst_roles' => (
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    lazy    => 1,
-    builder => '_build_catalyst_roles',
-);
-
-has 'catalyst_config' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_catalyst_config',
-);
-
-has 'dbi_config' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_dbi_config',
-);
-
-has 'mason_config' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_mason_config',
-);
-
-has '_home_dir' => (
-    is      => 'ro',
-    isa     => 'Path::Class::Dir',
+    isa     => Dir,
     lazy    => 1,
     default => sub { dir( File::HomeDir->my_home() ) },
     writer  => '_set_home_dir',
 );
 
-has 'var_lib_dir' => (
-    is      => 'ro',
-    isa     => 'Path::Class::Dir',
-    lazy    => 1,
-    builder => '_build_var_lib_dir',
-);
-
-has 'share_dir' => (
-    is      => 'ro',
-    isa     => 'Path::Class::Dir',
-    lazy    => 1,
-    builder => '_build_share_dir',
-);
-
-has 'etc_dir' => (
-    is      => 'ro',
-    isa     => 'Path::Class::Dir',
+has etc_dir => (
+    is      => 'rw',
+    isa     => Dir,
+    coerce  => 1,
     lazy    => 1,
     builder => '_build_etc_dir',
+    writer  => '_set_etc_dir',
 );
 
-has 'cache_dir' => (
+has files_dir => (
     is      => 'ro',
-    isa     => 'Path::Class::Dir',
+    isa     => Dir,
     lazy    => 1,
-    builder => '_build_cache_dir',
+    builder => '_build_files_dir',
 );
 
-has 'static_path_prefix' => (
-    is      => 'rw',
-    isa     => 'Maybe[Str]',
+has small_image_dir => (
+    is      => 'ro',
+    isa     => Dir,
     lazy    => 1,
-    builder => '_build_static_path_prefix',
-
-    # for testing
-    writer  => '_set_static_path_prefix',
-    clearer => '_clear_static_path_prefix',
+    builder => '_build_small_image_dir',
 );
 
-has 'path_prefix' => (
-    is      => 'rw',
-    isa     => 'Maybe[Str]',
-    default => sub { $_[0]->_config_hash()->{R2}{path_prefix} },
-
-    # for testing
-    writer => '_set_path_prefix',
+has thumbnails_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    lazy    => 1,
+    builder => '_build_thumbnails_dir',
 );
 
-has system_hostname => (
+has mini_image_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    lazy    => 1,
+    builder => '_build_mini_image_dir',
+);
+
+has temp_dir => (
+    is      => 'ro',
+    isa     => Dir,
+    lazy    => 1,
+    default => '_build_temp_dir',
+);
+
+has antispam_server => (
     is      => 'ro',
     isa     => Str,
-    lazy    => 1,
-    builder => '_build_system_hostname',
+    default => q{api.antispam.typepad.com},
+    section => 'antispam',
+    key     => 'server',
+    documentation =>
+        'The antispam server to use.',
 );
 
-has 'secret' => (
+has antispam_key => (
     is      => 'ro',
-    isa     => 'Str',
-    lazy    => 1,
-    builder => '_build_secret',
-
-    # for testing
-    writer => '_set_secret',
+    isa     => Str,
+    default => q{},
+    section => 'antispam',
+    key     => 'key',
+    documentation =>
+        'A key for your antispam server. If this is empty, R2 will not be able to check for spam links.',
 );
 
-sub _build_config_hash {
-    my $self = shift;
+{
+    my $Instance;
 
-    my $hash = Config::INI::Reader->read_file( $self->_config_file() );
-
-    # Can't call $self->is_production() or else we get a loop
-    if ( $hash->{R2}{is_production} ) {
-        die
-            'You must supply a value for [R2] - secret when running R2 in production'
-            if string_is_empty( $hash->{R2}{secret} );
+    sub instance {
+        return $Instance ||= shift->new(@_);
     }
 
-    return $hash;
+    sub _clear_instance {
+        undef $Instance;
+    }
+}
+
+sub BUILD {
+    my $self = shift;
+
+    return unless $self->is_production();
+
+    die
+        'You must supply a value for [R2] - secret when running R2 in production'
+        if string_is_empty( $self->secret() );
 }
 
 sub _build_config_file {
     my $self = shift;
 
-    if ( !string_is_empty( $ENV{R2_CONFIG} ) ) {
-        die "Nonexistent config file in R2_CONFIG env var: $ENV{R2_CONFIG}"
-            unless -f $ENV{R2_CONFIG};
+    if ( !string_is_empty( $ENV{SILKI_CONFIG} ) ) {
+        die
+            "Nonexistent config file in SILKI_CONFIG env var: $ENV{SILKI_CONFIG}"
+            unless -f $ENV{SILKI_CONFIG};
 
-        return file( $ENV{R2_CONFIG} );
+        return file( $ENV{SILKI_CONFIG} );
     }
 
-    my @looked;
+    return if $ENV{SILKI_CONFIG_TESTING};
 
-    my @dirs = dir('/etc/r2');
-    push @dirs, $self->_home_dir()->subdir( '.r2', 'etc' )
-        if $>;
+    my @dirs = dir('/etc/silki');
+    push @dirs, $self->_home_dir()->subdir( '.silki', 'etc' )
+        if $> && $self->_home_dir();
 
     for my $dir (@dirs) {
-        my $file = $dir->file('r2.conf');
+        my $file = $dir->file('silki.conf');
 
         return $file if -f $file;
-
-        push @looked, $file;
     }
 
-    die "Cannot find a config file anywhere I looked (@looked)\n";
+    return;
+}
+
+sub _build_serve_static_files {
+    my $self = shift;
+
+    return !( $ENV{MOD_PERL}
+        || $self->is_production()
+        || $self->is_profiling() );
 }
 
 {
-    my @StandardImports = qw( AuthenCookie
-        +R2::Plugin::ErrorHandling
-        Session::AsObject
-        Session::State::URI
-        +R2::Plugin::Session::Store::R2
-        RedirectAndDetach
-        SubRequest
-        Unicode
-    );
-
-    sub _build_catalyst_imports {
-        my $self = shift;
-
-        my @imports = @StandardImports;
-        push @imports, 'Static::Simple'
-            unless $ENV{MOD_PERL} || $self->is_profiling();
-
-        push @imports, 'StackTrace'
-            unless $self->is_production() || $self->is_profiling();
-
-        return \@imports;
-    }
-}
-
-{
-    my @StandardRoles = qw( R2::AppRole::Account
-        R2::AppRole::Domain
-        R2::AppRole::RedirectWithError
-        R2::AppRole::User
-    );
-
-    sub _build_catalyst_roles {
-        return \@StandardRoles;
-    }
-}
-
-{
-    my @Profilers = qw( Devel/DProf.pm
+    my @Profilers = qw(
+        Devel/DProf.pm
         Devel/FastProf.pm
         Devel/NYTProf.pm
         Devel/Profile.pm
@@ -269,26 +330,26 @@ sub _build_var_lib_dir {
 
     return $self->_dir(
         [ 'var', 'lib' ],
-        '/var/lib/r2',
+        '/var/lib/silki',
     );
 }
 
 sub _build_share_dir {
     my $self = shift;
 
+    # I'd like to use File::ShareDir, but it blows up if the directory doesn't
+    # exist, which isn't very fucking helpful. This is equivalent to
+    # dist_dir('R2')
+    my $share_dir = dir(
+        dir( $INC{'R2/Config.pm'} )->parent(),
+        'auto', 'share', 'dist',
+        'R2'
+    )->absolute()->cleanup();
+
     return $self->_dir(
         ['share'],
-        '/usr/local/share/r2',
-        dir( dir()->absolute(), 'share' ),
-    );
-}
-
-sub _build_etc_dir {
-    my $self = shift;
-
-    return $self->_dir(
-        ['etc'],
-        '/etc/r2',
+        $share_dir,
+        dir('share')->absolute(),
     );
 }
 
@@ -297,22 +358,81 @@ sub _build_cache_dir {
 
     return $self->_dir(
         ['cache'],
-        '/var/cache/r2',
+        '/var/cache/silki',
     );
 }
 
+sub _build_etc_dir {
+    my $self = shift;
+
+    return $self->_pick_dir(
+        ['etc'],
+        '/etc/silki',
+    );
+}
+
+sub _build_files_dir {
+    my $self = shift;
+
+    return $self->_cache_subdir('files');
+}
+
+sub _build_small_image_dir {
+    my $self = shift;
+
+    return $self->_cache_subdir('small-image');
+}
+
+sub _build_thumbnails_dir {
+    my $self = shift;
+
+    return $self->_cache_subdir('thumbnails');
+}
+
+sub _build_mini_image_dir {
+    my $self = shift;
+
+    return $self->_cache_subdir('mini-image');
+}
+
+sub _build_temp_dir {
+    my $self = shift;
+
+    my $temp = dir( File::Spec->tmpdir() )->subdir('silki');
+
+    $self->_ensure_dir($temp);
+
+    return $temp;
+}
+
+sub _cache_subdir {
+    my $self = shift;
+    my $name = shift;
+
+    my $subdir = $self->cache_dir()->subdir($name);
+
+    $self->_ensure_dir($subdir);
+
+    return $subdir;
+}
+
 sub _dir {
+    my $self = shift;
+
+    my $dir = $self->_pick_dir(@_);
+
+    $self->_ensure_dir($dir);
+
+    return $dir;
+}
+
+my $TestingRootDir;
+
+sub _pick_dir {
     my $self         = shift;
     my $pieces       = shift;
     my $prod_default = shift;
     my $dev_default  = shift;
-
-    my $config = $self->_config_hash();
-
-    my $key = join '_', @{$pieces};
-
-    return dir( $config->{dirs}{$key} )
-        if exists $config->{dirs}{$key};
 
     return dir($prod_default)
         if $self->is_production();
@@ -320,172 +440,67 @@ sub _dir {
     return $dev_default
         if defined $dev_default;
 
-    return dir( $self->_home_dir(), '.r2', @{$pieces} );
-}
+    if ( $ENV{HARNESS_ACTIVE} ) {
+        $TestingRootDir ||= tempdir( CLEANUP => 1 );
 
-sub _build_catalyst_config {
-    my $self = shift;
-
-    my %config = (
-        default_view => 'Mason',
-
-        session => {
-            expires => ( 60 * 5 ),
-
-            # Need to quote it for Pg
-            dbi_table        => q{"Session"},
-            dbi_dbh          => 'R2::Plugin::Session::Store::R2',
-            object_class     => 'R2::Web::Session',
-            rewrite_body     => 0,
-            rewrite_redirect => 1,
-        },
-
-        authen_cookie => {
-            name       => 'R2-user',
-            path       => '/',
-            mac_secret => $self->secret(),
-        },
-
-        'Log::Dispatch' => $self->_log_config(),
-    );
-
-    $config{root} = $self->share_dir();
-
-    unless ( $self->is_production() ) {
-        $config{static} = {
-            dirs         => [qw( files images js css static w3c )],
-            include_path => [
-                __PACKAGE__->cache_dir()->stringify(),
-                __PACKAGE__->var_lib_dir()->stringify(),
-                __PACKAGE__->share_dir()->stringify(),
-            ],
-            debug => 1,
-        };
+        return dir( $TestingRootDir, @{$pieces} );
     }
 
-    return \%config;
+    return dir( $self->_home_dir(), '.silki', @{$pieces} );
 }
 
-{
+sub _ensure_dir {
+    my $self = shift;
+    my $dir  = shift;
 
-    sub _log_config {
-        my $self = shift;
+    return if -d $dir;
 
-        my @loggers;
-        if ( $self->is_production() ) {
-            if ( $ENV{MOD_PERL} ) {
-                require Apache2::ServerUtil;
+    $dir->mkpath( 0, 0755 )
+        or die "Cannot make $dir: $!";
 
-                push @loggers, {
-                    class     => 'ApacheLog',
-                    name      => 'ApacheLog',
-                    min_level => 'warning',
-                    apache    => Apache2::ServerUtil->server(),
-                    callbacks => sub {
-                        my %m = @_;
-                        return 'r2: ' . $m{message};
-                    },
-                };
-            }
-            else {
-                require Log::Dispatch::Syslog;
-
-                push @loggers, {
-                    class     => 'Syslog',
-                    name      => 'Syslog',
-                    min_level => 'warning',
-                    };
-            }
-        }
-        else {
-            push @loggers, {
-                class     => 'Screen',
-                name      => 'Screen',
-                min_level => 'debug',
-                };
-        }
-
-        return \@loggers;
-    }
+    return;
 }
 
-sub _build_dbi_config {
+sub _build_database_connection {
     my $self = shift;
 
-    my $db_config = $self->_config_hash()->{db};
+    my $dsn = 'dbi:Pg:dbname=' . $self->database_name();
 
-    my $dsn = 'dbi:Pg:dbname=' . ( $db_config->{name} || 'R2' );
+    if ( my $host = $self->database_host() ) {
+        $dsn .= ';host=' . $host;
+    }
 
-    $dsn .= ';host=' . $db_config->{host}
-        if $db_config->{host};
-
-    $dsn .= ';port=' . $db_config->{port}
-        if $db_config->{port};
+    if ( my $port = $self->database_port() ) {
+        $dsn .= ';port=' . $port;
+    }
 
     return {
         dsn      => $dsn,
-        username => ( $db_config->{username} || q{} ),
-        password => ( $db_config->{password} || q{} ),
+        username => $self->database_username(),
+        password => $self->database_password(),
     };
-}
-
-sub _build_mason_config {
-    my $self = shift;
-
-    my %config = (
-        comp_root => $self->share_dir()->subdir('mason')->stringify(),
-        data_dir => $self->cache_dir()->subdir( 'mason', 'web' )->stringify(),
-        error_mode           => 'fatal',
-        in_package           => 'R2::Mason',
-        use_match            => 0,
-        default_escape_flags => 'h',
-    );
-
-    if ( $self->is_production() ) {
-        $config{static_source} = 1;
-        $config{static_source_touch_file}
-            = $self->etc_dir()->file('mason-touch')->stringify();
-    }
-
-    return \%config;
-}
-
-sub _build_static_path_prefix {
-    my $self = shift;
-
-    return $self->path_prefix() unless $self->is_production();
-
-    my $prefix
-        = string_is_empty( $self->path_prefix() )
-        ? q{}
-        : $self->path_prefix();
-
-    return $prefix . q{/}
-        . read_file( $self->etc_dir()->file('revision')->stringify() );
-}
-
-sub _build_system_hostname {
-    for my $name (
-        hostname(),
-        map { scalar gethostbyaddr( $_->address(), AF_INET ) }
-        grep { $_->address() } Net::Interface->interfaces()
-        ) {
-        return $name if $name =~ /\.[^.]+$/;
-    }
-
-    die 'Cannot determine system hostname.';
 }
 
 sub _build_secret {
     my $self = shift;
 
-    return 'a big secret' unless $self->is_production();
-
-    return $self->_config_hash()->{R2}{secret};
+    return $self->is_production()
+        ? q{}    # will cause an error in BUILD
+        : 'a big secret';
 }
+
+around write_config_file => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $version = $R2::Config::VERSION || '(working copy)';
+    my $generated = "Config file generated by R2 version $version";
+
+    $self->$orig( generated_by => $generated, @_ );
+};
 
 __PACKAGE__->meta()->make_immutable();
 
-no Moose;
-
 1;
+
+# ABSTRACT: Configuration information for R2
