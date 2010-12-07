@@ -26,7 +26,7 @@ use MooseX::ClassAttribute;
     );
 }
 
-sub CreateDefaultZones {
+sub EnsureRequiredTimeZonesExist {
     my $class = shift;
 
     my %zones = (

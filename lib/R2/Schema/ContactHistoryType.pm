@@ -46,12 +46,20 @@ use MooseX::ClassAttribute;
             is      => 'ro',
             isa     => 'R2::Schema::ContactHistoryType',
             lazy    => 1,
-            default => sub { __PACKAGE__->_CreateOrFindType($type) },
+            default => sub { __PACKAGE__->_FindOrCreateType($type) },
         );
     }
 }
 
-sub _CreateOrFindType {
+sub EnsureRequiredContactHistoryTypesExist {
+    for my $type ( __PACKAGE__->Types() ) {
+        my $name = $type->{system_name};
+
+        __PACKAGE_->$name();
+    }
+}
+
+sub _FindOrCreateType {
     my $class = shift;
     my $type  = shift;
 

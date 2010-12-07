@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw( :all );
 
-use lib './inc';
+use lib './lib';
 
 use R2::DatabaseManager;
 

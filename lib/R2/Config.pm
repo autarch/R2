@@ -153,6 +153,13 @@ has 'path_prefix' => (
     writer => '_set_path_prefix',
 );
 
+has system_hostname => (
+    is      => 'ro',
+    isa     => Str,
+    lazy    => 1,
+    builder => '_build_system_hostname',
+);
+
 has 'secret' => (
     is      => 'ro',
     isa     => 'Str',
@@ -455,6 +462,18 @@ sub _build_static_path_prefix {
 
     return $prefix . q{/}
         . read_file( $self->etc_dir()->file('revision')->stringify() );
+}
+
+sub _build_system_hostname {
+    for my $name (
+        hostname(),
+        map { scalar gethostbyaddr( $_->address(), AF_INET ) }
+        grep { $_->address() } Net::Interface->interfaces()
+        ) {
+        return $name if $name =~ /\.[^.]+$/;
+    }
+
+    die 'Cannot determine system hostname.';
 }
 
 sub _build_secret {

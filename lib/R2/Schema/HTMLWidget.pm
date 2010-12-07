@@ -16,7 +16,7 @@ use Fey::ORM::Table;
     has_table( $schema->table('HTMLWidget') );
 }
 
-sub CreateDefaultWidgets {
+sub EnsureRequiredHTMLWidgetsExist {
     my $class = shift;
 
     for my $name ( map { $_->type() } R2::CustomFieldType->All() ) {

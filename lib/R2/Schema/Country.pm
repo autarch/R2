@@ -3,6 +3,7 @@ package R2::Schema::Country;
 use strict;
 use warnings;
 
+use Locale::Country qw( all_country_codes code2country );
 use R2::Schema;
 
 use Fey::ORM::Table;
@@ -13,6 +14,17 @@ use Fey::ORM::Table;
     has_policy 'R2::Schema::Policy';
 
     has_table( $schema->table('Country') );
+}
+
+sub EnsureRequiredCountriesExist {
+    for my $code ( all_country_codes() ) {
+        next if __PACKAGE__->new( iso_code => $code );
+
+        __PACKAGE__->insert(
+            iso_code => $code,
+            name     => code2country($code),
+        );
+    }
 }
 
 no Fey::ORM::Table;

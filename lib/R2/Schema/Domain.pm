@@ -39,6 +39,24 @@ with 'R2::Role::Schema::URIMaker';
     );
 }
 
+sub EnsureRequiredDomainsExist {
+    my $class = shift;
+
+    $class->_FindOrCreateDefaultDomain();
+}
+
+sub _FindOrCreateDefaultDomain {
+    my $class = shift;
+
+    my $hostname = $ENV{R2_HOSTNAME}
+        || R2::Config->new()->system_hostname();
+
+    my $domain = $class->new( web_hostname => $hostname );
+    return $domain if $domain;
+
+    return $class->insert( web_hostname => $hostname );
+}
+
 sub All {
     my $class = shift;
 

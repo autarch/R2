@@ -20,12 +20,18 @@ use MooseX::ClassAttribute;
             is      => 'ro',
             isa     => 'R2::Schema::Role',
             lazy    => 1,
-            default => sub { __PACKAGE__->_CreateOrFindRole($role) },
+            default => sub { __PACKAGE__->_FindOrCreateRole($role) },
         );
     }
 }
 
-sub _CreateOrFindRole {
+sub EnsureRequiredRolesExist {
+    __PACKAGE__->Member();
+    __PACKAGE__->Editor();
+    __PACKAGE__->Admin();
+}
+
+sub _FindOrCreateRole {
     my $class = shift;
     my $name  = shift;
 

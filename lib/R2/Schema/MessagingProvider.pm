@@ -79,7 +79,7 @@ use MooseX::Params::Validate qw( validated_list );
         },
     );
 
-    sub MakeDefaultProviders {
+    sub EnsureRequiredMessageProvidersExist {
         for my $provider (@Providers) {
             next if __PACKAGE__->new( name => $provider->{name} );
 
