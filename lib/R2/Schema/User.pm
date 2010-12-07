@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Digest::SHA qw( sha512_base64 );
+use Authen::Passphrase::BlowfishCrypt;
 use Fey::ORM::Exceptions qw( no_such_row );
 use List::AllUtils qw( first );
 use R2::Schema;
@@ -16,7 +16,7 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
-    { steps => [qw( _validate_password _require_username_or_email )] };
+    { steps => [qw( _require_username_or_email )] };
 with 'R2::Role::Schema::URIMaker';
 
 {
@@ -49,21 +49,19 @@ with 'R2::Role::Schema::URIMaker';
     );
 }
 
+my $UnusablePW = '*unusable*';
+
 around 'insert' => sub {
     my $orig  = shift;
     my $class = shift;
     my %p     = @_;
 
-    my $password;
-
     if ( delete $p{disable_login} ) {
-        $password = '*disabled*';
+        $p{password} = $UnusablePW;
+        $p{is_disabled} = 1;
     }
     elsif ( $p{password} ) {
-
-        # XXX - require a certain length or complexity? make it
-        # configurable?
-        $password = sha512_base64( delete $p{password} );
+        $p{password} = $class->_password_as_rfc2307( $p{password} );
     }
 
     my %user_p
@@ -87,7 +85,6 @@ around 'insert' => sub {
 
         my $user = $class->$orig(
             %user_p,
-            password => $password,
             user_id  => $person->person_id(),
         );
 
@@ -99,24 +96,23 @@ around 'insert' => sub {
     return R2::Schema->RunInTransaction($sub);
 };
 
-# XXX - need an update wrapper for password hashing!
+around update => sub {
+    my $orig = shift;
+    my $self = shift;
+    my %p    = @_;
 
-sub _validate_password {
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
+    if ( delete $p{disable_login} ) {
+        $p{password} = $UnusablePW;
+        $p{is_disabled} = 1;
+    }
+    elsif ( !string_is_empty( $p{password} ) ) {
+        $p{password} = $self->_password_as_rfc2307( $p{password} );
+    }
 
-    return
-        unless exists $p->{password} || $is_insert;
+    $p{last_modified_datetime} = Fey::Literal::Function->new('NOW');
 
-    return {
-        message => 'A user requires a password.',
-        field   => 'password',
-        }
-        if string_is_empty( $p->{password} ) && !$p->{disable_login};
-
-    return;
-}
+    return $self->$orig(%p);
+};
 
 sub _require_username_or_email {
     my $self      = shift;
@@ -133,6 +129,21 @@ sub _require_username_or_email {
             && string_is_empty( $p->{email_address} );
 
     return;
+}
+
+sub _password_as_rfc2307 {
+    my $self = shift;
+    my $pw   = shift;
+
+    # XXX - require a certain length or complexity? make it
+    # configurable?
+    my $pass = Authen::Passphrase::BlowfishCrypt->new(
+        cost        => 8,
+        salt_random => 1,
+        passphrase  => $pw,
+    );
+
+    return $pass->as_rfc2307();
 }
 
 sub _load_from_dbms {
