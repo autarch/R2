@@ -130,7 +130,7 @@ sub contact_GET_html : Private {
 
     my $contact = $c->stash()->{contact};
 
-    $c->stash()->{tabs}[0]->is_selected(1);
+    $c->stash()->{tabs}[0]->set_is_selected(1);
 
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
@@ -213,7 +213,7 @@ sub donations_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{tabs}[1]->is_selected(1);
+    $c->stash()->{tabs}[1]->set_is_selected(1);
 
     $c->stash()->{can_edit_donations}
         = $c->model('Authz')->user_can_edit_contact(
@@ -413,7 +413,7 @@ sub notes_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{tabs}[2]->is_selected(1);
+    $c->stash()->{tabs}[2]->set_is_selected(1);
 
     $c->stash()->{can_edit_notes} = $c->model('Authz')->user_can_edit_contact(
         user    => $c->user(),
@@ -546,7 +546,7 @@ sub history_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{tabs}[4]->is_selected(1);
+    $c->stash()->{tabs}[4]->set_is_selected(1);
 
     $c->stash()->{can_edit_contact}
         = $c->model('Authz')->user_can_edit_contact(
