@@ -1,4 +1,4 @@
-  <div id="hd">
+  <div id="header">
     <ul id="global-nav">
 % if ( $c->user() ) {
 %   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->account() ) ) {

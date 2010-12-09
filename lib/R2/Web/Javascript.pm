@@ -41,7 +41,7 @@ sub _build_target_file {
 
     $js_dir->mkpath( 0, 0755 );
 
-    return file( $js_dir, 'silki-combined.js' );
+    return file( $js_dir, 'r2-combined.js' );
 }
 
 {

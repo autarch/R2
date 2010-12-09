@@ -16,29 +16,22 @@
 </head>
 <body>
 
-<div id="doc3" class="yui-t2">
-
 <& header.mas, %ARGS &>
 
-  <div id="bd">
-    <div id="yui-main">
-      <div id="content" class="yui-b">
+<div class="yui3-g">
+  <div id="content" class="<% $show_side_nav ? 'yui3-u-2-3' : 'yui3-u-1' %>">
 
 <& .messages &>
 
 % $m->call_next();
-      </div>
-    </div>
-
+  </div>
 % if ( $m->request_comp()->attr('show_side_nav') ) {
 <& side-nav.mas, %ARGS &>
 % }
 	
-  </div>
+</div>
 
 <& footer.mas, %ARGS &>
-
-</div>
 
 </body>
 </html>
@@ -46,6 +39,10 @@
 <%attr>
 show_side_nav => 1
 </%attr>
+
+<%init>
+my $show_side_nav = $m->request_comp()->attr('show_side_nav');
+</%Init>
 
 <%def .messages>
 <div id="messages">

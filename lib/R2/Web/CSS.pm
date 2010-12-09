@@ -42,7 +42,7 @@ sub _build_target_file {
 
     $css_dir->mkpath( 0, 0755 );
 
-    return file( $css_dir, 'silki-combined.css' );
+    return file( $css_dir, 'r2-combined.css' );
 }
 
 sub _squish {
