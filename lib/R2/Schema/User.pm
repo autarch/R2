@@ -146,19 +146,14 @@ sub _password_as_rfc2307 {
     return $pass->as_rfc2307();
 }
 
-sub _load_from_dbms {
+sub check_password {
     my $self = shift;
-    my $p    = shift;
+    my $pw   = shift;
 
-    # This gets set to the unhashed value in the constructor
-    $self->_clear_password();
+    my $pass = Authen::Passphrase::BlowfishCrypt->from_rfc2307(
+        $self->password() );
 
-    $self->SUPER::_load_from_dbms($p);
-
-    return unless $p->{password};
-
-    no_such_row 'Invalid password'
-        unless $self->password() eq sha512_base64( $p->{password} );
+    return $pass->match($pw);
 }
 
 sub format_date {
