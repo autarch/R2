@@ -19,7 +19,7 @@
 <& header.mas, %ARGS &>
 
 <div class="yui3-g">
-  <div id="content" class="<% $show_side_nav ? 'yui3-u-2-3' : 'yui3-u-1' %>">
+  <div id="content" class="<% $show_side_nav ? 'yui3-u-3-4' : 'yui3-u-1' %>">
 
 <& .messages &>
 
