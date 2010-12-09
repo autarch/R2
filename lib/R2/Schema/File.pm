@@ -133,7 +133,7 @@ sub _build_uri {
 
     my $path = $self->path();
 
-    my $cache_dir = R2::Config->new()->cache_dir();
+    my $cache_dir = R2::Config->instance()->cache_dir();
 
     ( my $uri = $path->stringify() ) =~ s{^\Q$cache_dir}{};
 
@@ -143,7 +143,7 @@ sub _build_uri {
 sub _build_cache_dir {
     my $self = shift;
 
-    my $config = R2::Config->new();
+    my $config = R2::Config->instance();
 
     my $hashed = sha512_hex( $self->file_id(), $config->secret() );
 

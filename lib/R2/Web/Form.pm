@@ -5,12 +5,9 @@ use warnings;
 use namespace::autoclean;
 
 use HTML::DOM;
-
-die "HTML::DOM 0.022 breaks this module"
-    if HTML::DOM->VERSION() eq '0.022';
-
 use HTML::FillInForm;
 use R2::Config;
+use R2::Types qw( ArrayRef Bool HashRef Str );
 use R2::Web::FormData;
 
 use Moose;
@@ -19,13 +16,13 @@ use MooseX::StrictConstructor;
 
 has 'html' => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has 'exclude' => (
     is      => 'ro',
-    isa     => 'ArrayRef[Str]',
+    isa     => ArrayRef[Str],
     default => sub { [] },
 );
 
@@ -42,32 +39,32 @@ has '_dom' => (
 
 has 'errors' => (
     is      => 'ro',
-    isa     => 'ArrayRef[HashRef|Str]',
+    isa     => ArrayRef[HashRef|Str],
     default => sub { [] },
 );
 
 has 'form_data' => (
     is      => 'ro',
     isa     => 'R2::Web::FormData',
-    default => sub { R2::Web::FormData->new( sources => [] ) },
+    default => sub { R2::Web::FormData->new() },
 );
 
 has 'filled_in_form' => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => Str,
     lazy    => 1,
     builder => '_fill_in_form',
 );
 
 has 'make_pretty' => (
     is      => 'ro',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
 );
 
 has 'is_fragment' => (
     is      => 'ro',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
 );
 
@@ -82,22 +79,7 @@ sub _fill_in_form {
 
     my $html = $self->_form_html_from_dom();
 
-    return $html unless $self->make_pretty();
-
-    require HTML::Tidy;
-    my $tidy = HTML::Tidy->new(
-        {
-            indent         => 'auto',
-            output_xhtml   => 1,
-            doctype        => 'omit',
-            show_body_only => 1,
-        }
-    );
-
-    $tidy->ignore( type => HTML::Tidy::TIDY_WARNING() );
-    $tidy->ignore( type => HTML::Tidy::TIDY_ERROR() );
-
-    return $tidy->clean($html);
+    return $html;
 }
 
 sub _fill_errors {
@@ -111,7 +93,9 @@ sub _fill_errors {
 
     for my $error ( @{$errors} ) {
         if ( ref $error && $error->{field} ) {
-            my $div = $self->_get_div_for_field( $error->{field} );
+            my $div = $self->_get_div_for_field( $error->{field} )
+                or next;
+
             $div->className( $div->className() . ' error' );
 
             my $p = $self->_create_error_para( $error->{message} );
@@ -137,8 +121,7 @@ sub _get_div_for_field {
 
     my $elt = $self->_dom()->getElementById($id);
 
-    die "No such element: $id\n"
-        unless $elt;
+    return unless $elt;
 
     my $node = $elt;
 
@@ -155,7 +138,8 @@ sub _create_error_para {
     my $self = shift;
     my $text = shift;
 
-    # The extra span is for the benefit of CSS, so we can set the left margin of the paragraph
+    # The extra span is for the benefit of CSS, so we can set the left margin
+    # of the paragraph
     my $span = $self->_dom()->createElement('span');
     $span->appendChild( $self->_dom()->createTextNode($text) );
 
@@ -174,8 +158,10 @@ sub _fill_form_data {
 
     my $html = $self->_form_html_from_dom();
 
-    my $filled = HTML::FillInForm->fill( \$html, $data,
-        ignore_fields => $self->exclude() );
+    my $filled = HTML::FillInForm->fill(
+        \$html, $data,
+        ignore_fields => $self->exclude()
+    );
 
     my $dom = HTML::DOM->new();
     $dom->write($filled);
@@ -207,9 +193,9 @@ sub _collapse_single_option_select {
     my $select = shift;
     my $option = shift;
 
-    my $span = $self->_dom()->createElement('span');
-    $span->className('text-for-hidden');
-    $span->appendChild($_) for @{ $option->childNodes() };
+    my $div = $self->_dom()->createElement('div');
+    $div->className('text-for-hidden');
+    $div->appendChild($_) for @{ $option->childNodes() };
 
     my $hidden = $self->_dom()->createElement('input');
     $hidden->setAttribute( type  => 'hidden' );
@@ -218,7 +204,7 @@ sub _collapse_single_option_select {
 
     my $parent = $select->parentNode();
 
-    $parent->replaceChild( $span, $select );
+    $parent->replaceChild( $div, $select );
     $parent->appendChild($hidden);
 }
 
@@ -235,8 +221,8 @@ sub _form_html_from_dom {
 
 # This bizarro bit seems to fix some tests. Sigh ...
 {
-
-    package HTML::DOM::Node;
+    package
+        HTML::DOM::Node;
 
     no warnings 'redefine';
 
@@ -250,4 +236,4 @@ __PACKAGE__->meta()->make_immutable();
 
 1;
 
-__END__
+# ABSTRACT: Does post-processing on HTML forms

@@ -5,31 +5,42 @@ use warnings;
 use namespace::autoclean;
 
 use Moose;
+use MooseX::SemiAffordanceAccessor;
 use MooseX::StrictConstructor;
 
-has 'uri' => (
+has uri => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-has 'label' => (
+has label => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-has 'tooltip' => (
+has tooltip => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-has 'is_selected' => (
+has id => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub { $_[0]->label() },
+);
+
+has is_selected => (
     is      => 'rw',
     isa     => 'Bool',
     default => 0,
 );
 
 __PACKAGE__->meta()->make_immutable();
+
 1;
+
+# ABSTRACT: A tab in the web UI

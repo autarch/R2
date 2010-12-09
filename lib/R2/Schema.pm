@@ -22,7 +22,7 @@ if ($R2::Schema::TestSchema) {
     __PACKAGE__->DBIManager()->add_source($source);
 }
 else {
-    my $config = R2::Config->new()->database_connection();
+    my $config = R2::Config->instance()->database_connection();
 
     my $source = Fey::DBIManager::Source->new(
         %{$config},

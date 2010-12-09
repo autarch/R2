@@ -25,7 +25,7 @@ sub exit : Path('/exit') : Args(0) {
     my $c    = shift;
 
     R2::Exception->throw('Naughty attempt to kill R2')
-        if R2::Config->new()->is_production();
+        if R2::Config->instance()->is_production();
 
     exit 0;
 }
@@ -35,7 +35,7 @@ sub die : Path('/die') : Args(0) {
     my $c    = shift;
 
     R2::Exception->throw('Naughty attempt to kill R2')
-        if R2::Config->new()->is_production();
+        if R2::Config->instance()->is_production();
 
     die 'Dead';
 }

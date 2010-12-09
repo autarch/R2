@@ -25,7 +25,7 @@ sub begin : Private {
 
     return unless $c->request()->looks_like_browser();
 
-    my $config = R2::Config->new();
+    my $config = R2::Config->instance();
 
     unless ( $config->is_production() || $config->is_profiling() ) {
         $_->new()->create_single_file()

@@ -2,6 +2,7 @@ package R2::Web::FormData;
 
 use strict;
 use warnings;
+use namespace::autoclean;
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -42,6 +43,9 @@ sub param {
     return;
 }
 
+__PACKAGE__->meta()->make_immutable();
+
 1;
 
-__END__
+# ABSTRACT: Represents data for filling in forms
+
