@@ -1,9 +1,7 @@
   <div id="header">
     <div class="yui3-g">
       <div class="yui3-u-3-4">
-        <h1>\
-% $m->request_comp->call_method( title => %ARGS );
-</h1>
+        <h1>Rapport</h1>
       </div>
       <div class="yui3-u-1-4">
         <ul id="global-nav">
