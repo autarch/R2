@@ -13,8 +13,20 @@ body {
     width: 960px;
 }
 
+#page {
+    font-size: 105%;
+}
+
 #header {
     background-color: #A1BA6C;
+    margin-top: 10px;
+    padding-top: 1.5em;
+
+    h1 {
+        color: white;
+        margin: 0;
+        margin-left: 10px;
+    }
 }
 
 #footer {
@@ -26,9 +38,10 @@ body {
 }
 
 #global-nav {
-    display: inline;
-    float: right;
     font-size: 80%;
+    margin: 0 1em 0 0;
+    padding-left: 8px;
+    text-align: left;
 
     li {
         display: inline;
@@ -36,14 +49,15 @@ body {
 
         a {
             color: white;
-            padding-left: 0.5em;
+            padding-right: 0.5em;
         }
     }
 }
 
 #tabs {
     line-height: 1.2;
-    margin-top: 1em;
+    margin-left: 10px;
+    padding-top: 1em;
 
     ul {
         font-size: 90%;
@@ -59,7 +73,6 @@ body {
 
         a {
             background-color: #EEFFCA;
-            border-bottom: 1px solid #EEFFCA;
             color: #333;
             font-weight: bold;
             padding: 0.3em 1em;
@@ -68,7 +81,6 @@ body {
 
         a:hover {
             background-color: #5B824C;
-            border-bottom: 1px solid #5B824C;
             color: white;
         }
     }
@@ -76,13 +88,11 @@ body {
     li.selected {
         a {
             background-color: white;
-            border-bottom: 1px solid white;
             padding: 0.5em 1.2em;
         }
 
         a:hover {
             background-color: white;
-            border-bottom: 1px solid white;
             color: #333;
         }
     }
@@ -100,7 +110,8 @@ body {
 }
 
 #content {
-    background-color: white;
+    padding-top: 8px;
+    padding-right: 8px;
 }
 
 #local-nav {
@@ -108,7 +119,8 @@ body {
 }
 
 #local-nav-content {
-    padding-left: 0.5em;
+    padding-left: 8px;
+    padding-top: 8px;
 }
 
 #summary h1 {
@@ -275,7 +287,6 @@ form {
     label.secondary {
         display: block;
         font-weight: normal;
-        text-align: right;
     }
 
     input.no-label {

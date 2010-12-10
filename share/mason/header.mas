@@ -1,21 +1,26 @@
   <div id="header">
-    <ul id="global-nav">
+    <div class="yui3-g">
+      <div class="yui3-u-3-4">
+        <h1>\
+% $m->request_comp->call_method( title => %ARGS );
+</h1>
+      </div>
+      <div class="yui3-u-1-4">
+        <ul id="global-nav">
 % if ( $c->user() ) {
 %   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->account() ) ) {
-      <li><a href="<% $c->account()->uri( view => 'settings' ) %>" title="Account settings">Account</a></li>
+          <li><a href="<% $c->account()->uri( view => 'settings' ) %>" title="Account settings">Account</a></li>
 %   }
-      <li><a href="<% $c->user()->uri( view => 'preferences') %>" title="Your application prefences">Prefs</a></li>
-      <li><a href="<% $c->domain()->application_uri
-                          ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
-             title="Log out of Rapport">Log Out</a></li>
+          <li><a href="<% $c->user()->uri( view => 'preferences') %>" title="Your application prefences">Prefs</a></li>
+              <li><a href="<% $c->domain()->application_uri
+                           ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
+                     title="Log out of Rapport">Log Out</a></li>
 % }
-      <li><a href="<% $c->domain()->application_uri( path => '/application/help' ) %>"
-             title="Help using Rapport">Help</a></li>
-    </ul>
-
-    <a href="<% $c->domain()->application_uri( path => '' ) %>"
-       ><img src="<% static_uri('/images/rapport-logo.jpg') %>"
-             width="115" height="57" /></a>
+          <li><a href="<% $c->domain()->application_uri( path => '/application/help' ) %>"
+                 title="Help using Rapport">Help</a></li>
+        </ul>
+      </div>
+    </div>
 
     <div id="tabs">
       <ul>
@@ -26,7 +31,7 @@
 % }
 % if ( ! @tabs ) {
         <!-- we need an element here or else the height of the header
-        is different for a page with tabs vs one without -->
+             is different for a page with tabs vs one without -->
         <li class="invisible">&nbsp;</li>
 % }
       </ul>

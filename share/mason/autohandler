@@ -16,15 +16,19 @@
 </head>
 <body>
 
+<div id="page">
 <& header.mas, %ARGS &>
 
 <div class="yui3-g">
-  <div id="content" class="<% $show_side_nav ? 'yui3-u-3-4' : 'yui3-u-1' %>">
+  <div class="<% $show_side_nav ? 'yui3-u-3-4' : 'yui3-u-1' %>">
 
-<& .messages &>
+    <div id="content">
+      <& .messages &>
 
 % $m->call_next();
+    </div>
   </div>
+
 % if ( $m->request_comp()->attr('show_side_nav') ) {
 <& side-nav.mas, %ARGS &>
 % }
@@ -32,6 +36,7 @@
 </div>
 
 <& footer.mas, %ARGS &>
+</div>
 
 </body>
 </html>
