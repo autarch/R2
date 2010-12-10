@@ -10,21 +10,23 @@ $suffix      => q{}
 my $params = $c->session_object()->form_data();
 
 my @data_sources;
-push @data_sources, $params if keys %{ $params };
-push @data_sources, $data if defined $data;
-push @data_sources, grep { defined } @objects;
+push @data_sources, $params if keys %{$params};
+push @data_sources, $data   if defined $data;
+push @data_sources, grep {defined} @objects;
 
-my $form_data = R2::Web::FormData->new( sources => \@data_sources,
-                                        suffix  => $suffix,
-                                      );
+my $form_data = R2::Web::FormData->new(
+    sources => \@data_sources,
+    suffix  => $suffix,
+);
 
-my $form = R2::Web::Form->new( html        => $m->content(),
-                               errors      => ( [ $c->session_object()->errors ] ),
-                               form_data   => $form_data,
-                               exclude     => \@exclude,
-                               is_fragment => $is_fragment,
-                               make_pretty => ( ! R2::Config->new()->is_production() ),
-                             );
+my $form = R2::Web::Form->new(
+    html        => $m->content(),
+    errors      => ( [ $c->session_object()->errors ] ),
+    form_data   => $form_data,
+    exclude     => \@exclude,
+    is_fragment => $is_fragment,
+    make_pretty => ( !R2::Config->new()->is_production() ),
+);
 
 $m->print( $form->filled_in_form() );
 </%init>
