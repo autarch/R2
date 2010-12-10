@@ -1,15 +1,26 @@
 /* color scheme - http://www.wellstyled.com/tools/colorscheme2/index-en.html?analog;28;0;144;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0 */
 
+@light-gray: #f3f3f3;
+@medium-gray: #999;
+@dark-gray: #555;
+@super-light-green: #f6ffe4;
+@light-green: #eeffca;
+@medium-green: #a1ba6c;
+@dark-green: #5b824c;
+@orange: #ff7400;
+@light-yellow: #ffffd9;
+
+@dark-green-border-light: @dark-green + #555;
+@dark-green-border-dark:  @dark-green - #222;
+
 html {
-    background-color: #f9fcf9;
+    background-color: @light-gray;
 }
 
 body {
-    background-color: white;
     font-family: sans-serif;
     line-height: 1.6em;
     margin: auto;
-    padding: 0px 8px;
     width: 960px;
 }
 
@@ -18,7 +29,7 @@ body {
 }
 
 #header {
-    background-color: #A1BA6C;
+    background-color: @dark-green;
     margin-top: 10px;
     padding-top: 1.5em;
 
@@ -30,10 +41,10 @@ body {
 }
 
 #footer {
-    background-color: #777;
+    background-color: @dark-gray;
     color: white;
     font-size: 90%;
-    padding: 2em 0.5em;
+    padding: 1em 0.5em;
     text-align: center;
 }
 
@@ -72,69 +83,73 @@ body {
         margin-right: 0.3em;
 
         a {
-            background-color: #EEFFCA;
-            color: #333;
+            background-color: @light-green;
+            color: black;
             font-weight: bold;
             padding: 0.3em 1em;
             text-decoration: none;
         }
 
         a:hover {
-            background-color: #5B824C;
+            background-color: @orange;
             color: white;
         }
     }
 
     li.selected {
         a {
-            background-color: white;
+            background-color: @light-gray;
+            color: @dark-green;
             padding: 0.5em 1.2em;
         }
 
         a:hover {
-            background-color: white;
-            color: #333;
+            background-color: @light-gray;
+            color: @dark-green;
         }
     }
 
     /* This makes sure that the header is the same height with our without tabs */
     li.invisible {
-        border: 1px 1px 0px 1px solid #A1BA6C;
+        border: 1px 1px 0px 1px solid @dark-green;
         padding: 0.3em 1em;
     }
 }
 
 #messages {
-    background-color: #FFFFD9;
+    background-color: @light-yellow;
     font-size: 90%;
 }
 
 #content {
-    padding-top: 8px;
-    padding-right: 8px;
-}
-
-#local-nav {
-    background-color: #FCFFE4;
+    background-color: white;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 8px;
+    -moz-box-shadow: inset -2px -2px 2px #888;
 }
 
 #local-nav-content {
+    margin-top: 10px;
     padding-left: 8px;
     padding-top: 8px;
 }
 
-#summary h1 {
-    margin: 0.2em 0 1em 0;
+#summary {
+    h1 {
+        margin: 0.2em 0 1em 0;
+    }
 }
 
 #contact-view {
     h2 {
-        border-bottom: 1px solid #333;
-        color: #333;
+        border-bottom: 1px solid @dark-gray;
+        color: @dark-gray;
     }
 
     h3 {
-        color: #666;
+        color: @medium-gray;
     }
 }
 
@@ -168,6 +183,7 @@ ul.donation-totals li {
 
 table.standard-table {
     width: 100%;
+    border: 1px solid @medium-gray;
 
     th, td {
         border: none;
@@ -178,12 +194,12 @@ table.standard-table {
     }
 
     thead tr {
-        background-color: #A1BA6C;
+        background-color: @medium-green;
         color: white;
     }
 
     tbody:hover tr {
-        background-color: #EEE;
+        background-color: @light-gray;
     }
 
     th {
@@ -191,7 +207,7 @@ table.standard-table {
     }
 
     tr.even {
-        background-color: #F6FFE4;
+        background-color: @super-light-green;
     }
 
     tr.note {
@@ -212,14 +228,14 @@ table.standard-table {
 /* === Forms === */
 
 fieldset {
-    background-color: #F6FFE4;
-    border-top: 1px solid #A1BA6C;
+    background-color: @super-light-green;
+    border-top: 1px solid @medium-green;
     margin-right: 2em;
     padding: 0.5em;
     padding-bottom: 1em;
 
     legend {
-        background-color: #A1BA6C;
+        background-color: @medium-green;
         color: white;
         font-weight: bold;
         padding: 0.4em;
@@ -295,7 +311,7 @@ form {
     }
 
     label.for-radio {
-        color: #777;
+        color: @medium-gray;
         margin-right: 0.5em;
     }
 
@@ -323,8 +339,8 @@ form {
     input.file,
     textarea,
     select {
-        border: 1px solid #5B824C;
-        color: #5B824C;
+        border: 1px solid @dark-green;
+        color: @dark-green;
         font-weight: bold;
         margin-top: -0.1em;
         padding: 0.2em;
@@ -332,7 +348,7 @@ form {
 
     span.text-for-hidden {
         font-weight: bold;
-        color: #5B824C;
+        color: @dark-green;
     }
 
     input.error,
@@ -345,14 +361,14 @@ form {
     input.disabled,
     textarea.disabled,
     select.disabled {
-        background-color: #CCC;
-        border-color: #333;
+        background-color: @light-gray;
+        border-color: @dark-gray;
     }
 
     input.text:focus,
     textarea:focus,
     select:focus {
-        background-color: #FAFFCA;
+        background-color: @light-yellow;
         border-color: black;
     }
 
@@ -381,11 +397,11 @@ form {
     }
 
     input.submit {
-        background-color: #5B824C;
-        border-bottom: 2px solid #39602A;
-        border-left: 1px solid #D9FFCA;
-        border-right: 2px solid #39602A;
-        border-top: 1px solid #D9FFCA;
+        background-color: @dark-green;
+        border-bottom: 2px solid @dark-green-border-dark;
+        border-left: 1px solid @dark-green-border-light;
+        border-right: 2px solid @dark-green-border-dark;
+        border-top: 1px solid @dark-green-border-light;
         color: white;
         font-weight: bold;
         margin-top: 0.5em;
