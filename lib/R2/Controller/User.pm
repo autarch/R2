@@ -58,10 +58,10 @@ sub authentication_POST {
 
     my $user;
     unless (@errors) {
-        $user = R2::Schema::User->new(
-            username => $username,
-            password => $pw,
-        );
+        $user = R2::Schema::User->new( username => $username );
+
+        $user = undef
+            unless $user->check_password($pw);
 
         push @errors, 'The username or password you provided was not valid.'
             unless $user;
