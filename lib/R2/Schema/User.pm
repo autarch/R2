@@ -5,12 +5,13 @@ use warnings;
 use namespace::autoclean;
 
 use Authen::Passphrase::BlowfishCrypt;
-use Fey::ORM::Exceptions qw( no_such_row );
+use DateTime::Locale;
 use List::AllUtils qw( first );
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
 use R2::Schema::Person;
+use R2::Types qw( Str );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
@@ -18,6 +19,38 @@ use Fey::ORM::Table;
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _require_username_or_email )] };
 with 'R2::Role::Schema::URIMaker';
+
+has _dt_locale => (
+    is       => 'ro',
+    isa      => 'DateTime::Locale::Base',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { DateTime::Locale->load( $_[0]->locale_code() ) },
+);
+
+has date_format => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { $_[0]->_dt_locale()->date_format_medium() },
+);
+
+has time_format => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { $_[0]->_dt_locale()->time_format_medium() },
+);
+
+has datetime_format => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { $_[0]->_dt_locale()->datetime_format_medium() },
+);
 
 {
     my $schema = R2::Schema->Schema();
@@ -35,17 +68,6 @@ with 'R2::Role::Schema::URIMaker';
             R2::Schema::Contact->meta()->get_attribute_list(),
             qw( display_name ),
         ],
-    );
-
-    has 'datetime_format' => (
-        is   => 'ro',
-        isa  => 'Str',
-        lazy => 1,
-
-        # This isn't really right because it assumes that the date
-        # comes before the time, but it's probably okay for the US &
-        # Canada.
-        default => sub { $_[0]->date_format() . q{ } . $_[0]->time_format() },
     );
 }
 
