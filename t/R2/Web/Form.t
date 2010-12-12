@@ -9,7 +9,6 @@ use List::AllUtils qw( first );
 use R2::Web::Form;
 use R2::Web::FormData;
 
-
 my $html = <<'EOF';
 <form action="/" method="POST">
  <input type="hidden" name="hidden" value="1" />
@@ -63,59 +62,81 @@ EOF
 {
     my $form = form_elt_for();
 
-    like( $form->as_HTML(), qr{<form.+</form>}xism,
-          'still returns form if there is nothing to alter' );
+    like(
+        $form->as_HTML(), qr{<form.+</form>}xism,
+        'still returns form if there is nothing to alter'
+    );
 }
 
 {
-    my $form = form_elt_for( errors => [ { message => 'A generic error' } ],
-                           );
+    my $form = form_elt_for(
+        errors => [ { message => 'A generic error' } ],
+    );
 
     generic_error_div_tests($form);
 }
 
 {
-    my $form = form_elt_for( errors => [ 'A generic error' ],
-                           );
+    my $form = form_elt_for(
+        errors => ['A generic error'],
+    );
 
     generic_error_div_tests($form);
 }
 
 {
-    my $form = form_elt_for( errors => [ { field   => 'text1',
-                                           message => 'Error in text1' } ],
-                           );
+    my $form = form_elt_for(
+        errors => [
+            {
+                field   => 'text1',
+                message => 'Error in text1'
+            }
+        ],
+    );
 
-    ok( ( ! any { $_->can('tagName')
-                  && lc $_->tagName() eq 'div'
-                  && $_->className eq 'form-error' } $form->childNodes() ),
-        'form does not have a generic error div' );
+    ok(
+        (
+            !any {
+                $_->can('tagName')
+                    && lc $_->tagName() eq 'div'
+                    && $_->className eq 'form-error';
+            }
+            $form->childNodes()
+        ),
+        'form does not have a generic error div'
+    );
 
     text1_error_div_tests($form);
 }
 
-
 {
-    my $form = form_elt_for( errors => [ { message => 'A generic error',
-                                         },
-                                         { field   => 'text1',
-                                           message => 'Error in text1' },
-                                       ],
-                           );
+    my $form = form_elt_for(
+        errors => [
+            {
+                message => 'A generic error',
+            }, {
+                field   => 'text1',
+                message => 'Error in text1'
+            },
+        ],
+    );
 
     generic_error_div_tests($form);
     text1_error_div_tests($form);
 }
 
 {
-    my $data = R2::Web::FormData->new( sources => [ { text1    => 't1',
-                                                      text2    => 't2',
-                                                      select1  => 1,
-                                                      select2  => [ 2, 3 ],
-                                                      textarea => 'tarea',
-                                                    },
-                                                  ],
-                                     );
+    my $data = R2::Web::FormData->new(
+        sources => [
+            {
+                text1    => 't1',
+                text2    => 't2',
+                select1  => 1,
+                select2  => [ 2, 3 ],
+                textarea => 'tarea',
+            },
+        ],
+    );
 
     my $form = form_elt_for( form_data => $data );
 
@@ -123,22 +144,29 @@ EOF
 }
 
 {
-    my $data = R2::Web::FormData->new( sources => [ { text1    => 't1',
-                                                      text2    => 't2',
-                                                      select1  => 1,
-                                                      select2  => [ 2, 3 ],
-                                                      textarea => 'tarea',
-                                                    },
-                                                  ],
-                                     );
+    my $data = R2::Web::FormData->new(
+        sources => [
+            {
+                text1    => 't1',
+                text2    => 't2',
+                select1  => 1,
+                select2  => [ 2, 3 ],
+                textarea => 'tarea',
+            },
+        ],
+    );
 
-    my $form = form_elt_for( errors    => [ { message => 'A generic error',
-                                            },
-                                            { field   => 'text1',
-                                              message => 'Error in text1' },
-                                          ],
-                             form_data => $data,
-                           );
+    my $form = form_elt_for(
+        errors => [
+            {
+                message => 'A generic error',
+            }, {
+                field   => 'text1',
+                message => 'Error in text1'
+            },
+        ],
+        form_data => $data,
+    );
 
     generic_error_div_tests($form);
     text1_error_div_tests($form);
@@ -146,23 +174,30 @@ EOF
 }
 
 {
-    my $form = form_elt_for( errors    => [ { field   => 'nested',
-                                              message => 'Error in nested',
-                                            },
-                                          ],
-                           );
+    my $form = form_elt_for(
+        errors => [
+            {
+                field   => 'nested',
+                message => 'Error in nested',
+            },
+        ],
+    );
 
-    my $nested =
-        first { $_->getAttribute('name') eq 'nested' } @{ $form->getElementsByTagName('input') };
+    my $nested = first { $_->getAttribute('name') eq 'nested' }
+    @{ $form->getElementsByTagName('input') };
 
     my $grandparent = $nested->parentNode()->parentNode();
 
     my $error_p = $grandparent->getElementsByTagName('p')->[0];
 
-    is( $error_p->className(), 'error-message',
-        q{found error message p tag} );
-    is( $error_p->parentNode(), $grandparent,
-        q{error message is a child of nested input's grandparent node} );
+    is(
+        $error_p->className(), 'error-message',
+        q{found error message p tag}
+    );
+    is(
+        $error_p->parentNode(), $grandparent,
+        q{error message is a child of nested input's grandparent node}
+    );
 }
 
 {
@@ -179,28 +214,36 @@ EOF
 
     my $form = form_elt_for();
 
-    my $select3 =
-        first { $_->getAttribute('name') eq 'select3' } @{ $form->getElementsByTagName('input') };
+    my $select3 = first { $_->getAttribute('name') eq 'select3' }
+    @{ $form->getElementsByTagName('input') };
 
-    is( lc $select3->tagName(), 'input',
-        'select3 has been made an input element' );
-    is( $select3->getAttribute('type'), 'hidden',
-        'select3 is a hidden input element' );
-    is( $select3->getAttribute('value'), '99',
-        'select3 value is 99' );
+    is(
+        lc $select3->tagName(), 'input',
+        'select3 has been made an input element'
+    );
+    is(
+        $select3->getAttribute('type'), 'hidden',
+        'select3 is a hidden input element'
+    );
+    is(
+        $select3->getAttribute('value'), '99',
+        'select3 value is 99'
+    );
 
-    my $span =
-        first { $_->className() eq 'text-for-hidden' } @{ $form->getElementsByTagName('span') };
+    my $span = first { $_->className() eq 'text-for-hidden' }
+    @{ $form->getElementsByTagName('span') };
 
-    is( $span->firstChild()->data(), 'ninety-nine',
-        'option text is now in a div' );
+    is(
+        $span->firstChild()->data(), 'ninety-nine',
+        'option text is now in a div'
+    );
 }
 
-sub form_elt_for
-{
-    my $form = R2::Web::Form->new( html => $html,
-                                   @_,
-                                 );
+sub form_elt_for {
+    my $form = R2::Web::Form->new(
+        html => $html,
+        @_,
+    );
 
     my $dom = HTML::DOM->new();
     $dom->write( $form->filled_in_form() );
@@ -209,93 +252,107 @@ sub form_elt_for
     # just cannot isolate. Without it, we get a weird error because
     # the ownerDocument property of the form is set to itself, not the
     # HTML::DOM object.
-#    my $x = $dom->as_HTML;
+    #    my $x = $dom->as_HTML;
 
     return $dom->getElementsByTagName('form')->[0];
 }
 
-sub generic_error_div_tests
-{
+sub generic_error_div_tests {
     my $form = shift;
 
-    my $error_div =
-        first { $_->can('tagName')
-                && lc $_->tagName() eq 'div'
-                && $_->className eq 'form-error' } $form->childNodes();
+    my $error_div = first {
+        $_->can('tagName')
+            && lc $_->tagName() eq 'div'
+            && $_->className eq 'form-error';
+    }
+    $form->childNodes();
 
     ok( $error_div, 'form has an error div as a child node' );
 
     my $error_p = $error_div->getElementsByTagName('p')->[0];
 
     ok( $error_p, 'error div has a P element as a child' );
-    is( $error_p->firstChild()->firstChild()->data(),
+    is(
+        $error_p->firstChild()->firstChild()->data(),
         'A generic error',
-        'text of p is expected error message' );
+        'text of p is expected error message'
+    );
 }
 
-sub text1_error_div_tests
-{
+sub text1_error_div_tests {
     my $form = shift;
 
-    my $error_div =
-        first { $_->can('tagName')
-                && lc $_->tagName() eq 'div'
-                && $_->className eq 'form-item error' } $form->childNodes();
+    my $error_div = first {
+        $_->can('tagName')
+            && lc $_->tagName() eq 'div'
+            && $_->className eq 'form-item error';
+    }
+    $form->childNodes();
 
-    ok( $error_div, 'form does have a form-item div with an additional error class' );
+    ok( $error_div,
+        'form does have a form-item div with an additional error class' );
 
     my $error_p = $error_div->getElementsByTagName('p')->[0];
 
     ok( $error_p, 'error div has a P element as a child' );
-    is( $error_p->firstChild()->firstChild()->data(),
+    is(
+        $error_p->firstChild()->firstChild()->data(),
         'Error in text1',
-        'text of p is expected error message' );
+        'text of p is expected error message'
+    );
 }
 
-sub fill_in_form_tests
-{
+sub fill_in_form_tests {
     my $form = shift;
 
-    my $text1 =
-        first { $_->name() eq 'text1' } $form->getElementsByTagName('input');
+    my $text1 = first { $_->name() eq 'text1' }
+    $form->getElementsByTagName('input');
 
-    is( $text1->value(), 't1',
-        'text1 has expected value' );
+    is(
+        $text1->value(), 't1',
+        'text1 has expected value'
+    );
 
-    my $text2 =
-        first { $_->name() eq 'text2' } $form->getElementsByTagName('input');
+    my $text2 = first { $_->name() eq 'text2' }
+    $form->getElementsByTagName('input');
 
-    is( $text2->value(), 't2',
-        'text1 has expected value' );
+    is(
+        $text2->value(), 't2',
+        'text1 has expected value'
+    );
 
-    my $select1 =
-        first { $_->name() eq 'select1' } $form->getElementsByTagName('select');
+    my $select1 = first { $_->name() eq 'select1' }
+    $form->getElementsByTagName('select');
 
-    is_deeply( [ map { $_->value() }
-                 grep { $_->selected() }
-                 $select1->options()
-               ],
-               [ 1 ],
-               'select1 has expected option marked as selected'
-             );
+    is_deeply(
+        [
+            map  { $_->value() }
+            grep { $_->selected() } $select1->options()
+        ],
+        [1],
+        'select1 has expected option marked as selected'
+    );
 
-    my $select2 =
-        first { $_->name() eq 'select2' } $form->getElementsByTagName('select');
+    my $select2 = first { $_->name() eq 'select2' }
+    $form->getElementsByTagName('select');
 
-    is_deeply( [ map { $_->value() }
-                 grep { $_->selected() }
-                 $select2->options()
-               ],
-               [ 2, 3 ],
-               'select2 has expected options marked as selected'
-             );
+    is_deeply(
+        [
+            map  { $_->value() }
+            grep { $_->selected() } $select2->options()
+        ],
+        [ 2, 3 ],
+        'select2 has expected options marked as selected'
+    );
 
-    my $textarea =
-        first { $_->name() eq 'textarea' } $form->getElementsByTagName('textarea');
+    my $textarea = first { $_->name() eq 'textarea' }
+    $form->getElementsByTagName('textarea');
 
     my $textarea_text = $textarea->firstChild()->data();
     $textarea_text =~ s/^\s+|\s+$//g;
 
-    is( $textarea_text, 'tarea',
-        'textarea has expected text content' );
+    is(
+        $textarea_text, 'tarea',
+        'textarea has expected text content'
+    );
 }
