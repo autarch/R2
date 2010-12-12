@@ -62,8 +62,7 @@ sub new_organization_form : Local {
     $c->stash()->{template} = '/organization/new_organization_form';
 }
 
-sub _set_contact : Chained('/account/_set_account') : PathPart('contact') :
-    CaptureArgs(1) {
+sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : CaptureArgs(1) {
     my $self       = shift;
     my $c          = shift;
     my $contact_id = shift;
@@ -120,8 +119,7 @@ sub _contact_view_tabs {
     ];
 }
 
-sub contact : Chained('_set_contact') : PathPart('') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub contact : Chained('_set_contact') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub contact_GET_html : Private {
@@ -178,17 +176,15 @@ sub contact_PUT : Private {
     my $self = shift;
     my $c    = shift;
 
-    my $account = $c->account();
+    my $contact = $c->stash()->{contact};
 
     $self->_check_authz(
         $c,
         'user_can_edit_contact',
-        { account => $account },
+        { contact => $contact },
         'You are not allowed to edit contacts.',
-        $account->uri(),
+        $c->account()->uri(),
     );
-
-    my $contact = $c->stash()->{contact};
 
     my $type = lc $contact->contact_type();
 
@@ -287,8 +283,7 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') :
     $c->stash()->{template} = '/donation/edit_form';
 }
 
-sub donation : Chained('_set_donation') : PathPart('') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub donation : Chained('_set_donation') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub donation_PUT {
@@ -350,8 +345,7 @@ sub donation_DELETE {
     $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
 }
 
-sub donation_confirm_deletion : Chained('_set_donation') :
-    PathPart('confirm_deletion') : Args(0) {
+sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_deletion') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
@@ -405,8 +399,7 @@ sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0) {
     $c->stash()->{template} = '/note/edit_form';
 }
 
-sub notes : Chained('_set_contact') : PathPart('notes') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub notes : Chained('_set_contact') : PathPart('notes') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub notes_GET_html : Private {
@@ -452,8 +445,7 @@ sub notes_POST : Private {
     $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
 }
 
-sub note : Chained('_set_note') : PathPart('') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub note : Chained('_set_note') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub note_PUT {
@@ -515,8 +507,7 @@ sub note_DELETE {
     $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
 }
 
-sub note_confirm_deletion : Chained('_set_note') :
-    PathPart('confirm_deletion') : Args(0) {
+sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
@@ -538,8 +529,7 @@ sub note_confirm_deletion : Chained('_set_note') :
     $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
-sub history : Chained('_set_contact') : PathPart('history') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub history : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub history_GET_html : Private {
