@@ -10,8 +10,7 @@ use Moose;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-sub contact : Chained('/account/_set_account') : PathPart('search/contact') :
-    Args(0) {
+sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Args(0) {
     my $self = shift;
     my $c    = shift;
 

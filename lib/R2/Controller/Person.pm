@@ -18,8 +18,7 @@ BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub person_GET {

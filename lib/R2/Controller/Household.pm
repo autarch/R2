@@ -13,8 +13,7 @@ BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-sub household : Chained('/account/_set_account') : PathPart('household') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub household : Chained('/account/_set_account') : PathPart('household') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub household_POST {

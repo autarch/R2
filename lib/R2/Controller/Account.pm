@@ -49,8 +49,7 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1) {
     $c->stash()->{account} = $account;
 }
 
-sub account : Chained('_set_account') : PathPart('') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub account : Chained('_set_account') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub account_GET_html : Private {
@@ -93,16 +92,13 @@ sub settings : Chained('_set_account') : PathPart('settings') : Args(0) {
 sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) {
 }
 
-sub donation_settings : Chained('_set_account') :
-    PathPart('donation_settings') : Args(0) {
+sub donation_settings : Chained('_set_account') : PathPart('donation_settings') : Args(0) {
 }
 
-sub donation_sources_form : Chained('_set_account') :
-    PathPart('donation_sources_form') : Args(0) {
+sub donation_sources_form : Chained('_set_account') : PathPart('donation_sources_form') : Args(0) {
 }
 
-sub donation_source : Chained('_set_account') : PathPart('donation_source') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_source : Chained('_set_account') : PathPart('donation_source') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub donation_source_POST : Private {
@@ -131,12 +127,10 @@ sub donation_source_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
-sub donation_targets_form : Chained('_set_account') :
-    PathPart('donation_targets_form') : Args(0) {
+sub donation_targets_form : Chained('_set_account') : PathPart('donation_targets_form') : Args(0) {
 }
 
-sub donation_target : Chained('_set_account') : PathPart('donation_target') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_target : Chained('_set_account') : PathPart('donation_target') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub donation_target_POST : Private {
@@ -165,12 +159,10 @@ sub donation_target_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
-sub payment_types_form : Chained('_set_account') :
-    PathPart('payment_types_form') : Args(0) {
+sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) {
 }
 
-sub payment_type : Chained('_set_account') : PathPart('payment_type') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub payment_type : Chained('_set_account') : PathPart('payment_type') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub payment_type_POST : Private {
@@ -198,12 +190,10 @@ sub payment_type_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
-sub address_types_form : Chained('_set_account') :
-    PathPart('address_types_form') : Args(0) {
+sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) {
 }
 
-sub address_type : Chained('_set_account') : PathPart('address_type') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub address_type : Chained('_set_account') : PathPart('address_type') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub address_type_POST : Private {
@@ -231,12 +221,10 @@ sub address_type_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub countries_form : Chained('_set_account') : PathPart('countries_form') :
-    Args(0) {
+sub countries_form : Chained('_set_account') : PathPart('countries_form') : Args(0) {
 }
 
-sub country : Chained('_set_account') : PathPart('country') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub country : Chained('_set_account') : PathPart('country') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub country_POST : Private {
@@ -245,13 +233,10 @@ sub country_POST : Private {
 
 }
 
-sub phone_number_types_form : Chained('_set_account') :
-    PathPart('phone_number_types_form') : Args(0) {
+sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) {
 }
 
-sub phone_number_type : Chained('_set_account') :
-    PathPart('phone_number_type') : Args(0) : ActionClass('+R2::Action::REST')
-{
+sub phone_number_type : Chained('_set_account') : PathPart('phone_number_type') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub phone_number_type_POST : Private {
@@ -280,13 +265,10 @@ sub phone_number_type_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub contact_note_types_form : Chained('_set_account') :
-    PathPart('contact_note_types_form') : Args(0) {
+sub contact_note_types_form : Chained('_set_account') : PathPart('contact_note_types_form') : Args(0) {
 }
 
-sub contact_note_type : Chained('_set_account') :
-    PathPart('contact_note_type') : Args(0) : ActionClass('+R2::Action::REST')
-{
+sub contact_note_type : Chained('_set_account') : PathPart('contact_note_type') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub contact_note_type_POST : Private {
@@ -315,13 +297,10 @@ sub contact_note_type_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub messaging_providers_form : Chained('_set_account') :
-    PathPart('messaging_providers_form') : Args(0) {
+sub messaging_providers_form : Chained('_set_account') : PathPart('messaging_providers_form') : Args(0) {
 }
 
-sub messaging_provider : Chained('_set_account') :
-    PathPart('messaging_provider') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub messaging_provider : Chained('_set_account') : PathPart('messaging_provider') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub messaging_provider_POST : Private {
@@ -350,13 +329,10 @@ sub messaging_provider_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub custom_field_groups_form : Chained('_set_account') :
-    PathPart('custom_field_groups_form') : Args(0) {
+sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) {
 }
 
-sub custom_field_group_collection : Chained('_set_account') :
-    PathPart('custom_field_group') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub custom_field_group_collection : Chained('_set_account') : PathPart('custom_field_group') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub custom_field_group_collection_POST : Private {
@@ -401,8 +377,7 @@ sub _set_custom_field_group : Chained('_set_account') :
     $c->stash()->{group} = $group;
 }
 
-sub custom_field_group : Chained('_set_custom_field_group') : PathPart('') :
-    Args(0) : ActionClass('+R2::Action::REST') {
+sub custom_field_group : Chained('_set_custom_field_group') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub custom_field_group_GET_html : Private {
