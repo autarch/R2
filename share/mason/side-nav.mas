@@ -1,4 +1,4 @@
-    <div id="local-nav" class="yui3-u-1-4">
+    <div id="local-nav" class="yui3-u-1-5">
       <div id="local-nav-content">
         <form action="/contact/search" method="get">
         <input name="search" type="text" class="text" value="Quick Search" />

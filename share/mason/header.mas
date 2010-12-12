@@ -1,9 +1,9 @@
   <div id="header">
     <div class="yui3-g">
-      <div class="yui3-u-3-4">
+      <div class="yui3-u-4-5">
         <h1>Rapport</h1>
       </div>
-      <div class="yui3-u-1-4">
+      <div class="yui3-u-1-5">
         <ul id="global-nav">
 % if ( $c->user() ) {
 %   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->account() ) ) {
