@@ -66,12 +66,6 @@ with 'R2::Role::Schema::ActsAsContact' =>
         lazy_build => 1,
     );
 
-    class_has 'GenderValues' => (
-        is         => 'ro',
-        isa        => 'ArrayRef',
-        lazy_build => 1,
-    );
-
     class_has 'DefaultOrderBy' => (
         is      => 'ro',
         isa     => 'ArrayRef',
@@ -84,18 +78,6 @@ with 'R2::Role::Schema::ActsAsContact' =>
             ];
         },
     );
-}
-
-sub _build_GenderValues {
-    my $class = shift;
-
-    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
-
-    my $sth = $dbh->column_info( '', '', 'Person', 'gender' );
-
-    my $col_info = $sth->fetchall_arrayref( {} )->[0];
-
-    return $col_info->{pg_enum_values} || [];
 }
 
 sub _require_some_name {
