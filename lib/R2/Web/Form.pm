@@ -211,12 +211,13 @@ sub _collapse_single_option_select {
 sub _form_html_from_dom {
     my $self = shift;
 
-    return $self->_dom()->documentElement()->as_HTML( undef, q{}, {} )
-        if $self->is_fragment();
-
-    my $form = $self->_dom()->getElementsByTagName('form')->[0];
-
-    return $form->as_HTML( undef, q{}, {} );
+    if ( $self->is_fragment() ) {
+        return $self->_dom()->getElementsByTagName('body')->[0]->innerHTML();
+    }
+    else {
+        return $self->_dom()->getElementsByTagName('form')->[0]
+            ->as_HTML( undef, q{}, {} );
+    }
 }
 
 # This bizarro bit seems to fix some tests. Sigh ...
