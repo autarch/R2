@@ -2,7 +2,7 @@
 
 <p>
 % if ( $contact->allows_email() ) {
-Is ok with being emailed via Rapport.
+Allows email from Rapport.
 % } else {
 Does not want to be emailed via Rapport.
 % }
@@ -21,7 +21,7 @@ Does not want to be emailed via Rapport.
 %   }
 %   if ( my $note = $email->note() ) {
     <p><% $note %></p>
-%   } 
+%   }
   </li>
 % }
 </ul>
