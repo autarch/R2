@@ -51,10 +51,12 @@
       <label class="for-field" for="last_name">Gender:</label>
       <select name="gender">
         <option value="">-- pick a gender --</option>
-% for my $value ( @{ R2::Schema::Person->GenderValues() } ) {
+% for my $value ( qw( female male ) ) {
         <option value="<% $value %>"><% $value %></option>
 % }
       </select>
+      <label class="secondary" for="gender_text">or enter a gender here</label>
+      <input type="text" class="text narrow" name="gender_text" id="gender_text" />
     </div>
 
 <& /lib/form/contact-ok-fields.mas &>
