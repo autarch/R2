@@ -19,8 +19,10 @@ use MooseX::ClassAttribute;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        @{ $schema->table('ContactHistory')->primary_key() } );
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        @{ $schema->table('ContactHistory')->primary_key() }
+    );
 
     $select->select($count)->from( $schema->tables('ContactHistory'), )
         ->where(
@@ -65,87 +67,93 @@ sub _FindOrCreateType {
 }
 
 {
-    my @Types = (
-        {
-            system_name => 'Created',
-            description => 'Contact was created',
-        },
+    my @Types;
 
-        {
-            system_name => 'Modified',
-            description => 'Contact was modified',
-        },
+    BEGIN {
+        @Types = (
+            {
+                system_name => 'Created',
+                description => 'Contact was created',
+            },
 
-        {
-            system_name => 'AddHouseholdMember',
-            description => 'A person was added to this household',
-        },
+            {
+                system_name => 'Modified',
+                description => 'Contact was modified',
+            },
 
-        {
-            system_name => 'AddOrganizationMember',
-            description => 'A person was added to this organization',
-        },
+            {
+                system_name => 'AddHouseholdMember',
+                description => 'A person was added to this household',
+            },
 
-        {
-            system_name => 'AddEmailAddress',
-            description => 'A new email address was added for the contact',
-        },
+            {
+                system_name => 'AddOrganizationMember',
+                description => 'A person was added to this organization',
+            },
 
-        {
-            system_name => 'DeleteEmailAddress',
-            description => 'An email address for the contact was deleted',
-        },
+            {
+                system_name => 'AddEmailAddress',
+                description =>
+                    'A new email address was added for the contact',
+            },
 
-        {
-            system_name => 'ModifyEmailAddress',
-            description => 'An email address for the contact was modified',
-        },
+            {
+                system_name => 'DeleteEmailAddress',
+                description => 'An email address for the contact was deleted',
+            },
 
-        {
-            system_name => 'AddWebsite',
-            description => 'A new website was added for the contact',
-        },
+            {
+                system_name => 'ModifyEmailAddress',
+                description =>
+                    'An email address for the contact was modified',
+            },
 
-        {
-            system_name => 'DeleteWebsite',
-            description => 'A website for the contact was deleted',
-        },
+            {
+                system_name => 'AddWebsite',
+                description => 'A new website was added for the contact',
+            },
 
-        {
-            system_name => 'ModifyWebsite',
-            description => 'A website for the contact was modified',
-        },
+            {
+                system_name => 'DeleteWebsite',
+                description => 'A website for the contact was deleted',
+            },
 
-        {
-            system_name => 'AddAddress',
-            description => 'A new address was added for the contact',
-        },
+            {
+                system_name => 'ModifyWebsite',
+                description => 'A website for the contact was modified',
+            },
 
-        {
-            system_name => 'DeleteAddress',
-            description => 'An address for the contact was deleted',
-        },
+            {
+                system_name => 'AddAddress',
+                description => 'A new address was added for the contact',
+            },
 
-        {
-            system_name => 'ModifyAddress',
-            description => 'An address for the contact was modified',
-        },
+            {
+                system_name => 'DeleteAddress',
+                description => 'An address for the contact was deleted',
+            },
 
-        {
-            system_name => 'AddPhoneNumber',
-            description => 'A new phone number was added for the contact',
-        },
+            {
+                system_name => 'ModifyAddress',
+                description => 'An address for the contact was modified',
+            },
 
-        {
-            system_name => 'DeletePhoneNumber',
-            description => 'A phone number for the contact was deleted',
-        },
+            {
+                system_name => 'AddPhoneNumber',
+                description => 'A new phone number was added for the contact',
+            },
 
-        {
-            system_name => 'ModifyPhoneNumber',
-            description => 'A phone number for the contact was modified',
-        },
-    );
+            {
+                system_name => 'DeletePhoneNumber',
+                description => 'A phone number for the contact was deleted',
+            },
+
+            {
+                system_name => 'ModifyPhoneNumber',
+                description => 'A phone number for the contact was modified',
+            },
+        );
+    }
 
     my $x = 1;
     $_->{sort_order} = $x++ for @Types;
