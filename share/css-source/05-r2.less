@@ -1,4 +1,31 @@
-/* color scheme - http://www.wellstyled.com/tools/colorscheme2/index-en.html?analog;28;0;144;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0.4193548387096774;0.7294117647058823;0.4193548387096774;0.5105882352941176;0.10483870967741934;1;0.2096774193548387;1;0 */
+.rounded-corners-top (@radius: 0px) {
+    border-radius-topleft: @radius;
+    border-radius-topright: @radius;
+    -moz-border-radius-topleft: @radius;
+    -moz-border-radius-topright: @radius;
+    -webkit-border-radius-topleft: @radius;
+    -webkit-border-radius-topright: @radius;
+}
+
+.rounded-corners-bottom (@radius: 0px) {
+    border-radius-bottomleft: @radius;
+    border-radius-bottomright: @radius;
+    -moz-border-radius-bottomleft: @radius;
+    -moz-border-radius-bottomright: @radius;
+    -webkit-border-radius-bottomleft: @radius;
+    -webkit-border-radius-bottomright: @radius;
+}
+
+.rounded-corners-both (@radius: 0px) {
+    .rounded-corners-top(@radius);
+    .rounded-corners-bottom(@radius);
+}
+
+.rounded-box (@radius: 6px, @color: black) {
+    .rounded-corners-both(@radius);
+    border: 1px solid @color;
+    margin-bottom: 1em;
+}     
 
 @light-gray: #f3f3f3;
 @medium-gray: #999;
@@ -89,6 +116,7 @@ body {
             padding: 0.3em 1em;
             text-decoration: none;
             vertical-align: middle;
+            .rounded-corners-top(6px);
         }
 
         a:hover {
@@ -102,6 +130,7 @@ body {
             background-color: @light-gray;
             color: @dark-green;
             padding: 0.5em 1.2em;
+            text-shadow: 1px 1px #999;
         }
 
         a:hover {
@@ -241,6 +270,8 @@ fieldset {
         color: white;
         font-weight: bold;
         padding: 0.4em;
+        text-shadow: 1px 1px #666;
+        .rounded-corners-top(6px);
     }
 }
 
