@@ -2,9 +2,9 @@
 
 <p>
 % if ( $contact->allows_mail() ) {
-Is ok with getting mail.
+Allows postal mail.
 % } else {
-Does not want to receive mail.
+Does not want to receive postal mail.
 % }
 </p>
 
