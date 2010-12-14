@@ -160,7 +160,7 @@ sub _password_as_rfc2307 {
     # XXX - require a certain length or complexity? make it
     # configurable?
     my $pass = Authen::Passphrase::BlowfishCrypt->new(
-        cost        => 8,
+        cost        => 12,
         salt_random => 1,
         passphrase  => $pw,
     );
