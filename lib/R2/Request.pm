@@ -14,8 +14,15 @@ with 'Catalyst::TraitFor::Request::REST::ForBrowsers';
 sub person_params {
     my $self = shift;
 
-    return $self->_params_for_classes(
+    my %person = $self->_params_for_classes(
         [ 'R2::Schema::Person', 'R2::Schema::Contact' ] );
+
+    my $params = $self->params();
+
+    $person{gender} = $params->{gender_text}
+        unless string_is_empty( $params->{gender_text} );
+
+    return %person;
 }
 
 sub household_params {
