@@ -455,7 +455,7 @@ sub _ensure_dir {
 
     return if -d $dir;
 
-    $dir->mkpath( 0, 0755 )
+    $dir->mkpath( 0, 0750 )
         or die "Cannot make $dir: $!";
 
     return;
