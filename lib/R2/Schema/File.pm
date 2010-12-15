@@ -147,8 +147,7 @@ sub _build_cache_dir {
 
     my $hashed = sha512_hex( $self->file_id(), $config->secret() );
 
-    return $config->cache_dir()->subdir(
-        'files',
+    return $config->files_dir()->subdir(
         substr( $hashed, 0, 2 ),
         $hashed
     );
