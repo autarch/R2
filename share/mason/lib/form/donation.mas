@@ -88,11 +88,11 @@
       <textarea name="note" class="wide"></textarea>
     </div>
 
+    <div class="form-item">
+      <input class="submit" type="submit" value="Submit" />
+    </div>
+
   </fieldset>
-    
-  <div class="form-item">
-    <input class="submit" type="submit" value="Submit" />
-  </div>
 
 </form>
 </&>
