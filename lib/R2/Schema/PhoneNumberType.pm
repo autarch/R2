@@ -49,14 +49,18 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        @{ $schema->table('Contact')->primary_key() } );
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('PhoneNumber')->column('phone_number_id')
+    );
 
+    #<<
     $select->select($count)
-        ->from( $schema->tables( 'PhoneNumber', 'Contact' ), )->where(
-        $schema->table('PhoneNumber')->column('phone_number_type_id'),
-        '=', Fey::Placeholder->new()
-        );
+           ->from  ( $schema->table('PhoneNumber') )
+           ->where( $schema->table('PhoneNumber')->column('phone_number_type_id'),
+                    '=', Fey::Placeholder->new()
+                  );
+    #>>>
 
     has 'contact_count' => (
         metaclass   => 'FromSelect',
