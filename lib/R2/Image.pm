@@ -25,10 +25,11 @@ has 'file' => (
 class_type('Image::Magick');
 
 has '_magick' => (
-    is         => 'ro',
-    isa        => 'Image::Magick',
-    lazy_build => 1,
-    init_arg   => undef,
+    is       => 'ro',
+    isa      => 'Image::Magick',
+    lazy     => 1,
+    init_arg => undef,
+    builder  => '_build_magick',
 );
 
 has 'height' => (
@@ -129,7 +130,7 @@ sub _make_resized_image {
     return ( ref $self )->new( file => $file );
 }
 
-sub _build__magick {
+sub _build_magick {
     my $self = shift;
 
     my $img = Image::Magick->new();
