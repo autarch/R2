@@ -90,12 +90,12 @@ around 'insert' => sub {
 sub _build_path {
     my $self = shift;
 
-    my $path = file( $self->_cache_dir(), $self->filename() );
+    my $path = $self->_cache_dir()->file( $self->filename() );
 
     return $path
         if -f $path;
 
-    $path->dir()->mkpath( 0, 0755 );
+    $path->dir()->mkpath( 0, 0750 );
 
     open my $fh, '>', $path;
     print {$fh} $self->contents();
@@ -147,9 +147,10 @@ sub _build_cache_dir {
 
     my $hashed = sha512_hex( $self->file_id(), $config->secret() );
 
-    return dir(
-        $config->cache_dir(), 'files',
-        substr( $hashed, 0, 2 ), $hashed
+    return $config->cache_dir()->subdir(
+        'files',
+        substr( $hashed, 0, 2 ),
+        $hashed
     );
 }
 
