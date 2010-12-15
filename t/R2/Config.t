@@ -1,359 +1,408 @@
 use strict;
 use warnings;
 
-use Test::Exception;
-use Test::More tests => 55;
+use Test::Most;
 
-use File::Slurp qw( write_file );
+use autodie;
+use Cwd qw( abs_path );
+use File::Basename qw( dirname );
+use File::HomeDir;
+use File::Slurp qw( read_file );
 use File::Temp qw( tempdir );
-use Path::Class;
+use Path::Class qw( dir );
 use R2::Config;
 
-my $config = R2::Config->new();
-my $file = file( tempdir( CLEANUP => 1 ), 'r2.conf' );
+my $dir = tempdir( CLEANUP => 1 );
+
+$ENV{HARNESS_ACTIVE}    = 0;
+$ENV{R2_CONFIG_TESTING} = 1;
 
 {
-    local $ENV{R2_CONFIG} = '/ this best not be a real / path';
+    my $config = R2::Config->new();
 
-    throws_ok(
-        sub { $config->_build_config_file() },
-        qr/nonexistent config file/i,
-        'bad value for R2_CONFIG throws an error'
+    is_deeply(
+        $config->_raw_config(),
+        {},
+        'config hash is empty by default'
     );
 }
 
 {
-    no warnings 'redefine';
-    local *Path::Class::File::stringify = sub {'/ also should not / exist'};
-
-    throws_ok(
-        sub { $config->_build_config_file() },
-        qr/cannot find a config file/i,
-        'error is thrown when we no config file can be found'
-    );
-}
-
-{
-    $config->_set_config_hash( { dirs => { foo_bar => '/my/foo/bar' } } );
+    my $config = R2::Config->new();
 
     is(
-        $config->_dir( [ 'foo', 'bar' ], '/prod/default' ),
-        '/my/foo/bar',
-        '_dir() returns value from config as first choice'
+        $config->secret, 'a big secret',
+        'secret has a basic default in dev environment'
     );
+}
+
+{
+    local $ENV{R2_CONFIG} = '/path/to/nonexistent/file.conf';
+
+    throws_ok(
+        sub { R2::Config->new() },
+        qr/\QNonexistent config file in R2_CONFIG env var/,
+        'R2_CONFIG pointing to bad file throws an error'
+    );
+}
+
+{
+    my $dir = tempdir( CLEANUP => 1 );
+    my $file = "$dir/r2.conf";
+    open my $fh, '>', $file;
+    print {$fh} <<'EOF';
+[R2]
+secret = foobar
+EOF
+    close $fh;
+
+    {
+        local $ENV{R2_CONFIG} = $file;
+
+        my $config = R2::Config->new();
+
+        is_deeply(
+            $config->_raw_config(), {
+                R2 => { secret => 'foobar' },
+            },
+            'config hash uses data from file in R2_CONFIG'
+        );
+    }
+
+    open $fh, '>', $file;
+    print {$fh} <<'EOF';
+[R2]
+is_production = 1
+EOF
+    close $fh;
+
+    {
+        local $ENV{R2_CONFIG} = $file;
+
+        throws_ok(
+            sub { R2::Config->new() },
+            qr/\QYou must supply a value for [R2] - secret when running R2 in production/,
+            'If is_production is true in config, there must be a secret defined'
+        );
+    }
+
+    open $fh, '>', $file;
+    print {$fh} <<'EOF';
+[R2]
+is_production = 1
+secret = foobar
+EOF
+    close $fh;
+
+    {
+        local $ENV{R2_CONFIG} = $file;
+
+        my $config = R2::Config->new();
+
+        is_deeply(
+            $config->_raw_config(), {
+                R2 => {
+                    secret        => 'foobar',
+                    is_production => 1,
+                },
+            },
+            'config hash with is_production true and a secret defined'
+        );
+    }
+}
+
+{
+    my $config = R2::Config->new();
+
+    ok( $config->serve_static_files(), 'by default we serve static files' );
+
+    $config = R2::Config->new();
 
     $config->_set_is_production(1);
-    $config->_set_config_hash( {} );
 
-    is(
-        $config->_dir( [ 'foo', 'bar' ], '/prod/default' ),
-        '/prod/default',
-        '_dir() returns prod default when is_production is true'
+    ok(
+        !$config->serve_static_files(),
+        'does not serve static files in production'
     );
+
+    $config = R2::Config->new();
 
     $config->_set_is_production(0);
 
-    is(
-        $config->_dir( [ 'foo', 'bar' ], '/prod/default', '/dev/default' ),
-        '/dev/default',
-        '_dir() returns dev default when is_production is true and dev default is provided'
-    );
-
-    $config->_set_home_dir( dir('/my/home') );
-
-    is(
-        $config->_dir( [ 'foo', 'bar' ], '/prod/default' ),
-        '/my/home/.r2/foo/bar',
-        '_dir() returns dir under $HOME/.r2 as final fallback'
-    );
-}
-
-{
-    no warnings 'redefine';
-
-    my %hash = ( R2 => { is_production => 1 } );
-    local *Config::INI::Reader::read_file = sub { return {%hash} };
-    throws_ok(
-        sub { $config->_build_config_hash() },
-        qr/^\QYou must supply a value for [R2] - secret when running R2 in production/,
-        'in production the config file must set a value for the secret'
-    );
-
-    $hash{R2}{secret} = 'X';
-
-    lives_ok(
-        sub { $config->_build_config_hash() },
-        'no error in production when config file has a value for the secret'
-    );
-}
-
-{
-    my %imports = map { $_ => 1 } @{ $config->_build_catalyst_imports() };
-    ok( $imports{AuthenCookie},        'AuthenCookie is always loaded' );
-    ok( $imports{'+R2::Plugin::User'}, 'R2::Plugin::User is always loaded' );
-    ok( $imports{'Static::Simple'},
-        'Static::Simple is loaded when not under mod_perl or profiling' );
-    ok( $imports{StackTrace},
-        'Static::Simple is loaded when not in production or profiling' );
-}
-
-{
-    local $ENV{MOD_PERL} = 1;
-    my %imports = map { $_ => 1 } @{ $config->_build_catalyst_imports() };
-
-    ok( $imports{AuthenCookie},        'AuthenCookie is always loaded' );
-    ok( $imports{'+R2::Plugin::User'}, 'R2::Plugin::User is always loaded' );
-    ok( !$imports{'Static::Simple'},
-        'Static::Simple is not loaded under mod_perl' );
-}
-
-{
     $config->_set_is_profiling(1);
-    my %imports = map { $_ => 1 } @{ $config->_build_catalyst_imports() };
+
+    ok(
+        !$config->serve_static_files(),
+        'does not serve static files when profiling'
+    );
+
+    $config = R2::Config->new();
+
     $config->_set_is_profiling(0);
 
-    ok( $imports{AuthenCookie},        'AuthenCookie is always loaded' );
-    ok( $imports{'+R2::Plugin::User'}, 'R2::Plugin::User is always loaded' );
-    ok( !$imports{'Static::Simple'},
-        'Static::Simple is not loaded when profiling' );
+    {
+        local $ENV{MOD_PERL} = 1;
+
+        ok(
+            !$config->serve_static_files(),
+            'does not serve static files under mod_perl'
+        );
+    }
 }
 
 {
-    $config->_set_is_production(1);
-    my %imports = map { $_ => 1 } @{ $config->_build_catalyst_imports() };
-    $config->_set_is_production(0);
-
-    ok( $imports{AuthenCookie},        'AuthenCookie is always loaded' );
-    ok( $imports{'+R2::Plugin::User'}, 'R2::Plugin::User is always loaded' );
-    ok( !$imports{StackTrace},
-        'StackTrace is not loaded when in production' );
-}
-
-{
-    my $cat = $config->_build_catalyst_config();
+    my $config = R2::Config->new();
 
     is(
-        $cat->{default_view}, 'Mason',
-        'check default_view Catalyst config'
-    );
-
-    ok( $cat->{static}, 'has static config when not in production' );
-    is_deeply(
-        $cat->{static}{dirs}, [qw( files images js css static w3c )],
-        'static dirs is expected list of dirs'
-    );
-
-    is(
-        scalar @{ $cat->{'Log::Dispatch'} }, 1,
-        'just one logger when not in production'
-    );
-
-    is(
-        $cat->{'Log::Dispatch'}[0]{class}, 'Screen',
-        'logger is Screen when not in production'
+        $config->is_profiling(), 0,
+        'is_profiling defaults to false'
     );
 }
 
 {
-    $config->_set_is_production(1);
-    my $cat = $config->_build_catalyst_config();
-    $config->_set_is_production(0);
-
-    ok( !$cat->{static}, 'does not have static config when in production' );
-
-    is(
-        scalar @{ $cat->{'Log::Dispatch'} }, 1,
-        'just one logger when in production'
-    );
-
-    is(
-        $cat->{'Log::Dispatch'}[0]{class}, 'Syslog',
-        'logger is Syslog when in production'
-    );
-
-}
-
-{
-    no warnings 'once';
-    local *Apache2::ServerUtil::server = sub {1};
-
-    $config->_set_is_production(1);
-    my $cat
-        = do { local $ENV{MOD_PERL} = 1; $config->_build_catalyst_config(); };
-    $config->_set_is_production(0);
-
-    ok( !$cat->{static}, 'does not have static config when in production' );
-
-    is(
-        scalar @{ $cat->{'Log::Dispatch'} }, 1,
-        'just one logger when in production'
-    );
-
-    is(
-        $cat->{'Log::Dispatch'}[0]{class}, 'ApacheLog',
-        'logger is ApacheLog when in production under mod_perl'
-    );
-
-}
-
-{
-    ok( !$config->_build_is_profiling(), 'is_profiling is normally false' );
-
     local $INC{'Devel/NYTProf.pm'} = 1;
 
-    ok( $config->_build_is_profiling(),
-        'is_profiling is true when a profiler is loaded' );
-}
-
-{
-    is(
-        $config->_build_var_lib_dir(),
-        dir( $config->_home_dir(), '.r2', 'var', 'lib' ),
-        'by default var lib dir is under home dir'
-    );
+    my $config = R2::Config->new();
 
     is(
-        $config->_build_share_dir(),
-        dir( dir()->absolute(), 'share' ),
-        'by default share dir is in checkout'
-    );
-
-    is(
-        $config->_build_etc_dir(),
-        dir( $config->_home_dir(), '.r2', 'etc' ),
-        'by default etc dir is under home dir'
-    );
-
-    is(
-        $config->_build_cache_dir(),
-        dir( $config->_home_dir(), '.r2', 'cache' ),
-        'by default cache dir is under home dir'
+        $config->is_profiling(), 1,
+        'is_profiling defaults is true if Devel::NYTProf is loaded'
     );
 }
 
 {
-    my $hash = $config->_config_hash();
-    local $hash->{db} = {};
+    my $config = R2::Config->new();
 
-    my $dbi = $config->_build_dbi_config();
+    my $home_dir = dir( File::HomeDir->my_home() );
+
     is(
-        $dbi->{dsn}, 'dbi:Pg:dbname=R2',
-        'database name defaults to R2, ignores host and port if not set'
+        $config->var_lib_dir(),
+        $home_dir->subdir( '.r2', 'var', 'lib' ),
+        'var lib dir defaults to $HOME/.r2/var/lib'
     );
 
     is(
-        $dbi->{username}, q{},
-        'database username defaults to empty string'
-    );
-    is(
-        $dbi->{password}, q{},
-        'database password defaults to empty string'
-    );
-}
-
-{
-    my $mason = $config->_build_mason_config();
-
-    ok( !ref $mason->{comp_root}, 'comp_root is a string, not an object' );
-    ok( !ref $mason->{data_dir},  'data_dir is a string, not an object' );
-
-    is(
-        $mason->{comp_root},
-        dir( $config->share_dir(), 'mason' ),
-        'comp_root is under share dir'
-    );
-    is(
-        $mason->{data_dir},
-        dir( $config->cache_dir(), 'mason', 'web' ),
-        'data_dir is under cache dir as mason/web'
+        $config->share_dir(),
+        dir( dirname( abs_path($0) ), '..', '..', 'share' )->resolve(),
+        'share dir defaults to $CHECKOUT/share'
     );
 
-    ok( !$mason->{static_source},
-        'static source is false when not in production' );
-}
-
-{
-    $config->_set_is_production(1);
-    my $mason = $config->_build_mason_config();
-    $config->_set_is_production(0);
-
-    ok( $mason->{static_source}, 'static source is true when in production' );
     is(
-        $mason->{static_source_touch_file},
-        file( $config->etc_dir(), 'mason-touch' )->stringify(),
-        'touch file is set and under etc dir when in production'
+        $config->etc_dir(),
+        $home_dir->subdir( '.r2', 'etc' ),
+        'etc dir defaults to $HOME/.r2/etc'
+    );
+
+    is(
+        $config->cache_dir(),
+        $home_dir->subdir( '.r2', 'cache' ),
+        'cache dir defaults to $HOME/.r2/cache'
+    );
+
+    is(
+        $config->files_dir(),
+        $home_dir->subdir( '.r2', 'cache', 'files' ),
+        'files dir defaults to $HOME/.r2/cache/files'
+    );
+
+    is(
+        $config->thumbnails_dir(),
+        $home_dir->subdir( '.r2', 'cache', 'thumbnails' ),
+        'thumbnails dir defaults to $HOME/.r2/cache/thumbnails'
     );
 }
 
 {
-    is(
-        $config->_build_static_path_prefix(), undef,
-        'static path prefix defaults to undef when not in production and there is no path prefix'
-    );
-
-    $config->_set_path_prefix('/foo/r2');
-    is(
-        $config->_build_static_path_prefix(), '/foo/r2',
-        'static path prefix defaults to path prefix when not in production and path prefix is set'
-    );
+    my $config = R2::Config->new();
 
     $config->_set_is_production(1);
 
     no warnings 'redefine';
-    local *R2::Config::read_file = sub {'2713'};
-    is(
-        $config->_build_static_path_prefix(), '/foo/r2/2713',
-        'static path prefix includes revision and path prefix in production'
-    );
-
-    $config->_set_path_prefix(undef);
+    local *R2::Config::_ensure_dir = sub {return};
 
     is(
-        $config->_build_static_path_prefix(), '/2713',
-        'static path prefix is only revision in production when there is no path prefix'
+        $config->var_lib_dir(),
+        '/var/lib/r2',
+        'var lib dir defaults to /var/lib/r2 in production'
     );
 
-    $config->_set_is_production(0);
+    my $share_dir = dir(
+        dir( $INC{'R2/Config.pm'} )->parent(),
+        'auto', 'share', 'dist',
+        'R2'
+    )->absolute()->cleanup();
+
+    is(
+        $config->share_dir(),
+        $share_dir,
+        'share dir defaults to /usr/local/share/r2 in production'
+    );
+
+    is(
+        $config->etc_dir(),
+        '/etc/r2',
+        'etc dir defaults to /etc/r2 in production'
+    );
+
+    is(
+        $config->cache_dir(),
+        '/var/cache/r2',
+        'cache dir defaults to /var/cache/r2 in production'
+    );
+
+    is(
+        $config->files_dir(),
+        '/var/cache/r2/files',
+        'files dir defaults to /var/cache/r2/files in production'
+    );
+
+    is(
+        $config->thumbnails_dir(),
+        '/var/cache/r2/thumbnails',
+        'thumbnails dir defaults to /var/cache/r2/thumbnails in production'
+    );
 }
 
 {
-    is(
-        $config->_build_secret(), 'a big secret',
-        'secret is "a big secret" when not in production'
-    );
-
-    my $hash = $config->_config_hash();
-    local $hash->{R2}{secret} = 'new secret';
-
-    $config->_set_is_production(1);
-    is(
-        $config->_build_secret(), 'new secret',
-        'secret is read from config hash when in production'
-    );
-    $config->_set_is_production(0);
-}
-
-{
-    write_file( $file->stringify(), <<'EOF' );
-[db]
-name = Foo
-username = Bar
-password = baz
-host = example.com
-port = 42
+    my $dir = tempdir( CLEANUP => 1 );
+    my $file = "$dir/r2.conf";
+    open my $fh, '>', $file;
+    print {$fh} <<'EOF';
+[dirs]
+var_lib = /foo/var/lib
+share   = /foo/share
+cache   = /foo/cache
 EOF
+    close $fh;
 
-    local $ENV{R2_CONFIG} = $file->stringify();
+    no warnings 'redefine';
+    local *R2::Config::_ensure_dir = sub {return};
 
-    $config->_clear_config_file();
-    $config->_clear_config_hash();
+    {
+        local $ENV{R2_CONFIG} = $file;
+
+        my $config = R2::Config->new();
+
+        is(
+            $config->var_lib_dir(),
+            dir('/foo/var/lib'),
+            'var lib dir defaults gets /foo/var/lib from file'
+        );
+
+        is(
+            $config->share_dir(),
+            dir('/foo/share'),
+            'share dir defaults gets /foo/share from file'
+        );
+
+        is(
+            $config->cache_dir(),
+            dir('/foo/cache'),
+            'cache dir defaults gets /foo/cache from file'
+        );
+    }
+}
+
+{
+    my $config = R2::Config->new();
 
     is_deeply(
-        $config->dbi_config(), {
-            dsn      => 'dbi:Pg:dbname=Foo;host=example.com;port=42',
-            username => 'Bar',
-            password => 'baz',
+        $config->database_connection(), {
+            dsn      => 'dbi:Pg:dbname=R2',
+            username => q{},
+            password => q{},
         },
-        'dbi_config() from config file'
+        'default database config'
     );
 }
+
+{
+    my $dir = tempdir( CLEANUP => 1 );
+    my $file = "$dir/r2.conf";
+    open my $fh, '>', $file;
+    print {$fh} <<'EOF';
+[database]
+name = Foo
+host = example.com
+port = 9876
+username = user
+password = pass
+EOF
+    close $fh;
+
+    local $ENV{R2_CONFIG} = $file;
+
+    my $config = R2::Config->new();
+
+    is_deeply(
+        $config->database_connection(), {
+            dsn      => 'dbi:Pg:dbname=Foo;host=example.com;port=9876',
+            username => 'user',
+            password => 'pass',
+        },
+        'database config from file'
+    );
+}
+
+{
+    my $config = R2::Config->new();
+
+    my $dir = tempdir( CLEANUP => 1 );
+
+    my $new_dir = dir($dir)->subdir('foo');
+
+    $config->_ensure_dir($new_dir);
+
+    ok( -d $new_dir, '_ensure_dir makes a new directory if needed' );
+}
+
+{
+    my $dir = tempdir( CLEANUP => 1 );
+
+    my $file = "$dir/r2.conf";
+
+    my $config = R2::Config->new();
+
+    $config->write_config_file(
+        file   => $file,
+        values => {
+            'database_name'     => 'Foo',
+            'database_username' => 'fooer',
+            'share_dir'         => '/path/to/share',
+            'antispam_key'      => 'abcdef',
+        },
+    );
+
+    my $content = read_file($file);
+    like(
+        $content, qr/\Q; Config file generated by R2 version \E.+/,
+        'generated config file includes R2 version'
+    );
+
+    like(
+        $content, qr/\Q; static =/,
+        'generated config file does not set static'
+    );
+
+    like(
+        $content, qr/\Qname = Foo/,
+        'generated config file includes explicit set value for database name'
+    );
+
+    like(
+        $content, qr/\Qusername = fooer/,
+        'generated config file includes explicit set value for database username'
+    );
+
+    like(
+        $content, qr/\[database\].+?name = Foo.+?username = fooer/s,
+        'generated config file keys are in order defined by meta description'
+    );
+
+    like(
+        $content, qr/\[R2\].+?\[database\].+?\[antispam\]/s,
+        'section order matches order of definition on R2::Config'
+    );
+}
+
+done_testing();
