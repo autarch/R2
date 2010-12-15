@@ -66,8 +66,10 @@ sub resize {
     return R2::Image->new( file => $file )
         if $file;
 
-    $file = $self->_make_resized_image( $height, $width, $dimensions,
-        $unique_name );
+    $file = $self->_make_resized_image(
+        $height, $width, $dimensions,
+        $unique_name
+    );
 }
 
 sub _new_dimensions {
