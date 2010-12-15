@@ -57,9 +57,9 @@ with 'R2::Role::Schema::AppliesToContactTypes';
     #<<
     $select->select($count)
            ->from  ( $schema->table('PhoneNumber') )
-           ->where( $schema->table('PhoneNumber')->column('phone_number_type_id'),
-                    '=', Fey::Placeholder->new()
-                  );
+           ->where ( $schema->table('PhoneNumber')->column('phone_number_type_id'),
+                     '=', Fey::Placeholder->new()
+                   );
     #>>>
 
     has 'contact_count' => (
