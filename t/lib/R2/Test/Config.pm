@@ -7,7 +7,6 @@ use File::Slurp qw( write_file );
 use File::Temp qw( tempdir );
 
 sub import {
-    my $dir     = tempdir( CLEANUP => 1 );
     my $etc     = tempdir( CLEANUP => 1 );
     my $var_lib = tempdir( CLEANUP => 1 );
     my $cache   = tempdir( CLEANUP => 1 );
@@ -20,7 +19,7 @@ var_lib = $var_lib
 cache   = $cache
 EOF
 
-    my $conf_file = "$dir/r2.conf";
+    my $conf_file = "$etc/r2.conf";
     write_file( $conf_file, $config );
 
     $ENV{R2_CONFIG} = $conf_file;
