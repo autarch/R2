@@ -167,7 +167,7 @@ has cache_dir => (
     section => 'dirs',
     key     => 'cache',
     documentation =>
-        'The directory where generated files are stored. Defaults to /var/cache/silki.',
+        'The directory where generated files are stored. Defaults to /var/cache/r2.',
 );
 
 has var_lib_dir => (
@@ -178,7 +178,7 @@ has var_lib_dir => (
     section => 'dirs',
     key     => 'var_lib',
     documentation =>
-        'This directory stores files generated at install time (CSS and Javascript). Defaults to /var/lib/silki.',
+        'This directory stores files generated at install time (CSS and Javascript). Defaults to /var/lib/r2.',
 );
 
 has _home_dir => (
@@ -278,22 +278,22 @@ sub BUILD {
 sub _build_config_file {
     my $self = shift;
 
-    if ( !string_is_empty( $ENV{SILKI_CONFIG} ) ) {
+    if ( !string_is_empty( $ENV{R2_CONFIG} ) ) {
         die
-            "Nonexistent config file in SILKI_CONFIG env var: $ENV{SILKI_CONFIG}"
-            unless -f $ENV{SILKI_CONFIG};
+            "Nonexistent config file in R2_CONFIG env var: $ENV{R2_CONFIG}"
+            unless -f $ENV{R2_CONFIG};
 
-        return file( $ENV{SILKI_CONFIG} );
+        return file( $ENV{R2_CONFIG} );
     }
 
-    return if $ENV{SILKI_CONFIG_TESTING};
+    return if $ENV{R2_CONFIG_TESTING};
 
-    my @dirs = dir('/etc/silki');
-    push @dirs, $self->_home_dir()->subdir( '.silki', 'etc' )
+    my @dirs = dir('/etc/r2');
+    push @dirs, $self->_home_dir()->subdir( '.r2', 'etc' )
         if $> && $self->_home_dir();
 
     for my $dir (@dirs) {
-        my $file = $dir->file('silki.conf');
+        my $file = $dir->file('r2.conf');
 
         return $file if -f $file;
     }
@@ -330,7 +330,7 @@ sub _build_var_lib_dir {
 
     return $self->_dir(
         [ 'var', 'lib' ],
-        '/var/lib/silki',
+        '/var/lib/r2',
     );
 }
 
@@ -358,7 +358,7 @@ sub _build_cache_dir {
 
     return $self->_dir(
         ['cache'],
-        '/var/cache/silki',
+        '/var/cache/r2',
     );
 }
 
@@ -367,7 +367,7 @@ sub _build_etc_dir {
 
     return $self->_pick_dir(
         ['etc'],
-        '/etc/silki',
+        '/etc/r2',
     );
 }
 
@@ -398,7 +398,7 @@ sub _build_mini_image_dir {
 sub _build_temp_dir {
     my $self = shift;
 
-    my $temp = dir( File::Spec->tmpdir() )->subdir('silki');
+    my $temp = dir( File::Spec->tmpdir() )->subdir('r2');
 
     $self->_ensure_dir($temp);
 
@@ -446,7 +446,7 @@ sub _pick_dir {
         return dir( $TestingRootDir, @{$pieces} );
     }
 
-    return dir( $self->_home_dir(), '.silki', @{$pieces} );
+    return dir( $self->_home_dir(), '.r2', @{$pieces} );
 }
 
 sub _ensure_dir {
