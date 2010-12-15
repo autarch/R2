@@ -3,8 +3,8 @@ package R2::Schema::File;
 use strict;
 use warnings;
 use namespace::autoclean;
-
 use autodie;
+
 use Digest::SHA qw( sha512_hex );
 use File::LibMagic ();
 use File::Slurp qw( read_file );
