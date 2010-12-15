@@ -2,33 +2,36 @@
 
 use strict;
 use warnings;
+use autodie qw( :all );
 
-use lib './lib';
+use lib 'lib', 'inc';
 
 use FindBin;
 use MIME::Base64 qw( encode_base64 );
+use R2::DatabaseManager;
 use Storable qw( nfreeze );
 
-unless ( grep { $_ eq '--existing' } @ARGV ) {
-    system("$FindBin::Bin/rebuild-schema")
-        and die $!;
-}
+R2::DatabaseManager->new(
+    db_name          => 'R2Test',
+    drop             => 1,
+    seed             => 0,
+    quiet            => 1,
+    _existing_config => {},         # XXX - uber hack!
+)->update_or_install_db();
 
 require R2::Schema;
 
-open my $fh, '>', 't/lib/R2/Test/Schema.pm'
-    or die $!;
+open my $fh, '>', 't/lib/R2/Test/FakeSchema.pm';
 
 print {$fh}
     sprintf( <<'EOF', encode_base64( nfreeze( R2::Schema->Schema() ) ) );
-package R2::Test::Schema;
+package R2::Test::FakeSchema;
 
 use strict;
 use warnings;
 
 use MIME::Base64 qw( decode_base64 );
 use Storable qw( thaw );
-
 
 $R2::Schema::TestSchema = thaw( decode_base64( '%s' ) );
 
