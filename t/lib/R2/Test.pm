@@ -9,7 +9,7 @@ our @EXPORT_OK = qw( mock_schema mock_dbh );
 
 use DBD::Mock 1.36;
 use Fey::ORM::Mock;
-use R2::Test::Schema;
+use R2::Test::FakeSchema;
 use R2::Schema;
 
 my $IsMocked = 0;
