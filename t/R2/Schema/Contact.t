@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
@@ -208,3 +208,5 @@ my $contact = R2::Schema::Contact->insert(
         '_base_uri_path'
     );
 }
+
+done_testing();

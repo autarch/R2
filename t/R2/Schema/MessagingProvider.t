@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use lib 't/lib';
 
@@ -100,3 +100,5 @@ use R2::Schema::MessagingProvider;
         'error when config key is not valid'
     );
 }
+
+done_testing();

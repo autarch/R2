@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -25,3 +25,5 @@ my $dbh = mock_dbh();
         'got expected error message'
     );
 }
+
+done_testing();

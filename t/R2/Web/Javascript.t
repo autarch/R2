@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test::Config;
@@ -30,3 +30,5 @@ like(
     $js, qr[\Qhas_multiple_lines(){1;2;}],
     'generated file is squished'
 );
+
+done_testing();

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema );
@@ -158,3 +158,5 @@ mock_schema();
         );
     }
 }
+
+done_testing();

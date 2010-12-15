@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 89;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
@@ -844,3 +844,5 @@ my $account;
         '_base_uri_path() is /account/1'
     );
 }
+
+done_testing();

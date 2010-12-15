@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema mock_dbh );
@@ -103,3 +103,5 @@ my $dbh  = mock_dbh();
             . ' for which it has addresses silently ignores that part of the update.'
     );
 }
+
+done_testing();

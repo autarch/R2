@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -30,3 +30,5 @@ my $dbh = mock_dbh();
         'ByCountry() generates expected SQL'
     );
 }
+
+done_testing();

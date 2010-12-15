@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
+use Test::More;
 
 use HTML::DOM;
 use List::AllUtils qw( any );
@@ -356,3 +356,5 @@ sub fill_in_form_tests {
         'textarea has expected text content'
     );
 }
+
+done_testing();

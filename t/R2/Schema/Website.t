@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_schema );
@@ -57,3 +57,5 @@ mock_schema();
         'got expected error message'
     );
 }
+
+done_testing();

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test::Config;
@@ -28,3 +28,5 @@ like(
     $css, qr[p\s*{\s*color:\s*blue;\s*}],
     'p style still exists'
 );
+
+done_testing();

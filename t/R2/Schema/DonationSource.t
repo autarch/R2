@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test qw( mock_dbh );
@@ -33,3 +33,5 @@ my $dbh = mock_dbh();
         'executed expected SELECT'
     );
 }
+
+done_testing();

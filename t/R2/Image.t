@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::Exception;
-use Test::More tests => 12;
+use Test::More;
 
 use lib 't/lib';
 use R2::Test::RealSchema;
@@ -136,3 +136,5 @@ my $shoe_file;
     );
 
 }
+
+done_testing();
