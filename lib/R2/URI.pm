@@ -22,26 +22,32 @@ sub dynamic_uri {
 }
 
 {
-    my $StaticPathPrefix;
+    our $StaticPathPrefix;    # public for testing
 
-    my $config = R2::Config->instance();
-    if ( $config->is_production() ) {
-        $StaticPathPrefix = $config->path_prefix();
-        $StaticPathPrefix .= q{/};
-        $StaticPathPrefix .= $R2::Config::VERSION || 'wc';
-    }
-    else {
-        $StaticPathPrefix = q{};
-    }
+    sub _static_path_prefix {
+        return $StaticPathPrefix if defined $StaticPathPrefix;
 
-    sub static_uri {
-        my $path = shift;
+        my $config = R2::Config->instance();
+        if ( $config->is_production() ) {
+            $StaticPathPrefix = $config->path_prefix();
+            $StaticPathPrefix .= q{/};
+            $StaticPathPrefix .= $R2::Config::VERSION || 'wc';
+        }
+        else {
+            $StaticPathPrefix = q{};
+        }
 
-        return _prefixed_path(
-            $StaticPathPrefix,
-            $path
-        );
+        return $StaticPathPrefix;
     }
+}
+
+sub static_uri {
+    my $path = shift;
+
+    return _prefixed_path(
+        _static_path_prefix(),
+        $path
+    );
 }
 
 sub _prefixed_path {
