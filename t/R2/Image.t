@@ -5,7 +5,7 @@ use Test::Exception;
 use Test::More tests => 12;
 
 use lib 't/lib';
-use R2::Test qw( mock_dbh );
+use R2::Test::RealSchema;
 
 use Digest::SHA;
 use File::Slurp qw( read_file );
@@ -13,19 +13,23 @@ use Image::Size qw( imgsize );
 use R2::Test::Config;
 use R2::Config;
 use R2::Image;
+use R2::Schema::Account;
 use R2::Schema::File;
 
-my $dbh = mock_dbh();
+my $domain  = R2::Schema::Domain->DefaultDomain();
+my $account = R2::Schema::Account->insert(
+    name      => 'Account',
+    domain_id => $domain->domain_id(),
+);
 
 my $image_data = read_file('t/files/shoe.jpg');
 
 {
-    my $file = R2::Schema::File->new(
-        file_id     => 1,
-        mime_type   => 'text/plain',
-        filename    => 'foo.txt',
-        contents    => 'some text',
-        _from_query => 1,
+    my $file = R2::Schema::File->insert(
+        mime_type  => 'text/plain',
+        filename   => 'foo.txt',
+        contents   => 'some text',
+        account_id => $account->account_id(),
     );
 
     throws_ok(
@@ -35,31 +39,19 @@ my $image_data = read_file('t/files/shoe.jpg');
     );
 }
 
+my $shoe_file;
+
 {
-    my $file = R2::Schema::File->new(
-        file_id     => 1,
-        mime_type   => 'image/jpeg',
-        filename    => 'shoe.jpg',
-        contents    => $image_data,
-        _from_query => 1,
+    my $file = R2::Schema::File->insert(
+        mime_type  => 'image/jpeg',
+        filename   => 'shoe.jpg',
+        contents   => $image_data,
+        account_id => $account->account_id(),
     );
 
-    $dbh->{mock_clear_history} = 1;
-
-    $dbh->{mock_insert_id} = 2;
-
-    $dbh->{mock_add_resultset} = [
-        [qw( file_id filename unique_name )],
-    ];
+    $shoe_file = $file;
 
     my $resized_data = read_file('t/files/shoe-100x100.jpg');
-
-    $dbh->{mock_add_resultset} = [
-        [qw( file_id filename account_id mime_type unique_name contents )],
-        [
-            2, 'shoe-100x100.jpg', 1, 'image/jpeg', '1-100x100', $resized_data
-        ],
-    ];
 
     my $image = R2::Image->new( file => $file );
     my $resized = $image->resize( height => 100, width => 100 );
@@ -69,8 +61,10 @@ my $image_data = read_file('t/files/shoe.jpg');
         'resized file has expected filename'
     );
 
+    my $file_id = $file->file_id();
+
     is(
-        $resized->file()->unique_name(), '1-100x100',
+        $resized->file()->unique_name(), $file_id . '-100x100',
         'resized file has expected unique_name'
     );
 
@@ -79,27 +73,10 @@ my $image_data = read_file('t/files/shoe.jpg');
     is( $y, 100, 'resized y is 100' );
 }
 
-# Re-run the tests faking that the resized file is already in the
-# database
 {
-    my $file = R2::Schema::File->new(
-        file_id     => 1,
-        mime_type   => 'image/jpeg',
-        filename    => 'shoe.jpg',
-        contents    => $image_data,
-        _from_query => 1,
-    );
-
-    $dbh->{mock_clear_history} = 1;
+    my $file = R2::Schema::File->new( file_id => $shoe_file->file_id() );
 
     my $resized_data = read_file('t/files/shoe-100x100.jpg');
-
-    $dbh->{mock_add_resultset} = [
-        [qw( file_id filename account_id mime_type unique_name contents )],
-        [
-            2, 'shoe-100x100.jpg', 1, 'image/jpeg', '1-100x100', $resized_data
-        ],
-    ];
 
     my $image = R2::Image->new( file => $file );
     my $resized = $image->resize( height => 100, width => 100 );
@@ -109,26 +86,27 @@ my $image_data = read_file('t/files/shoe.jpg');
         'resized file has expected filename'
     );
 
+    my $file_id = $file->file_id();
+
     is(
-        $resized->file()->unique_name(), '1-100x100',
+        $resized->file()->unique_name(), $file_id . '-100x100',
         'resized file has expected unique_name'
     );
 
     is(
         Digest::SHA->new()->addfile( $resized->path()->stringify() )
             ->b64digest(),
-        'qyiMDI4bKHAezS/IGxneuUuOfp4',
+        '+klHWVKxwpMaJ6WZ0Cu4t5RkRS0',
         'file contents hash to expected digest value'
     );
 }
 
 {
-    my $file = R2::Schema::File->new(
-        file_id     => 1,
-        mime_type   => 'image/jpeg',
-        filename    => 'shoe.jpg',
-        contents    => $image_data,
-        _from_query => 1,
+    my $file = R2::Schema::File->insert(
+        mime_type  => 'image/jpeg',
+        filename   => 'shoe.jpg',
+        contents   => $image_data,
+        account_id => $account->account_id(),
     );
 
     my $image = R2::Image->new( file => $file );
