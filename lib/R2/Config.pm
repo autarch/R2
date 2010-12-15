@@ -205,27 +205,6 @@ has files_dir => (
     builder => '_build_files_dir',
 );
 
-has small_image_dir => (
-    is      => 'ro',
-    isa     => Dir,
-    lazy    => 1,
-    builder => '_build_small_image_dir',
-);
-
-has thumbnails_dir => (
-    is      => 'ro',
-    isa     => Dir,
-    lazy    => 1,
-    builder => '_build_thumbnails_dir',
-);
-
-has mini_image_dir => (
-    is      => 'ro',
-    isa     => Dir,
-    lazy    => 1,
-    builder => '_build_mini_image_dir',
-);
-
 has temp_dir => (
     is      => 'ro',
     isa     => Dir,
@@ -375,24 +354,6 @@ sub _build_files_dir {
     my $self = shift;
 
     return $self->_cache_subdir('files');
-}
-
-sub _build_small_image_dir {
-    my $self = shift;
-
-    return $self->_cache_subdir('small-image');
-}
-
-sub _build_thumbnails_dir {
-    my $self = shift;
-
-    return $self->_cache_subdir('thumbnails');
-}
-
-sub _build_mini_image_dir {
-    my $self = shift;
-
-    return $self->_cache_subdir('mini-image');
 }
 
 sub _build_temp_dir {
