@@ -49,11 +49,13 @@ sub make_domain {
 
     my $hostname = $domain->web_hostname();
 
-    print <<"EOF";
+    if ($VERBOSE) {
+        print <<"EOF";
 
   Made a new domain: $hostname
 
 EOF
+    }
 
     return $domain;
 }
@@ -104,7 +106,8 @@ sub make_account {
         role => R2::Schema::Role->Admin(),
     );
 
-    print <<"EOF";
+    if ($VERBOSE) {
+        print <<"EOF";
 
   Created a new account: $account_name
 
@@ -114,6 +117,7 @@ sub make_account {
     password: $password
 
 EOF
+    }
 }
 
 1;
