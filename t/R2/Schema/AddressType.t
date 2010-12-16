@@ -1,23 +1,33 @@
 use strict;
 use warnings;
 
+use Test::Exception;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema mock_dbh );
+use R2::Test::RealSchema;
 
 use List::AllUtils qw( first );
+use R2::Schema::Account;
+use R2::Schema::Address;
 use R2::Schema::AddressType;
+use R2::Schema::Person;
 
-my $mock = mock_schema();
-my $dbh  = mock_dbh();
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
-    eval { R2::Schema::AddressType->insert( name => 'Test' ); };
+    eval {
+        R2::Schema::AddressType->insert(
+            name       => 'Test0',
+            account_id => $account->account_id(),
+        );
+    };
 
     my $e = $@;
-    ok( $e,
-        'cannot create a new address type which does not apply to anything' );
+    ok(
+        $e,
+        'cannot create a new address type which does not apply to anything'
+    );
     can_ok( $e, 'errors' );
 
     my @e = @{ $e->errors() };
@@ -30,29 +40,18 @@ my $dbh  = mock_dbh();
 
 {
     my $type = R2::Schema::AddressType->insert(
-        name                    => 'Test',
+        name                    => 'Test1',
         applies_to_person       => 0,
         applies_to_household    => 0,
         applies_to_organization => 1,
-        account_id              => 42,
+        account_id              => $account->account_id(),
     );
-
-    $dbh->{mock_clear_history} = 1;
-
-    $dbh->{mock_add_resultset} = [
-        ['count'],
-        [0],
-    ];
-
-    $dbh->{mock_add_resultset} = [
-        ['count'],
-        [0],
-    ];
 
     eval { $type->update( applies_to_organization => 0 ); };
 
     my $e = $@;
-    ok( $e,
+    ok(
+        $e,
         'cannot update an address type so that it does not apply to anything'
     );
     can_ok( $e, 'errors' );
@@ -66,26 +65,23 @@ my $dbh  = mock_dbh();
 }
 
 {
-    $mock->recorder()->clear_all();
-
-    $dbh->{mock_clear_history} = 1;
-
-    $dbh->{mock_add_resultset} = [
-        ['count'],
-        [10],
-    ];
-
-    $dbh->{mock_add_resultset} = [
-        ['count'],
-        [0],
-    ];
-
     my $type = R2::Schema::AddressType->insert(
-        name                    => 'Test',
+        name                    => 'Test2',
         applies_to_person       => 1,
         applies_to_household    => 1,
         applies_to_organization => 1,
-        account_id              => 42,
+        account_id              => $account->account_id(),
+    );
+
+    my $person = R2::Schema::Person->insert(
+        first_name => 'Joe',
+        account_id => $account->account_id(),
+    );
+
+    $person->contact()->add_address(
+        city            => 'Minneapolis',
+        address_type_id => $type->address_type_id(),
+        iso_code        => 'us',
     );
 
     $type->update(
@@ -93,14 +89,15 @@ my $dbh  = mock_dbh();
         applies_to_household => 0,
     );
 
-    my $update = first { $_->is_update() }
-    $mock->recorder()->actions_for_class('R2::Schema::AddressType');
-
-    is_deeply(
-        $update->values(),
-        { applies_to_household => 0 },
+    ok(
+        $type->applies_to_person(),
         'trying to update an address type so it no longer applies to a type'
             . ' for which it has addresses silently ignores that part of the update.'
+    );
+
+    ok(
+        !$type->applies_to_household(),
+        'type no longer applies to household after update'
     );
 }
 

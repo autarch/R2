@@ -56,7 +56,7 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
     my $count = Fey::Literal::Function->new(
         'COUNT',
-         $schema->table('Address')->column('contact_id'),
+        $schema->table('Address')->column('contact_id'),
     );
 
     #<<<
@@ -66,7 +66,6 @@ with 'R2::Role::Schema::AppliesToContactTypes';
         ->where ( $schema->table('Address')->column('address_type_id'),
                   '=', Fey::Placeholder->new() );
     #>>>
-
     has 'contact_count' => (
         metaclass   => 'FromSelect',
         is          => 'ro',
