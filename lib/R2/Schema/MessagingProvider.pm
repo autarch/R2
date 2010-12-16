@@ -50,9 +50,10 @@ use MooseX::Params::Validate qw( validated_list );
     #>>>
 
     class_has '_SelectAllSQL' => (
-        is         => 'ro',
-        isa        => 'Fey::SQL::Select',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        lazy    => 1,
+        builder => '_BuildSelectAllSQL',
     );
 }
 
@@ -146,7 +147,7 @@ sub All {
     );
 }
 
-sub _build__SelectAllSQL {
+sub _BuildSelectAllSQL {
     my $class = __PACKAGE__;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
