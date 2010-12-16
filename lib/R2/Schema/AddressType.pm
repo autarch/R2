@@ -27,17 +27,20 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
         my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-        my $count = Fey::Literal::Function->new( 'COUNT',
-            $schema->table('Contact')->column('contact_id') );
+        my $count = Fey::Literal::Function->new(
+            'COUNT',
+            $schema->table('Contact')->column('contact_id')
+        );
 
-        $select->select($count)
-            ->from( $schema->tables( 'Address', 'Contact' ) )->where(
-            $schema->table('Address')->column('address_type_id'),
-            '=', Fey::Placeholder->new()
-            )
-            ->and( $schema->table('Contact')->column('contact_type'), '=',
-            Fey::Placeholder->new() );
-
+        #<<<
+        $select
+            ->select($count)
+            ->from  ( $schema->tables( 'Address', 'Contact' ) )
+            ->where ( $schema->table('Address')->column('address_type_id'),
+                      '=', Fey::Placeholder->new() )
+            ->and   ( $schema->table('Contact')->column('contact_type'), '=',
+                      Fey::Placeholder->new() );
+        #>>>
         has lc $type
             . '_count' => (
             metaclass   => 'FromSelect',
@@ -57,11 +60,11 @@ with 'R2::Role::Schema::AppliesToContactTypes';
     );
 
     #<<<
-    $select->select($count)
-           ->from  ( $schema->table('Address') )
-           ->where ( $schema->table('Address')->column('address_type_id'),
-                     '=', Fey::Placeholder->new()
-                   );
+    $select
+        ->select($count)
+        ->from  ( $schema->table('Address') )
+        ->where ( $schema->table('Address')->column('address_type_id'),
+                  '=', Fey::Placeholder->new() );
     #>>>
 
     has 'contact_count' => (
