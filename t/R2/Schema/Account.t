@@ -39,11 +39,20 @@ my $account;
             "after inserting an account the $meth method finds related rows"
         );
     }
+}
+
+{
+    $account->add_country(
+        country => R2::Schema::Country->new(
+            iso_code => $_,
+        ),
+        is_default => 0,
+    ) for 'gu', 'gb';
 
     is_deeply(
-        [ map { $_->iso_code() } $account->countries()->all() ],
-        [ 'us', 'ca' ],
-        'countries returns default country first'
+        [ map { $_->name() } $account->countries()->all() ],
+        [ 'United States', 'Canada', 'Guam', 'United Kingdom' ],
+        'countries returns default country first, then ordered by name'
     );
 }
 

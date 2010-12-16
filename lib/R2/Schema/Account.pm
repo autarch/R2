@@ -136,14 +136,6 @@ with 'R2::Role::Schema::URIMaker';
         builder => '_build_made_a_note_contact_note_type',
     );
 
-    has 'countries' => (
-        is       => 'ro',
-        isa      => 'Fey::Object::Iterator::FromSelect::Caching',
-        lazy     => 1,
-        builder  => '_build_countries',
-        init_arg => undef,
-    );
-
     class_has '_CountriesSelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
@@ -227,6 +219,21 @@ sub users_with_roles {
         classes => [qw( R2::Schema::User R2::Schema::Role  )],
         dbh     => $dbh,
         select  => $select,
+        bind_params => [ $self->account_id() ],
+    );
+}
+
+sub countries {
+    my $self = shift;
+
+    my $select = $self->_CountriesSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => ['R2::Schema::Country'],
+        dbh         => $dbh,
+        select      => $select,
         bind_params => [ $self->account_id() ],
     );
 }
