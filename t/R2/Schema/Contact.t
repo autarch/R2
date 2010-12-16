@@ -4,208 +4,128 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema mock_dbh );
+use R2::Test::RealSchema;
 
+use R2::Schema::Account;
 use R2::Schema::Contact;
 
-# Contact should load these but can't because of circular dep fun
-use R2::Schema::Account;
-use R2::Schema::ContactNote;
-use R2::Schema::Donation;
-use R2::Schema::Household;
-use R2::Schema::Organization;
-use R2::Schema::Person;
-
-my $mock = mock_schema();
-my $dbh  = mock_dbh();
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
-    for my $type (qw( person organization household )) {
-        my $contact = R2::Schema::Contact->insert(
-            account_id   => 1,
-            contact_type => ucfirst $type,
-        );
+    for my $type (qw( Person Organization Household )) {
+        my %name
+            = $type eq 'Person'
+            ? ( first_name => 'Bob' )
+            : ( name => 'Whatever' );
 
-        $dbh->{mock_clear_history} = 1;
-        $dbh->{mock_add_resultset} = [
-            [ $type . '_id' ],
-            [ $contact->contact_id() ],
-        ];
+        my $real_class = 'R2::Schema::' . $type;
+        my $id_col     = lc $type . '_id';
 
+        my $contact = $real_class->insert(
+            %name,
+            account_id => $account->account_id(),
+        )->contact();
+
+        my $real = $contact->real_contact();
         isa_ok(
-            $contact->_build_real_contact(),
-            'R2::Schema::' . ucfirst $type,
-            '_build_real_contact returns expected type of object'
+            $real,
+            $real_class,
+            'real_contact returns expected type of object'
         );
     }
 }
 
-my $contact = R2::Schema::Contact->insert(
-    account_id   => 42,
-    contact_type => 'Person',
-);
+my $contact = R2::Schema::Person->insert(
+    account_id => $account->account_id(),
+    first_name => 'Jane',
+)->contact();
 
 {
-    $mock->recorder()->clear_all();
+    my $target       = $account->donation_targets()->next();
+    my $source       = $account->donation_sources()->next();
+    my $payment_type = $account->payment_types()->next();
 
-    my %donation = (
-        donation_target_id => 1,
-        donation_source_id => 1,
-        payment_type_id    => 1,
+    $contact->add_donation(
+        donation_target_id => $target->donation_target_id(),
+        donation_source_id => $source->donation_source_id(),
+        payment_type_id    => $payment_type->payment_type_id(),
         amount             => 42,
         donation_date      => '2008-02-24',
     );
-    $contact->add_donation(%donation);
 
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::Donation');
-    ok(
-        $insert,
-        'add_donation inserted a new donation'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %donation,
-        },
-        'insert included contact_id'
+    is(
+        $contact->donation_count(),
+        1,
+        'add_donation added a donation'
     );
 }
 
 {
-    $mock->recorder()->clear_all();
+    $contact->add_email_address( email_address => 'dave@example.com' );
 
-    my %email = (
-        email_address => 'dave@example.com',
-    );
-    $contact->add_email_address(%email);
-
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::EmailAddress');
-    ok(
-        $insert,
-        'add_email_address inserted a new email address'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %email,
-        },
-        'insert included contact_id'
+    is(
+        $contact->email_address_count(),
+        1,
+        'add_email_address added an email address'
     );
 }
 
 {
-    $mock->recorder()->clear_all();
+    $contact->add_website( uri => 'http://example.com' );
 
-    my %website = (
-        uri => 'http://example.com/',
-    );
-    $contact->add_website(%website);
-
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::Website');
-    ok(
-        $insert,
-        'add_website inserted a new website'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %website,
-        },
-        'insert included contact_id'
+    is(
+        $contact->website_count(),
+        1,
+        'add_website added a website'
     );
 }
 
 {
-    $mock->recorder()->clear_all();
+    my $address_type = $account->address_types()->next();
 
-    my %address = (
-        address_type_id => 1,
+    $contact->add_address(
+        address_type_id => $address_type->address_type_id(),
         city            => 'Minneapolis',
         region          => 'MN',
         iso_code        => 'us',
     );
-    $contact->add_address(%address);
-
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::Address');
-    ok(
-        $insert,
-        'add_address inserted a new address'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %address,
-        },
-        'insert included contact_id'
-    );
-}
-
-{
-    $mock->recorder()->clear_all();
-
-    my %phone = (
-        phone_number_type_id => 1,
-        phone_number         => '612-555-1123',
-    );
-    $contact->add_phone_number(%phone);
-
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::PhoneNumber');
-    ok(
-        $insert,
-        'add_phone_number inserted a new phone number'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %phone,
-        },
-        'insert included contact_id'
-    );
-}
-
-{
-    $mock->recorder()->clear_all();
-
-    my %note = (
-        contact_note_type_id => 1,
-        note                 => 'blah blah',
-        user_id              => 1,
-    );
-    $contact->add_note(%note);
-
-    my ($insert)
-        = $mock->recorder()->actions_for_class('R2::Schema::ContactNote');
-    ok(
-        $insert,
-        'add_note inserted a new note'
-    );
-    is_deeply(
-        $insert->values(), {
-            contact_id => $contact->contact_id(),
-            %note,
-        },
-        'insert included contact_id'
-    );
-}
-
-{
-    my $iterator = $contact->_build_history();
-
-    isa_ok( $iterator, 'Fey::Object::Iterator::FromSelect::Caching' );
-}
-
-{
-    $mock->seed_class( 'R2::Schema::Account' => { account_id => 42 } );
 
     is(
-        $contact->_base_uri_path(),
-        '/account/42/contact/' . $contact->contact_id(),
-        '_base_uri_path'
+        $contact->address_count(),
+        1,
+        'add_address added an address'
+    );
+}
+
+{
+    my $phone_number_type = $account->phone_number_types()->next();
+
+    $contact->add_phone_number(
+        phone_number_type_id => $phone_number_type->phone_number_type_id(),
+        phone_number         => '612-555-1123',
+    );
+
+    is(
+        $contact->phone_number_count(),
+        1,
+        'add_phone_number added a phone number'
+    );
+}
+
+{
+    my $contact_note_type = $account->contact_note_types()->next();
+    my $user              = ( $account->users_with_roles()->next() )[0];
+
+    $contact->add_note(
+        contact_note_type_id => $contact_note_type->contact_note_type_id(),
+        note                 => 'blah blah',
+        user_id              => $user->user_id(),
+    );
+
+    is(
+        $contact->note_count(),
+        1,
+        'add_contact_note added a note'
     );
 }
 

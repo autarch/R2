@@ -19,14 +19,6 @@ use R2::Schema::Website;
 use R2::Types qw( PosOrZeroInt Bool HashRef );
 use R2::Util qw( string_is_empty );
 
-# cannot load these because of circular dependency problems
-#use R2::Schema::Account;
-#use R2::Schema::ContactNote;
-#use R2::Schema::Donation;
-#use R2::Schema::Household;
-#use R2::Schema::Organization;
-#use R2::Schema::Person;
-
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( pos_validated_list );
@@ -63,10 +55,11 @@ with 'R2::Role::Schema::URIMaker';
     }
 
     has 'real_contact' => (
-        is         => 'ro',
-        does       => 'R2::Role::Schema::ActsAsContact',
-        lazy_build => 1,
-        init_arg   => undef,
+        is       => 'ro',
+        does     => 'R2::Role::Schema::ActsAsContact',
+        lazy     => 1,
+        builder  => '_build_real_contact',
+        init_arg => undef,
     );
 
     has_one '_file' => ( table => $schema->table('File') );
@@ -93,9 +86,14 @@ with 'R2::Role::Schema::URIMaker';
         cache => 1,
     );
 
+    query email_address_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('EmailAddress'),
+        bind_params => sub { $_[0]->contact_id() },
+    );
+
     has_one 'preferred_email_address' => (
         table       => $schema->table('EmailAddress'),
-        select      => __PACKAGE__->_BuildPreferredEmailAddressSelect(),
+        select      => __PACKAGE__->_PreferredThingSelect('EmailAddress'),
         bind_params => sub { $_[0]->contact_id() }
     );
 
@@ -114,9 +112,14 @@ with 'R2::Role::Schema::URIMaker';
         cache => 1,
     );
 
+    query address_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('Address'),
+        bind_params => sub { $_[0]->contact_id() },
+    );
+
     has_one 'preferred_address' => (
         table       => $schema->table('Address'),
-        select      => __PACKAGE__->_BuildPreferredAddressSelect(),
+        select      => __PACKAGE__->_PreferredThingSelect('Address'),
         bind_params => sub { $_[0]->contact_id() }
     );
 
@@ -131,9 +134,14 @@ with 'R2::Role::Schema::URIMaker';
         ],
     );
 
+    query phone_number_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('PhoneNumber'),
+        bind_params => sub { $_[0]->contact_id() },
+    );
+
     has_one 'preferred_phone_number' => (
         table       => $schema->table('PhoneNumber'),
-        select      => __PACKAGE__->_BuildPreferredPhoneNumberSelect(),
+        select      => __PACKAGE__->_PreferredThingSelect('PhoneNumber'),
         bind_params => sub { $_[0]->contact_id() }
     );
 
@@ -148,6 +156,11 @@ with 'R2::Role::Schema::URIMaker';
         cache => 1,
     );
 
+    query website_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('Website'),
+        bind_params => sub { $_[0]->contact_id() },
+    );
+
     has_many 'donations' => (
         table    => $schema->table('Donation'),
         order_by => [
@@ -159,12 +172,8 @@ with 'R2::Role::Schema::URIMaker';
         cache => 1,
     );
 
-    has 'donation_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
-        select      => __PACKAGE__->_BuildDonationCountSelect(),
+    query donation_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('Donation'),
         bind_params => sub { $_[0]->contact_id() },
     );
 
@@ -179,12 +188,8 @@ with 'R2::Role::Schema::URIMaker';
         cache => 1,
     );
 
-    has 'note_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
-        select      => __PACKAGE__->_BuildNoteCountSelect(),
+    query note_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('ContactNote'),
         bind_params => sub { $_[0]->contact_id() },
     );
 
@@ -195,17 +200,19 @@ with 'R2::Role::Schema::URIMaker';
     );
 
     has 'history' => (
-        is         => 'ro',
-        isa        => 'Fey::Object::Iterator::FromSelect::Caching',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect::Caching',
+        lazy    => 1,
+        builder => '_build_history',
     );
 
     has '_custom_field_values' => (
-        traits     => ['Hash'],
-        is         => 'ro',
-        isa        => HashRef,
-        lazy_build => 1,
-        handles    => {
+        traits  => ['Hash'],
+        is      => 'ro',
+        isa     => HashRef,
+        lazy    => 1,
+        builder => '_build_custom_field_values',
+        handles => {
             custom_field_value      => 'get',
             _set_custom_field_value => 'set',
         },
@@ -213,96 +220,49 @@ with 'R2::Role::Schema::URIMaker';
     );
 }
 
-sub _BuildPreferredEmailAddressSelect {
+sub _CountContactsInTableSelect {
     my $class = shift;
+    my $table_name = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('EmailAddress') )
-        ->from( $schema->table('EmailAddress') )->where(
-        $schema->table('EmailAddress')->column('contact_id'),
-        '=', Fey::Placeholder->new()
-        )->and(
-        $schema->table('EmailAddress')->column('is_preferred'),
-        '=', Fey::Literal::String->new('t')
-        )->limit(1);
+    my $table = $schema->table($table_name);
 
-    return $select;
-}
-
-sub _BuildPreferredAddressSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->table('Address') )
-        ->from( $schema->table('Address') )->where(
-        $schema->table('Address')->column('contact_id'),
-        '=', Fey::Placeholder->new()
-        )->and(
-        $schema->table('Address')->column('is_preferred'),
-        '=', Fey::Literal::String->new('t')
-        )->limit(1);
-
-    return $select;
-}
-
-sub _BuildPreferredPhoneNumberSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->table('PhoneNumber') )
-        ->from( $schema->table('PhoneNumber') )->where(
-        $schema->table('PhoneNumber')->column('contact_id'),
-        '=', Fey::Placeholder->new()
-        )->and(
-        $schema->table('PhoneNumber')->column('is_preferred'),
-        '=', Fey::Literal::String->new('t')
-        )->limit(1);
-
-    return $select;
-}
-
-sub _BuildDonationCountSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        $schema->table('Donation')->column('donation_id') );
-
-    $select->select($count)->from( $schema->tables('Donation') )->where(
-        $schema->table('Donation')->column('contact_id'),
-        '=', Fey::Placeholder->new()
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        @{ $table->primary_key() },
     );
 
+    #<<<
+    $select
+        ->select($count)
+        ->from  ($table)
+        ->where ( $table->column('contact_id'), '=', Fey::Placeholder->new() );
+    #>>>
     return $select;
 }
 
-sub _BuildNoteCountSelect {
+sub _PreferredThingSelect {
     my $class = shift;
+    my $table_name = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
     my $schema = R2::Schema->Schema();
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        $schema->table('ContactNote')->column('contact_id') );
+    my $table = $schema->table($table_name);
 
-    $select->select($count)->from( $schema->tables('ContactNote') )->where(
-        $schema->table('ContactNote')->column('contact_id'),
-        '=', Fey::Placeholder->new()
-    );
-
+    #<<<
+    $select
+        ->select($table)
+        ->from  ($table)
+        ->where ( $table->column('contact_id'), '=', Fey::Placeholder->new() )
+        ->and   ( $table->column('is_preferred'),
+                  '=', Fey::Literal::String->new('t') )
+        ->limit (1);
+    #>>>
     return $select;
 }
 
@@ -314,6 +274,8 @@ sub _build_real_contact {
 
         return $self->$type() if $self->$is();
     }
+
+    die 'Cannot find a real contact for contact id: ' . $self->contact_id();
 }
 
 sub add_donation {
@@ -375,12 +337,18 @@ sub add_note {
 
     my $schema = R2::Schema->Schema();
 
-    my $sum = Fey::Literal::Function->new( 'SUM',
-        $schema->table('Donation')->column('amount') );
-    $select_base->select($sum)->from( $schema->table('Donation') )
-        ->where( $schema->table('Donation')->column('contact_id'), '=',
-        Fey::Placeholder->new() );
+    my $sum = Fey::Literal::Function->new(
+        'SUM',
+        $schema->table('Donation')->column('amount')
+    );
 
+    #<<<
+    $select_base
+        ->select($sum)
+        ->from  ( $schema->table('Donation') )
+        ->where ( $schema->table('Donation')->column('contact_id'), '=',
+                  Fey::Placeholder->new() );
+    #>>>
     sub donations_total {
         my $self = shift;
         my ($date)
@@ -409,9 +377,10 @@ sub add_note {
 
 sub has_custom_field_values_for_group {
     my $self = shift;
-    my ($group)
-        = pos_validated_list( \@_,
-        { isa => 'R2::Schema::CustomFieldGroup' } );
+    my ($group) = pos_validated_list(
+        \@_,
+        { isa => 'R2::Schema::CustomFieldGroup' }
+    );
 
     return any { $self->custom_field_value( $_->custom_field_id() ) }
     $group->custom_fields()->all();
@@ -428,30 +397,36 @@ sub has_custom_field_values_for_group {
 
         if ( $type_table->name() =~ /Select/ ) {
             my $value_table = $schema->table('CustomFieldSelectOption');
-            $select->select( $type_table->column('custom_field_id'),
-                $value_table->column('value') )
-                ->from( $type_table, $value_table )->order_by(
-                $type_table->column('custom_field_id'),
-                $value_table->column('display_order')
-                );
+
+            #<<<
+            $select
+                ->select( $type_table->column('custom_field_id'),
+                          $value_table->column('value') )
+                ->from  ( $type_table, $value_table )
+                ->order_by( $type_table->column('custom_field_id'),
+                            $value_table->column('display_order') );
+            #>>>
         }
         else {
-            $select->select(
-                $type_table->columns( 'custom_field_id', 'value' ) )
-                ->from($type_table);
+            #<<<
+            $select
+                ->select( $type_table->columns( 'custom_field_id', 'value' ) )
+                ->from  ($type_table);
+            #>>>
         }
 
-        $select->where( $type_table->column('contact_id'), '=',
-            Fey::Placeholder->new() );
+        $select->where(
+            $type_table->column('contact_id'), '=',
+            Fey::Placeholder->new()
+        );
 
         $Selects{ $type_table->name() } = $select;
     }
 
-    sub _build__custom_field_values {
+    sub _build_custom_field_values {
         my $self = shift;
 
-        my %fields
-            = map { $_->custom_field_id() => $_ }
+        my %fields = map { $_->custom_field_id() => $_ }
             map { $_->custom_fields()->all() }
             $self->account()->custom_field_groups()->all();
 
@@ -512,18 +487,17 @@ sub _BuildHistorySelect {
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->tables('ContactHistory') )
-        ->from( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
-        ->where(
-        $schema->table('ContactHistory')->column('contact_id'),
-        '=', Fey::Placeholder->new()
-        )->order_by(
-        $schema->table('ContactHistory')->column('history_datetime'),
-        'DESC',
-        $schema->table('ContactHistoryType')->column('sort_order'),
-        'ASC',
-        );
-
+    #<<<
+    $select
+        ->select( $schema->tables('ContactHistory') )
+        ->from  ( $schema->tables( 'ContactHistory', 'ContactHistoryType' ) )
+        ->where( $schema->table('ContactHistory')->column('contact_id'),
+                 '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('ContactHistory')->column('history_datetime'),
+                    'DESC',
+                    $schema->table('ContactHistoryType')->column('sort_order'),
+                    'ASC' );
+    #>>>
     return $select;
 }
 
@@ -537,6 +511,14 @@ sub _base_uri_path {
 }
 
 __PACKAGE__->meta()->make_immutable();
+
+# Need to load these here because of circular dependency problems
+require R2::Schema::Account;
+require R2::Schema::ContactNote;
+require R2::Schema::Donation;
+require R2::Schema::Household;
+require R2::Schema::Organization;
+require R2::Schema::Person;
 
 1;
 
