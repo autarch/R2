@@ -154,10 +154,12 @@ sub _BuildSelectAllSQL {
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('MessagingProvider') )
-        ->from( $schema->tables('MessagingProvider') )
+    #<<<
+    $select
+        ->select( $schema->table('MessagingProvider') )
+        ->from  ( $schema->tables('MessagingProvider') )
         ->order_by( $schema->table('MessagingProvider')->column('name') );
-
+    #>>>
     return $select;
 
 }
