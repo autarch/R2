@@ -423,7 +423,7 @@ sub _build_countries {
     my $dbh = $self->_dbh($select);
 
     return Fey::Object::Iterator::FromSelect::Caching->new(
-        classes => [qw( R2::Schema::AccountCountry R2::Schema::Country  )],
+        classes => [qw( R2::Schema::Country  )],
         dbh     => $dbh,
         select  => $select,
         bind_params => [ $self->account_id() ],
@@ -438,7 +438,7 @@ sub _BuildCountriesSelect {
     my $schema = R2::Schema->Schema();
 
     #<<<
-    $select->select( $schema->tables( 'AccountCountry', 'Country' ) )
+    $select->select( $schema->tables( 'Country' ) )
            ->from  ( $schema->tables( 'AccountCountry', 'Country' ) )
            ->where ( $schema->table('AccountCountry')->column('account_id'),
                      '=', Fey::Placeholder->new() )
