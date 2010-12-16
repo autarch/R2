@@ -437,17 +437,15 @@ sub _BuildMessagingProvidersSelect {
 
     my $schema = R2::Schema->Schema();
 
+    #<<<
     $select->select( $schema->tables('MessagingProvider') )
-        ->from(
-        $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
-        ->where(
-        $schema->table('AccountMessagingProvider')->column('account_id'),
-        '=', Fey::Placeholder->new()
-        )->order_by(
-        $schema->table('MessagingProvider')->column('name'),
-        'ASC',
-        );
-
+           ->from  ( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
+           ->where ( $schema->table('AccountMessagingProvider')->column('account_id'),
+                     '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('MessagingProvider')->column('name'),
+                       'ASC',
+                     );
+    #>>>
     return $select;
 }
 
@@ -458,17 +456,17 @@ sub _BuildCountriesSelect {
 
     my $schema = R2::Schema->Schema();
 
+    #<<<
     $select->select( $schema->tables( 'AccountCountry', 'Country' ) )
-        ->from( $schema->tables( 'AccountCountry', 'Country' ) )->where(
-        $schema->table('AccountCountry')->column('account_id'),
-        '=', Fey::Placeholder->new()
-        )->order_by(
-        $schema->table('AccountCountry')->column('is_default'),
-        'DESC',
-        $schema->table('Country')->column('name'),
-        'ASC',
-        );
-
+           ->from  ( $schema->tables( 'AccountCountry', 'Country' ) )
+           ->where ( $schema->table('AccountCountry')->column('account_id'),
+                     '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('AccountCountry')->column('is_default'),
+                       'DESC',
+                       $schema->table('Country')->column('name'),
+                       'ASC',
+                     );
+    #>>>
     return $select;
 }
 
@@ -484,8 +482,7 @@ sub _BuildUsersWithRolesSelect {
            ->from( $schema->tables( 'AccountUserRole', 'User' ) )
            ->from( $schema->tables( 'AccountUserRole', 'Role' ) )
            ->where( $schema->table('AccountUserRole')->column('account_id'),
-                    '=', Fey::Placeholder->new()
-                  )
+                    '=', Fey::Placeholder->new() )
            ->order_by( $schema->table('User')->column('username') );
     #>>>
     return $select;
@@ -503,12 +500,13 @@ sub _AddSQLMethods {
 
         my $foreign_table = $schema->table($type);
 
+        #<<<
         $select->select($foreign_table)
-            ->from( $schema->tables('Contact'), $foreign_table )->where(
-            $schema->table('Contact')->column('account_id'),
-            '=', Fey::Placeholder->new()
-            )->order_by( @{ $class->DefaultOrderBy() } );
-
+               ->from  ( $schema->tables('Contact'), $foreign_table )
+               ->where( $schema->table('Contact')->column('account_id'),
+                        '=', Fey::Placeholder->new() )
+               ->order_by( @{ $class->DefaultOrderBy() } );
+        #>>>
         has_many lc $pl_type => (
             table       => $foreign_table,
             select      => $select,
@@ -517,15 +515,17 @@ sub _AddSQLMethods {
 
         $select = R2::Schema->SQLFactoryClass()->new_select();
 
-        my $count = Fey::Literal::Function->new( 'COUNT',
-            @{ $foreign_table->primary_key() } );
+        my $count = Fey::Literal::Function->new(
+            'COUNT',
+            @{ $foreign_table->primary_key() }
+        );
 
+        #<<<
         $select->select($count)
-            ->from( $schema->tables('Contact'), $foreign_table )->where(
-            $schema->table('Contact')->column('account_id'),
-            '=', Fey::Placeholder->new()
-            );
-
+               ->from  ( $schema->tables('Contact'), $foreign_table )
+               ->where( $schema->table('Contact')->column('account_id'),
+                        '=', Fey::Placeholder->new() );
+        #>>>
         my $build_count_meth = '_Build' . $type . 'CountSelect';
         __PACKAGE__->meta()->add_method( $build_count_meth => sub {$select} );
 
@@ -566,13 +566,16 @@ sub _AddSQLMethods {
 
     my $cfg_table = $schema->table('CustomFieldGroup');
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        @{ $cfg_table->primary_key() } );
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        @{ $cfg_table->primary_key() }
+    );
 
+    #<<<
     $select->select($count)->from($cfg_table)
-        ->where( $cfg_table->column('account_id'), '=',
-        Fey::Placeholder->new() );
-
+           ->where( $cfg_table->column('account_id'), '=',
+                    Fey::Placeholder->new() );
+    #>>>
     has 'custom_field_group_count' => (
         metaclass   => 'FromSelect',
         is          => 'ro',
