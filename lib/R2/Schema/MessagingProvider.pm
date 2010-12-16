@@ -78,7 +78,7 @@ use MooseX::Params::Validate qw( validated_list );
             chat_uri_template => 'callto:{screen_name}?chat',
             call_uri_template => 'callto:{screen_name}?call',
             status_uri_template =>
-                'http://mystatus.skype.com/mediumincon/{screen_name}',
+                'http://mystatus.skype.com/mediumicon/{screen_name}',
         }, {
             name               => 'Windows Live Messenger',
             add_uri_template   => 'msnim:add?contact={screen_name}',
