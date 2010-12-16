@@ -111,10 +111,11 @@ with 'R2::Role::Schema::URIMaker';
     }
 
     has '_messaging_provider_id_hash' => (
-        is         => 'ro',
-        isa        => HashRef,
-        lazy_build => 1,
-        init_arg   => undef,
+        is       => 'ro',
+        isa      => HashRef,
+        lazy     => 1,
+        builder  => '_build__messaging_provider_id_hash',
+        init_arg => undef,
     );
 
     has_many 'contact_note_types' => (
@@ -129,15 +130,18 @@ with 'R2::Role::Schema::URIMaker';
     );
 
     has 'made_a_note_contact_note_type' => (
-        is         => 'ro',
-        isa        => 'R2::Schema::ContactNoteType',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'R2::Schema::ContactNoteType',
+        lazy    => 1,
+        builder => '_build_made_a_note_contact_note_type',
     );
 
     has 'countries' => (
-        is         => 'ro',
-        isa        => 'Fey::Object::Iterator::FromSelect::Caching',
-        lazy_build => 1,
+        is       => 'ro',
+        isa      => 'Fey::Object::Iterator::FromSelect::Caching',
+        lazy     => 1,
+        builder  => '_build_countries',
+        init_arg => undef,
     );
 
     class_has '_CountriesSelect' => (
@@ -395,7 +399,7 @@ sub has_messaging_provider {
         ->{ $provider->messaging_provider_id() };
 }
 
-sub _build__messaging_provider_id_hash {
+sub _build_messaging_provider_id_hash {
     my $self = shift;
 
     return { map { $_->messaging_provider_id() => 1 }
