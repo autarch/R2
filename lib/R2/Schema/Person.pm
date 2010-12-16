@@ -29,10 +29,14 @@ with 'R2::Role::Schema::ActsAsContact' =>
     has_one 'contact' => (
         table   => $schema->table('Contact'),
         handles => [
-            qw( email_addresses primary_email_address
+            qw(
+                email_addresses
+                primary_email_address
                 websites
-                addresses primary_address
-                phone_numbers primary_phone_number
+                addresses
+                primary_address
+                phone_numbers
+                primary_phone_number
                 uri
                 has_custom_field_values_for_group
                 custom_field_value
