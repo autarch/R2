@@ -33,6 +33,7 @@ with 'R2::Role::Schema::HistoryRecorder';
         isa     => 'Str|Undef',
         lazy    => 1,
         builder => '_build_city_region_postal_code',
+        clearer => '_clear_city_region_postal_code',
     );
 
     has 'summary' => (
@@ -40,8 +41,16 @@ with 'R2::Role::Schema::HistoryRecorder';
         isa     => 'Str',
         lazy    => 1,
         builder => '_build_summary',
+        clearer => '_clear_summary',
     );
 }
+
+after update => sub {
+    my $self = shift;
+
+    $self->_clear_city_region_postal_code();
+    $self->_clear_summary();
+};
 
 sub _build_city_region_postal_code {
     my $self = shift;

@@ -92,8 +92,8 @@ mock_schema();
             map {"$_ = '$test->[0]{$_}'"} qw( city region postal_code );
 
         is(
-            $address->_build_city_region_postal_code(), $test->[1],
-            qq{_build_city_region_postal_code with $desc - '$test->[1]'}
+            $address->city_region_postal_code(), $test->[1],
+            qq{city_region_postal_code with $desc - '$test->[1]'}
         );
     }
 }
@@ -153,10 +153,55 @@ mock_schema();
             qw( street_1 city_region_postal_code );
 
         is(
-            $address->_build_summary(), $test->[1],
-            qq{_build_summary with $desc - '$test->[1]'}
+            $address->summary(), $test->[1],
+            qq{summary with $desc - '$test->[1]'}
         );
     }
+}
+
+{
+    my $address = R2::Schema::Address->new(
+        address_id      => 1,
+        street_1        => '100 Some St',
+        city            => 'Opolis',
+        region          => 'MN',
+        postal_code     => '55555',
+        contact_id      => 1,
+        address_type_id => 1,
+        iso_code        => 'us',
+        _from_query     => 1,
+    );
+
+    is(
+        $address->city_region_postal_code,
+        'Opolis, MN 55555',
+        'city_region_postal_code before update'
+    );
+
+    is(
+        $address->summary(),
+        '100 Some St',
+        'summary before update'
+    );
+
+    $address->update(
+        street_1    => '101 Other St',
+        city        => 'Mopolis',
+        region      => 'CA',
+        postal_code => '99999',
+    );
+
+    is(
+        $address->city_region_postal_code,
+        'Mopolis, CA 99999',
+        'city_region_postal_code after update'
+    );
+
+    is(
+        $address->summary(),
+        '101 Other St',
+        'summary after update'
+    );
 }
 
 done_testing();
