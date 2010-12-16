@@ -118,8 +118,14 @@ with 'R2::Role::Schema::URIMaker';
     );
 
     has_many 'contact_note_types' => (
-        table => $schema->table('ContactNoteType'),
-        cache => 1,
+        table    => $schema->table('ContactNoteType'),
+        cache    => 1,
+        order_by => [
+            $schema->table('ContactNoteType')->column('is_system_defined'),
+            'DESC',
+            $schema->table('ContactNoteType')->column('description'),
+            'ASC',
+        ],
     );
 
     has 'made_a_note_contact_note_type' => (
@@ -138,6 +144,12 @@ with 'R2::Role::Schema::URIMaker';
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
         default => sub { __PACKAGE__->_BuildCountriesSelect() },
+    );
+
+    class_has '_UsersWithRolesSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        default => sub { __PACKAGE__->_BuildUsersWithRolesSelect() },
     );
 
     __PACKAGE__->_AddSQLMethods();
@@ -197,6 +209,21 @@ sub add_user {
         account_id => $self->account_id(),
         user_id    => $user->user_id(),
         role_id    => $role->role_id(),
+    );
+}
+
+sub users_with_roles {
+    my $self = shift;
+
+    my $select = $self->_UsersWithRolesSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes => [qw( R2::Schema::User R2::Schema::Role  )],
+        dbh     => $dbh,
+        select  => $select,
+        bind_params => [ $self->account_id() ],
     );
 }
 
@@ -438,6 +465,25 @@ sub _BuildCountriesSelect {
         'ASC',
         );
 
+    return $select;
+}
+
+sub _BuildUsersWithRolesSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select->select( $schema->tables( 'User', 'Role' ) )
+           ->from( $schema->tables( 'AccountUserRole', 'User' ) )
+           ->from( $schema->tables( 'AccountUserRole', 'Role' ) )
+           ->where( $schema->table('AccountUserRole')->column('account_id'),
+                    '=', Fey::Placeholder->new()
+                  )
+           ->order_by( $schema->table('User')->column('username') );
+    #>>>
     return $select;
 }
 
