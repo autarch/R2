@@ -430,25 +430,6 @@ sub _build_countries {
     );
 }
 
-sub _BuildMessagingProvidersSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    #<<<
-    $select->select( $schema->tables('MessagingProvider') )
-           ->from  ( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
-           ->where ( $schema->table('AccountMessagingProvider')->column('account_id'),
-                     '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('MessagingProvider')->column('name'),
-                       'ASC',
-                     );
-    #>>>
-    return $select;
-}
-
 sub _BuildCountriesSelect {
     my $class = shift;
 
@@ -464,6 +445,25 @@ sub _BuildCountriesSelect {
            ->order_by( $schema->table('AccountCountry')->column('is_default'),
                        'DESC',
                        $schema->table('Country')->column('name'),
+                       'ASC',
+                     );
+    #>>>
+    return $select;
+}
+
+sub _BuildMessagingProvidersSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select->select( $schema->tables('MessagingProvider') )
+           ->from  ( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
+           ->where ( $schema->table('AccountMessagingProvider')->column('account_id'),
+                     '=', Fey::Placeholder->new() )
+           ->order_by( $schema->table('MessagingProvider')->column('name'),
                        'ASC',
                      );
     #>>>
