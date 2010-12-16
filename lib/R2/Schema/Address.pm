@@ -29,15 +29,17 @@ with 'R2::Role::Schema::HistoryRecorder';
     has_one( $schema->table('Country') );
 
     has 'city_region_postal_code' => (
-        is         => 'ro',
-        isa        => 'Str|Undef',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Str|Undef',
+        lazy    => 1,
+        builder => '_build_city_region_postal_code',
     );
 
     has 'summary' => (
-        is         => 'ro',
-        isa        => 'Str',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Str',
+        lazy    => 1,
+        builder => '_build_summary',
     );
 }
 
