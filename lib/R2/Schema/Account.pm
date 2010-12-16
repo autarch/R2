@@ -508,11 +508,12 @@ sub _AddSQLMethods {
         my $foreign_table = $schema->table($type);
 
         #<<<
-        $select->select($foreign_table)
-               ->from  ( $schema->tables('Contact'), $foreign_table )
-               ->where( $schema->table('Contact')->column('account_id'),
-                        '=', Fey::Placeholder->new() )
-               ->order_by( @{ $class->DefaultOrderBy() } );
+        $select
+            ->select($foreign_table)
+            ->from  ( $schema->tables('Contact'), $foreign_table )
+            ->where ( $schema->table('Contact')->column('account_id'),
+                      '=', Fey::Placeholder->new() )
+            ->order_by( @{ $class->DefaultOrderBy() } );
         #>>>
         has_many lc $pl_type => (
             table       => $foreign_table,
@@ -528,10 +529,11 @@ sub _AddSQLMethods {
         );
 
         #<<<
-        $select->select($count)
-               ->from  ( $schema->tables('Contact'), $foreign_table )
-               ->where( $schema->table('Contact')->column('account_id'),
-                        '=', Fey::Placeholder->new() );
+        $select
+            ->select($count)
+            ->from  ( $schema->tables('Contact'), $foreign_table )
+            ->where ( $schema->table('Contact')->column('account_id'),
+                      '=', Fey::Placeholder->new() );
         #>>>
         my $build_count_meth = '_Build' . $type . 'CountSelect';
         __PACKAGE__->meta()->add_method( $build_count_meth => sub {$select} );
@@ -579,9 +581,10 @@ sub _AddSQLMethods {
     );
 
     #<<<
-    $select->select($count)->from($cfg_table)
-           ->where( $cfg_table->column('account_id'), '=',
-                    Fey::Placeholder->new() );
+    $select
+        ->select($count)->from($cfg_table)
+        ->where ( $cfg_table->column('account_id'), '=',
+                  Fey::Placeholder->new() );
     #>>>
     has 'custom_field_group_count' => (
         metaclass   => 'FromSelect',
