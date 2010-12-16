@@ -19,9 +19,13 @@ use MooseX::Params::Validate qw( validated_list );
 
     has_table( $schema->table('MessagingProvider') );
 
-    my @uri_types = qw( add_uri_template chat_uri_template
-        status_uri_template call_uri_template
-        video_uri_template );
+    my @uri_types = qw(
+        add_uri_template
+        chat_uri_template
+        status_uri_template
+        call_uri_template
+        video_uri_template
+    );
 
     for my $type (@uri_types) {
         ( my $meth = $type ) =~ s/_template$//;
@@ -34,10 +38,16 @@ use MooseX::Params::Validate qw( validated_list );
         );
     }
 
-    transform @uri_types => inflate {
-        return if string_is_empty( $_[1] );
-        URI::Template->new( $_[1] );
-    } => deflate { defined $_[1] && ref $_[1] ? $_[1]->as_string() : $_[1] };
+    #<<<
+    transform @uri_types
+        => inflate {
+            return if string_is_empty( $_[1] );
+            URI::Template->new( $_[1] );
+        }
+        => deflate {
+            defined $_[1] && ref $_[1] ? $_[1]->as_string() : $_[1]
+        };
+    #>>>
 
     class_has '_SelectAllSQL' => (
         is         => 'ro',
