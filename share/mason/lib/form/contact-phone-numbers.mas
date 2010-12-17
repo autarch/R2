@@ -34,6 +34,6 @@ $contact_type
 </%args>
 
 <%init>
-my $meth = $contact_type . '_phone_number_types';
+my $meth = 'phone_number_types_for_' . $contact_type;
 my @phone_number_types = @{ $c->account()->$meth() };
 </%init>

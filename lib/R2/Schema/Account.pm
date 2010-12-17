@@ -305,6 +305,10 @@ sub update_or_add_address_types {
         'address_type',
         'name',
     );
+
+    $self->_clear_address_types_for_person();
+    $self->_clear_address_types_for_household();
+    $self->_clear_address_types_for_organization();
 }
 
 sub update_or_add_phone_number_types {
@@ -318,6 +322,10 @@ sub update_or_add_phone_number_types {
         'phone_number_type',
         'name',
     );
+
+    $self->_clear_phone_number_types_for_person();
+    $self->_clear_phone_number_types_for_household();
+    $self->_clear_phone_number_types_for_organization();
 }
 
 sub update_or_add_contact_note_types {
@@ -552,24 +560,30 @@ sub _AddSQLMethods {
 
         my $applies_meth = 'applies_to_' . lc $type;
 
-        has lc $type . '_address_types' => (
-            is      => 'ro',
-            isa     => ArrayRef ['R2::Schema::AddressType'],
-            lazy    => 1,
-            default => sub {
+        my $addr_types_attr = 'address_types_for_' . lc $type;
+        has $addr_types_attr => (
+            is       => 'ro',
+            isa      => ArrayRef ['R2::Schema::AddressType'],
+            init_arg => undef,
+            lazy     => 1,
+            default  => sub {
                 [ grep { $_->$applies_meth() }
                         $_[0]->address_types()->all() ];
             },
+            clearer => '_clear_' . $addr_types_attr,
         );
 
-        has lc $type . '_phone_number_types' => (
-            is      => 'ro',
-            isa     => ArrayRef ['R2::Schema::PhoneNumberType'],
-            lazy    => 1,
-            default => sub {
+        my $phone_types_attr = 'phone_number_types_for_' . lc $type;
+        has $phone_types_attr => (
+            is       => 'ro',
+            isa      => ArrayRef ['R2::Schema::PhoneNumberType'],
+            init_arg => undef,
+            lazy     => 1,
+            default  => sub {
                 [ grep { $_->$applies_meth() }
                         $_[0]->phone_number_types()->all() ];
             },
+            clearer => '_clear_' . $phone_types_attr,
         );
     }
 
