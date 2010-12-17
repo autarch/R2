@@ -352,31 +352,6 @@ my $account;
 }
 
 
-
-# {
-#     $dbh->{mock_clear_history} = 1;
-
-#     $dbh->{mock_add_resultset} = [
-#         [qw( account_id is_default iso_code iso_code name )],
-#         [ 1, 1, 'us', 'us', 'United States' ],
-#         [ 1, 0, 'ca', 'ca', 'Canada' ],
-#     ];
-
-#     my @countries = $account->_build_countries()->all();
-
-#     is(
-#         scalar @countries, 2,
-#         'found two countries for this account'
-#     );
-# }
-
-# {
-#     is(
-#         $account->_base_uri_path(), '/account/1',
-#         '_base_uri_path() is /account/1'
-#     );
-# }
-
 sub users_with_roles_data {
     my $account = shift;
 
