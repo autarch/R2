@@ -108,6 +108,7 @@ with 'R2::Role::Schema::URIMaker';
             isa     => 'Fey::Object::Iterator::FromArray',
             lazy    => 1,
             default => $default,
+            clearer => '_clear_custom_field_groups_for_' . $type
             );
     }
 
@@ -348,6 +349,10 @@ sub update_or_add_custom_field_groups {
         'custom_field_group',
         'name',
     );
+
+    $self->_clear_custom_field_groups_for_person();
+    $self->_clear_custom_field_groups_for_household();
+    $self->_clear_custom_field_groups_for_organization();
 }
 
 sub _update_or_add_things {
@@ -587,11 +592,7 @@ sub _AddSQLMethods {
         ->where ( $cfg_table->column('account_id'), '=',
                   Fey::Placeholder->new() );
     #>>>
-    has 'custom_field_group_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
+    query 'custom_field_group_count' => (
         select      => $select,
         bind_params => sub { $_[0]->account_id() },
     );

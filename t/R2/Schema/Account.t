@@ -351,6 +351,62 @@ my $account;
         'Cannot call update_or_add_donation_sources with nothing to update or add';
 }
 
+{
+    $account->update_or_add_custom_field_groups(
+        {},
+        [
+            {
+                name                    => 'Group 1',
+                applies_to_person       => 1,
+                applies_to_household    => 0,
+                applies_to_organization => 1,
+            }, {
+                name                    => 'Group 2',
+                applies_to_person       => 0,
+                applies_to_household    => 1,
+                applies_to_organization => 1,
+            }, {
+                name                    => 'Group 3',
+                applies_to_person       => 1,
+                applies_to_household    => 1,
+                applies_to_organization => 0,
+            },
+        ],
+    );
+
+    is(
+        $account->custom_field_group_count(),
+        3,
+        'account has three custom field groups after update_or_add_custom_field_groups'
+    );
+
+    is_deeply(
+        [
+            map { $_->name() }
+                $account->custom_field_groups_for_person()->all()
+        ],
+        [ 'Group 1', 'Group 3' ],
+        'custom_field_groups_for_person'
+    );
+
+    is_deeply(
+        [
+            map { $_->name() }
+                $account->custom_field_groups_for_household()->all()
+        ],
+        [ 'Group 2', 'Group 3' ],
+        'custom_field_groups_for_household'
+    );
+
+    is_deeply(
+        [
+            map { $_->name() }
+                $account->custom_field_groups_for_organization()->all()
+        ],
+        [ 'Group 1', 'Group 2' ],
+        'custom_field_groups_for_organization'
+    );
+}
 
 sub users_with_roles_data {
     my $account = shift;
