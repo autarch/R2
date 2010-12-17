@@ -15,7 +15,6 @@ use R2::Util qw( string_is_empty );
 use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
-use MooseX::ClassAttribute;
 
 with 'R2::Role::Schema::DataValidator' => {
     steps => [
@@ -78,22 +77,26 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
                 my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-                my $count = Fey::Literal::Function->new( 'COUNT',
-                    $cf_value_table->column('contact_id') );
+                my $count = Fey::Literal::Function->new(
+                    'COUNT',
+                    $cf_value_table->column('contact_id')
+                );
 
-                $select->select($count)
-                    ->from( $cf_value_table, $schema->table('Contact') )
-                    ->where(
-                    $cf_value_table->column('custom_field_id'), 'IN',
-                    @{ $self->custom_field_ids() }
-                    )
-                    ->and( $schema->table('Contact')->column('contact_type'),
-                    '=', $contact_type );
-
+                #<<<
+                $select
+                    ->select($count)
+                    ->from  ( $cf_value_table, $schema->table('Contact') )
+                    ->where ( $cf_value_table->column('custom_field_id'), 'IN',
+                              @{ $self->custom_field_ids() } )
+                    ->and   ( $schema->table('Contact')->column('contact_type'),
+                              '=', $contact_type );
+                #>>>
                 my $dbh = $self->_dbh($select);
 
-                $count += $dbh->selectrow_arrayref( $select->sql($dbh), {},
-                    $select->bind_params() )->[0];
+                $count += $dbh->selectrow_arrayref(
+                    $select->sql($dbh), {},
+                    $select->bind_params()
+                )->[0];
             }
 
             return $count;
@@ -122,18 +125,24 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 
             my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-            my $count = Fey::Literal::Function->new( 'COUNT',
-                $cf_value_table->column('contact_id') );
-
-            $select->select($count)->from($cf_value_table)->where(
-                $cf_value_table->column('custom_field_id'), 'IN',
-                @{ $self->custom_field_ids() }
+            my $count = Fey::Literal::Function->new(
+                'COUNT',
+                $cf_value_table->column('contact_id')
             );
 
+            #<<<
+            $select
+                ->select($count)
+                ->from  ($cf_value_table)
+                ->where( $cf_value_table->column('custom_field_id'), 'IN',
+                         @{ $self->custom_field_ids() } );
+            #>>>
             my $dbh = $self->_dbh($select);
 
-            $count += $dbh->selectrow_arrayref( $select->sql($dbh), {},
-                $select->bind_params() )->[0];
+            $count += $dbh->selectrow_arrayref(
+                $select->sql($dbh), {},
+                $select->bind_params()
+            )->[0];
         }
 
         return $count;
@@ -145,17 +154,6 @@ with 'R2::Role::Schema::AppliesToContactTypes';
         lazy     => 1,
         default  => $get_count,
         init_arg => undef,
-    );
-
-    class_has '_ValidationSteps' => (
-        is      => 'ro',
-        isa     => ArrayRef [Str],
-        lazy    => 1,
-        default => sub {
-            [
-                qw( _display_order_is_unique _applies_to_something _cannot_unapply )
-            ];
-        },
     );
 }
 
