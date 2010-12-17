@@ -47,7 +47,6 @@ has 'table' => (
         R2::Schema->Schema()
             ->table( 'CustomField' . $_[0]->type() . 'Value' );
     },
-    required => 1,
     init_arg => undef,
 );
 
