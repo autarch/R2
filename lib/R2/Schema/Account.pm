@@ -544,12 +544,8 @@ sub _AddSQLMethods {
         my $build_count_meth = '_Build' . $type . 'CountSelect';
         __PACKAGE__->meta()->add_method( $build_count_meth => sub {$select} );
 
-        has lc $type
+        query lc $type
             . '_count' => (
-            metaclass   => 'FromSelect',
-            is          => 'ro',
-            isa         => PosOrZeroInt,
-            lazy        => 1,
             select      => __PACKAGE__->$build_count_meth(),
             bind_params => sub { $_[0]->account_id() },
             );
