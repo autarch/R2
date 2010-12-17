@@ -50,7 +50,7 @@ my $contact = R2::Schema::Person->insert(
         donation_source_id => $source->donation_source_id(),
         payment_type_id    => $payment_type->payment_type_id(),
         amount             => 42,
-        donation_date      => '2008-02-24',
+        donation_date      => '2008-01-01',
     );
 
     is(
@@ -67,6 +67,12 @@ my $contact = R2::Schema::Person->insert(
         $contact->email_address_count(),
         1,
         'add_email_address added an email address'
+    );
+
+    is(
+        $contact->preferred_email_address()->email_address(),
+        'dave@example.com',
+        'adding an email address makes the address preferred when the contact has no other addresses'
     );
 }
 
@@ -85,6 +91,7 @@ my $contact = R2::Schema::Person->insert(
 
     $contact->add_address(
         address_type_id => $address_type->address_type_id(),
+        street_1        => '99 Some Drive',
         city            => 'Minneapolis',
         region          => 'MN',
         iso_code        => 'us',
@@ -94,6 +101,12 @@ my $contact = R2::Schema::Person->insert(
         $contact->address_count(),
         1,
         'add_address added an address'
+    );
+
+    is(
+        $contact->preferred_address()->street_1(),
+        '99 Some Drive',
+        'adding an address makes the address preferred when the contact has no other addresses'
     );
 }
 
@@ -109,6 +122,12 @@ my $contact = R2::Schema::Person->insert(
         $contact->phone_number_count(),
         1,
         'add_phone_number added a phone number'
+    );
+
+    is(
+        $contact->preferred_phone_number()->phone_number(),
+        '612-555-1123',
+        'adding a phone number makes the number preferred when the contact has no other numbers'
     );
 }
 
@@ -126,6 +145,41 @@ my $contact = R2::Schema::Person->insert(
         $contact->note_count(),
         1,
         'add_contact_note added a note'
+    );
+}
+
+{
+    my $target       = $account->donation_targets()->next();
+    my $source       = $account->donation_sources()->next();
+    my $payment_type = $account->payment_types()->next();
+
+    $contact->add_donation(
+        donation_target_id => $target->donation_target_id(),
+        donation_source_id => $source->donation_source_id(),
+        payment_type_id    => $payment_type->payment_type_id(),
+        amount             => 500,
+        donation_date      => '2009-01-01',
+    );
+
+    $contact->add_donation(
+        donation_target_id => $target->donation_target_id(),
+        donation_source_id => $source->donation_source_id(),
+        payment_type_id    => $payment_type->payment_type_id(),
+        amount             => 501,
+        donation_date      => '2010-01-01',
+    );
+
+    is(
+        $contact->donation_total(),
+        1043,
+        'donation total for all time is 1043',
+    );
+
+    my $y2009 = DateTime->new( year => 2009 );
+    is(
+        $contact->donation_total( since => $y2009 ),
+        1001,
+        'donation total since 2009 is 1001'
     );
 }
 

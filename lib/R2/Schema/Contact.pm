@@ -21,7 +21,7 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-use MooseX::Params::Validate qw( pos_validated_list );
+use MooseX::Params::Validate qw( validated_list );
 
 with 'R2::Role::Schema::DataValidator';
 with 'R2::Role::Schema::URIMaker';
@@ -289,10 +289,13 @@ sub add_donation {
 
 sub add_email_address {
     my $self = shift;
+    my %p    = @_;
+
+    $p{is_preferred} = 1 unless $self->email_address_count();
 
     return R2::Schema::EmailAddress->insert(
         contact_id => $self->contact_id(),
-        @_,
+        %p,
     );
 }
 
@@ -307,19 +310,25 @@ sub add_website {
 
 sub add_address {
     my $self = shift;
+    my %p    = @_;
+
+    $p{is_preferred} = 1 unless $self->address_count();
 
     return R2::Schema::Address->insert(
         contact_id => $self->contact_id(),
-        @_,
+        %p,
     );
 }
 
 sub add_phone_number {
     my $self = shift;
+    my %p    = @_;
+
+    $p{is_preferred} = 1 unless $self->phone_number_count();
 
     return R2::Schema::PhoneNumber->insert(
         contact_id => $self->contact_id(),
-        @_,
+        %p,
     );
 }
 
@@ -349,10 +358,12 @@ sub add_note {
         ->where ( $schema->table('Donation')->column('contact_id'), '=',
                   Fey::Placeholder->new() );
     #>>>
-    sub donations_total {
+    sub donation_total {
         my $self = shift;
-        my ($date)
-            = pos_validated_list( \@_, { isa => 'DateTime', optional => 1 } );
+        my ($date) = validated_list(
+            \@_,
+            since => { isa => 'DateTime', optional => 1 },
+        );
 
         my $select = $select_base->clone();
 
@@ -371,7 +382,9 @@ sub add_note {
             $self->contact_id(), $select->bind_params()
         );
 
-        return $row ? $row->[0] : 0;
+        # We need to numify the result or we may get a string like "1000.00"
+        # instead of just 1000
+        return $row ? $row->[0] + 0 : 0;
     }
 }
 
