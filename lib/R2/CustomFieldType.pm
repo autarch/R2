@@ -52,15 +52,17 @@ has 'table' => (
 );
 
 has 'default_widget' => (
-    is         => 'ro',
-    isa        => 'R2::Schema::HTMLWidget',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'R2::Schema::HTMLWidget',
+    lazy    => 1,
+    builder => '_build_default_widget',
 );
 
 has 'html_widgets' => (
-    is         => 'ro',
-    isa        => 'ArrayRef[R2::Schema::HTMLWidget]',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'ArrayRef[R2::Schema::HTMLWidget]',
+    lazy    => 1,
+    builder => '_build_html_widgets',
 );
 
 has 'is_select' => (
@@ -70,12 +72,13 @@ has 'is_select' => (
 );
 
 class_has 'Types' => (
-    is         => 'ro',
-    isa        => 'ArrayRef',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    lazy    => 1,
+    builder => '_BuildTypes',
 );
 
-sub _build_Types {
+sub _BuildTypes {
     my $class = shift;
 
     # It'd be more correct to look at the enum in the database, but
