@@ -44,15 +44,17 @@ with 'R2::Role::Schema::DataValidator';
         } => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };
 
     has 'value_count' => (
-        is         => 'ro',
-        isa        => 'Int',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Int',
+        lazy    => 1,
+        biulder => '_build_value_count',
     );
 
     has '_value_count_select' => (
-        is         => 'ro',
-        isa        => 'Fey::SQL::Select',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        lazy    => 1,
+        builder => '_build_value_count_select',
     );
 }
 
@@ -75,7 +77,7 @@ sub _build_value_count {
     return $row ? $row->[0] : 0;
 }
 
-sub _build__value_count_select {
+sub _build_value_count_select {
     my $self = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
