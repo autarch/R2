@@ -95,6 +95,7 @@ with 'R2::Role::Schema::URIMaker';
         my $default = sub {
             my @groups
                 = grep { $_->$meth() } $_[0]->custom_field_groups()->all();
+
             return Fey::Object::Iterator::FromArray->new(
                 classes => 'R2::Schema::CustomFieldGroup',
                 objects => \@groups,
