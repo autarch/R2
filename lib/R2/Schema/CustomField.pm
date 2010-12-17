@@ -89,11 +89,13 @@ sub _build_value_count_select {
     my $count = Fey::Literal::Function->new( 'COUNT',
         $value_table->column('custom_field_id') );
 
-    $select->select($count)->from($value_table)->where(
-        $value_table->column('custom_field_id'),
-        '=', $self->custom_field_id()
-    );
-
+    #<<<
+    $select
+        ->select($count)
+        ->from  ($value_table)
+        ->where( $value_table->column('custom_field_id'),
+                 '=', $self->custom_field_id() );
+    #>>>
     return $select;
 }
 
