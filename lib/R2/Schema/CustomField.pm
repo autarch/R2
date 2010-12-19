@@ -35,19 +35,23 @@ with 'R2::Role::Schema::DataValidator';
         handles => { widget_name => 'name' },
     );
 
-    transform 'type' =>
-        inflate { R2::CustomFieldType->new( type => $_[1] ) } => handles {
-        clean_value => 'clean_value',
-        is_select   => 'is_select',
-        type_table  => 'table',
-        type_name   => 'type',
-        } => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };
+    #<<<
+    transform 'type'
+        => inflate { R2::CustomFieldType->new( type => $_[1] ) }
+        => handles {
+            clean_value => 'clean_value',
+            is_select   => 'is_select',
+            type_table  => 'table',
+            type_name   => 'type',
+        }
+        => deflate { blessed $_[1] ? $_[1]->type() : $_[1] };
+    #>>>
 
     has 'value_count' => (
         is      => 'ro',
         isa     => 'Int',
         lazy    => 1,
-        biulder => '_build_value_count',
+        builder => '_build_value_count',
     );
 
     has '_value_count_select' => (
