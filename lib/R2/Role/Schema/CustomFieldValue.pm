@@ -33,11 +33,13 @@ role {
 
     my $delete = R2::Schema->SQLFactoryClass()->new_delete();
 
-    $delete->from($table)
-        ->where( $table->column('custom_field_id'), '=',
-        Fey::Placeholder->new() )
-        ->and( $table->column('contact_id'), '=', Fey::Placeholder->new() );
-
+    #<<<
+    $delete->from ($table)
+           ->where( $table->column('custom_field_id'),
+                    '=', Fey::Placeholder->new() )
+           ->and  ( $table->column('contact_id'),
+                    '=', Fey::Placeholder->new() );
+    #>>>
     method 'replace_value_for_contact' => sub {
         my $class = shift;
         my ( $field, $contact, $value ) = validated_list(
