@@ -78,9 +78,9 @@ sub _recreate_database {
     require R2::DatabaseManager;
 
     my $man = R2::DatabaseManager->new(
-        db_name  => 'R2Test',
-        drop  => 1,
-        quiet => 1,
+        db_name => 'R2Test',
+        drop    => 1,
+        quiet   => 1,
     );
 
     $man->update_or_install_db();
