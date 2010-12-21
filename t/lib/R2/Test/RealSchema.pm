@@ -77,14 +77,13 @@ sub _recreate_database {
 
     require R2::DatabaseManager;
 
-    my $inst = R2::DatabaseManager->new(
-        name  => 'R2Test',
+    my $man = R2::DatabaseManager->new(
+        db_name  => 'R2Test',
         drop  => 1,
         quiet => 1,
     );
 
-    $inst->_drop_and_create_db();
-    $inst->_build_db();
+    $man->update_or_install_db();
 }
 
 sub _clean_tables {
