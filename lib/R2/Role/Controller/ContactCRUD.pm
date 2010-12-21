@@ -314,8 +314,10 @@ sub _make_insert_sub {
         }
 
         for my $pair ( @{$custom_fields} ) {
-            $pair->[0]->set_value_for_contact( contact => $contact,
-                value => $pair->[1] );
+            $pair->[0]->set_value_for_contact(
+                contact => $contact,
+                value   => $pair->[1]
+            );
         }
 
         return $thing;
@@ -438,8 +440,10 @@ sub _make_update_sub {
         }
 
         for my $pair ( @{$custom_fields} ) {
-            $pair->[0]->set_value_for_contact( contact => $contact,
-                value => $pair->[1] );
+            $pair->[0]->set_value_for_contact(
+                contact => $contact,
+                value   => $pair->[1]
+            );
         }
     };
 }
