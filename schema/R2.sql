@@ -1,6 +1,6 @@
 SET CLIENT_MIN_MESSAGES = ERROR;
 
-CREATE DOMAIN email_address AS VARCHAR(255)
+CREATE DOMAIN email_address AS citext
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
 -- Is there a way to ensure that this table only ever has one row?
@@ -200,7 +200,7 @@ CREATE TABLE "CustomFieldSelectOption" (
        custom_field_select_option_id INT8    PRIMARY KEY,
        custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
-       value                    VARCHAR(255) NOT NULL
+       value                    TEXT         NOT NULL
 --       CONSTRAINT custom_field_id_display_order_ck
 --                  UNIQUE ( custom_field_id, display_order )
 --                  INITIALLY DEFERRED
