@@ -183,4 +183,101 @@ my $contact = R2::Schema::Person->insert(
     );
 }
 
+{
+    $account->update_or_add_custom_field_groups(
+        {},
+        [
+            {
+                name                    => 'Group 1',
+                applies_to_person       => 1,
+                applies_to_household    => 0,
+                applies_to_organization => 1,
+            }, {
+                name                    => 'Group 2',
+                applies_to_person       => 0,
+                applies_to_household    => 1,
+                applies_to_organization => 1,
+            }, {
+                name                    => 'Group 3',
+                applies_to_person       => 1,
+                applies_to_household    => 1,
+                applies_to_organization => 0,
+            },
+        ],
+    );
+
+    my @groups = $account->custom_field_groups()->all();
+
+    $groups[0]->update_or_add_custom_fields(
+        {},
+        [
+            {
+                label       => 'Field 1-1',
+                description => 'custom field 1-1',
+                type        => 'Integer',
+            }, {
+                label       => 'Field 1-2',
+                description => 'custom field 1-2',
+                type        => 'Decimal',
+            },
+        ]
+    );
+
+    $groups[1]->update_or_add_custom_fields(
+        {},
+        [
+            {
+                label       => 'Field 2-1',
+                description => 'custom field 2-1',
+                type        => 'Date',
+            }, {
+                label       => 'Field 2-2',
+                description => 'custom field 2-2',
+                type        => 'DateTime',
+            }, {
+                label       => 'Field 2-3',
+                description => 'custom field 2-3',
+                type        => 'Text',
+            },
+        ]
+    );
+
+    $groups[2]->update_or_add_custom_fields(
+        {},
+        [
+            {
+                label       => 'Field 3-1',
+                description => 'custom field 3-1',
+                type        => 'File',
+            }, {
+                label       => 'Field 3-2',
+                description => 'custom field 3-2',
+                type        => 'SingleSelect',
+            }, {
+                label       => 'Field 3-3',
+                description => 'custom field 3-3',
+                type        => 'MultiSelect',
+            },
+        ]
+    );
+
+    ok(
+        !$contact->has_custom_field_values_for_group($_),
+        'contact has no custom field values for group - ' . $_->name()
+    ) for @groups;
+
+    $contact->_clear_custom_field_values();
+
+    my @fields1 = $groups[0]->custom_fields()->all();
+    $fields1[0]->set_value_for_contact(
+        contact => $contact,
+        value   => 42,
+    );
+
+    ok(
+        $contact->has_custom_field_values_for_group( $groups[0] ),
+        'contact has a custom field value for Group 1'
+    );
+}
+
 done_testing();

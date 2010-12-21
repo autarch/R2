@@ -21,7 +21,7 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-use MooseX::Params::Validate qw( validated_list );
+use MooseX::Params::Validate qw( pos_validated_list validated_list );
 
 with 'R2::Role::Schema::DataValidator';
 with 'R2::Role::Schema::URIMaker';
@@ -217,6 +217,7 @@ with 'R2::Role::Schema::URIMaker';
             _set_custom_field_value => 'set',
         },
         init_arg => undef,
+        clearer  => '_clear_custom_field_values',
     );
 }
 
