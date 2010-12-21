@@ -339,7 +339,7 @@ CREATE TABLE "OrganizationMember" (
        PRIMARY KEY ( organization_id, person_id )
 );
 
--- It's tepmting to make the email address unique, but contacts could
+-- It's tempting to make the email address unique, but contacts could
 -- share an email address, especially in the case of a household and a
 -- person in the household, or an organization.
 CREATE TABLE "EmailAddress" (
