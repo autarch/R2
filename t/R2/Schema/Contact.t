@@ -294,4 +294,50 @@ my $contact = R2::Schema::Person->insert(
     );
 }
 
+{
+    my $contact = R2::Schema::Person->insert(
+        account_id => $account->account_id(),
+        first_name => 'Jane',
+        user       => R2::Schema::User->SystemUser(),
+    )->contact();
+
+    my @history = $contact->history()->all();
+
+    is(
+        scalar @history, 1,
+        'contact has one history entry',
+    );
+
+    is(
+        $history[0]->type_name(),
+        'Created',
+        'history is a Created entry',
+    );
+
+    is(
+        $history[0]->user_id(),
+        R2::Schema::User->SystemUser()->user_id(),
+        'user_id for history belongs to R2 System User'
+    );
+
+    my $email = $contact->add_email_address(
+        email_address => 'foo@example.com',
+        user          => R2::Schema::User->SystemUser(),
+    );
+
+    $email->update(
+        email_address => 'bar@example.com',
+        user          => R2::Schema::User->SystemUser(),
+    );
+
+    $email->delete( user => R2::Schema::User->SystemUser() );
+
+    my @history = $contact->history()->all();
+
+    is(
+        scalar @history, 4,
+        'contact has four history entries',
+    );
+}
+
 done_testing();

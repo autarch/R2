@@ -23,7 +23,13 @@ with 'R2::Role::Schema::URIMaker';
 
     has_table( $schema->table('ContactHistory') );
 
-    has_one type => ( table => $schema->table('ContactHistoryType') );
+    has_one type => (
+        table   => $schema->table('ContactHistoryType'),
+        handles => {
+            type_name        => 'system_name',
+            type_description => 'description',
+        }
+    );
 
     has_one $schema->table('User');
 

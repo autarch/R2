@@ -174,6 +174,9 @@ my $_make_delete_wrapper = sub {
             sub {
                 my %history_p;
                 while ( my ( $key, $meth ) = each %{$history_attrs} ) {
+                    # Trying to insert a primary key that no longer exists
+                    # causes an FK violation.
+                    next if $in_pk{$key};
                     $history_p{$key} = $self->$meth();
                 }
 

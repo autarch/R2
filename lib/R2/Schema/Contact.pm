@@ -201,7 +201,7 @@ with 'R2::Role::Schema::URIMaker';
 
     has 'history' => (
         is      => 'ro',
-        isa     => 'Fey::Object::Iterator::FromSelect::Caching',
+        isa     => 'Fey::Object::Iterator::FromSelect',
         lazy    => 1,
         builder => '_build_history',
     );
@@ -485,9 +485,8 @@ sub _build_history {
 
     my $dbh = $self->_dbh($select);
 
-    return Fey::Object::Iterator::FromSelect::Caching->new(
-        classes =>
-            [qw( R2::Schema::ContactHistory R2::Schema::ContactHistoryType )],
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::ContactHistory )],
         dbh         => $dbh,
         select      => $select,
         bind_params => [ $self->contact_id() ],
