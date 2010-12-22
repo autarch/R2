@@ -15,6 +15,7 @@ use R2::Types qw( Str );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _require_username_or_email )] };
@@ -50,6 +51,13 @@ has datetime_format => (
     init_arg => undef,
     lazy     => 1,
     default  => sub { $_[0]->_dt_locale()->datetime_format_medium() },
+);
+
+class_has SystemUser => (
+    is      => 'ro',
+    isa     => __PACKAGE__,
+    lazy    => 1,
+    builder => '_FindOrCreateSystemUser',
 );
 
 {
@@ -102,12 +110,13 @@ around 'insert' => sub {
                 email_address => $email_address,
                 contact_id    => $person->person_id(),
                 is_preferred  => 1,
+                user          => $p{user},
             );
         }
 
         my $user = $class->$orig(
             %user_p,
-            user_id  => $person->person_id(),
+            person_id => $person->person_id(),
         );
 
         $user->_set_person($person);
@@ -176,6 +185,28 @@ sub check_password {
         $self->password() );
 
     return $pass->match($pw);
+}
+
+sub EnsureRequiredUsersExist {
+    my $class = shift;
+
+    $class->_FindOrCreateSystemUser();
+}
+
+sub _FindOrCreateSystemUser {
+    my $class = shift;
+
+    my $user = $class->new( username => 'R2 System User' );
+    return $user if $user;
+
+    # Hack to avoid our around wrapper.
+    return $class->Fey::Object::Table::insert(
+        user_id        => -1,
+        username       => 'R2 System User',
+        password       => $UnusablePW,
+        is_disabled    => 1,
+        is_system_user => 1,
+    );
 }
 
 sub format_date {

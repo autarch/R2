@@ -7,7 +7,9 @@ use namespace::autoclean;
 use DateTime::Format::Strptime;
 use List::AllUtils qw( first );
 use R2::Schema;
-use R2::Schema::Contact;
+# Can't load this here because of load order issues with
+# R2::Role::Schema::HistoryRecorder.
+#use R2::Schema::Contact;
 
 use Fey::ORM::Table;
 

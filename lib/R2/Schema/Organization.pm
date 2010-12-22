@@ -50,6 +50,8 @@ with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
         { membership_table => $schema->table('OrganizationMember') };
 }
 
+with 'R2::Role::Schema::HistoryRecorder';
+
 sub display_name {
     return $_[0]->name();
 }

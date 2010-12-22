@@ -13,7 +13,6 @@ use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _valid_email_address )] };
-with 'R2::Role::Schema::HistoryRecorder';
 
 {
     my $schema = R2::Schema->Schema();
@@ -24,6 +23,8 @@ with 'R2::Role::Schema::HistoryRecorder';
 
     has_one( $schema->table('Contact') );
 }
+
+with 'R2::Role::Schema::HistoryRecorder';
 
 sub _valid_email_address {
     my $self = shift;

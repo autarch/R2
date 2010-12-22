@@ -99,6 +99,7 @@ sub make_account {
         last_name     => $last_name,
         gender        => 'male',
         account_id    => $account->account_id(),
+        user          => R2::Schema::User->SystemUser(),
     );
 
     $account->add_user(

@@ -33,6 +33,8 @@ with 'R2::Role::Schema::URIMaker';
     has_one( $schema->table('Contact') );
 }
 
+with 'R2::Role::Schema::HistoryRecorder';
+
 sub _validate_amount {
     my $self = shift;
     my $p    = shift;
@@ -100,6 +102,8 @@ sub _base_uri_path {
         . '/donation/'
         . $self->donation_id();
 }
+
+sub summary { $_[0]->amount()  . ' from ' . $_[0]->contact()->real_contact()->full_name() }
 
 __PACKAGE__->meta()->make_immutable();
 

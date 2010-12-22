@@ -8,8 +8,6 @@ use R2::Schema::Contact;
 
 use MooseX::Role::Parameterized;
 
-with 'R2::Role::Schema::HistoryRecorder';
-
 # Can't use Fey::ORM::Table in a role yet
 #
 # has_one 'contact' => ...

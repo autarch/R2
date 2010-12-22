@@ -11,8 +11,6 @@ use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
 
-with 'R2::Role::Schema::HistoryRecorder';
-
 {
     my $schema = R2::Schema->Schema();
 
@@ -23,6 +21,8 @@ with 'R2::Role::Schema::HistoryRecorder';
     has_one( $schema->table('Organization') );
     has_one( $schema->table('Person') );
 }
+
+with 'R2::Role::Schema::HistoryRecorder';
 
 sub contact_id_for_history {
     my $self = shift;

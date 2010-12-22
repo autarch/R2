@@ -8,6 +8,7 @@ use R2::Test::RealSchema;
 
 use R2::Schema::Account;
 use R2::Schema::Contact;
+use R2::Schema::User;
 
 my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
@@ -24,6 +25,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         my $contact = $real_class->insert(
             %name,
             account_id => $account->account_id(),
+            user       => R2::Schema::User->SystemUser(),
         )->contact();
 
         my $real = $contact->real_contact();
@@ -38,6 +40,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 my $contact = R2::Schema::Person->insert(
     account_id => $account->account_id(),
     first_name => 'Jane',
+    user       => R2::Schema::User->SystemUser(),
 )->contact();
 
 {
@@ -51,6 +54,7 @@ my $contact = R2::Schema::Person->insert(
         payment_type_id    => $payment_type->payment_type_id(),
         amount             => 42,
         donation_date      => '2008-01-01',
+        user               => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -61,7 +65,10 @@ my $contact = R2::Schema::Person->insert(
 }
 
 {
-    $contact->add_email_address( email_address => 'dave@example.com' );
+    $contact->add_email_address(
+        email_address => 'dave@example.com',
+        user          => R2::Schema::User->SystemUser(),
+    );
 
     is(
         $contact->email_address_count(),
@@ -77,7 +84,10 @@ my $contact = R2::Schema::Person->insert(
 }
 
 {
-    $contact->add_website( uri => 'http://example.com' );
+    $contact->add_website(
+        uri  => 'http://example.com',
+        user => R2::Schema::User->SystemUser(),
+    );
 
     is(
         $contact->website_count(),
@@ -95,6 +105,7 @@ my $contact = R2::Schema::Person->insert(
         city            => 'Minneapolis',
         region          => 'MN',
         iso_code        => 'us',
+        user            => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -116,6 +127,7 @@ my $contact = R2::Schema::Person->insert(
     $contact->add_phone_number(
         phone_number_type_id => $phone_number_type->phone_number_type_id(),
         phone_number         => '612-555-1123',
+        user                 => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -159,6 +171,7 @@ my $contact = R2::Schema::Person->insert(
         payment_type_id    => $payment_type->payment_type_id(),
         amount             => 500,
         donation_date      => '2009-01-01',
+        user               => R2::Schema::User->SystemUser(),
     );
 
     $contact->add_donation(
@@ -167,6 +180,7 @@ my $contact = R2::Schema::Person->insert(
         payment_type_id    => $payment_type->payment_type_id(),
         amount             => 501,
         donation_date      => '2010-01-01',
+        user               => R2::Schema::User->SystemUser(),
     );
 
     is(

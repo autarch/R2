@@ -13,7 +13,6 @@ use R2::Util qw( string_is_empty );
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator';
-with 'R2::Role::Schema::HistoryRecorder';
 
 {
     my $schema = R2::Schema->Schema();
@@ -44,6 +43,8 @@ with 'R2::Role::Schema::HistoryRecorder';
         clearer => '_clear_summary',
     );
 }
+
+with 'R2::Role::Schema::HistoryRecorder';
 
 after update => sub {
     my $self = shift;

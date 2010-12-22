@@ -12,6 +12,7 @@ use R2::Schema::Account;
 use R2::Schema::Address;
 use R2::Schema::AddressType;
 use R2::Schema::Person;
+use R2::Schema::User;
 
 my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
@@ -76,12 +77,14 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
     my $person = R2::Schema::Person->insert(
         first_name => 'Joe',
         account_id => $account->account_id(),
+        user       => R2::Schema::User->SystemUser(),
     );
 
     $person->contact()->add_address(
         city            => 'Minneapolis',
         address_type_id => $type->address_type_id(),
         iso_code        => 'us',
+        user            => R2::Schema::User->SystemUser(),
     );
 
     $type->update(

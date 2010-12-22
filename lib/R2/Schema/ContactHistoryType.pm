@@ -87,8 +87,18 @@ sub _FindOrCreateType {
             },
 
             {
+                system_name => 'DeleteHouseholdMember',
+                description => 'A person was removed from this household',
+            },
+
+            {
                 system_name => 'AddOrganizationMember',
                 description => 'A person was added to this organization',
+            },
+
+            {
+                system_name => 'DeleteOrganizationMember',
+                description => 'A person was removed from this organization',
             },
 
             {
@@ -151,6 +161,21 @@ sub _FindOrCreateType {
             {
                 system_name => 'ModifyPhoneNumber',
                 description => 'A phone number for the contact was modified',
+            },
+
+            {
+                system_name => 'AddDonation',
+                description => 'A new donation was added for the contact',
+            },
+
+            {
+                system_name => 'DeleteDonation',
+                description => 'A donation for the contact was deleted',
+            },
+
+            {
+                system_name => 'ModifyDonation',
+                description => 'A donation for the contact was modified',
             },
         );
     }

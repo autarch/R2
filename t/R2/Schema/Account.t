@@ -14,6 +14,7 @@ use R2::Schema::Domain;
 use R2::Schema::Role;
 use R2::Schema::User;
 
+my $user   = R2::Schema::User->SystemUser();
 my $domain = R2::Schema::Domain->DefaultDomain();
 
 my $account;
@@ -62,6 +63,7 @@ my $account;
         email_address => 'bob@example.com',
         password      => 'foo',
         account_id    => $account->account_id(),
+        user          => $user,
     );
 
     $account->add_user(
@@ -80,6 +82,7 @@ my $account;
         email_address => 'lisa@example.com',
         password      => 'foo',
         account_id    => $account->account_id(),
+        user          => $user,
     );
 
     my $role = R2::Schema::Role->Member();

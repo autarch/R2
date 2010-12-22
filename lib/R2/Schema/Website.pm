@@ -15,7 +15,6 @@ use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _validate_and_canonicalize_uri )] };
-with 'R2::Role::Schema::HistoryRecorder';
 
 {
     my $schema = R2::Schema->Schema();
@@ -30,6 +29,8 @@ with 'R2::Role::Schema::HistoryRecorder';
         deflate { blessed $_[1] ? $_[1]->canonical() . '' : $_[1] },
         inflate { defined $_[1] ? URI->new( $_[1] ) : $_[1] };
 }
+
+with 'R2::Role::Schema::HistoryRecorder';
 
 sub _validate_and_canonicalize_uri {
     my $self = shift;

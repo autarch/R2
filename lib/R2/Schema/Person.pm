@@ -84,6 +84,8 @@ with 'R2::Role::Schema::ActsAsContact' =>
     );
 }
 
+with 'R2::Role::Schema::HistoryRecorder';
+
 sub _require_some_name {
     my $self      = shift;
     my $p         = shift;

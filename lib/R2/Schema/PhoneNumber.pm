@@ -11,7 +11,6 @@ use R2::Schema;
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator';
-with 'R2::Role::Schema::HistoryRecorder';
 
 {
     my $schema = R2::Schema->Schema();
@@ -24,6 +23,8 @@ with 'R2::Role::Schema::HistoryRecorder';
 
     has_one 'type' => ( table => $schema->table('PhoneNumberType') );
 }
+
+with 'R2::Role::Schema::HistoryRecorder';
 
 sub summary { $_[0]->type()->name() . q{: } . $_[0]->phone_number() }
 

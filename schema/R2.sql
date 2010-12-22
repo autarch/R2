@@ -8,9 +8,11 @@ CREATE TABLE "Version" (
        version                  INTEGER         PRIMARY KEY
 );
 
+CREATE UNIQUE INDEX only_one_version_row ON "Version" ((TRUE));
+
 CREATE TABLE "User" (
        -- will be the same as a person_id
-       user_id                  INT8            PRIMARY KEY,
+       user_id                  SERIAL8         PRIMARY KEY,
        username                 TEXT            UNIQUE NOT NULL,
        -- RFC2307 Blowfish crypt
        password                 VARCHAR(67)     NOT NULL,
@@ -20,6 +22,8 @@ CREATE TABLE "User" (
        last_modified_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin          BOOLEAN         DEFAULT FALSE,
        is_disabled              BOOLEAN         DEFAULT FALSE,
+       is_system_user           BOOLEAN         DEFAULT FALSE,
+       person_id                INT8            NULL,
        CONSTRAINT valid_username CHECK ( username != '' ),
        CONSTRAINT valid_password CHECK ( password != '' )
 );
@@ -486,8 +490,8 @@ CREATE TABLE "Session" (
 );
 
 
-ALTER TABLE "User" ADD CONSTRAINT "User_user_id"
-  FOREIGN KEY ("user_id") REFERENCES "Person" ("person_id")
+ALTER TABLE "User" ADD CONSTRAINT "User_person_id"
+  FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "Account" ADD CONSTRAINT "Account_domain_id"
