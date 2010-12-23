@@ -158,12 +158,13 @@ sub _MakeSelectAllSQL {
 
     my $schema = R2::Schema->Schema();
 
-    $select->select( $schema->table('Domain') )
-        ->from( $schema->tables('Domain') )
+    #<<<
+    $select
+        ->select( $schema->table('Domain') )
+        ->from  ( $schema->tables('Domain') )
         ->order_by( $schema->table('Domain')->column('web_hostname') );
-
+    #>>>
     return $select;
-
 }
 
 sub _build_uri_params {
