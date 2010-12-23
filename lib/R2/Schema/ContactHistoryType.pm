@@ -24,17 +24,15 @@ use MooseX::ClassAttribute;
         @{ $schema->table('ContactHistory')->primary_key() }
     );
 
-    $select->select($count)->from( $schema->tables('ContactHistory'), )
-        ->where(
-        $schema->table('ContactHistory')->column('contact_history_type_id'),
-        '=', Fey::Placeholder->new()
-        );
+    #<<<
+    $select
+        ->select($count)
+        ->from  ( $schema->tables('ContactHistory'), )
+        ->where( $schema->table('ContactHistory')->column('contact_history_type_id'),
+                 '=', Fey::Placeholder->new() );
+    #>>>
 
-    has 'history_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
+    query history_count => (
         select      => $select,
         bind_params => sub { $_[0]->contact_history_type_id() },
     );
