@@ -5,9 +5,11 @@ use warnings;
 use namespace::autoclean;
 
 use DateTime::Format::Strptime;
+use Number::Format qw( format_number );
 use R2::Schema::DonationCampaign;
 use R2::Schema::DonationSource;
 use R2::Schema;
+use R2::Types qw( Str );
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( looks_like_number );
 
@@ -31,6 +33,14 @@ with 'R2::Role::Schema::URIMaker';
     has_one( $schema->table('PaymentType') );
 
     has_one( $schema->table('Contact') );
+
+    has formatted_amount => (
+        is       => 'ro',
+        isa      => Str,
+        init_arg => undef,
+        lazy     => 1,
+        builder  => '_build_formatted_amount',
+    );
 }
 
 with 'R2::Role::Schema::HistoryRecorder';
@@ -53,11 +63,11 @@ sub _validate_amount {
             = "The amount you specified ($p->{amount}) does not seem to be a number.";
     }
     elsif ( $p->{amount} <= 0 ) {
-        $msg = "You cannot have a negative amount for a donation.";
+        $msg = 'The amount for a donation cannot be negative.';
     }
     elsif ( sprintf( '%.2f', $p->{amount} ) != $p->{amount} ) {
         $msg
-            = "You cannot have more than two digits to the right of the decimal point.";
+            = 'You cannot have more than two digits to the right of the decimal point.';
     }
 
     return unless $msg;
@@ -95,6 +105,12 @@ sub _valid_donation_date {
     return;
 }
 
+sub _build_formatted_amount {
+    my $self = shift;
+
+    return format_number( $self->amount(), 2, 'trailing zeroes' );
+}
+
 sub _base_uri_path {
     my $self = shift;
 
@@ -104,7 +120,12 @@ sub _base_uri_path {
         . $self->donation_id();
 }
 
-sub summary { $_[0]->amount()  . ' from ' . $_[0]->contact()->real_contact()->full_name() }
+sub summary {
+    my $self = shift;
+
+    return $self->formatted_amount() . ' from '
+        . $self->contact()->real_contact()->full_name();
+}
 
 __PACKAGE__->meta()->make_immutable();
 
