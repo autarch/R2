@@ -18,9 +18,9 @@
   </li>
   <li>
     <a href="<% $account->uri( view => 'donation_settings' ) %>"
-       title="Donation sources, targets, etc.">Donation settings</a>
+       title="Donation sources, campaigns, etc.">Donation settings</a>
     <p>
-      Donation sources and targets, as well as allowed payment types.
+      Donation sources and campaigns, as well as allowed payment types.
     </p>
   </li>
   <li>

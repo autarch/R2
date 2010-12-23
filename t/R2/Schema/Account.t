@@ -27,7 +27,7 @@ my $account;
 
     for my $meth (
         qw(
-        donation_sources donation_targets payment_types
+        donation_sources donation_campaigns payment_types
         address_types phone_number_types
         messaging_providers
         contact_note_types
@@ -125,12 +125,12 @@ my $account;
 }
 
 {
-    my %targets
-        = map { $_->name() => $_ } $account->donation_targets()->all();
+    my %campaigns
+        = map { $_->name() => $_ } $account->donation_campaigns()->all();
 
-    $account->update_or_add_donation_targets(
+    $account->update_or_add_donation_campaigns(
         {
-            $targets{'General Fund'}->donation_target_id() =>
+            $campaigns{'General Fund'}->donation_campaign_id() =>
                 { name => 'Pyramid Scheme' },
         },
         [
@@ -140,9 +140,9 @@ my $account;
     );
 
     is_deeply(
-        [ map { $_->name() } $account->donation_targets()->all() ],
+        [ map { $_->name() } $account->donation_campaigns()->all() ],
         [ 'Pyramid Scheme', 'Tofu Party Fund', 'World Domination Fund' ],
-        'got expected donation targets after update_or_add_donation_targets'
+        'got expected donation campaigns after update_or_add_donation_campaigns'
     );
 }
 

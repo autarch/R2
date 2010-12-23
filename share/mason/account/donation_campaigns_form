@@ -1,0 +1,62 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<p>
+<a href="<% $account->uri( view => 'donation_settings' ) %>" title="Donation settings">back to donation settings</a>
+</p>
+
+<& /lib/help-text/donation-campaign.mas &>
+
+<&| /lib/filter/form.mas &>
+<form action="<% $account->uri( view => 'donation_campaign' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Donation Campaigns</legend>
+% while ( my $campaign = $campaigns->next() ) {
+      <input class="text medium no-label" type="text" name="donation_campaign_name_<% $campaign->donation_campaign_id() %>"
+             value="<% $campaign->name() %>" />
+%   if ( ! $campaign->is_deletable() ) {
+      <div class="help-text">
+        <p>
+          You can change this campaign's name, but it cannot be deleted because it is still associated with <% $campaign->donation_count() %> <% PL_N( 'donation', $campaign->donation_count() ) %>.
+        </p>
+      </div>
+%   }
+% }
+
+    <h3>Add New Campaigns</h3>
+
+    <div class="JS-repeatable-group JS-repeatable-group-donation-campaign">
+      <input class="text medium no-label" type="text" name="donation_campaign_name_new1"
+             id="donation_campaign_name_new1" />
+    </div>
+
+    <a href="#" class="add-another" id="donation-campaign-repeater">Add another campaign</a>
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+  
+</form>
+</&>
+
+
+<%args>
+$account
+</%args>
+
+<%init>
+my $campaigns = $account->donation_campaigns();
+</%init>
+
+<%method title>
+Donation campaigns for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

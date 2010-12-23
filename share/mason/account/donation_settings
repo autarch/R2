@@ -16,10 +16,10 @@
     <& /lib/help-text/donation-source.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'donation_targets_form' ) %>"
-       title="Edit donation targets">Edit donation targets</a>
+    <a href="<% $account->uri( view => 'donation_campaigns_form' ) %>"
+       title="Edit donation campaigns">Edit donation campaigns</a>
 
-    <& /lib/help-text/donation-target.mas &>
+    <& /lib/help-text/donation-campaign.mas &>
   </li>
   <li>
     <a href="<% $account->uri( view => 'payment_types_form' ) %>"

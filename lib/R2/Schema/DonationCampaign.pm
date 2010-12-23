@@ -1,4 +1,4 @@
-package R2::Schema::DonationTarget;
+package R2::Schema::DonationCampaign;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Fey::ORM::Table;
 
     has_policy 'R2::Schema::Policy';
 
-    has_table( $schema->table('DonationTarget') );
+    has_table( $schema->table('DonationCampaign') );
 
     has_one( $schema->table('Account') );
 
@@ -24,7 +24,7 @@ use Fey::ORM::Table;
 
     query donation_count => (
         select      => __PACKAGE__->_BuildDonationCountSelect(),
-        bind_params => sub { $_[0]->donation_target_id() },
+        bind_params => sub { $_[0]->donation_campaign_id() },
     );
 }
 
@@ -54,7 +54,7 @@ sub _BuildDonationCountSelect {
     $select
         ->select($count)
         ->from( $schema->tables('Donation') )
-        ->where( $schema->table('Donation')->column('donation_target_id'),
+        ->where( $schema->table('Donation')->column('donation_campaign_id'),
                  '=', Fey::Placeholder->new() );
     #>>>
     return $select;

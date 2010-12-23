@@ -127,32 +127,32 @@ sub donation_source_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
 }
 
-sub donation_targets_form : Chained('_set_account') : PathPart('donation_targets_form') : Args(0) {
+sub donation_campaigns_form : Chained('_set_account') : PathPart('donation_campaigns_form') : Args(0) {
 }
 
-sub donation_target : Chained('_set_account') : PathPart('donation_target') : Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_campaign : Chained('_set_account') : PathPart('donation_campaign') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub donation_target_POST : Private {
+sub donation_campaign_POST : Private {
     my $self = shift;
     my $c    = shift;
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->donation_targets();
+    my ( $existing, $new ) = $c->request()->donation_campaigns();
 
-    eval { $account->update_or_add_donation_targets( $existing, $new ); };
+    eval { $account->update_or_add_donation_campaigns( $existing, $new ); };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
-            uri       => $account->uri( view => 'donation_targets_form' ),
+            uri       => $account->uri( view => 'donation_campaigns_form' ),
             form_data => $c->request()->params(),
         );
     }
 
     $c->session_object()
-        ->add_message( 'The donation targets for '
+        ->add_message( 'The donation campaigns for '
             . $account->name()
             . ' have been updated' );
 

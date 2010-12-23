@@ -82,14 +82,14 @@ sub donation_sources {
     return ( \%existing, \@new );
 }
 
-sub donation_targets {
+sub donation_campaigns {
     my $self = shift;
 
     my $params = $self->params();
 
     my %existing = (
         map {
-            /^donation_target_name_(\d+)/
+            /^donation_campaign_name_(\d+)/
                 ? ( $1 => { name => $params->{$_} } )
                 : ()
             }
@@ -100,7 +100,7 @@ sub donation_targets {
         map { +{ name => $_ } }
             grep { !string_is_empty($_) }
             map  { $params->{$_} }
-            grep {/^donation_target_name_new/}
+            grep {/^donation_campaign_name_new/}
             keys %{$params}
     );
 

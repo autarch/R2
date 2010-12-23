@@ -19,7 +19,7 @@ use R2::Schema::Country;
 use R2::Schema::CustomFieldGroup;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
-use R2::Schema::DonationTarget;
+use R2::Schema::DonationCampaign;
 use R2::Schema::Household;
 use R2::Schema::Organization;
 use R2::Schema::PaymentType;
@@ -51,10 +51,10 @@ with 'R2::Role::Schema::URIMaker';
         order_by => [ $schema->table('DonationSource')->column('name') ],
     );
 
-    has_many 'donation_targets' => (
-        table    => $schema->table('DonationTarget'),
+    has_many 'donation_campaigns' => (
+        table    => $schema->table('DonationCampaign'),
         cache    => 1,
-        order_by => [ $schema->table('DonationTarget')->column('name') ],
+        order_by => [ $schema->table('DonationCampaign')->column('name') ],
     );
 
     has_many 'payment_types' => (
@@ -179,7 +179,7 @@ sub _initialize {
 
     R2::Schema::DonationSource->CreateDefaultsForAccount($self);
 
-    R2::Schema::DonationTarget->CreateDefaultsForAccount($self);
+    R2::Schema::DonationCampaign->CreateDefaultsForAccount($self);
 
     R2::Schema::AccountMessagingProvider->CreateDefaultsForAccount($self);
 
@@ -268,7 +268,7 @@ sub update_or_add_donation_sources {
     );
 }
 
-sub update_or_add_donation_targets {
+sub update_or_add_donation_campaigns {
     my $self     = shift;
     my $existing = shift;
     my $new      = shift;
@@ -276,7 +276,7 @@ sub update_or_add_donation_targets {
     $self->_update_or_add_things(
         $existing,
         $new,
-        'donation_target',
+        'donation_campaign',
         'name',
     );
 }

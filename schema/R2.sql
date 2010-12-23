@@ -453,7 +453,7 @@ CREATE TABLE "Donation" (
        is_recurring       BOOL               NOT NULL DEFAULT FALSE,
        receipt_sent       BOOL               NOT NULL DEFAULT FALSE,
        donation_source_id INT8               NOT NULL,
-       donation_target_id INT8               NOT NULL,
+       donation_campaign_id  INT8            NOT NULL,
        payment_type_id    INT8               NOT NULL,
        external_id        TEXT               UNIQUE NULL,
        note               TEXT               NOT NULL DEFAULT '',
@@ -469,8 +469,8 @@ CREATE TABLE "DonationSource" (
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
-CREATE TABLE "DonationTarget" (
-       donation_target_id SERIAL8            PRIMARY KEY,
+CREATE TABLE "DonationCampaign" (
+       donation_campaign_id  SERIAL8         PRIMARY KEY,
        name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' )
@@ -782,11 +782,11 @@ ALTER TABLE "DonationSource" ADD CONSTRAINT "DonationSource_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_target_id"
-  FOREIGN KEY ("donation_target_id") REFERENCES "DonationTarget" ("donation_target_id")
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_campaign_id"
+  FOREIGN KEY ("donation_campaign_id") REFERENCES "DonationCampaign" ("donation_campaign_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "DonationTarget" ADD CONSTRAINT "DonationTarget_account_id"
+ALTER TABLE "DonationCampaign" ADD CONSTRAINT "DonationCampaign_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -5,8 +5,8 @@ use warnings;
 use namespace::autoclean;
 
 use DateTime::Format::Strptime;
+use R2::Schema::DonationCampaign;
 use R2::Schema::DonationSource;
-use R2::Schema::DonationTarget;
 use R2::Schema;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( looks_like_number );
@@ -26,7 +26,7 @@ with 'R2::Role::Schema::URIMaker';
 
     has_one source => ( table => $schema->table('DonationSource') );
 
-    has_one target => ( table => $schema->table('DonationTarget') );
+    has_one campaign => ( table => $schema->table('DonationCampaign') );
 
     has_one( $schema->table('PaymentType') );
 
@@ -41,6 +41,7 @@ sub _validate_amount {
 
     # remove any currency symbols and such
     $p->{amount} =~ s/^[^\d\-](\d)/$1/;
+    $p->{amount} =~ s/,//g;
 
     # will be caught later
     return if string_is_empty( $p->{amount} );

@@ -11,7 +11,7 @@
       <th>Gift</th>
       <th>Trans.</th>
       <th>Source</th>
-      <th>Target</th>
+      <th>Campaign</th>
       <th>Payment</th>
       <th>Receipt</th>
 %   if ($can_edit_donations) {
@@ -28,7 +28,7 @@
       <td>$<% $donation->value_for_donor() %></td>
       <td>$<% $donation->transaction_cost() %></td>
       <td><% $donation->source()->name() %></td>
-      <td><% $donation->target()->name() %></td>
+      <td><% $donation->campaign()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
       <td><% $donation->receipt_sent() ? 'yes' : 'no' %></td>
 %     if ($can_edit_donations) {

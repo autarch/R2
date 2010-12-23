@@ -44,17 +44,17 @@ my $contact = R2::Schema::Person->insert(
 )->contact();
 
 {
-    my $target       = $account->donation_targets()->next();
+    my $campaign     = $account->donation_campaigns()->next();
     my $source       = $account->donation_sources()->next();
     my $payment_type = $account->payment_types()->next();
 
     $contact->add_donation(
-        donation_target_id => $target->donation_target_id(),
-        donation_source_id => $source->donation_source_id(),
-        payment_type_id    => $payment_type->payment_type_id(),
-        amount             => 42,
-        donation_date      => '2008-01-01',
-        user               => R2::Schema::User->SystemUser(),
+        donation_campaign_id => $campaign->donation_campaign_id(),
+        donation_source_id   => $source->donation_source_id(),
+        payment_type_id      => $payment_type->payment_type_id(),
+        amount               => 42,
+        donation_date        => '2008-01-01',
+        user                 => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -161,26 +161,26 @@ my $contact = R2::Schema::Person->insert(
 }
 
 {
-    my $target       = $account->donation_targets()->next();
+    my $campaign     = $account->donation_campaigns()->next();
     my $source       = $account->donation_sources()->next();
     my $payment_type = $account->payment_types()->next();
 
     $contact->add_donation(
-        donation_target_id => $target->donation_target_id(),
-        donation_source_id => $source->donation_source_id(),
-        payment_type_id    => $payment_type->payment_type_id(),
-        amount             => 500,
-        donation_date      => '2009-01-01',
-        user               => R2::Schema::User->SystemUser(),
+        donation_campaign_id => $campaign->donation_campaign_id(),
+        donation_source_id   => $source->donation_source_id(),
+        payment_type_id      => $payment_type->payment_type_id(),
+        amount               => 500,
+        donation_date        => '2009-01-01',
+        user                 => R2::Schema::User->SystemUser(),
     );
 
     $contact->add_donation(
-        donation_target_id => $target->donation_target_id(),
-        donation_source_id => $source->donation_source_id(),
-        payment_type_id    => $payment_type->payment_type_id(),
-        amount             => 501,
-        donation_date      => '2010-01-01',
-        user               => R2::Schema::User->SystemUser(),
+        donation_campaign_id => $campaign->donation_campaign_id(),
+        donation_source_id   => $source->donation_source_id(),
+        payment_type_id      => $payment_type->payment_type_id(),
+        amount               => 501,
+        donation_date        => '2010-01-01',
+        user                 => R2::Schema::User->SystemUser(),
     );
 
     is(

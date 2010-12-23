@@ -61,10 +61,10 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="target">Target:</label>
-      <select name="donation_target_id">
-% while ( my $target = $targets->next() ) {
-        <option value="<% $target->donation_target_id() %>"><% $target->name() %></option>
+      <label class="for-field" for="campaign">Campaign:</label>
+      <select name="donation_campaign_id">
+% while ( my $campaign = $campaigns->next() ) {
+        <option value="<% $campaign->donation_campaign_id() %>"><% $campaign->name() %></option>
 % }
       </select>
     </div>
@@ -104,6 +104,6 @@ $donation => undef
 
 <%init>
 my $sources = $c->account()->donation_sources();
-my $targets = $c->account()->donation_targets();
+my $campaigns = $c->account()->donation_campaigns();
 my $payment_types = $c->account()->payment_types();
 </%init>
