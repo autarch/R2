@@ -466,6 +466,7 @@ CREATE TABLE "DonationSource" (
        donation_source_id SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
+       is_active          BOOLEAN            DEFAULT TRUE,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
@@ -473,6 +474,7 @@ CREATE TABLE "DonationCampaign" (
        donation_campaign_id  SERIAL8         PRIMARY KEY,
        name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
+       is_active          BOOLEAN            DEFAULT TRUE,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
@@ -480,6 +482,7 @@ CREATE TABLE "PaymentType" (
        payment_type_id    SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
        account_id         INT8               NOT NULL,
+       is_active          BOOLEAN            DEFAULT TRUE,
        CONSTRAINT valid_name CHECK ( name != '' )
 );
 
