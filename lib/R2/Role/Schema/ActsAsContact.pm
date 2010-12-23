@@ -15,9 +15,10 @@ use MooseX::Role::Parameterized;
 requires '_build_friendly_name', 'display_name';
 
 has 'friendly_name' => (
-    is         => 'ro',
-    isa        => 'Str',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_friendly_name',
 );
 
 parameter 'steps' => (

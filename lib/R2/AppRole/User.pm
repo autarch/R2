@@ -5,13 +5,15 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema::User;
+use R2::Types qw( Maybe );
 
 use Moose::Role;
 
 has 'user' => (
-    is         => 'ro',
-    isa        => 'R2::Schema::User|Undef',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => Maybe ['R2::Schema::User'],
+    lazy    => 1,
+    builder => '_build_user',
 );
 
 sub _build_user {

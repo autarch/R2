@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
 use R2::Exceptions qw( data_validation_error );
 use R2::Schema;
@@ -18,15 +19,17 @@ parameter 'membership_table' => (
 );
 
 has 'members' => (
-    is         => 'ro',
-    isa        => 'Fey::Object::Iterator::FromSelect::Caching',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'Fey::Object::Iterator::FromSelect',
+    lazy    => 1,
+    builder => '_build_members',
 );
 
 has 'member_count' => (
-    is         => 'ro',
-    isa        => 'Int',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'Int',
+    lazy    => 1,
+    builder => '_build_member_count',
 );
 
 sub add_member {
@@ -119,7 +122,7 @@ role {
 
         my $dbh = $self->_dbh($members_select);
 
-        return Fey::Object::Iterator::FromSelect::Caching->new(
+        return Fey::Object::Iterator::FromSelect->new(
             classes     => [ qw( R2::Schema::Person ), $membership_class ],
             dbh         => $dbh,
             select      => $members_select,

@@ -4,13 +4,15 @@ use strict;
 use warnings;
 
 use R2::Schema::Account;
+use R2::Types qw( Maybe );
 
 use Moose::Role;
 
 has 'account' => (
-    is         => 'ro',
-    isa        => 'R2::Schema::Account|Undef',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => Maybe['R2::Schema::Account'],
+    lazy    => 1,
+    builder => '_build_account',
 );
 
 sub _build_account {

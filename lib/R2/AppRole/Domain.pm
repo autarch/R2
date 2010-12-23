@@ -8,9 +8,10 @@ use R2::Schema::Domain;
 use Moose::Role;
 
 has 'domain' => (
-    is         => 'ro',
-    isa        => 'R2::Schema::Domain',
-    lazy_build => 1,
+    is      => 'ro',
+    isa     => 'R2::Schema::Domain',
+    lazy    => 1,
+    builder => '_build_domain',
 );
 
 sub _build_domain {

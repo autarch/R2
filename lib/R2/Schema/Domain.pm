@@ -36,10 +36,11 @@ with 'R2::Role::Schema::URIMaker';
     has_many 'accounts' => ( table => $schema->table('Account') );
 
     has 'uri_params' => (
-        is         => 'ro',
-        isa        => 'HashRef',
-        lazy_build => 1,
-        init_arg   => undef,
+        is       => 'ro',
+        isa      => 'HashRef',
+        lazy     => 1,
+        builder  => '_build_uri_params',
+        init_arg => undef,
     );
 
     class_has DefaultDomain => (

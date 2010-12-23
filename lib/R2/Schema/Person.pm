@@ -65,9 +65,10 @@ with 'R2::Role::Schema::ActsAsContact' =>
     );
 
     has 'full_name' => (
-        is         => 'ro',
-        isa        => 'Str',
-        lazy_build => 1,
+        is      => 'ro',
+        isa     => 'Str',
+        lazy    => 1,
+        builder => '_build_full_name',
     );
 
     class_has 'DefaultOrderBy' => (
