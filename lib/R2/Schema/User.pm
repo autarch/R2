@@ -79,15 +79,12 @@ class_has SystemUser => (
     );
 }
 
-my $UnusablePW = '*unusable*';
-
 around 'insert' => sub {
     my $orig  = shift;
     my $class = shift;
     my %p     = @_;
 
     if ( delete $p{disable_login} ) {
-        $p{password} = $UnusablePW;
         $p{is_disabled} = 1;
     }
     elsif ( $p{password} ) {
@@ -133,7 +130,6 @@ around update => sub {
     my %p    = @_;
 
     if ( delete $p{disable_login} ) {
-        $p{password} = $UnusablePW;
         $p{is_disabled} = 1;
     }
     elsif ( !string_is_empty( $p{password} ) ) {
@@ -203,7 +199,7 @@ sub _FindOrCreateSystemUser {
     return $class->Fey::Object::Table::insert(
         user_id        => -1,
         username       => 'R2 System User',
-        password       => $UnusablePW,
+        password       => '*unusable*',
         is_disabled    => 1,
         is_system_user => 1,
     );
