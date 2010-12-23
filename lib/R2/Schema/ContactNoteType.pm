@@ -18,19 +18,20 @@ use Fey::ORM::Table;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        @{ $schema->table('ContactNote')->primary_key() } );
-
-    $select->select($count)->from( $schema->tables('ContactNote') )->where(
-        $schema->table('ContactNote')->column('contact_note_type_id'),
-        '=', Fey::Placeholder->new()
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        @{ $schema->table('ContactNote')->primary_key() }
     );
 
-    has 'note_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
+    #<<<
+    $select
+        ->select($count)
+        ->from  ( $schema->tables('ContactNote') )
+        ->where( $schema->table('ContactNote')->column('contact_note_type_id'),
+                 '=', Fey::Placeholder->new() );
+    #>>>
+
+    query note_count => (
         select      => $select,
         bind_params => sub { $_[0]->contact_note_type_id() },
     );
