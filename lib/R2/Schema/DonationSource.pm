@@ -48,14 +48,18 @@ sub _BuildDonationCountSelect {
 
     my $schema = R2::Schema->Schema();
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        $schema->table('Donation')->column('donation_id') );
-
-    $select->select($count)->from( $schema->tables('Donation') )->where(
-        $schema->table('Donation')->column('donation_source_id'),
-        '=', Fey::Placeholder->new()
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('Donation')->column('donation_id')
     );
 
+    #<<<
+    $select
+        ->select($count)
+        ->from  ( $schema->tables('Donation') )
+        ->where( $schema->table('Donation')->column('donation_source_id'),
+                 '=', Fey::Placeholder->new() );
+    #>>>
     return $select;
 }
 
