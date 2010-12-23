@@ -23,11 +23,7 @@ use MooseX::ClassAttribute;
 
     has_many 'donations' => ( table => $schema->table('Donation') );
 
-    has 'donation_count' => (
-        metaclass   => 'FromSelect',
-        is          => 'ro',
-        isa         => PosOrZeroInt,
-        lazy        => 1,
+    query donation_count => (
         select      => __PACKAGE__->_BuildDonationCountSelect(),
         bind_params => sub { $_[0]->donation_source_id() },
     );
