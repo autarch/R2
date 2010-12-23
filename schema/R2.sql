@@ -451,7 +451,7 @@ CREATE TABLE "Donation" (
        value_for_donor    NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        transaction_cost   NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        is_recurring       BOOL               NOT NULL DEFAULT FALSE,
-       receipt_sent       BOOL               NOT NULL DEFAULT FALSE,
+       receipt_date       DATE               NULL,
        donation_source_id INT8               NOT NULL,
        donation_campaign_id  INT8            NOT NULL,
        payment_type_id    INT8               NOT NULL,
