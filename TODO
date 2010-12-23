@@ -20,6 +20,11 @@ Emails
 - limit size of created lists somehow? add a confirm-via-email step for any list larger than X?
 - DKIM and SPF for bigger email senders?
 
+SMS
+
+- PhoneNumber.allow_sms
+- way to send
+
 Reports
 
 - Top donors
