@@ -60,11 +60,12 @@ sub authentication_POST {
     unless (@errors) {
         $user = R2::Schema::User->new( username => $username );
 
-        $user = undef
-            unless $user->check_password($pw);
-
-        push @errors, 'The username or password you provided was not valid.'
-            unless $user;
+        if ( $user->is_disabled() ) {
+            push @errors, 'This account has been disabled.';
+        }
+        elsif ( ! $user->check_password($pw) ) {
+            push @errors, 'The username or password you provided was not valid.';
+        }
     }
 
     unless ($user) {
