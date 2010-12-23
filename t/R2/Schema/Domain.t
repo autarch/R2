@@ -1,16 +1,14 @@
 use strict;
 use warnings;
 
+use Test::Fatal;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema );
+use R2::Test::RealSchema;
 
-use R2::Test::Config;
 use R2::Config;
 use R2::Schema::Domain;
-
-mock_schema();
 
 {
     my $domain = R2::Schema::Domain->insert(
@@ -28,17 +26,55 @@ mock_schema();
 
 {
     my $domain = R2::Schema::Domain->insert(
-        web_hostname   => 'www.example.com',
-        email_hostname => 'www.example.com',
+        web_hostname   => 'foo.example.com',
+        email_hostname => 'foo.example.com',
         requires_ssl   => 1,
     );
 
     is(
         $domain->application_uri( path => '/foo', with_host => 1 ),
-        'https://www.example.com/foo',
+        'https://foo.example.com/foo',
         'ssl uri() for /foo'
     );
 
+}
+
+{
+    eval { R2::Schema::Domain->insert( web_hostname => 'foo.example.com' ) };
+
+    my $e = $@;
+
+    ok(
+        $e,
+        'got an exception trying to insert a web_hostname that already exists'
+    );
+
+    like(
+        $e->full_message(),
+        qr/\QThe web hostname you provided is already in use by another domain./,
+        'exception contains the expected error',
+    );
+}
+
+{
+    eval {
+        R2::Schema::Domain->insert(
+            web_hostname   => 'new.example.com',
+            email_hostname => 'foo.example.com',
+        );
+    };
+
+    my $e = $@;
+
+    ok(
+        $e,
+        'got an exception trying to insert an email_hostname that already exists'
+    );
+    like(
+        $e->full_message(),
+        qr/\QThe email hostname you provided is already in use by another domain./,
+        'exception contains the expected error',
+    );
 }
 
 done_testing();

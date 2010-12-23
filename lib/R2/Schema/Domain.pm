@@ -81,10 +81,9 @@ sub _web_hostname_is_unique {
     return unless __PACKAGE__->new( web_hostname => $p->{web_hostname} );
 
     return {
-        field   => 'web_hostname',
-        message => loc(
+        field => 'web_hostname',
+        message =>
             'The web hostname you provided is already in use by another domain.'
-        ),
     };
 }
 
@@ -101,10 +100,10 @@ sub _email_hostname_is_unique {
     return unless __PACKAGE__->new( email_hostname => $p->{email_hostname} );
 
     return {
-        field   => 'email_hostname',
-        message => loc(
+        field => 'email_hostname',
+        message =>
             'The email hostname you provided is already in use by another domain.'
-        ),
+
     };
 }
 
