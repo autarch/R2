@@ -19,6 +19,10 @@ R2::DatabaseManager->new(
     _existing_config => {},         # XXX - uber hack!
 )->update_or_install_db();
 
+require R2::Config;
+
+R2::Config->instance()->_set_database_name('R2Test');
+
 require R2::Schema;
 
 open my $fh, '>', 't/lib/R2/Test/FakeSchema.pm';
