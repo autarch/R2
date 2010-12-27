@@ -315,6 +315,21 @@ CREATE TABLE "AccountMessagingProvider" (
        PRIMARY KEY (account_id, messaging_provider_id)
 );
 
+CREATE TABLE "PersonRelationship" (
+       person_id          INT8               NOT NULL,
+       relationship_type_id  INT8            NOT NULL,
+       other_person_id    INT8               NOT NULL,
+       note               TEXT               NOT NULL DEFAULT '',
+       PRIMARY KEY ( person_id, relationship_type_id, other_person_id )
+);
+
+CREATE TABLE "RelationshipType" (
+       relationship_type_id  SERIAL8         PRIMARY KEY,
+       account_id          INT8              NOT NULL,
+       name                TEXT              NOT NULL,
+       inverse_name        TEXT              NOT NULL
+);   
+
 CREATE TABLE "Household" (
        household_id       SERIAL8            PRIMARY KEY,
        name               citext             NOT NULL,
@@ -704,6 +719,22 @@ ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_pe
 ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_messaging_provider_id"
   FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "PersonRelationship" ADD CONSTRAINT "PersonRelationship_person_id"
+  FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "PersonRelationship" ADD CONSTRAINT "PersonRelationship_relationship_type_id"
+  FOREIGN KEY ("relationship_type_id") REFERENCES "RelationshipType" ("relationship_type_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "PersonRelationship" ADD CONSTRAINT "PersonRelationship_other_person_id"
+  FOREIGN KEY ("other_person_id") REFERENCES "Person" ("person_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "RelationshipType" ADD CONSTRAINT "RelationshipType_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "AccountMessagingProvider" ADD CONSTRAINT "AccountMessagingProvider_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")

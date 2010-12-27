@@ -25,6 +25,7 @@ use R2::Schema::Organization;
 use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
 use R2::Schema::Person;
+use R2::Schema::RelationshipType;
 use R2::Schema;
 use R2::Types qw( Bool ArrayRef HashRef PosOrZeroInt );
 use R2::Util qw( string_is_empty );
@@ -186,6 +187,8 @@ sub _initialize {
     R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
+
+    R2::Schema::RelationshipType->CreateDefaultsForAccount($self);
 
     for my $code (qw( us ca )) {
         $self->add_country(
