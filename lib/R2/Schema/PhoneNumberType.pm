@@ -39,12 +39,8 @@ with 'R2::Role::Schema::AppliesToContactTypes';
             ->and   ( $schema->table('Contact')->column('contact_type'),
                       '=', Fey::Placeholder->new() );
         #>>>
-        has lc $type
+        query lc $type
             . '_count' => (
-            metaclass   => 'FromSelect',
-            is          => 'ro',
-            isa         => PosOrZeroInt,
-            lazy        => 1,
             select      => $select,
             bind_params => sub { $_[0]->phone_number_type_id(), $type },
             );
