@@ -4,10 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Lingua::EN::Inflect qw( PL_N );
-use List::AllUtils qw( any );
 use R2::Schema;
-use R2::Types qw( PosOrZeroInt );
 
 use Fey::ORM::Table;
 
