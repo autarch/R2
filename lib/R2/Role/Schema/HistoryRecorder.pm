@@ -16,13 +16,13 @@ use MooseX::Role::Parameterized;
 
 requires qw( Table insert update delete );
 
-my $_history_types_for_class = sub {
+my $_history_type_names_for_class = sub {
     my $class = shift;
 
     if ( $class->does_role('R2::Role::Schema::ActsAsContact') ) {
         return (
-            insert => R2::Schema::ContactHistoryType->Created(),
-            update => R2::Schema::ContactHistoryType->Modified(),
+            insert => 'Created',
+            update => 'Modified',
         );
     }
     else {
@@ -31,24 +31,24 @@ my $_history_types_for_class = sub {
         my $modify = 'Modify' . $thing;
         my $delete = 'Delete' . $thing;
 
-        my %types = (
-            insert => R2::Schema::ContactHistoryType->$add(),
-            delete => R2::Schema::ContactHistoryType->$delete(),
+        my %names = (
+            insert => $add,
+            delete => $delete,
         );
 
         # Some history recorder classes only record inserts and deletes (like
         # HouseholdMember).
-        $types{update} = R2::Schema::ContactHistoryType->$modify()
+        $names{update} = $modify
             if R2::Schema::ContactHistoryType->can($modify);
 
-        return %types;
+        return %names;
     }
 };
 
 my $_make_insert_wrapper = sub {
     my $class         = shift;
     my $history_attrs = shift;
-    my $type          = shift;
+    my $type_name     = shift;
 
     my @pk = map { $_->name() } @{ $class->Table()->primary_key() };
 
@@ -77,6 +77,8 @@ my $_make_insert_wrapper = sub {
                     method             => 'delete',
                 };
 
+                my $type = R2::Schema::ContactHistoryType->$type_name();
+
                 my $description = $type->description();
                 $description .= ' - ' . $row->summary()
                     if $row->can('summary');
@@ -99,7 +101,7 @@ my $_make_insert_wrapper = sub {
 my $_make_update_wrapper = sub {
     my $class         = shift;
     my $history_attrs = shift;
-    my $type          = shift;
+    my $type_name     = shift;
 
     my @pk = map { $_->name() } @{ $class->Table()->primary_key() };
 
@@ -129,6 +131,8 @@ my $_make_update_wrapper = sub {
                     method_params      => \%original,
                 };
 
+                my $type = R2::Schema::ContactHistoryType->$type_name();
+
                 my $description = $type->description();
                 $description .= ' - ' . $self->summary()
                     if $self->can('summary');
@@ -151,7 +155,7 @@ my $_make_update_wrapper = sub {
 my $_make_delete_wrapper = sub {
     my $class         = shift;
     my $history_attrs = shift;
-    my $type          = shift;
+    my $type_name     = shift;
 
     my @pk = map { $_->name() } @{ $class->Table()->primary_key() };
 
@@ -188,6 +192,8 @@ my $_make_delete_wrapper = sub {
                     method_params => \%original,
                 };
 
+                my $type = R2::Schema::ContactHistoryType->$type_name();
+
                 my $description = $type->description();
                 $description .= ' - ' . $self->summary()
                     if $self->can('summary');
@@ -223,29 +229,29 @@ role {
     $history_attrs{other_contact_id} = 'other_contact_id_for_history'
         if $consumer->has_method('other_contact_id_for_history');
 
-    my %types = $_history_types_for_class->($consumer);
+    my %type_names = $_history_type_names_for_class->($consumer);
 
-    if ( $types{insert} ) {
+    if ( $type_names{insert} ) {
         around 'insert' => $_make_insert_wrapper->(
             $consumer->name(),
             \%history_attrs,
-            $types{insert},
+            $type_names{insert},
         );
     }
 
-    if ( $types{update} ) {
+    if ( $type_names{update} ) {
         around 'update' => $_make_update_wrapper->(
             $consumer->name(),
             \%history_attrs,
-            $types{update},
+            $type_names{update},
         );
     }
 
-    if ( $types{delete} ) {
+    if ( $type_names{delete} ) {
         around 'delete' => $_make_delete_wrapper->(
             $consumer->name(),
             \%history_attrs,
-            $types{delete},
+            $type_names{delete},
         );
     }
 };
