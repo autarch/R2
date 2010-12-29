@@ -4,11 +4,22 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema );
+use R2::Test::RealSchema;
 
+use R2::Schema::Account;
 use R2::Schema::Address;
+use R2::Schema::Person;
+use R2::Schema::User;
 
-mock_schema();
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
+
+my $contact = R2::Schema::Person->insert(
+    first_name => 'Bob',
+    account_id => $account->account_id(),
+    user       => R2::Schema::User->SystemUser(),
+)->contact();
+
+my $address_type = $account->address_types()->next();
 
 {
     my @tests = (
@@ -79,13 +90,11 @@ mock_schema();
     );
 
     for my $test (@tests) {
-        my $address = R2::Schema::Address->new(
-            address_id => 1,
+        my $address = $contact->add_address(
             %{ $test->[0] },
-            contact_id      => 1,
-            address_type_id => 1,
             iso_code        => 'us',
-            _from_query     => 1,
+            address_type_id => $address_type->address_type_id(),
+            user            => R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',
@@ -139,13 +148,11 @@ mock_schema();
     );
 
     for my $test (@tests) {
-        my $address = R2::Schema::Address->new(
-            address_id => 1,
+        my $address = $contact->add_address(
             %{ $test->[0] },
-            contact_id      => 1,
-            address_type_id => 1,
             iso_code        => 'us',
-            _from_query     => 1,
+            address_type_id => $address_type->address_type_id(),
+            user            => R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',
@@ -160,16 +167,15 @@ mock_schema();
 }
 
 {
-    my $address = R2::Schema::Address->new(
-        address_id      => 1,
+    my $address = $contact->add_address(
         street_1        => '100 Some St',
         city            => 'Opolis',
         region          => 'MN',
         postal_code     => '55555',
-        contact_id      => 1,
         address_type_id => 1,
         iso_code        => 'us',
-        _from_query     => 1,
+        address_type_id => $address_type->address_type_id(),
+        user            => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -189,6 +195,7 @@ mock_schema();
         city        => 'Mopolis',
         region      => 'CA',
         postal_code => '99999',
+        user        => R2::Schema::User->SystemUser(),
     );
 
     is(
