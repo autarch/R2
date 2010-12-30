@@ -10,17 +10,12 @@ use R2::Test::RealSchema;
 use Digest::SHA;
 use File::Slurp qw( read_file );
 use Image::Size qw( imgsize );
-use R2::Test::Config;
 use R2::Config;
 use R2::Image;
 use R2::Schema::Account;
 use R2::Schema::File;
 
-my $domain  = R2::Schema::Domain->DefaultDomain();
-my $account = R2::Schema::Account->insert(
-    name      => 'Account',
-    domain_id => $domain->domain_id(),
-);
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 my $image_data = read_file('t/files/shoe.jpg');
 
