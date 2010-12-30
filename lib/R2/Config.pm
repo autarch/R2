@@ -219,6 +219,7 @@ has aim_key => (
     section       => 'messaging',
     key           => 'aim_key',
     documentation => 'The AIM key to use for retrieving AIM IM status.',
+    writer        => '_set_aim_key',
 );
 
 {
