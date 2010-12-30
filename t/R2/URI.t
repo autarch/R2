@@ -5,7 +5,6 @@ use Test::More;
 
 use lib 't/lib';
 
-use R2::Test::Config;
 use R2::Config;
 use R2::URI qw( dynamic_uri static_uri );
 
