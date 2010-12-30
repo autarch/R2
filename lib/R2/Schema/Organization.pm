@@ -5,13 +5,9 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
-use R2::Schema::Contact;
-use R2::Schema::OrganizationMember;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-
-with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
 
 {
     my $schema = R2::Schema->Schema();
@@ -19,6 +15,17 @@ with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
     has_policy 'R2::Schema::Policy';
 
     has_table( $schema->table('Organization') );
+
+    class_has 'DefaultOrderBy' => (
+        is   => 'ro',
+        isa  => 'ArrayRef',
+        lazy => 1,
+        default =>
+            sub { [ $schema->table('Organization')->column('name') ] },
+    );
+
+    require R2::Schema::Contact;
+    require R2::Schema::OrganizationMember;
 
     has_one 'contact' => (
         table   => $schema->table('Contact'),
@@ -38,17 +45,11 @@ with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
         ],
     );
 
-    class_has 'DefaultOrderBy' => (
-        is   => 'ro',
-        isa  => 'ArrayRef',
-        lazy => 1,
-        default =>
-            sub { [ $schema->table('Organization')->column('name') ] },
-    );
-
     with 'R2::Role::Schema::HasMembers' =>
         { membership_table => $schema->table('OrganizationMember') };
 }
+
+with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
 
 with 'R2::Role::Schema::HistoryRecorder';
 

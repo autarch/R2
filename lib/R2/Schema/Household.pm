@@ -5,12 +5,9 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
-use R2::Schema::HouseholdMember;
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-
-with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
 
 {
     my $schema = R2::Schema->Schema();
@@ -18,6 +15,17 @@ with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
     has_policy 'R2::Schema::Policy';
 
     has_table( $schema->table('Household') );
+
+    class_has 'DefaultOrderBy' => (
+        is   => 'ro',
+        isa  => 'ArrayRef',
+        lazy => 1,
+        default =>
+            sub { [ $schema->table('Household')->column('name') ] },
+    );
+
+    require R2::Schema::Contact;
+    require R2::Schema::HouseholdMember;
 
     has_one 'contact' => (
         table   => $schema->table('Contact'),
@@ -37,17 +45,11 @@ with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
         ],
     );
 
-    class_has 'DefaultOrderBy' => (
-        is   => 'ro',
-        isa  => 'ArrayRef',
-        lazy => 1,
-        default =>
-            sub { [ $schema->table('Household')->column('name') ] },
-    );
-
     with 'R2::Role::Schema::HasMembers' =>
         { membership_table => $schema->table('HouseholdMember') };
 }
+
+with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
 
 with 'R2::Role::Schema::HistoryRecorder';
 
@@ -62,8 +64,6 @@ sub _build_friendly_name {
 }
 
 __PACKAGE__->meta()->make_immutable();
-
-require R2::Schema::Contact;
 
 1;
 

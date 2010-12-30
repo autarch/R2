@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use R2::Schema;
+use R2::Schema::Contact;
 use R2::Schema::MessagingProvider;
 use R2::Schema::Person;
-use R2::Schema;
 
 use Fey::ORM::Table;
 
