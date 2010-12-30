@@ -4,17 +4,27 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema );
 
+use R2::Test::RealSchema;
+
+use R2::Schema::Account;
 use R2::Schema::EmailAddress;
+use R2::Schema::Person;
+use R2::Schema::User;
 
-mock_schema();
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
+
+my $contact = R2::Schema::Person->insert(
+    first_name => 'Bob',
+    account_id => $account->account_id(),
+    user       => R2::Schema::User->SystemUser(),
+)->contact();
 
 {
     eval {
-        R2::Schema::EmailAddress->insert(
+        $contact->add_email_address(
             email_address => '@example.com',
-            contact_id    => 1,
+            user          => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -30,9 +40,9 @@ mock_schema();
 
 {
     eval {
-        R2::Schema::EmailAddress->insert(
+        $contact->add_email_address(
             email_address => 'bob@not a domain.com',
-            contact_id    => 1,
+            user          => R2::Schema::User->SystemUser(),
         );
     };
 
