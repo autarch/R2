@@ -8,8 +8,15 @@ use JavaScript::Minifier::XS qw( minify );
 use JSAN::ServerSide 0.04;
 use Path::Class;
 use R2::Config;
+use R2::Types qw( Bool );
 
 use Moose;
+
+has squish => (
+    is      => 'ro',
+    isa     => Bool,
+    default => sub { R2::Config->instance()->is_production() },
+);
 
 with 'R2::Role::Web::CombinedStaticFiles';
 
@@ -44,22 +51,13 @@ sub _build_target_file {
     return file( $js_dir, 'r2-combined.js' );
 }
 
-{
-    my @Exceptions = (
-        qr/\@cc_on/,
-        qr/\@if/,
-        qr/\@end/,
-    );
+sub _squish {
+    my $self = shift;
+    my $code = shift;
 
-    sub _squish {
-        my $self = shift;
-        my $code = shift;
+    return $code unless $self->squish();
 
-        return $code
-            unless R2::Config->instance()->is_production();
-
-        return minify($code);
-    }
+    return minify($code);
 }
 
 __PACKAGE__->meta()->make_immutable();
