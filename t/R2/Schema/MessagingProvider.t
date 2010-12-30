@@ -5,6 +5,9 @@ use Test::More;
 
 use lib 't/lib';
 
+use R2::Test::FakeSchema;
+
+use R2::Config;
 use R2::Schema::MessagingProvider;
 
 {
@@ -47,20 +50,13 @@ use R2::Schema::MessagingProvider;
 }
 
 {
+    R2::Config->instance()->_set_aim_key('abcdefg123456');
 
-    package R2::Config;
-
-    sub AIMKey { return 'abcdefg123456' }
-
-    sub EmptyKey { }
-}
-
-{
     my $provider = R2::Schema::MessagingProvider->new(
         messaging_provider_id => 1,
         name                  => 'AIM',
         status_uri_template =>
-            'http://api.oscar.aol.com/presence/icon?k={Config->AIMKey}&t={screen_name}',
+            'http://api.oscar.aol.com/presence/icon?k={Config->aim_key}&t={screen_name}',
         _from_query => 1,
     );
 
@@ -72,13 +68,19 @@ use R2::Schema::MessagingProvider;
 }
 
 {
+    package R2::Config;
+
+    sub empty_key { return undef }
+}
+
+{
     my $provider = R2::Schema::MessagingProvider->new(
         messaging_provider_id => 1,
         name                  => 'AIM',
         status_uri_template =>
-            'http://api.oscar.aol.com/presence/icon?k={Config->AIMKey}&t={screen_name}',
-        add_uri_template  => '{Config->EmptyKey}&t={screen_name}',
-        chat_uri_template => '{Config->NoSuchKey}&t={screen_name}',
+            'http://api.oscar.aol.com/presence/icon?k={Config->aim_key}&t={screen_name}',
+        add_uri_template  => '{Config->empty_key}&t={screen_name}',
+        chat_uri_template => '{Config->no_such_key}&t={screen_name}',
         _from_query       => 1,
     );
 
@@ -90,13 +92,13 @@ use R2::Schema::MessagingProvider;
 
     eval { $provider->add_uri('bubba') };
     like(
-        $@, qr/No value for config key: EmptyKey/,
+        $@, qr/No value for config key: empty_key/,
         'error when config key is empty'
     );
 
     eval { $provider->chat_uri('bubba') };
     like(
-        $@, qr/Invalid config key: NoSuchKey/,
+        $@, qr/Invalid config key: no_such_key/,
         'error when config key is not valid'
     );
 }
