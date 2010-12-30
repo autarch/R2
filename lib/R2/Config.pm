@@ -212,24 +212,13 @@ has temp_dir => (
     default => '_build_temp_dir',
 );
 
-has antispam_server => (
-    is      => 'ro',
-    isa     => Str,
-    default => q{api.antispam.typepad.com},
-    section => 'antispam',
-    key     => 'server',
-    documentation =>
-        'The antispam server to use.',
-);
-
-has antispam_key => (
-    is      => 'ro',
-    isa     => Str,
-    default => q{},
-    section => 'antispam',
-    key     => 'key',
-    documentation =>
-        'A key for your antispam server. If this is empty, R2 will not be able to check for spam links.',
+has aim_key => (
+    is            => 'ro',
+    isa           => Str,
+    default       => {},
+    section       => 'messaging',
+    key           => 'aim_key',
+    documentation => 'The AIM key to use for retrieving AIM IM status.',
 );
 
 {
