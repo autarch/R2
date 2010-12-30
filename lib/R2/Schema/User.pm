@@ -84,10 +84,10 @@ around 'insert' => sub {
     my $class = shift;
     my %p     = @_;
 
-    if ( delete $p{disable_login} ) {
-        $p{is_disabled} = 1;
+    if ( $p{is_disabled} ) {
+        $p{password} //= '*disabled*';
     }
-    elsif ( $p{password} ) {
+    elsif ( !string_is_empty( $p{password} ) ) {
         $p{password} = $class->_password_as_rfc2307( $p{password} );
     }
 
@@ -129,10 +129,7 @@ around update => sub {
     my $self = shift;
     my %p    = @_;
 
-    if ( delete $p{disable_login} ) {
-        $p{is_disabled} = 1;
-    }
-    elsif ( !string_is_empty( $p{password} ) ) {
+    unless ( string_is_empty( $p{password} ) ) {
         $p{password} = $self->_password_as_rfc2307( $p{password} );
     }
 
@@ -209,7 +206,8 @@ sub format_date {
     my $self = shift;
     my $dt   = shift;
 
-    return $dt->clone()->set_time_zone( $self->time_zone() )
+    return $dt->clone()->set( locale => $self->locale_code() )
+        ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->date_format() );
 }
 
@@ -217,7 +215,8 @@ sub format_datetime {
     my $self = shift;
     my $dt   = shift;
 
-    return $dt->clone()->set_time_zone( $self->time_zone() )
+    return $dt->clone()->set( locale => $self->locale_code() )
+        ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->datetime_format() );
 }
 
