@@ -4,11 +4,14 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use R2::Test qw( mock_schema );
 
+use R2::Test::RealSchema;
+
+use R2::Schema::Account;
 use R2::Schema::Person;
+use R2::Schema::User;
 
-mock_schema();
+my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $person = R2::Schema::Person->insert(
@@ -17,13 +20,15 @@ mock_schema();
         middle_name => '',
         last_name   => 'Smith',
         suffix      => '',
-        account_id  => 1,
+        account_id  => $account->account_id(),
+        user        => R2::Schema::User->SystemUser(),
     );
 
     ok( $person->contact(), 'newly created person has a contact' );
-    is( $person->contact()->contact_id(), 1, 'contact_id == 1' );
-    is( $person->person_id(), $person->contact()->contact_id(),
-        'person_id == contact_id' );
+    is(
+        $person->person_id(), $person->contact()->contact_id(),
+        'person_id == contact_id'
+    );
 
     is(
         $person->first_name(), 'Joe',
@@ -46,7 +51,8 @@ mock_schema();
         middle_name => 'J.',
         last_name   => 'Smith',
         suffix      => 'the 23rd',
-        account_id  => 1,
+        account_id  => $account->account_id(),
+        user        => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -76,7 +82,8 @@ mock_schema();
         middle_name => 'J.',
         last_name   => 'Smith',
         suffix      => 'the 23rd',
-        account_id  => 1,
+        account_id  => $account->account_id(),
+        user        => R2::Schema::User->SystemUser(),
     );
 
     my @errors = $person->validate_for_update(
@@ -93,24 +100,6 @@ mock_schema();
 }
 
 {
-    eval {
-        R2::Schema::Person->insert(
-            salutation => 'Yo',
-            account_id => 1,
-        );
-    };
-
-    ok( $@, 'cannot create a new person without a first or last name' );
-    can_ok( $@, 'errors' );
-
-    my @e = @{ $@->errors() };
-    is(
-        $e[0]->{message}, 'A person requires either a first or last name.',
-        'got expected error message'
-    );
-}
-
-{
     my $dt = DateTime->today()->add( days => 10 );
 
     eval {
@@ -118,7 +107,8 @@ mock_schema();
             first_name  => 'Dave',
             birth_date  => $dt->strftime('%Y-%m-%d'),
             date_format => '%Y-%m-%d',
-            account_id  => 1,
+            account_id  => $account->account_id(),
+            user        => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -140,7 +130,8 @@ mock_schema();
             first_name  => 'Dave',
             birth_date  => '01-03-1973',
             date_format => '%Y-%m-%d',
-            account_id  => 1,
+            account_id  => $account->account_id(),
+            user        => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -159,7 +150,8 @@ mock_schema();
         first_name  => 'Dave',
         birth_date  => '1973-06-23',
         date_format => '%Y-%m-%d',
-        account_id  => 1,
+        account_id  => $account->account_id(),
+        user        => R2::Schema::User->SystemUser(),
     );
 
     ok( $person, 'date_format gets removed from insert parameters' );

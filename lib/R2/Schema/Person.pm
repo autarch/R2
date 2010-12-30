@@ -6,16 +6,12 @@ use namespace::autoclean;
 
 use DateTime::Format::Strptime;
 use R2::Schema;
-use R2::Schema::Contact;
 use R2::Schema::PersonMessagingProvider;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-
-with 'R2::Role::Schema::ActsAsContact' =>
-    { steps => [qw( _require_some_name _valid_birth_date )] };
 
 {
     my $schema = R2::Schema->Schema();
@@ -25,6 +21,21 @@ with 'R2::Role::Schema::ActsAsContact' =>
     my $person_t = $schema->table('Person');
 
     has_table $person_t;
+
+    class_has 'DefaultOrderBy' => (
+        is      => 'ro',
+        isa     => 'ArrayRef',
+        lazy    => 1,
+        default => sub {
+            [
+                $schema->table('Person')->column('last_name'),
+                $schema->table('Person')->column('first_name'),
+                $schema->table('Person')->column('middle_name'),
+            ];
+        },
+    );
+
+    require R2::Schema::Contact;
 
     has_one 'contact' => (
         table   => $schema->table('Contact'),
@@ -70,20 +81,10 @@ with 'R2::Role::Schema::ActsAsContact' =>
         lazy    => 1,
         builder => '_build_full_name',
     );
-
-    class_has 'DefaultOrderBy' => (
-        is      => 'ro',
-        isa     => 'ArrayRef',
-        lazy    => 1,
-        default => sub {
-            [
-                $schema->table('Person')->column('last_name'),
-                $schema->table('Person')->column('first_name'),
-                $schema->table('Person')->column('middle_name'),
-            ];
-        },
-    );
 }
+
+with 'R2::Role::Schema::ActsAsContact' =>
+    { steps => [qw( _require_some_name _valid_birth_date )] };
 
 with 'R2::Role::Schema::HistoryRecorder';
 
