@@ -204,12 +204,6 @@ EOF
         $home_dir->subdir( '.r2', 'cache', 'files' ),
         'files dir defaults to $HOME/.r2/cache/files'
     );
-
-    is(
-        $config->thumbnails_dir(),
-        $home_dir->subdir( '.r2', 'cache', 'thumbnails' ),
-        'thumbnails dir defaults to $HOME/.r2/cache/thumbnails'
-    );
 }
 
 {
@@ -254,12 +248,6 @@ EOF
         $config->files_dir(),
         '/var/cache/r2/files',
         'files dir defaults to /var/cache/r2/files in production'
-    );
-
-    is(
-        $config->thumbnails_dir(),
-        '/var/cache/r2/thumbnails',
-        'thumbnails dir defaults to /var/cache/r2/thumbnails in production'
     );
 }
 
