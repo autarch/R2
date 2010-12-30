@@ -388,7 +388,7 @@ EOF
     );
 
     like(
-        $content, qr/\[R2\].+?\[database\].+?\[antispam\]/s,
+        $content, qr/\[R2\].+?\[database\].+?\[messaging\]/s,
         'section order matches order of definition on R2::Config'
     );
 }
