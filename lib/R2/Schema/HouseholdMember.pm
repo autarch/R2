@@ -5,11 +5,14 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
+use R2::Schema::Contact;
 use R2::Schema::Household;
 use R2::Schema::Person;
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
+
+with 'R2::Role::Schema::MemberOfSomething';
 
 {
     my $schema = R2::Schema->Schema();
@@ -28,23 +31,6 @@ sub contact_id_for_history {
     my $self = shift;
 
     return $self->household_id();
-}
-
-sub other_contact_id_for_history {
-    my $self = shift;
-
-    return $self->person_id();
-}
-
-sub summary {
-    my $self = shift;
-
-    my $summary = $self->person()->display_name();
-
-    $summary .= ' as ' . $self->position()
-        unless string_is_empty( $self->position() );
-
-    return $summary;
 }
 
 __PACKAGE__->meta()->make_immutable();

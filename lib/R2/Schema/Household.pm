@@ -5,7 +5,6 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
-use R2::Schema::Contact;
 use R2::Schema::HouseholdMember;
 
 use Fey::ORM::Table;
@@ -63,6 +62,8 @@ sub _build_friendly_name {
 }
 
 __PACKAGE__->meta()->make_immutable();
+
+require R2::Schema::Contact;
 
 1;
 
