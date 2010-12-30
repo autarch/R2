@@ -68,7 +68,7 @@ use MooseX::Params::Validate qw( validated_list );
             name              => 'AIM',
             chat_uri_template => 'aim:goim?screenname={screen_name}',
             status_uri_template =>
-                'http://api.oscar.aol.com/presence/icon?k={Config->AIMKey}&t={screen_name}',
+                'http://api.oscar.aol.com/presence/icon?k={Config->aim_key}&t={screen_name}',
         }, {
             name => 'Google Talk',
         }, {
