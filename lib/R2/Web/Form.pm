@@ -44,9 +44,9 @@ has 'errors' => (
 );
 
 has 'form_data' => (
-    is      => 'ro',
-    isa     => 'R2::Web::FormData',
-    default => sub { R2::Web::FormData->new() },
+    is        => 'ro',
+    isa       => 'R2::Web::FormData',
+    predicate => '_has_form_data',
 );
 
 has 'filled_in_form' => (
@@ -153,13 +153,13 @@ sub _create_error_para {
 sub _fill_form_data {
     my $self = shift;
 
-    my $data = $self->form_data();
-    return unless $data->has_sources();
+    return unless $self->_has_form_data();
 
     my $html = $self->_form_html_from_dom();
 
     my $filled = HTML::FillInForm->fill(
-        \$html, $data,
+        \$html,
+        $self->form_data(),
         ignore_fields => $self->exclude()
     );
 
