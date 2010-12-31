@@ -10,7 +10,7 @@
 </p>
 
 <p>
-This group applies to <% english_list( map { PL_N($_) } $group->types_applied_to() ) %>.
+This group applies to <% english_list( map { PL_N($_) } $group->contact_types_applied_to() ) %>.
 </p>
 
 <&| /lib/filter/form.mas &>

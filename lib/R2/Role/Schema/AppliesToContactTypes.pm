@@ -71,7 +71,7 @@ sub _applies_to_something {
     };
 }
 
-sub types_applied_to {
+sub contact_types_applied_to {
     my $self = shift;
 
     return (
