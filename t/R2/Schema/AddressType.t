@@ -74,6 +74,12 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         account_id              => $account->account_id(),
     );
 
+    is_deeply(
+        [ $type->contact_types_applied_to() ],
+        [ 'Person', 'Household', 'Organization' ],
+        'contact_types_applied_to returns all contact types'
+    );
+
     my $person = R2::Schema::Person->insert(
         first_name => 'Joe',
         account_id => $account->account_id(),
@@ -101,6 +107,12 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
     ok(
         !$type->applies_to_household(),
         'type no longer applies to household after update'
+    );
+
+    is_deeply(
+        [ $type->contact_types_applied_to() ],
+        [ 'Person', 'Organization' ],
+        'contact_types_applied_to returns Person and Organization'
     );
 }
 
