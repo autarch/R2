@@ -96,7 +96,8 @@ role {
 
     with 'R2::Role::Schema::DataValidator' => { steps => \@steps };
 
-    my $pk_name;
+    my $pk_name
+        = $extra{consumer}->name()->Table()->primary_key()->[0]->name();
 
     method _validation_errors => sub {
         my $self      = shift;
@@ -116,8 +117,6 @@ role {
             $self->R2::Schema::Contact::_check_validation_steps( $contact_p,
             $is_insert )
             if R2::Schema::Contact->can('_check_validation_steps');
-
-        $pk_name ||= $self->Table()->primary_key()->[0]->name();
 
         {
 
