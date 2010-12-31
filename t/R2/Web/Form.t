@@ -184,11 +184,11 @@ EOF
     );
 
     my $nested = first { $_->getAttribute('name') eq 'nested' }
-    @{ $form->getElementsByTagName('input') };
+    $form->getElementsByTagName('input');
 
     my $grandparent = $nested->parentNode()->parentNode();
 
-    my $error_p = $grandparent->getElementsByTagName('p')->[0];
+    my $error_p = ( $grandparent->getElementsByTagName('p') )[0];
 
     is(
         $error_p->className(), 'error-message',
@@ -215,7 +215,7 @@ EOF
     my $form = form_elt_for();
 
     my $select3 = first { $_->getAttribute('name') eq 'select3' }
-    @{ $form->getElementsByTagName('input') };
+    $form->getElementsByTagName('input');
 
     is(
         lc $select3->tagName(), 'input',
@@ -231,7 +231,7 @@ EOF
     );
 
     my $span = first { $_->className() eq 'text-for-hidden' }
-    @{ $form->getElementsByTagName('span') };
+    $form->getElementsByTagName('div');
 
     is(
         $span->firstChild()->data(), 'ninety-nine',
@@ -254,7 +254,7 @@ sub form_elt_for {
     # HTML::DOM object.
     #    my $x = $dom->as_HTML;
 
-    return $dom->getElementsByTagName('form')->[0];
+    return ( $dom->getElementsByTagName('form') )[0];
 }
 
 sub generic_error_div_tests {
@@ -269,7 +269,7 @@ sub generic_error_div_tests {
 
     ok( $error_div, 'form has an error div as a child node' );
 
-    my $error_p = $error_div->getElementsByTagName('p')->[0];
+    my $error_p = ( $error_div->getElementsByTagName('p') )[0];
 
     ok( $error_p, 'error div has a P element as a child' );
     is(
@@ -292,7 +292,7 @@ sub text1_error_div_tests {
     ok( $error_div,
         'form does have a form-item div with an additional error class' );
 
-    my $error_p = $error_div->getElementsByTagName('p')->[0];
+    my $error_p = ( $error_div->getElementsByTagName('p') )[0];
 
     ok( $error_p, 'error div has a P element as a child' );
     is(

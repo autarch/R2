@@ -220,19 +220,6 @@ sub _form_html_from_dom {
     }
 }
 
-# This bizarro bit seems to fix some tests. Sigh ...
-{
-    package
-        HTML::DOM::Node;
-
-    no warnings 'redefine';
-
-    sub as_HTML {
-        ( my $clone = shift->clone )->deobjectify_text;
-        $clone->SUPER::as_HTML(@_);
-    }
-}
-
 __PACKAGE__->meta()->make_immutable();
 
 1;
