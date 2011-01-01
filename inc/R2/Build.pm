@@ -3,131 +3,214 @@ package R2::Build;
 use strict;
 use warnings;
 
+use File::Path qw( mkpath );
+use File::Spec;
+
 use base 'Module::Build';
-
-my %Requires = (
-    'autodie'                               => '0',
-    'Catalyst'                              => '5.80007',
-    'Catalyst::Action::REST'                => '0.5',
-    'CatalystX::RoleApplicator'             => '0',
-    'Catalyst::Plugin::AuthenCookie'        => '0.01',
-    'Catalyst::Plugin::Log::Dispatch'       => '0',
-    'Catalyst::Plugin::RedirectAndDetach'   => '0',
-    'Catalyst::Plugin::Session'             => '0.31',
-    'Catalyst::Plugin::Session::AsObject'   => '0',
-    'Catalyst::Plugin::Session::State'      => '0',
-    'Catalyst::Plugin::Session::State::URI' => '0.11',
-    'Catalyst::Plugin::Session::Store'      => '0',
-    'Catalyst::Plugin::Session::Store::DBI' => '0',
-    'Catalyst::Plugin::StackTrace'          => '0.10',
-    'Catalyst::Plugin::Static::Simple'      => '0.21',
-    'Catalyst::Plugin::SubRequest'          => '0',
-    'Catalyst::Plugin::Unicode'             => '0',
-    'Catalyst::Request::REST::ForBrowsers'  => '0',
-    'Catalyst::View::Mason'                 => '0.13',
-    'Config::INI'                           => '0',
-    'CSS::Minifier'                         => '0',
-    'Cwd'                                   => '0',
-    'Data::Validate::Domain'                => '0',
-    'Data::Validate::URI'                   => '0',
-    'DateTime'                              => '0',
-    'DateTime::Format::Pg'                  => '0',
-    'DateTime::Format::Strptime'            => '0',
-    'DBD::Pg'                               => '2.5.0',
-    'DBI'                                   => '0',
-    'Digest::SHA'                           => '0',
-    'Email::Valid'                          => '0',
-    'Exporter'                              => '0',
-    'Fey'                                   => '0.14',
-    'Fey::DBIManager'                       => '0.07',
-    'Fey::Loader'                           => '0.05',
-    'Fey::ORM'                              => '0.14',
-    'File::Copy'                            => '0',
-    'File::LibMagic'                        => '0',
-    'File::Slurp'                           => '0',
-    'File::Temp'                            => '0',
-    'HTML::FillInForm'                      => '0',
-    'HTML::DOM'                             => '0',
-    'HTML::Tidy'                            => '0',
-    'Image::Magick'                         => '0',
-    'IPC::Run3'                             => '0',
-    'JavaScript::Squish'                    => '0',
-    'JSAN::ServerSide'                      => '0.04',
-    'JSON::XS'                              => '0',
-    'Lingua::EN::Inflect'                   => '0',
-    'List::AllUtils'                        => '0',
-    'Locale::Country'                       => '0',
-    'LWPx::ParanoidAgent'                   => '0',
-    'Moose'                                 => '0.58',
-    'MooseX::ClassAttribute'                => '0.05',
-    'MooseX::Params::Validate'              => '0.07',
-    'MooseX::Role::Parameterized'           => '0.04',
-    'MooseX::Singleton'                     => '0.12',
-    'MooseX::Types'                         => '0.16',
-    'Net::OpenID::Consumer'                 => '0',
-    'Path::Class'                           => '0',
-    'Params::Validate'                      => '0',
-    'Sub::Name'                             => '0',
-    'Sys::Hostname'                         => '0',
-    'Time::HiRes'                           => '0',
-    'URI::FromHash'                         => '0',
-    'URI::Template'                         => '0',
-);
-
-my %BuildRequires = (
-    'DBD::Mock'       => '1.39',
-    'Fey::ORM::Mock'  => '0',
-    'Image::Size'     => '0',
-    'Test::Exception' => '0',
-    'Test::More'      => '0',
-);
 
 sub new {
     my $class = shift;
+    my %args  = @_;
 
-    return $class->SUPER::new(
-        license              => 'agpl3',
-        module_name          => 'R2',
-        requires             => \%Requires,
-        build_requires       => \%BuildRequires,
-        script_files         => [ glob('bin/*.pl') ],
-        recursive_test_files => 1,
-        meta_merge           => {
-            resources => {
-                homepage   => 'http://www.rapportware.org/',
-                repository => 'http://hg.urth.org/hg/R2',
+    $args{get_options} = {
+        'db-name'     => { type => '=s', default => 'R2' },
+        'db-username' => { type => '=s' },
+        'db-password' => { type => '=s' },
+        'db-host'     => { type => '=s' },
+        'db-port'     => { type => '=s' },
+    };
+
+    $args{auto_features} = {
+        PSGI => {
+            description => 'PSGI app (r2.psgi)',
+            requires    => {
+                'Catalyst::Engine::PSGI'          => '0',
+                'Plack'                           => '0',
+                'Plack::Builder'                  => '0',
+                'Plack::Middleware::ReverseProxy' => '0',
             },
         },
-    );
+    };
+
+    my $self = $class->SUPER::new(%args);
+
+    $self->_update_from_existing_config();
+
+    return $self
 }
 
-sub ACTION_missing {
+sub _update_from_existing_config {
     my $self = shift;
 
-    my $prereqs = $self->prereq_failures();
+    my $config = eval {
+        local $ENV{R2_CONFIG}
+            = $self->args('etc-dir')
+            ? File::Spec->catfile( $self->args('etc-dir'), 'r2.conf' )
+            : undef;
 
-    my %mods = (
-        map { $_ => 1 }
-            map { keys %{ $prereqs->{$_} } }
-            keys %{$prereqs}
+        require R2::ConfigFile;
+
+        R2::ConfigFile->new()->raw_data();
+    };
+
+    return unless $config;
+
+    my %map = (
+        R2    => { hostname => 'hostname' },
+        database => {
+            name     => 'db-name',
+            username => 'db-username',
+            password => 'db-password',
+            host     => 'db-host',
+            port     => 'db-port',
+            ssl      => 'db-ssl',
+        },
+        dirs => { share => 'share-dir' },
     );
 
-    delete $mods{'Image::Magick'};
+    for my $section (keys %map ) {
+        for my $key ( keys %{$map{$section}} ) {
+            my $value = $config->{$section}{$key};
 
-    print join ' ', sort keys %mods;
-    print "\n";
+            next unless defined $value && $value ne q{};
+
+            my $mb_key = $map{$section}{$key};
+            $self->args( $mb_key => $value );
+        }
+    }
+
+    return;
 }
 
-sub ACTION_prereq_list {
-    print "$_\n" for sort keys %Requires;
-}
-
-sub valid_licenses {
+sub process_share_dir_files {
     my $self = shift;
 
-    my $licenses = $self->SUPER::valid_licenses();
+    return if $self->args('share-dir');
 
-    $licenses->{agpl3} = 'http://opensource.org/licenses/agpl-v3.html';
-
-    return $licenses;
+    return $self->SUPER::process_share_dir_files(@_);
 }
+
+sub ACTION_install {
+    my $self = shift;
+
+    $self->SUPER::ACTION_install(@_);
+
+    $self->dispatch('share');
+
+    $self->dispatch('database');
+
+    $self->dispatch('config');
+
+    $self->dispatch('clean_mason_cache');
+}
+
+sub ACTION_share {
+    my $self = shift;
+
+    my $share_dir = $self->args('share-dir')
+        or return;
+
+    for my $file ( grep { -f } @{ $self->rscan_dir('share') } ) {
+        ( my $shareless = $file ) =~ s{share[/\\]}{};
+
+        $self->copy_if_modified(
+            from => $file,
+            to   => File::Spec->catfile( $share_dir, $shareless ),
+        );
+    }
+
+    return;
+}
+
+sub ACTION_database {
+    my $self = shift;
+
+    require R2::DatabaseManager;
+
+    my %db_config;
+
+    my %args = $self->args();
+
+    for my $key ( grep { defined $args{$_} } grep { /^db-/ } keys %args ) {
+        ( my $no_prefix = $key ) =~ s/^db-//;
+        $db_config{$no_prefix} = $args{$key};
+    }
+
+    my $hostname = $self->args('hostname');
+
+    local $ENV{R2_HOSTNAME} = $hostname
+        if defined $hostname && $hostname ne q{};
+
+    $db_config{db_name} = delete $db_config{name};
+
+    R2::DatabaseManager->new(
+        %db_config,
+        production => 1,
+        quiet      => $self->quiet(),
+    )->update_or_install_db();
+}
+
+sub ACTION_config {
+    my $self = shift;
+
+    my $config_file = File::Spec->catfile( $self->args('etc-dir')
+            || ( '', 'etc', 'r2' ), 'r2.conf' );
+
+    require R2::Config;
+
+    my $config = R2::Config->instance();
+
+    if ( -f $config_file ) {
+        $self->log_info("  You already have a config file at $config_file.\n\n");
+        return;
+    }
+    else {
+        $self->log_info("  Generating a new config file at $config_file.\n\n");
+    }
+
+    require Digest::SHA;
+    my $secret = Digest::SHA::sha1_hex( time . $$ . rand(1_000_000_000) );
+
+    my %values = (
+        'R2/is_production' => 1,
+        'R2/secret'        => $secret,
+    );
+
+    my %args = $self->args();
+
+    $values{'dirs/share'} = $args{'share-dir'}
+        if $args{'share-dir'};
+
+    $values{'dirs/cache'} = $args{'cache-dir'}
+        if $args{'cache-dir'};
+
+    for my $key ( grep { defined $args{$_} } grep {/^db-/} keys %args ) {
+        ( my $conf_key = $key ) =~ s/^db-//;
+        $values{"database/$conf_key"} = $args{$key};
+    }
+
+    $config->write_config_file( file => $config_file, values => \%values );
+}
+
+sub ACTION_clean_mason_cache {
+    my $self = shift;
+
+    require R2::Config;
+
+    my $config = R2::Config->instance();
+
+    my $cache_dir = $config->cache_dir();
+
+    if ( -w $cache_dir ) {
+        require File::Path;
+
+        $self->log_info("  Deleting your mason cache dir at $cache_dir\n\n");
+
+        File::Path::rmtree( $cache_dir->subdir('mason'), 0, 0 );
+    }
+    else {
+        $self->log_warning("  Cannot delete your mason cache dir at $cache_dir\n  You may want to do this manually\n\n");
+    }
+}
+
+1;
