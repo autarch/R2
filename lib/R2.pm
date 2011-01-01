@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.01';
 
 use Catalyst::App::RoleApplicator;
 use Catalyst::Plugin::Session;
@@ -98,32 +97,3 @@ __PACKAGE__->setup();
 __PACKAGE__->meta()->make_immutable( replace_constructor => 1 );
 
 1;
-
-__END__
-
-=head1 NAME
-
-R2 - Catalyst based application
-
-=head1 SYNOPSIS
-
-    script/r2_server.pl
-
-=head1 DESCRIPTION
-
-[enter your description here]
-
-=head1 SEE ALSO
-
-L<R2::Controller::Root>, L<Catalyst>
-
-=head1 AUTHOR
-
-Dave Rolsky,,,
-
-=head1 LICENSE
-
-This library is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
