@@ -22,7 +22,7 @@
 <div class="yui3-g">
   <div class="<% $show_side_nav ? 'yui3-u-4-5' : 'yui3-u-1' %>">
 
-    <div id="content">
+    <div id="content" class="<% $show_side_nav ? q{} : 'no-side-nav' %>">
       <& .messages &>
 
 % $m->call_next();
