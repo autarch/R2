@@ -71,7 +71,7 @@ sub _updated_email_addresses {
     my $c      = shift;
     my $errors = shift;
 
-    my $emails = $c->request()->new_email_address_param_sets();
+    my $emails = $c->request()->updated_email_address_param_sets();
 
     for my $suffix ( keys %{$emails} ) {
         my @e = R2::Schema::EmailAddress->ValidateForInsert(
