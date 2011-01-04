@@ -252,104 +252,56 @@ sub contact_note_types {
     return ( \%existing, \@new );
 }
 
-sub updated_email_address_param_sets {
-    my $self = shift;
-
-    return $self->_updated_repeatable_param_sets(
-        'R2::Schema::EmailAddress',
-        'email_address_id',
-        'email_address',
-        sub { string_is_empty( $_[0]->{email_address} ) },
-        'has preferred',
-    );
-}
-
-sub _updated_repeatable_param_sets {
-    my $self           = shift;
-    my $class          = shift;
-    my $id_field       = shift;
-    my $key            = shift;
-    my $exclude_filter = shift;
-    my $has_preferred  = shift;
-
-    my %things;
-
-    my $params = $self->params();
-
-    for my $suffix ( $self->param($id_field) ) {
-        my %thing = $self->_params_for_classes( [$class], $suffix );
-
-        next if $exclude_filter->( \%thing );
-
-        if (
-            !string_is_empty( $params->{ $key . '_note' . q{-} . $suffix } ) )
-        {
-            $thing{note} = $params->{ $key . '_note' . q{-} . $suffix };
-        }
-
-        if ($has_preferred) {
-            $thing{is_preferred}
-                = $params->{ $key . '_is_preferred' } eq $suffix ? 1 : 0;
-        }
-
-        $things{$suffix} = \%thing;
-    }
-
-    return \%things;
-}
-
-sub new_email_address_param_sets {
-    my $self = shift;
-
-    return $self->_new_repeatable_param_sets(
-        'R2::Schema::EmailAddress',
-        'email_address',
-        'email_address',
-        sub { string_is_empty( $_[0]->{email_address} ) },
-        'has preferred',
-    );
-}
-
-sub new_website_param_sets {
-    my $self = shift;
-
-    return $self->_new_repeatable_param_sets(
-        'R2::Schema::Website',
-        'website',
-        'uri',
-        sub { string_is_empty( $_[0]->{uri} ) },
-    );
-}
-
-sub new_address_param_sets {
-    my $self = shift;
-
-    return $self->_new_repeatable_param_sets(
-        'R2::Schema::Address',
-        'address',
-        'address_type_id',
-
-        # If it just has a type and country, we ignore it.
-        sub {
+my @objects = (
+    {
+        type          => 'EmailAddress',
+        filter        => sub { string_is_empty( $_[0]->{email_address} ) },
+        has_preferred => 1,
+    }, {
+        type   => 'Website',
+        field  => 'uri',
+        filter => sub { string_is_empty( $_[0]->{uri} ) },
+    }, {
+        type  => 'Address',
+        field => 'address_type_id',
+        filter =>    # If it just has a type and country, we ignore it.
+            sub {
             ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 2;
-        },
-        'has preferred',
-    );
-}
-
-sub new_phone_number_param_sets {
-    my $self = shift;
-
-    return $self->_new_repeatable_param_sets(
-        'R2::Schema::PhoneNumber',
-        'phone_number',
-        'phone_number_type_id',
-
-        # If it just has a type, we ignore it.
-        sub {
+            },
+        has_preferred => 1,
+    }, {
+        type  => 'PhoneNumber',
+        field => 'phone_number_type_id',
+        filter =>    # If it just has a type, we ignore it.
+            sub {
             ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 1;
-        },
-        'has preferred',
+            },
+        has_preferred => 1,
+    },
+);
+
+for my $object (@objects) {
+    my $class = 'R2::Schema::' . $object->{type};
+
+    my $id_key = R2::Util::studly_to_calm( $object->{type} );
+    my $primary_field = $object->{field} || $id_key;
+
+    my @args = (
+        $class,
+        $id_key,
+        $primary_field,
+        $object->{filter},
+        $object->{has_preferred},
+    );
+
+    __PACKAGE__->meta()->add_method(
+        'new_' . $id_key . '_param_sets',
+        sub { $_[0]->_new_repeatable_param_sets(@args) },
+    );
+
+    __PACKAGE__->meta()->add_method(
+        'updated_' . $id_key . '_param_sets',
+        sub { $_[0]->_updated_repeatable_param_sets(@args) },
     );
 }
 
@@ -371,25 +323,73 @@ sub _new_repeatable_param_sets {
 
         last unless exists $params->{ $primary_field . q{-} . $suffix };
 
+        my $thing = $self->_param_set(
+            $class,
+            $key,
+            $suffix,
+            $exclude_filter,
+            $has_preferred
+        ) or next;
+
+        $things{$suffix} = $thing;
+    }
+
+    return \%things;
+}
+
+sub _updated_repeatable_param_sets {
+    my $self           = shift;
+    my $class          = shift;
+    my $id_field       = shift;
+    my $key            = shift;
+    my $exclude_filter = shift;
+    my $has_preferred  = shift;
+
+    my %things;
+
+    my $params = $self->params();
+
+    for my $suffix ( $self->param($id_field) ) {
         my %thing = $self->_params_for_classes( [$class], $suffix );
 
-        next if $exclude_filter->( \%thing );
-
-        if (
-            !string_is_empty( $params->{ $key . '_note' . q{-} . $suffix } ) )
-        {
-            $thing{note} = $params->{ $key . '_note' . q{-} . $suffix };
-        }
-
-        if ($has_preferred) {
-            $thing{is_preferred}
-                = $params->{ $key . '_is_preferred' } eq $suffix ? 1 : 0;
-        }
+        my $thing = $self->_param_set(
+            $class,
+            $key,
+            $suffix,
+            $exclude_filter,
+            $has_preferred
+        ) or next;
 
         $things{$suffix} = \%thing;
     }
 
     return \%things;
+}
+
+sub _param_set {
+    my $self           = shift;
+    my $class          = shift;
+    my $key            = shift;
+    my $suffix         = shift;
+    my $exclude_filter = shift;
+    my $has_preferred  = shift;
+
+    my %thing = $self->_params_for_classes( [$class], $suffix );
+
+    return if $exclude_filter->( \%thing );
+
+    my $params = $self->params();
+
+    if ( !string_is_empty( $params->{ $key . '_note' . q{-} . $suffix } ) ) {
+        $thing{note} = $params->{ $key . '_note' . q{-} . $suffix };
+    }
+
+    if ($has_preferred) {
+        $thing{is_preferred}
+            = $params->{ $key . '_is_preferred' } eq $suffix ? 1 : 0;
+    }
+
+    return \%thing;
 }
 
 sub custom_field_values {
