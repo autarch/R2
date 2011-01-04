@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-
-use Catalyst::App::RoleApplicator;
+use CatalystX::RoleApplicator;
 use Catalyst::Plugin::Session;
 use Catalyst::Request::REST::ForBrowsers;
 use R2::Config;
