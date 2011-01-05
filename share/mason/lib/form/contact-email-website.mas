@@ -27,7 +27,7 @@
 % }
 
     <div class="JS-repeatable-group JS-repeatable-group-email-address">
-      <& .email_address, id => 'new1', is_preferred => ! $emails &>
+      <& .email_address, id => 'new1', is_preferred => ! $emails->index() &>
     </div>
 
     <a href="#" class="add-another" id="email-address-repeater">Add another email address</a>
@@ -70,7 +70,7 @@ $websites = $contact->websites()
       <input type="hidden" name="email_address_id" value="<% $id %>" />
 % }
 
-      <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $email_address ? [ $email_address ] : [] &>
+      <&| /lib/filter/form.mas, is_fragment => 1, prefix => 'email_address', suffix => q{-} . $id, objects => $email_address ? [ $email_address ] : [] &>
       <div class="form-item">
         <label class="for-field" for="email_address-<% $id %>">Email address:</label>
         <input type="text" class="text medium" name="email_address-<% $id %>" id="email_address-<% $id %>" />
@@ -105,7 +105,7 @@ $is_preferred => 0
       <input type="hidden" name="website_id" value="<% $id %>" />
 % }
 
-      <&| /lib/filter/form.mas, is_fragment => 1, suffix => q{-} . $id, objects => $website ? [ $website ] : [] &>
+      <&| /lib/filter/form.mas, is_fragment => 1, prefix => 'website', suffix => q{-} . $id, objects => $website ? [ $website ] : [] &>
       <div class="form-item">
         <label class="for-field" for="label-<% $id %>">Label:</label>
         <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />

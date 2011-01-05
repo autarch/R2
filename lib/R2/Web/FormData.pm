@@ -13,6 +13,12 @@ has 'sources' => (
     required => 1,
 );
 
+has 'prefix' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => q{},
+);
+
 has 'suffix' => (
     is      => 'ro',
     isa     => 'Str',
@@ -26,6 +32,11 @@ sub has_sources {
 sub param {
     my $self  = shift;
     my $param = shift;
+
+    if ( my $p = $self->prefix() ) {
+        # Don't want to turn phone_number_type_id into type_id
+        $param =~ s/^\Q$p\E_(?!type)//;
+    }
 
     if ( my $s = $self->suffix() ) {
         $param =~ s/\Q$s\E$//;
