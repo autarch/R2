@@ -1,7 +1,7 @@
   <fieldset>
     <legend>Addresses</legend>
 
-    <div class="JS-repeatable-group JS-repeatable-group-address">
+    <div class="JS-repeatable-group JS-repeatable-group-address repeat-group">
       <div class="form-item">
         <label class="for-field" for="address-new1" id="for-address-new1">Address:</label>
         <select name="address_type_id-new1">

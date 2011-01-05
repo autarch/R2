@@ -20,13 +20,13 @@
 
 % if ($emails) {
 %   while ( my $email = $emails->next() ) {
-    <div id="JS-email-address-<% $email->email_address_id() %>">
+    <div id="JS-email-address-<% $email->email_address_id() %>" class="repeat-group">
       <& .email_address, email_address => $email, id => $email->email_address_id(), is_preferred => $email->is_preferred() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-email-address">
+    <div class="JS-repeatable-group JS-repeatable-group-email-address repeat-group">
       <& .email_address, id => 'new1', is_preferred => ! $emails->index() &>
     </div>
 
@@ -38,13 +38,13 @@
 
 % if ($websites) {
 %   while ( my $website = $websites->next() ) {
-    <div id="JS-website-<% $website->website_id() %>">
+    <div id="JS-website-<% $website->website_id() %>" class="repeat-group">
       <& .website, website => $website, id => $website->website_id() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-website">
+    <div class="JS-repeatable-group JS-repeatable-group-website repeat-group">
       <& .website, id => 'new1' &>
     </div>
 
