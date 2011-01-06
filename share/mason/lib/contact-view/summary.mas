@@ -1,12 +1,11 @@
 <div id="summary">
+% if ($image ) {
+  <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
+% }
   <h1>
     <% $contact->display_name() %>
 
     <& /lib/contact-view/contact-icon.mas, contact => $contact &>
-
-% if ($image ) {
-    <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
-% }
   </h1>
 </div>
 
