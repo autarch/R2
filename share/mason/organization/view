@@ -1,16 +1,16 @@
 <div id="contact-view">
 
-<& /lib/contact-view/summary.mas, contact => $household &>
+<& /lib/contact-view/summary.mas, contact => $organization &>
 
-<& /lib/contact-view/members.mas, contact => $household &>
+<& /lib/contact-view/members.mas, contact => $organization &>
 
-<& /lib/contact-view/email-addresses.mas, contact => $household &>
+<& /lib/contact-view/email-addresses.mas, contact => $organization &>
 
-<& /lib/contact-view/websites.mas, contact => $household &>
+<& /lib/contact-view/websites.mas, contact => $organization &>
 
-<& /lib/contact-view/phone-numbers.mas, contact => $household &>
+<& /lib/contact-view/phone-numbers.mas, contact => $organization &>
 
-<& /lib/contact-view/addresses.mas, contact => $household &>
+<& /lib/contact-view/addresses.mas, contact => $organization &>
 
 </div>
 
