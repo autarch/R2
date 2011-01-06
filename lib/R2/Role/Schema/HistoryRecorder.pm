@@ -115,7 +115,8 @@ my $_make_update_wrapper = sub {
             . ( ref $self )
             . " requires a user parameter";
 
-        my %original = map { $_ => $self->$_() } keys %p;
+        my %original
+            = map { $_ => $self->$_() } grep { $self->can($_) } keys %p;
 
         R2::Schema->RunInTransaction(
             sub {
