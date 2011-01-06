@@ -63,7 +63,9 @@
 
 <& /lib/form/contact-image.mas &>
 
+% unless ($person) {
 <& /lib/form/contact-note.mas &>
+% }
 
   </fieldset>
 
