@@ -26,7 +26,7 @@
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-email-address repeat-group">
+    <div class="JS-repeatable-group-email-address repeat-group">
       <& .email_address, id => 'new1', is_preferred => ! ( $emails && $emails->index() ) &>
     </div>
 
@@ -44,7 +44,7 @@
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-website repeat-group">
+    <div class="JS-repeatable-group-website repeat-group">
       <& .website, id => 'new1' &>
     </div>
 

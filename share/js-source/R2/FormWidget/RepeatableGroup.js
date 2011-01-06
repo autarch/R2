@@ -19,7 +19,7 @@ R2.FormWidget.RepeatableGroup = function ( div, form ) {
 
     this.form = form;
 
-    var matches = div.className.match( /JS-repeatable-group-(.+)/ );
+    var matches = div.className.match( /JS-repeatable-group-(\S+)/ );
     var type = matches[1];
 
     var repeater = $( type + "-repeater" );
@@ -60,6 +60,8 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
 
     var div = document.createElement("div");
     div.id = "R2-RepeatableGroup-" + R2.FormWidget._idSequence++;
+
+    div.className = "repeat-group";
 
     div.innerHTML = html;
 

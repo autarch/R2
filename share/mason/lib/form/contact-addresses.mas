@@ -9,7 +9,7 @@
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-address repeat-group">
+    <div class="JS-repeatable-group-address repeat-group">
       <& .address, id => 'new1', is_preferred => ! ( $addresses && $addresses->index() ), contact_type => $contact_type &>
     </div>
 

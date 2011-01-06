@@ -9,7 +9,7 @@
 %   }
 % }
 
-    <div class="JS-repeatable-group JS-repeatable-group-phone-number repeat-group">
+    <div class="JS-repeatable-group-phone-number repeat-group">
       <& .phone_number, id => 'new1', is_preferred => ! ( $numbers && $numbers->index() ), contact_type => $contact_type &>
     </div>
 
