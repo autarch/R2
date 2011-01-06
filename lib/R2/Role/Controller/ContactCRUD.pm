@@ -6,7 +6,8 @@ use namespace::autoclean;
 
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
-use R2::Util qw( string_is_empty );
+use R2::Util qw( string_is_empty studly_to_calm );
+use Scalar::Util qw( blessed );
 
 use Moose::Role;
 
@@ -28,7 +29,7 @@ sub _contact_params_for_class {
     return \%p;
 }
 
-sub _new_image {
+sub _contact_image {
     my $self   = shift;
     my $c      = shift;
     my $errors = shift;
@@ -45,109 +46,65 @@ sub _new_image {
     return $image;
 }
 
-sub _new_email_addresses {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
+for my $class_suffix (qw( EmailAddress Website Address PhoneNumber )) {
+    my $type  = studly_to_calm($class_suffix);
+    my $class = 'R2::Schema::' . $class_suffix;
 
-    my $emails = $c->request()->new_email_address_param_sets();
+    my $new_param_set_meth = 'new_' . $type . '_param_sets';
 
-    for my $suffix ( keys %{$emails} ) {
-        my @e = R2::Schema::EmailAddress->ValidateForInsert(
-            %{ $emails->{$suffix} },
-            contact_id => 1,
-        );
+    my $new_sub = sub {
+        my $self   = shift;
+        my $c      = shift;
+        my $errors = shift;
 
-        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
+        my $sets = $c->request()->$new_param_set_meth();
 
-        push @{$errors}, @e;
-    }
+        for my $suffix ( keys %{$sets} ) {
+            my @e = $class->ValidateForInsert(
+                %{ $sets->{$suffix} },
+                contact_id => 1,
+            );
 
-    return [ values %{$emails} ];
-}
+            $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
 
-sub _updated_email_addresses {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
+            push @{$errors}, @e;
+        }
 
-    my $emails = $c->request()->updated_email_address_param_sets();
+        return [ values %{$sets} ];
+    };
 
-    for my $suffix ( keys %{$emails} ) {
-        my @e = R2::Schema::EmailAddress->ValidateForInsert(
-            %{ $emails->{$suffix} },
-            contact_id => 1,
-        );
+    my $plural = $type . ( $type =~ /s$/ ? 'es' : 's' );
+    my $new_meth = '_new_' . $plural;
 
-        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
+    __PACKAGE__->meta()->add_method( $new_meth => $new_sub );
 
-        push @{$errors}, @e;
-    }
+    my $updated_param_set_meth = 'updated_' . $type . '_param_sets';
 
-    return [ values %{$emails} ];
-}
+    my $pk_col = $class->Table()->primary_key()->[0]->name();
 
-sub _new_websites {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
+    my $updated_sub = sub {
+        my $self   = shift;
+        my $c      = shift;
+        my $errors = shift;
 
-    my $sites = $c->request()->new_website_param_sets();
+        my $sets = $c->request()->$updated_param_set_meth();
 
-    for my $suffix ( keys %{$sites} ) {
-        my @e = R2::Schema::Website->ValidateForInsert(
-            %{ $sites->{$suffix} },
-            contact_id => 1,
-        );
+        for my $id ( keys %{$sets} ) {
+            my $object = $class->new( $pk_col => $id ) or next;
 
-        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
+            my @e = $object->validate_for_update( %{ $sets->{$id} } );
 
-        push @{$errors}, @e;
-    }
+            $self->_apply_suffix_to_fields_in_errors( $id, \@e );
 
-    return [ values %{$sites} ];
-}
+            push @{$errors}, @e;
+        }
 
-sub _new_addresses {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
+        return $sets;
+    };
 
-    my $addresses = $c->request()->new_address_param_sets();
+    my $updated_meth = '_updated_' . $plural;
 
-    for my $suffix ( keys %{$addresses} ) {
-        my @e = R2::Schema::Address->ValidateForInsert(
-            %{ $addresses->{$suffix} },
-            contact_id => 1,
-        );
-
-        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
-
-        push @{$errors}, @e;
-    }
-
-    return [ values %{$addresses} ];
-}
-
-sub _new_phone_numbers {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
-
-    my $numbers = $c->request()->new_phone_number_param_sets();
-
-    for my $suffix ( keys %{$numbers} ) {
-        my @e = R2::Schema::PhoneNumber->ValidateForInsert(
-            %{ $numbers->{$suffix} },
-            contact_id => 1,
-        );
-
-        $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
-
-        push @{$errors}, @e;
-    }
-
-    return [ values %{$numbers} ];
+    __PACKAGE__->meta()->add_method( $updated_meth => $updated_sub );
 }
 
 sub _new_custom_fields {
@@ -206,7 +163,7 @@ sub _insert_contact {
 
     my @errors = $class->ValidateForInsert( %{$p} );
 
-    my $image = $self->_new_image( $c, \@errors );
+    my $image = $self->_contact_image( $c, \@errors );
 
     my $emails = $self->_new_email_addresses( $c, \@errors );
 
@@ -329,26 +286,35 @@ sub _update_contact {
     my $c       = shift;
     my $contact = shift;
 
-    my $p = $self->_contact_params_for_class( $c, ref $contact );
+    my $real_contact = $contact->real_contact();
+    my $class = blessed $real_contact;
 
-    my @errors = $contact->validate_for_update( %{$p} );
+    my $p = $self->_contact_params_for_class( $c, $class );
 
-    my $image = $self->_new_image( $c, \@errors );
+    my @errors = $real_contact->validate_for_update( %{$p} );
 
-    my $emails = $self->_new_email_addresses( $c, \@errors );
+    my $image = $self->_contact_image( $c, \@errors );
 
-    my $websites = $self->_new_websites( $c, \@errors );
+    my $new_emails = $self->_new_email_addresses( $c, \@errors );
+    my $updated_emails = $self->_updated_email_addresses( $c, \@errors );
 
-    my $addresses = $self->_new_addresses( $c, \@errors );
+    my $new_websites = $self->_new_websites( $c, \@errors );
+    my $updated_websites = $self->_updated_websites( $c, \@errors );
 
-    my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
+    my $new_addresses = $self->_new_addresses( $c, \@errors );
+    my $updated_addresses = $self->_updated_addresses( $c, \@errors );
 
-    my $custom_fields = $self->_new_custom_fields( $c, \@errors );
+    my $new_phone_numbers = $self->_new_phone_numbers( $c, \@errors );
+    my $updated_phone_numbers = $self->_updated_phone_numbers( $c, \@errors );
 
-    my $members;
-    if ( $contact->can('members') ) {
-        $members = $c->request()->members();
+    my $new_custom_fields = $self->_new_custom_fields( $c, \@errors );
+
+    my $new_members;
+    if ( $real_contact->can('members') ) {
+        $new_members = $c->request()->members();
     }
+
+    my $updated_members;
 
     if (@errors) {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
@@ -365,80 +331,119 @@ sub _update_contact {
         $contact,
         $p,
         $image,
-        $emails,
-        $websites,
-        $addresses,
-        $phone_numbers,
-        $members,
-        $custom_fields,
+        $new_emails,
+        $updated_emails,
+        $new_websites,
+        $updated_websites,
+        $new_addresses,
+        $updated_addresses,
+        $new_phone_numbers,
+        $updated_phone_numbers,
+        $new_members,
+        $updated_members,
+        $new_custom_fields,
     );
 
     return R2::Schema->RunInTransaction($update_sub);
 }
 
 sub _make_update_sub {
-    my $self          = shift;
-    my $c             = shift;
-    my $contact       = shift;
-    my $contact_p     = shift;
-    my $image         = shift;
-    my $emails        = shift;
-    my $websites      = shift;
-    my $addresses     = shift;
-    my $phone_numbers = shift;
-    my $members       = shift;
-    my $custom_fields = shift;
+    my $self                  = shift;
+    my $c                     = shift;
+    my $contact               = shift;
+    my $contact_p             = shift;
+    my $image                 = shift;
+    my $new_emails            = shift;
+    my $updated_emails        = shift;
+    my $new_websites          = shift;
+    my $updated_websites      = shift;
+    my $new_addresses         = shift;
+    my $updated_addresses     = shift;
+    my $new_phone_numbers     = shift;
+    my $updated_phone_numbers = shift;
+    my $new_members           = shift;
+    my $updated_members       = shift;
+    my $custom_fields         = shift;
 
     my $user    = $c->user();
     my $account = $c->account();
 
     return sub {
         if ($image) {
+            if ( my $old_image = $contact->image() ) {
+                $old_image->file()->delete();
+            }
+
             my $file = R2::Schema::File->insert(
                 filename   => $image->basename(),
                 contents   => scalar $image->slurp(),
                 mime_type  => $image->type(),
-                account_id => $contact_p->{account_id},
+                account_id => $contact->account_id(),
             );
 
             $contact_p->{image_file_id} = $file->file_id();
         }
 
-        $contact->update( %{$contact_p}, user => $user );
+        $contact->real_contact()->update( %{$contact_p}, user => $user );
 
-        for my $email ( @{$emails} ) {
+        for my $email ( @{$new_emails} ) {
             $contact->add_email_address( %{$email}, user => $user );
         }
 
-        for my $website ( @{$websites} ) {
+        for my $email_address_id ( keys %{$updated_emails} ) {
+            my $email = R2::Schema::EmailAddress->new(
+                email_address_id => $email_address_id,
+            ) or next;
+
+            $email->update( %{ $updated_emails->{$email_address_id} } );
+        }
+
+        for my $website ( @{$new_websites} ) {
             $contact->add_website( %{$website}, user => $user );
         }
 
-        for my $address ( @{$addresses} ) {
+        for my $website_id ( keys %{$updated_websites} ) {
+            my $website = R2::Schema::Website->new(
+                website_id => $website_id,
+            ) or next;
+
+            $website->update( %{ $updated_websites->{$website_id} } );
+        }
+
+        for my $address ( @{$new_addresses} ) {
             $contact->add_address( %{$address}, user => $user );
         }
 
-        for my $number ( @{$phone_numbers} ) {
+        for my $address_id ( keys %{$updated_addresses} ) {
+            my $address = R2::Schema::Address->new(
+                address_id => $address_id,
+            ) or next;
+
+            $address->update( %{ $updated_addresses->{$address_id} } );
+        }
+
+        for my $number ( @{$new_phone_numbers} ) {
             $contact->add_phone_number( %{$number}, user => $user );
         }
 
-        if ($members) {
-            for my $member ( @{$members} ) {
+        for my $phone_number_id ( keys %{$updated_phone_numbers} ) {
+            my $phone_number = R2::Schema::PhoneNumber->new(
+                phone_number_id => $phone_number_id,
+            ) or next;
+
+            $phone_number->update(
+                %{ $updated_phone_numbers->{$phone_number_id} } );
+        }
+
+        if ($new_members) {
+            for my $member ( @{$new_members} ) {
                 $contact->add_member( %{$member}, user => $user );
             }
         }
 
-        my $note = $c->request()->params()->{note};
-        if ( !string_is_empty($note) ) {
-            $contact->add_note(
-                note => $note,
-                contact_note_type_id =>
-                    $account->made_a_note_contact_note_type()
-                    ->contact_note_type_id(),
-                user_id => $c->user()->user_id(),
-            );
-        }
+        # XXX - updated_members
 
+        # XXX - how to delete a custom field value?
         for my $pair ( @{$custom_fields} ) {
             $pair->[0]->set_value_for_contact(
                 contact => $contact,

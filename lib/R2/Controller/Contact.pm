@@ -17,6 +17,8 @@ use Moose;
 
 BEGIN { extends 'R2::Controller::Base' }
 
+with 'R2::Role::Controller::ContactCRUD';
+
 sub new_person_form : Local {
     my $self = shift;
     my $c    = shift;
@@ -186,19 +188,12 @@ sub contact_PUT : Private {
         $c->account()->uri(),
     );
 
-    my $type = lc $contact->contact_type();
-
-    my %p = $c->request()->person_params();
-    $p{date_format} = $c->request()->params()->{date_format};
-
-    my @errors = R2::Schema::Person->ValidateForInsert(%p);
-
     $self->_update_contact(
         $c,
-        'R2::Schema::Person',
-        \%p,
-        \@errors,
+        $contact,
     );
+
+    $c->redirect_and_detach( $contact->uri() );
 }
 
 sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) :
