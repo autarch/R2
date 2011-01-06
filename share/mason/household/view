@@ -1,6 +1,6 @@
 <div id="contact-view">
 
-<& /lib/contact-view/summary.mas, contact => $household &>
+<& /lib/contact-view/summary.mas, contact => $household, show_image => 1 &>
 
 <& /lib/contact-view/members.mas, contact => $household &>
 

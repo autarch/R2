@@ -11,12 +11,12 @@
 
 <%args>
 $contact
+$show_image => 0
 </%args>
 
 <%init>
 my $image;
-if ( $contact->image() )
-{
+if ( $show_image && $contact->image() ) {
     $image = $contact->image()->resize( height => 100, width => 100 );
 }
 </%init>
