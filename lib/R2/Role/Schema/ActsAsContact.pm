@@ -114,9 +114,10 @@ role {
 
         # Eek - this is horrid
         push @errors,
-            $self->R2::Schema::Contact::_check_validation_steps( $contact_p,
-            $is_insert )
-            if R2::Schema::Contact->can('_check_validation_steps');
+            $self->R2::Schema::Contact::_check_validation_steps(
+            $contact_p,
+            $is_insert,
+            ) if R2::Schema::Contact->can('_check_validation_steps');
 
         {
 
