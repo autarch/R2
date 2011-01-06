@@ -20,7 +20,9 @@ Does not want to be emailed via Rapport.
     </strong>
 %   }
 %   if ( my $note = $email->note() ) {
-    <p><% $note %></p>
+    <p class="email-address-note">
+      <% $note %>
+    </p>
 %   }
   </li>
 % }
