@@ -10,7 +10,7 @@
 % }
 
     <div class="JS-repeatable-group JS-repeatable-group-phone-number repeat-group">
-      <& .phone_number, id => 'new1', is_preferred => ! $numbers->index(), contact_type => $contact_type &>
+      <& .phone_number, id => 'new1', is_preferred => ! ( $numbers && $numbers->index() ), contact_type => $contact_type &>
     </div>
 
     <a href="#" class="add-another" id="phone-number-repeater">Add another phone number</a>

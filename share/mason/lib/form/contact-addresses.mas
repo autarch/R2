@@ -10,7 +10,7 @@
 % }
 
     <div class="JS-repeatable-group JS-repeatable-group-address repeat-group">
-      <& .address, id => 'new1', is_preferred => ! $addresses->index(), contact_type => $contact_type &>
+      <& .address, id => 'new1', is_preferred => ! ( $addresses && $addresses->index() ), contact_type => $contact_type &>
     </div>
 
     <a href="#" class="add-another" id="address-repeater">Add another address</a>

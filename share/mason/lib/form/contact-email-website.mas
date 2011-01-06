@@ -27,7 +27,7 @@
 % }
 
     <div class="JS-repeatable-group JS-repeatable-group-email-address repeat-group">
-      <& .email_address, id => 'new1', is_preferred => ! $emails->index() &>
+      <& .email_address, id => 'new1', is_preferred => ! ( $emails && $emails->index() ) &>
     </div>
 
     <a href="#" class="add-another" id="email-address-repeater">Add another email address</a>
