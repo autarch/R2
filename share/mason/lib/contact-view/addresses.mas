@@ -8,9 +8,37 @@ Does not want to receive postal mail.
 % }
 </p>
 
+<ul>
 % for my $address (@addresses) {
-<& /lib/contact-view/address.mas, address => $address &>
+  <li class="<% $address->is_preferred() ? 'preferred' : q{} %>">
+    <% $address->type()->name() %>
+%   if ( $address->is_preferred() ) {
+    (Preferred)
+%   }
+
+    <address>
+      <% $address->street_1() %>
+
+% if ( ! string_is_empty( $address->street_2() ) ) {
+      <br />
+      <% $address->street_2() %>
 % }
+% if ( ! string_is_empty( $address->city_region_postal_code() ) ) {
+      <br />
+      <% $address->city_region_postal_code() %>
+% }
+      <br />
+      <% $address->country()->name() %>
+    </address>
+
+%   if ( ! string_is_empty( $address->note() ) ) {
+    <p class="address-note">
+      <% $address->note() %>
+    </p>
+%   }
+  </li>
+% }
+</ul>
 
 <%args>
 $contact

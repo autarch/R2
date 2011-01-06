@@ -185,24 +185,33 @@ body {
     h3 {
         color: @medium-gray;
     }
-}
 
-#contact-image {
-    margin-left: 0.5em;
-    vertical-align: top;
-}
+    #contact-image {
+        margin-left: 0.5em;
+        vertical-align: top;
+    }
 
-.email-address-note, .website-note, .address-note, .phone-number-note {
-    font-style: italic;
-}
+    li.preferred {
+        font-weight: bold;
 
-div.contact-custom-field {
-   margin-bottom: 0.5em;
+        address {
+            font-weight: bold;
+        }
+    }
+    
+    .email-address-note, .website-note, .address-note, .phone-number-note {
+        font-weight: normal;
+        font-style: italic;
+    }
 
-   span.label {
-       font-weight: bold;
-       margin-right: 0.5em;
-   }
+    div.contact-custom-field {
+        margin-bottom: 0.5em;
+
+        span.label {
+            font-weight: bold;
+            margin-right: 0.5em;
+        }
+    }
 }
 
 ul.table-summary {

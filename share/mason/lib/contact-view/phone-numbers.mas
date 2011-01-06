@@ -10,15 +10,18 @@ Does not want to receive phone calls.
 
 <ul>
 % for my $number (@phone_numbers) {
-  <li><% $number->type()->name() %>:
-      <% $number->phone_number() %>
+  <li class="<% $number->is_preferred() ? 'preferred' : q{} %>">
+    <% $number->type()->name() %>
 %   if ( $number->is_preferred() ) {
-      <strong>(Preferred)</strong>
+      (Preferred)
 %   }
+    <br />
+    <% $number->phone_number() %>
 %   if ( ! string_is_empty( $number->note() ) ) {
-      <br /
-      <span class="phone-number-note"><% $number->note() %></span>
+    <br />
+    <span class="phone-number-note"><% $number->note() %></span>
 %   }
+  </li>
 % }
 </ul>
 
