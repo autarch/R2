@@ -87,6 +87,16 @@ around 'insert' => sub {
     return $file;
 };
 
+after delete => sub {
+    my $self = shift;
+
+    my $path = $self->_cache_dir()->file( $self->filename() );
+
+    unlink $path if -f $path;
+
+    return;
+};
+
 sub _build_path {
     my $self = shift;
 

@@ -67,6 +67,13 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         $file->unique_name(), $file->file_id(),
         'unique_name defaults to file_id'
     );
+
+    $file->delete();
+
+    ok(
+        !-e $file->_cache_dir()->file( $file->filename() ),
+        'file deletes itself off the disk when delete is called'
+    );
 }
 
 {
