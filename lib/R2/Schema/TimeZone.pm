@@ -27,6 +27,9 @@ use MooseX::ClassAttribute;
     );
 }
 
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('iso_code') };
+
 sub EnsureRequiredTimeZonesExist {
     my $class = shift;
 
@@ -56,14 +59,11 @@ sub EnsureRequiredTimeZonesExist {
     );
 
     for my $iso_code ( keys %zones ) {
-        my $order = 1;
-
         for my $zone ( @{ $zones{$iso_code} } ) {
             $class->insert(
                 olson_name    => $zone->[0],
                 iso_code      => $iso_code,
                 description   => $zone->[1],
-                display_order => $order++,
             );
         }
     }

@@ -126,11 +126,9 @@ CREATE TABLE "CustomFieldGroup" (
        applies_to_person              BOOLEAN      NOT NULL DEFAULT TRUE,
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization        BOOLEAN      NOT NULL DEFAULT FALSE,
-       account_id                     INT8         NOT NULL
--- unique constraints are not deferrable
---       CONSTRAINT account_id_display_order_ck
---                  UNIQUE ( account_id, display_order )
---                  INITIALLY DEFERRED
+       account_id                     INT8         NOT NULL,
+       CONSTRAINT account_id_display_order_ck
+                  UNIQUE ( account_id, display_order )
 );
 
 CREATE TYPE custom_field_type AS
@@ -145,10 +143,9 @@ CREATE TABLE "CustomField" (
        html_widget_id           INTEGER      NOT NULL,
        display_order            pos_int      NOT NULL,
        account_id               INT8         NOT NULL,
-       custom_field_group_id    INT8         NOT NULL
---       CONSTRAINT custom_field_group_id_display_order_ck
---                  UNIQUE ( custom_field_group_id, display_order )
---                  INITIALLY DEFERRED
+       custom_field_group_id    INT8         NOT NULL,
+       CONSTRAINT custom_field_group_id_display_order_ck
+                  UNIQUE ( custom_field_group_id, display_order )
 );
 
 CREATE TABLE "HTMLWidget" (
@@ -204,10 +201,9 @@ CREATE TABLE "CustomFieldSelectOption" (
        custom_field_select_option_id INT8    PRIMARY KEY,
        custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
-       value                    TEXT         NOT NULL
---       CONSTRAINT custom_field_id_display_order_ck
---                  UNIQUE ( custom_field_id, display_order )
---                  INITIALLY DEFERRED
+       value                    TEXT         NOT NULL,
+       CONSTRAINT custom_field_id_display_order_ck
+                  UNIQUE ( custom_field_id, display_order )
 );
 
 CREATE TABLE "CustomFieldSingleSelectValue" (
@@ -420,11 +416,9 @@ CREATE TABLE "TimeZone" (
        CONSTRAINT valid_olson_name CHECK ( olson_name != '' ),
        CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
        CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT valid_display_order CHECK ( display_order > 0 )
--- unique constraints are not deferrable
---       CONSTRAINT account_id_display_order_ck
---                  UNIQUE ( iso_code, display_order )
---                  INITIALLY DEFERRED
+       CONSTRAINT valid_display_order CHECK ( display_order > 0 ),
+       CONSTRAINT iso_code_display_order_ck
+                  UNIQUE ( iso_code, display_order )
 );
 
 CREATE TABLE "AddressType" (

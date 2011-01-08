@@ -62,6 +62,9 @@ with 'R2::Role::Schema::DataValidator';
     );
 }
 
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('custom_field_group_id') };
+
 sub is_deletable {
     my $self = shift;
 

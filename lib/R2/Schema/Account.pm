@@ -258,112 +258,40 @@ sub add_country {
     );
 }
 
-sub update_or_add_donation_sources {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
+for my $pair (
+    [ 'donation_source',    'name' ],
+    [ 'donation_campaign',  'name' ],
+    [ 'payment_type',       'name' ],
+    [ 'address_type',       'name' ],
+    [ 'phone_number_type',  'name' ],
+    [ 'contact_note_type',  'description' ],
+    [ 'custom_field_group', 'name' ],
+    ) {
 
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'donation_source',
-        'name',
-    );
-}
+    my $thing    = $pair->[0];
+    my $name_col = $pair->[1];
 
-sub update_or_add_donation_campaigns {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
+    my $plural = $thing . 's';
 
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'donation_campaign',
-        'name',
-    );
-}
+    my @clears = grep { __PACKAGE__->can($_) }
+        map { '_clear_' . $plural . '_for_' . $_ }
+        qw( person household organization );
 
-sub update_or_add_payment_types {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
+    my $sub = sub {
+        my $self = shift;
 
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'payment_type',
-        'name',
-    );
-}
+        $self->_update_or_add_things(
+            @_,
+            $thing,
+            $name_col,
+        );
 
-sub update_or_add_address_types {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
+        $self->$_() for @clears;
+    };
 
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'address_type',
-        'name',
-    );
+    my $meth = 'update_or_add_' . $plural;
 
-    $self->_clear_address_types_for_person();
-    $self->_clear_address_types_for_household();
-    $self->_clear_address_types_for_organization();
-}
-
-sub update_or_add_phone_number_types {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
-
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'phone_number_type',
-        'name',
-    );
-
-    $self->_clear_phone_number_types_for_person();
-    $self->_clear_phone_number_types_for_household();
-    $self->_clear_phone_number_types_for_organization();
-}
-
-sub update_or_add_contact_note_types {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
-
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'contact_note_type',
-        'description',
-    );
-}
-
-sub update_or_add_custom_field_groups {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
-
-    my $order = $self->custom_field_group_count() + 1;
-    for my $new ( @{$new} ) {
-        $new->{display_order} = $order++;
-    }
-
-    $self->_update_or_add_things(
-        $existing,
-        $new,
-        'custom_field_group',
-        'name',
-    );
-
-    $self->_clear_custom_field_groups_for_person();
-    $self->_clear_custom_field_groups_for_household();
-    $self->_clear_custom_field_groups_for_organization();
+    __PACKAGE__->meta()->add_method( $meth => $sub );
 }
 
 sub _update_or_add_things {

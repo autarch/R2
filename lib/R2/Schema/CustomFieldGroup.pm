@@ -164,10 +164,6 @@ with 'R2::Role::Schema::AppliesToContactTypes';
 with 'R2::Role::Schema::HasDisplayOrder' =>
     { related_column => __PACKAGE__->Table()->column('account_id') };
 
-sub _display_order_is_unique {
-    return;
-}
-
 sub update_or_add_custom_fields {
     my $self     = shift;
     my $existing = shift;
