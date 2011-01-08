@@ -294,7 +294,7 @@ for my $pair (
             error "You must have at least one $thing_name.";
         }
 
-        my $sub = subname(
+        my $trans_sub = subname(
             'R2::Schema::Account::_update_or_add-' . $thing => sub {
                 for my $object ( $self->$plural()->all() ) {
                     my $updated_thing = $existing->{ $object->$id_col() };
@@ -319,7 +319,7 @@ for my $pair (
             }
         );
 
-        R2::Schema->RunInTransaction($sub);
+        R2::Schema->RunInTransaction($trans_sub);
 
         $self->$_() for @clears;
     };
