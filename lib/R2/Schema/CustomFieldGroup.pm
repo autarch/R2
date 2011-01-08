@@ -18,10 +18,14 @@ use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' => {
     steps => [
-        qw( _display_order_is_unique
-            _applies_to_something _cannot_unapply )
+        qw(
+            _display_order_is_unique
+            _applies_to_something
+            _cannot_unapply
+            )
     ]
 };
+
 with 'R2::Role::Schema::AppliesToContactTypes';
 
 {
@@ -156,6 +160,9 @@ with 'R2::Role::Schema::AppliesToContactTypes';
         init_arg => undef,
     );
 }
+
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('account_id') };
 
 sub _display_order_is_unique {
     return;
