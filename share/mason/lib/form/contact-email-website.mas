@@ -110,7 +110,11 @@ $is_preferred => 0
       <input type="hidden" name="website_id" value="<% $id %>" />
 % }
 
-      <&| /lib/filter/form.mas, is_fragment => 1, prefix => 'website', suffix => q{-} . $id, objects => $website ? [ $website ] : [] &>
+      <&| /lib/filter/form.mas,
+          is_fragment => 1,
+          prefix      => 'website',
+          suffix      => q{-} . $id,
+          objects     => $website ? [ $website ] : [] &>
       <div class="form-item">
         <label class="for-field" for="label-<% $id %>">Label:</label>
         <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />
