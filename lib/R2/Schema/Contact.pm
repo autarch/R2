@@ -17,7 +17,8 @@ use R2::Schema::File;
 use R2::Schema::PhoneNumber;
 use R2::Schema::Website;
 use R2::Types qw( PosOrZeroInt Bool HashRef );
-use R2::Util qw( string_is_empty );
+use R2::Util qw( calm_to_studly string_is_empty );
+use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -94,7 +95,7 @@ with 'R2::Role::Schema::URIMaker';
     has_one 'preferred_email_address' => (
         table       => $schema->table('EmailAddress'),
         select      => __PACKAGE__->_PreferredThingSelect('EmailAddress'),
-        bind_params => sub { $_[0]->contact_id() }
+        bind_params => sub { $_[0]->contact_id() },
     );
 
     has_many 'addresses' => (
@@ -279,57 +280,96 @@ sub _build_real_contact {
     die 'Cannot find a real contact for contact id: ' . $self->contact_id();
 }
 
+for my $pair (
+    [ 'email_address', 'email_address' ],
+    [ 'website',       'uri' ],
+    [ 'phone_number',  'phone_number_type_id' ],
+    [ 'address',       'address_type_id' ]
+    ) {
+
+    my $thing         = $pair->[0];
+    my $existence_col = $pair->[1];
+
+    my $plural = $thing . ( $thing =~ /s$/ ? 'es' : 's' );
+
+    my $class = 'R2::Schema::' . calm_to_studly($thing);
+
+    my $id_col = $thing . '_id';
+
+    my $can_is_preferred = !!$class->can('is_preferred');
+
+    my $count_method           = $thing . '_count';
+    my $preferred_method       = 'preferred_' . $thing;
+    my $clear_preferred_method = '_clear_preferred_' . $thing;
+
+    my $method = 'update_or_add_' . $plural;
+
+    my $sub = sub {
+        my $self     = shift;
+        my $existing = shift;
+        my $new      = shift;
+        my $user     = shift;
+
+        if ($can_is_preferred) {
+            if ( @{ $new || [] } && !$self->$count_method() ) {
+                unless ( grep { $_->{is_preferred} } @{$new} ) {
+                    $new->[0]->{is_preferred} = 1;
+                }
+            }
+        }
+
+        my $trans_sub = subname(
+            'R2::Schema::Contact::_update_or_add-' . $thing => sub {
+                for my $object ( $self->$plural()->all() ) {
+                    my $updated_data = $existing->{ $object->$id_col() };
+
+                    if ( string_is_empty( $updated_data->{$existence_col} ) )
+                    {
+                        $object->delete( user => $user );
+                    }
+                    else {
+                        $object->update(
+                            %{$updated_data},
+                            user => $user,
+                        );
+                    }
+                }
+
+                for my $new_data ( @{$new} ) {
+                    $class->insert(
+                        %{$new_data},
+                        contact_id => $self->contact_id(),
+                        user       => $user
+                    );
+                }
+
+                return unless $can_is_preferred;
+
+                $self->$clear_preferred_method();
+
+                return
+                    if $self->$count_method() == 0
+                        || $self->$preferred_method();
+
+                die
+                    "When calling $method, there must be one preferred $thing (or no $plural)";
+            }
+        );
+
+        R2::Schema->RunInTransaction($trans_sub);
+
+        return;
+    };
+
+    __PACKAGE__->meta()->add_method( $method => $sub );
+}
+
 sub add_donation {
     my $self = shift;
 
     return R2::Schema::Donation->insert(
         contact_id => $self->contact_id(),
         @_,
-    );
-}
-
-sub add_email_address {
-    my $self = shift;
-    my %p    = @_;
-
-    $p{is_preferred} = 1 unless $self->email_address_count();
-
-    return R2::Schema::EmailAddress->insert(
-        contact_id => $self->contact_id(),
-        %p,
-    );
-}
-
-sub add_website {
-    my $self = shift;
-
-    return R2::Schema::Website->insert(
-        contact_id => $self->contact_id(),
-        @_,
-    );
-}
-
-sub add_address {
-    my $self = shift;
-    my %p    = @_;
-
-    $p{is_preferred} = 1 unless $self->address_count();
-
-    return R2::Schema::Address->insert(
-        contact_id => $self->contact_id(),
-        %p,
-    );
-}
-
-sub add_phone_number {
-    my $self = shift;
-    my %p    = @_;
-
-    $p{is_preferred} = 1 unless $self->phone_number_count();
-
-    return R2::Schema::PhoneNumber->insert(
-        contact_id => $self->contact_id(),
-        %p,
     );
 }
 

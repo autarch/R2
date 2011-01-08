@@ -65,15 +65,18 @@ my $contact = R2::Schema::Person->insert(
 }
 
 {
-    $contact->add_email_address(
-        email_address => 'dave@example.com',
-        user          => R2::Schema::User->SystemUser(),
+    $contact->update_or_add_email_addresses(
+        {},
+        [
+            { email_address => 'dave@example.com' },
+        ],
+        R2::Schema::User->SystemUser(),
     );
 
     is(
         $contact->email_address_count(),
         1,
-        'add_email_address added an email address'
+        'add_or_update_email_address added an email address'
     );
 
     is(
@@ -81,12 +84,67 @@ my $contact = R2::Schema::Person->insert(
         'dave@example.com',
         'adding an email address makes the address preferred when the contact has no other addresses'
     );
+
+    my $email = $contact->preferred_email_address();
+
+    $contact->update_or_add_email_addresses(
+        {
+            $email->email_address_id() => {
+                email_address => 'bob@example.com',
+            },
+        },
+        [
+            { email_address => 'foo@example.com' },
+        ],
+        R2::Schema::User->SystemUser(),
+    );
+
+    is(
+        $contact->email_address_count(),
+        2,
+        'add_or_update_email_address added an email address'
+    );
+
+    is(
+        $contact->preferred_email_address()->email_address(),
+        'bob@example.com',
+        'preferred email address was changed'
+    );
+
+    my $non_preferred = ( $contact->email_addresses()->all() )[1];
+
+    $contact->update_or_add_email_addresses(
+        {
+            $non_preferred->email_address_id() => {
+                email_address => 'foo@example.com',
+                is_preferred  => 1,
+            },
+        },
+        [],
+        R2::Schema::User->SystemUser(),
+    );
+
+    is(
+        $contact->email_address_count(),
+        1,
+        'add_or_update_email_address deleted an email address not included in the list of existing addresses'
+    );
+
+
+    is(
+        $contact->preferred_email_address()->email_address(),
+        'foo@example.com',
+        'remaining email address is now preferred'
+    );
 }
 
 {
-    $contact->add_website(
-        uri  => 'http://example.com',
-        user => R2::Schema::User->SystemUser(),
+    $contact->update_or_add_websites(
+        {},
+        [
+            { uri => 'http://example.com' }
+        ],
+        R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -99,13 +157,18 @@ my $contact = R2::Schema::Person->insert(
 {
     my $address_type = $account->address_types()->next();
 
-    $contact->add_address(
-        address_type_id => $address_type->address_type_id(),
-        street_1        => '99 Some Drive',
-        city            => 'Minneapolis',
-        region          => 'MN',
-        iso_code        => 'us',
-        user            => R2::Schema::User->SystemUser(),
+    $contact->update_or_add_addresses(
+        {},
+        [
+            {
+                address_type_id => $address_type->address_type_id(),
+                street_1        => '99 Some Drive',
+                city            => 'Minneapolis',
+                region          => 'MN',
+                iso_code        => 'us',
+            },
+        ],
+        R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -124,10 +187,16 @@ my $contact = R2::Schema::Person->insert(
 {
     my $phone_number_type = $account->phone_number_types()->next();
 
-    $contact->add_phone_number(
-        phone_number_type_id => $phone_number_type->phone_number_type_id(),
-        phone_number         => '612-555-1123',
-        user                 => R2::Schema::User->SystemUser(),
+    $contact->update_or_add_phone_numbers(
+        {},
+        [
+            {
+                phone_number_type_id =>
+                    $phone_number_type->phone_number_type_id(),
+                phone_number => '612-555-1123',
+            },
+        ],
+        R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -320,10 +389,15 @@ my $contact = R2::Schema::Person->insert(
         'user_id for history belongs to R2 System User'
     );
 
-    my $email = $contact->add_email_address(
-        email_address => 'foo@example.com',
-        user          => R2::Schema::User->SystemUser(),
+    $contact->update_or_add_email_addresses(
+        {},
+        [
+            { email_address => 'foo@example.com' }
+        ],
+        R2::Schema::User->SystemUser(),
     );
+
+    my $email = $contact->email_addresses()->next();
 
     $email->update(
         email_address => 'bar@example.com',
