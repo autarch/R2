@@ -541,15 +541,14 @@ sub _params_for_classes {
             $key .= q{-} . $suffix
                 if $suffix;
 
+            next unless exists $params->{$key};
+
             if ( string_is_empty( $params->{$key} ) ) {
-                if ( $col->is_nullable() ) {
-                    $found{$name} = undef;
-                }
-
-                next;
+                $found{$name} = $col->is_nullable() ? undef : q{};
             }
-
-            $found{$name} = $params->{$key};
+            else {
+                $found{$name} = $params->{$key};
+            }
         }
     }
 
