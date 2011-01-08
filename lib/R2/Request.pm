@@ -352,8 +352,6 @@ sub _updated_repeatable_param_sets {
     my $params = $self->params();
 
     for my $id ( $self->param($pk_col) ) {
-        my %thing = $self->_params_for_classes( [$class], $id );
-
         my $thing = $self->_param_set(
             $class,
             $key,
@@ -362,7 +360,7 @@ sub _updated_repeatable_param_sets {
             $has_preferred
         ) or next;
 
-        $things{$id} = \%thing;
+        $things{$id} = $thing;
     }
 
     return \%things;
