@@ -159,9 +159,9 @@ sub _insert_contact {
     my $c     = shift;
     my $class = shift;
 
-    my $p = $self->_contact_params_for_class( $c, $class );
+    my $contact_p = $self->_contact_params_for_class( $c, $class );
 
-    my @errors = $class->ValidateForInsert( %{$p} );
+    my @errors = $class->ValidateForInsert( %{$contact_p} );
 
     my $image = $self->_contact_image( $c, \@errors );
 
@@ -190,39 +190,10 @@ sub _insert_contact {
         );
     }
 
-    my $insert_sub = $self->_make_insert_sub(
-        $c,
-        $class,
-        $p,
-        $image,
-        $emails,
-        $websites,
-        $addresses,
-        $phone_numbers,
-        $members,
-        $custom_fields,
-    );
-
-    return R2::Schema->RunInTransaction($insert_sub);
-}
-
-sub _make_insert_sub {
-    my $self          = shift;
-    my $c             = shift;
-    my $class         = shift;
-    my $contact_p     = shift;
-    my $image         = shift;
-    my $emails        = shift;
-    my $websites      = shift;
-    my $addresses     = shift;
-    my $phone_numbers = shift;
-    my $members       = shift;
-    my $custom_fields = shift;
-
     my $user    = $c->user();
     my $account = $c->account();
 
-    return sub {
+    my $insert_sub = sub {
         if ($image) {
             my $file = R2::Schema::File->insert(
                 filename   => $image->basename(),
@@ -237,27 +208,20 @@ sub _make_insert_sub {
         my $thing = $class->insert( %{$contact_p}, user => $user );
         my $contact = $thing->contact();
 
-        for my $email ( @{$emails} ) {
-            $contact->add_email_address( %{$email}, user => $user );
-        }
-
-        for my $website ( @{$websites} ) {
-            $contact->add_website( %{$website}, user => $user );
-        }
-
-        for my $address ( @{$addresses} ) {
-            $contact->add_address( %{$address}, user => $user );
-        }
-
-        for my $number ( @{$phone_numbers} ) {
-            $contact->add_phone_number( %{$number}, user => $user );
-        }
-
-        if ($members) {
-            for my $member ( @{$members} ) {
-                $thing->add_member( %{$member}, user => $user );
-            }
-        }
+        $self->_update_or_add_contact_data(
+            $contact,
+            $user,
+            $emails,
+            undef,
+            $websites,
+            undef,
+            $addresses,
+            undef,
+            $phone_numbers,
+            undef,
+            $members,
+            undef,
+        );
 
         my $note = $c->request()->params()->{note};
         if ( !string_is_empty($note) ) {
@@ -266,19 +230,14 @@ sub _make_insert_sub {
                 contact_note_type_id =>
                     $account->made_a_note_contact_note_type()
                     ->contact_note_type_id(),
-                user_id => $c->user()->user_id(),
-            );
-        }
-
-        for my $pair ( @{$custom_fields} ) {
-            $pair->[0]->set_value_for_contact(
-                contact => $contact,
-                value   => $pair->[1]
+                user_id => $user->user_id(),
             );
         }
 
         return $thing;
     };
+
+    return R2::Schema->RunInTransaction($insert_sub);
 }
 
 sub _update_contact {
@@ -289,9 +248,9 @@ sub _update_contact {
     my $real_contact = $contact->real_contact();
     my $class = blessed $real_contact;
 
-    my $p = $self->_contact_params_for_class( $c, $class );
+    my $contact_p = $self->_contact_params_for_class( $c, $class );
 
-    my @errors = $real_contact->validate_for_update( %{$p} );
+    my @errors = $real_contact->validate_for_update( %{$contact_p} );
 
     my $image = $self->_contact_image( $c, \@errors );
 
@@ -326,49 +285,9 @@ sub _update_contact {
         );
     }
 
-    my $update_sub = $self->_make_update_sub(
-        $c,
-        $contact,
-        $p,
-        $image,
-        $new_emails,
-        $updated_emails,
-        $new_websites,
-        $updated_websites,
-        $new_addresses,
-        $updated_addresses,
-        $new_phone_numbers,
-        $updated_phone_numbers,
-        $new_members,
-        $updated_members,
-        $new_custom_fields,
-    );
+    my $user = $c->user();
 
-    return R2::Schema->RunInTransaction($update_sub);
-}
-
-sub _make_update_sub {
-    my $self                  = shift;
-    my $c                     = shift;
-    my $contact               = shift;
-    my $contact_p             = shift;
-    my $image                 = shift;
-    my $new_emails            = shift;
-    my $updated_emails        = shift;
-    my $new_websites          = shift;
-    my $updated_websites      = shift;
-    my $new_addresses         = shift;
-    my $updated_addresses     = shift;
-    my $new_phone_numbers     = shift;
-    my $updated_phone_numbers = shift;
-    my $new_members           = shift;
-    my $updated_members       = shift;
-    my $custom_fields         = shift;
-
-    my $user    = $c->user();
-    my $account = $c->account();
-
-    return sub {
+    my $update_sub = sub {
         if ($image) {
             if ( my $old_image = $contact->image() ) {
                 $old_image->file()->delete();
@@ -386,82 +305,81 @@ sub _make_update_sub {
 
         $contact->real_contact()->update( %{$contact_p}, user => $user );
 
-        for my $email ( @{$new_emails} ) {
-            $contact->add_email_address( %{$email}, user => $user );
-        }
-
-        for my $email_address_id ( keys %{$updated_emails} ) {
-            my $email = R2::Schema::EmailAddress->new(
-                email_address_id => $email_address_id,
-            ) or next;
-
-            $email->update(
-                %{ $updated_emails->{$email_address_id} },
-                user => $user
-            );
-        }
-
-        for my $website ( @{$new_websites} ) {
-            $contact->add_website( %{$website}, user => $user );
-        }
-
-        for my $website_id ( keys %{$updated_websites} ) {
-            my $website = R2::Schema::Website->new(
-                website_id => $website_id,
-            ) or next;
-
-            $website->update(
-                %{ $updated_websites->{$website_id} },
-                user => $user
-            );
-        }
-
-        for my $address ( @{$new_addresses} ) {
-            $contact->add_address( %{$address}, user => $user );
-        }
-
-        for my $address_id ( keys %{$updated_addresses} ) {
-            my $address = R2::Schema::Address->new(
-                address_id => $address_id,
-            ) or next;
-
-            $address->update(
-                %{ $updated_addresses->{$address_id} },
-                user => $user
-            );
-        }
-
-        for my $number ( @{$new_phone_numbers} ) {
-            $contact->add_phone_number( %{$number}, user => $user );
-        }
-
-        for my $phone_number_id ( keys %{$updated_phone_numbers} ) {
-            my $phone_number = R2::Schema::PhoneNumber->new(
-                phone_number_id => $phone_number_id,
-            ) or next;
-
-            $phone_number->update(
-                %{ $updated_phone_numbers->{$phone_number_id} },
-                user => $user
-            );
-        }
-
-        if ($new_members) {
-            for my $member ( @{$new_members} ) {
-                $contact->add_member( %{$member}, user => $user );
-            }
-        }
-
-        # XXX - updated_members
-
-        # XXX - how to delete a custom field value?
-        for my $pair ( @{$custom_fields} ) {
-            $pair->[0]->set_value_for_contact(
-                contact => $contact,
-                value   => $pair->[1]
-            );
-        }
+        $self->_update_or_add_contact_data(
+            $contact,
+            $user,
+            $new_emails,
+            $updated_emails,
+            $new_websites,
+            $updated_websites,
+            $new_addresses,
+            $updated_addresses,
+            $new_phone_numbers,
+            $updated_phone_numbers,
+            $new_members,
+            $updated_members,
+            $new_custom_fields,
+        );
     };
+
+    return R2::Schema->RunInTransaction($update_sub);
+}
+
+sub _update_or_add_contact_data {
+    my $self              = shift;
+    my $contact           = shift;
+    my $user              = shift;
+    my $new_emails        = shift;
+    my $updated_emails    = shift;
+    my $new_websites      = shift;
+    my $updated_websites  = shift;
+    my $new_addresses     = shift;
+    my $updated_addresses = shift;
+    my $new_numbers       = shift;
+    my $updated_numbers   = shift;
+    my $new_members       = shift;
+    my $updated_members   = shift;
+    my $custom_fields     = shift;
+
+    $contact->update_or_add_email_addresses(
+        $updated_emails || {},
+        $new_emails,
+        $user,
+    );
+
+    $contact->update_or_add_websites(
+        $updated_websites || {},
+        $new_websites,
+        $user,
+    );
+
+    $contact->update_or_add_addresses(
+        $updated_addresses || {},
+        $new_addresses,
+        $user,
+    );
+
+    $contact->update_or_add_phone_numbers(
+        $updated_numbers || {},
+        $new_numbers,
+        $user,
+    );
+
+    if ( $contact->can('update_or_add_members') ) {
+        $contact->update_or_add_members(
+            $updated_members || {},
+            $new_members,
+            $user,
+        );
+    }
+
+    # XXX - how to delete a custom field value?
+    for my $pair ( @{$custom_fields} ) {
+        $pair->[0]->set_value_for_contact(
+            contact => $contact,
+            value   => $pair->[1]
+        );
+    }
 }
 
 1;
