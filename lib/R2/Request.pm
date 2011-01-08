@@ -347,20 +347,22 @@ sub _updated_repeatable_param_sets {
 
     my %things;
 
+    my $pk_col = $class->Table()->primary_key()->[0]->name();
+
     my $params = $self->params();
 
-    for my $suffix ( $self->param($id_field) ) {
-        my %thing = $self->_params_for_classes( [$class], $suffix );
+    for my $id ( $self->param($pk_col) ) {
+        my %thing = $self->_params_for_classes( [$class], $id );
 
         my $thing = $self->_param_set(
             $class,
             $key,
-            $suffix,
+            $id,
             $exclude_filter,
             $has_preferred
         ) or next;
 
-        $things{$suffix} = \%thing;
+        $things{$id} = \%thing;
     }
 
     return \%things;
