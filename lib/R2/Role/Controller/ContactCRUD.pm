@@ -395,7 +395,10 @@ sub _make_update_sub {
                 email_address_id => $email_address_id,
             ) or next;
 
-            $email->update( %{ $updated_emails->{$email_address_id} } );
+            $email->update(
+                %{ $updated_emails->{$email_address_id} },
+                user => $user
+            );
         }
 
         for my $website ( @{$new_websites} ) {
@@ -407,7 +410,10 @@ sub _make_update_sub {
                 website_id => $website_id,
             ) or next;
 
-            $website->update( %{ $updated_websites->{$website_id} } );
+            $website->update(
+                %{ $updated_websites->{$website_id} },
+                user => $user
+            );
         }
 
         for my $address ( @{$new_addresses} ) {
@@ -419,7 +425,10 @@ sub _make_update_sub {
                 address_id => $address_id,
             ) or next;
 
-            $address->update( %{ $updated_addresses->{$address_id} } );
+            $address->update(
+                %{ $updated_addresses->{$address_id} },
+                user => $user
+            );
         }
 
         for my $number ( @{$new_phone_numbers} ) {
@@ -432,7 +441,9 @@ sub _make_update_sub {
             ) or next;
 
             $phone_number->update(
-                %{ $updated_phone_numbers->{$phone_number_id} } );
+                %{ $updated_phone_numbers->{$phone_number_id} },
+                user => $user
+            );
         }
 
         if ($new_members) {
