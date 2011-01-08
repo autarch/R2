@@ -160,7 +160,7 @@ sub _fill_form_data {
     my $filled = HTML::FillInForm->fill(
         \$html,
         $self->form_data(),
-        ignore_fields => $self->exclude()
+        ignore_fields => $self->exclude(),
     );
 
     my $dom = HTML::DOM->new();
