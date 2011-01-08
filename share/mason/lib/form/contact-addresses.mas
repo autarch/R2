@@ -34,7 +34,12 @@ my @countries;
 </%shared>
 
 <%def .address>
-      <&| /lib/filter/form.mas, is_fragment => 1, prefix => 'address', suffix => q{-} . $id, objects => $address ? [ $address ] : [] &>
+      <&| /lib/filter/form.mas,
+          is_fragment => 1,
+          prefix      => 'address',
+          suffix      => q{-} . $id,
+          exclude     => ['address_is_preferred'],
+          objects     => $address ? [ $address ] : [] &>
       <div class="form-item">
         <label class="for-field" for="address-<% $id %>" id="for-address-<% $id %>">Address:</label>
         <select name="address_type_id-<% $id %>">
