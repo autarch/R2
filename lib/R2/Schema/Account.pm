@@ -28,7 +28,7 @@ use R2::Schema::Person;
 use R2::Schema::RelationshipType;
 use R2::Schema;
 use R2::Types qw( Bool ArrayRef HashRef PosOrZeroInt );
-use R2::Util qw( string_is_empty );
+use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
 use Fey::ORM::Table;
@@ -273,18 +273,52 @@ for my $pair (
 
     my $plural = $thing . 's';
 
+    ( my $thing_name = $thing ) =~ s/_/ /g;
+
+    my $class = 'R2::Schema::' . calm_to_studly($thing);
+
+    my $id_col = $thing . '_id';
+
     my @clears = grep { __PACKAGE__->can($_) }
         map { '_clear_' . $plural . '_for_' . $_ }
         qw( person household organization );
 
     my $sub = sub {
-        my $self = shift;
+        my $self     = shift;
+        my $existing = shift;
+        my $new      = shift;
 
-        $self->_update_or_add_things(
-            @_,
-            $thing,
-            $name_col,
+        unless ( @{ $new || [] }
+            || any { !string_is_empty( $_->{$name_col} ) }
+            values %{ $existing || {} } ) {
+            error "You must have at least one $thing_name.";
+        }
+
+        my $sub = subname(
+            'R2::Schema::_update_or_add-' . $thing => sub {
+                for my $object ( $self->$plural()->all() ) {
+                    my $updated_thing = $existing->{ $object->$id_col() };
+
+                    if ( string_is_empty( $updated_thing->{$name_col} ) ) {
+                        next unless $object->is_deletable();
+
+                        $object->delete();
+                    }
+                    else {
+                        $object->update( %{$updated_thing} );
+                    }
+                }
+
+                for my $new_thing ( @{$new} ) {
+                    $class->insert(
+                        %{$new_thing},
+                        account_id => $self->account_id(),
+                    );
+                }
+            }
         );
+
+        R2::Schema->RunInTransaction($sub);
 
         $self->$_() for @clears;
     };
@@ -292,55 +326,6 @@ for my $pair (
     my $meth = 'update_or_add_' . $plural;
 
     __PACKAGE__->meta()->add_method( $meth => $sub );
-}
-
-sub _update_or_add_things {
-    my $self     = shift;
-    my $existing = shift;
-    my $new      = shift;
-    my $thing    = shift;
-    my $name_col = shift;
-
-    my $id_col = $thing . '_id';
-    ( my $thing_name = $thing ) =~ s/_/ /g;
-
-    my $thing_pl = $thing . q{s};
-
-    my $class = 'R2::Schema::' . ( join '', map {ucfirst} split /_/, $thing );
-
-    unless ( @{ $new || [] }
-        || any { !string_is_empty( $_->{$name_col} ) }
-        values %{ $existing || {} } ) {
-        error "You must have at least one $thing_name.";
-    }
-
-    my $sub = subname(
-        'R2::Schema::_update_or_add_things-' . $thing => sub {
-            for my $thing ( $self->$thing_pl()->all() ) {
-                my $updated_thing = $existing->{ $thing->$id_col() };
-
-                if ( string_is_empty( $updated_thing->{$name_col} ) ) {
-                    next unless $thing->is_deletable();
-
-                    $thing->delete();
-                }
-                else {
-                    $thing->update( %{$updated_thing} );
-                }
-            }
-
-            for my $new_thing ( @{$new} ) {
-                $class->insert(
-                    %{$new_thing},
-                    account_id => $self->account_id(),
-                );
-            }
-        }
-    );
-
-    R2::Schema->RunInTransaction($sub);
-
-    return;
 }
 
 sub has_messaging_provider {
