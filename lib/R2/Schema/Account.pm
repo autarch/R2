@@ -268,8 +268,8 @@ for my $pair (
     [ 'custom_field_group', 'name' ],
     ) {
 
-    my $thing    = $pair->[0];
-    my $name_col = $pair->[1];
+    my $thing         = $pair->[0];
+    my $existence_col = $pair->[1];
 
     my $plural = $thing . 's';
 
@@ -289,17 +289,18 @@ for my $pair (
         my $new      = shift;
 
         unless ( @{ $new || [] }
-            || any { !string_is_empty( $_->{$name_col} ) }
+            || any { !string_is_empty( $_->{$existence_col} ) }
             values %{ $existing || {} } ) {
             error "You must have at least one $thing_name.";
         }
 
         my $sub = subname(
-            'R2::Schema::_update_or_add-' . $thing => sub {
+            'R2::Schema::Account::_update_or_add-' . $thing => sub {
                 for my $object ( $self->$plural()->all() ) {
                     my $updated_thing = $existing->{ $object->$id_col() };
 
-                    if ( string_is_empty( $updated_thing->{$name_col} ) ) {
+                    if ( string_is_empty( $updated_thing->{$existence_col} ) )
+                    {
                         next unless $object->is_deletable();
 
                         $object->delete();
