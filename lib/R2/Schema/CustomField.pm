@@ -14,6 +14,7 @@ use R2::Schema::CustomFieldIntegerValue;
 use R2::Schema::CustomFieldMultiSelectValue;
 use R2::Schema::CustomFieldSingleSelectValue;
 use R2::Schema::CustomFieldTextValue;
+use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
 
 use Fey::ORM::Table;
@@ -107,14 +108,11 @@ sub _build_value_count_select {
 }
 
 sub validate_value {
-    my $self = shift;
+    my $self  = shift;
+    my $value = shift;
 
-    unless ( $self->type()->value_is_valid( $_[1] ) ) {
-        my $message
-            = 'The value provided for '
-            . $self->label()
-            . ' was not a valid '
-            . $self->type()->name() . q{.};
+    if ( $self->is_required() && string_is_empty($value) ) {
+        my $message = 'You must provide a value for ' . $self->label() . q{.};
 
         return {
             message => $message,
@@ -122,7 +120,18 @@ sub validate_value {
         };
     }
 
-    return;
+    return if $self->type()->value_is_valid($value);
+
+    my $message
+        = 'The value provided for '
+        . $self->label()
+        . ' was not a valid '
+        . $self->type()->name() . q{.};
+
+    return {
+        message => $message,
+        field   => 'custom_field_' . $self->custom_field_id(),
+    };
 }
 
 sub set_value_for_contact {
