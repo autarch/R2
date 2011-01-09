@@ -2,44 +2,7 @@
   <h1><& SELF:title, %ARGS &></h1>
 </div>
 
-<&| /lib/filter/form.mas &>
-<form class="JS-standard-form"
-      action="<% $c->account()->uri( view => 'household' ) %>"
-      method="post"
-      enctype="multipart/form-data">
-
-  <fieldset>
-    <legend>The Basics</legend>
-
-    <div class="form-item">
-      <label class="for-field" for="first_name">Name:</label>
-      <input type="text" class="text" name="name" id="name" />
-    </div>
-
-<& /lib/form/member-search.mas &>
-
-<& /lib/form/contact-ok-fields.mas &>
-
-<& /lib/form/contact-image.mas &>
-
-<& /lib/form/contact-note.mas &>
-
-  </fieldset>
-
-<& /lib/form/contact-email-website.mas &>
-
-<& /lib/form/contact-phone-numbers.mas, contact_type => 'household' &>
-
-<& /lib/form/contact-addresses.mas, contact_type => 'household' &>
-
-<& /lib/form/contact-custom-fields.mas, contact_type => 'household' &>
-
-  <div class="form-item">
-    <input class="submit" type="submit" value="Submit" />
-  </div>
-
-</form>
-</&>
+<& /lib/form/household.mas &>
 
 <%method title>
 Add a new household

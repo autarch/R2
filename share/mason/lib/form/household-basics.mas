@@ -1,0 +1,23 @@
+  <fieldset>
+    <legend>The Basics</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="first_name">Name:</label>
+      <input type="text" class="text" name="name" id="name" />
+    </div>
+
+<& /lib/form/member-search.mas, contact => $household &>
+
+<& /lib/form/contact-ok-fields.mas, contact => $household &>
+
+<& /lib/form/contact-image.mas, contact => $household &>
+
+% unless ($household) {
+<& /lib/form/contact-note.mas &>
+% }
+
+  </fieldset>
+
+<%args>
+$household => undef
+</%args>

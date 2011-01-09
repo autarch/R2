@@ -1,0 +1,36 @@
+<&| /lib/filter/form.mas &>
+<form class="JS-standard-form"
+      action="<% $action %>"
+      method="post"
+      enctype="multipart/form-data">
+
+% if ($household) {
+<input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
+<& /lib/form/household-basics.mas, household => $household &>
+
+<& /lib/form/contact-email.mas, contact => $household &>
+
+<& /lib/form/contact-website.mas, contact => $household &>
+
+<& /lib/form/contact-phone-numbers.mas, contact => $household, contact_type => 'household' &>
+
+<& /lib/form/contact-addresses.mas, contact => $household, contact_type => 'household' &>
+
+<& /lib/form/contact-custom-fields.mas, contact => $household, contact_type => 'household' &>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$household => undef
+</%args>
+
+<%init>
+my $action = $household ? $household->uri() : $c->account()->uri( view => 'household' );
+</%init>

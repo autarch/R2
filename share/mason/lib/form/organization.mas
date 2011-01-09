@@ -1,0 +1,36 @@
+<&| /lib/filter/form.mas &>
+<form class="JS-standard-form"
+      action="<% $action %>"
+      method="post"
+      enctype="multipart/form-data">
+
+% if ($organization) {
+<input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
+<& /lib/form/organization-basics.mas, organization => $organization &>
+
+<& /lib/form/contact-email.mas, contact => $organization &>
+
+<& /lib/form/contact-website.mas, contact => $organization &>
+
+<& /lib/form/contact-phone-numbers.mas, contact => $organization, contact_type => 'organization' &>
+
+<& /lib/form/contact-addresses.mas, contact => $organization, contact_type => 'organization' &>
+
+<& /lib/form/contact-custom-fields.mas, contact => $organization, contact_type => 'organization' &>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$organization => undef
+</%args>
+
+<%init>
+my $action = $organization ? $organization->uri() : $c->account()->uri( view => 'organization' );
+</%init>
