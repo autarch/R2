@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use Fey::Placeholder;
-use R2::Types;
+use R2::Types qw( Defined Str );
 
 use MooseX::Role::Parameterized;
 use MooseX::Params::Validate qw( validated_list );
@@ -48,7 +48,7 @@ role {
             \@_,
             field   => { isa => 'R2::Schema::CustomField' },
             contact => { isa => 'R2::Schema::Contact' },
-            value   => { isa => 'Defined' },
+            value   => { isa => Defined },
         );
 
         my %p = (
@@ -71,7 +71,21 @@ role {
         );
     };
 
-    
+    method delete_value_for_contact => sub {
+        my $class = shift;
+        my ( $field, $contact, $value ) = validated_list(
+            \@_,
+            field   => { isa => 'R2::Schema::CustomField' },
+            contact => { isa => 'R2::Schema::Contact' },
+        );
+
+        my $dbh = $class->_dbh($delete);
+
+        $dbh->do(
+            $delete->sql($dbh), {},
+            $field->custom_field_id(), $contact->contact_id()
+        );
+    };
 };
 
 sub _replace_value_for_contact {

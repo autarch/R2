@@ -5,7 +5,8 @@ use warnings;
 use namespace::autoclean;
 
 use Fey::Literal::String;
-use Fey::Object::Iterator::FromSelect::Caching;
+use Fey::Object::Iterator::FromArray;
+use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
 use List::AllUtils qw( any uniq );
 use R2::Image;
@@ -205,6 +206,13 @@ with 'R2::Role::Schema::URIMaker';
         isa     => 'Fey::Object::Iterator::FromSelect',
         lazy    => 1,
         builder => '_build_history',
+    );
+
+    has 'custom_fields' => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromArray',
+        lazy    => 1,
+        builder => '_build_custom_fields',
     );
 
     has '_custom_field_values' => (
@@ -443,38 +451,99 @@ sub has_custom_field_values_for_group {
 {
     my $schema = R2::Schema->Schema();
 
-    my %Selects;
+    my %CountSelects;
+    my %ValueSelects;
+
     for my $type ( R2::CustomFieldType->All() ) {
         my $type_table = $type->table();
 
-        my $select = R2::Schema->SQLFactoryClass()->new_select();
+        my $count_select = R2::Schema->SQLFactoryClass()->new_select();
+        my $value_select = R2::Schema->SQLFactoryClass()->new_select();
 
         if ( $type_table->name() =~ /Select/ ) {
             my $value_table = $schema->table('CustomFieldSelectOption');
 
+            my $count = Fey::Literal::Function->new(
+                'COUNT',
+                $value_table->column('value')
+            );
+
+            $count_select->select($count);
+
             #<<<
-            $select
+            $value_select
                 ->select( $type_table->column('custom_field_id'),
-                          $value_table->column('value') )
-                ->from  ( $type_table, $value_table )
-                ->order_by( $type_table->column('custom_field_id'),
-                            $value_table->column('display_order') );
+                          $value_table->column('value') );
             #>>>
+            for my $select ( $count_select, $value_select ) {
+                #<<<
+                $select
+                    ->from  ( $type_table, $value_table )
+                    ->order_by( $type_table->column('custom_field_id'),
+                                $value_table->column('display_order') );
+                #>>>
+            }
         }
         else {
+            my $count = Fey::Literal::Function->new(
+                'COUNT',
+                $type_table->column('value')
+            );
+
             #<<<
-            $select
+            $count_select
+                ->select($count)
+                ->from  ($type_table);
+
+            $value_select
                 ->select( $type_table->columns( 'custom_field_id', 'value' ) )
                 ->from  ($type_table);
             #>>>
         }
 
-        $select->where(
-            $type_table->column('contact_id'), '=',
+        $count_select->where(
+            $type_table->column('custom_field_id'), '=',
             Fey::Placeholder->new()
         );
 
-        $Selects{ $type_table->name() } = $select;
+        for my $select ( $count_select, $value_select ) {
+            $select->where(
+                $type_table->column('contact_id'), '=',
+                Fey::Placeholder->new()
+            );
+        }
+
+        $CountSelects{ $type_table->name() } = $count_select;
+        $ValueSelects{ $type_table->name() } = $value_select;
+    }
+
+    sub _build_custom_fields {
+        my $self = shift;
+
+        my @fields
+            = map { $_->custom_fields()->all() }
+            $self->account()->custom_field_groups()->all();
+
+        my @populated;
+        for my $field (@fields) {
+            my $select = $CountSelects{ $field->type_table()->name() };
+
+            my $dbh = $self->_dbh($select);
+
+            my $row = $dbh->selectrow_arrayref(
+                $select->sql($dbh), {},
+                $field->custom_field_id(), $self->contact_id()
+            );
+
+            next unless $row && $row->[0];
+
+            push @populated, $field;
+        }
+
+        return Fey::Object::Iterator::FromArray->new(
+            classes => 'R2::Schema::CustomField',
+            objects => \@populated,
+        );
     }
 
     sub _build_custom_field_values {
@@ -486,7 +555,7 @@ sub has_custom_field_values_for_group {
 
         my %values;
         for my $table ( uniq map { $_->type_table() } values %fields ) {
-            my $select = $Selects{ $table->name() };
+            my $select = $ValueSelects{ $table->name() };
 
             my $dbh = $self->_dbh($select);
 

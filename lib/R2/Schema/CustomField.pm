@@ -133,6 +133,14 @@ sub set_value_for_contact {
     $class->replace_value_for_contact( field => $self, @_ );
 }
 
+sub delete_value_for_contact {
+    my $self = shift;
+
+    my $class = Fey::Meta::Class::Table->ClassForTable( $self->type_table() );
+
+    $class->delete_value_for_contact( field => $self, @_ );
+}
+
 sub value_object {
     my $self = shift;
 

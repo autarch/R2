@@ -1,8 +1,10 @@
     <input type="text"
            class="narrow"
+           value="<% defined $value ? $value->value() : q{} %>"
            name="custom_field_<% $field->custom_field_id() %>"
            id="custom_field_<% $field->custom_field_id() %>" />
 
 <%args>
 $field
+$value => undef
 </%args>

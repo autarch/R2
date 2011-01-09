@@ -107,7 +107,7 @@ for my $class_suffix (qw( EmailAddress Website Address PhoneNumber )) {
     __PACKAGE__->meta()->add_method( $updated_meth => $updated_sub );
 }
 
-sub _new_custom_fields {
+sub _custom_fields {
     my $self   = shift;
     my $c      = shift;
     my $errors = shift;
@@ -173,7 +173,7 @@ sub _insert_contact {
 
     my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
 
-    my $custom_fields = $self->_new_custom_fields( $c, \@errors );
+    my $custom_fields = $self->_custom_fields( $c, \@errors );
 
     my $members;
     if ( $class->can('members') ) {
@@ -221,6 +221,7 @@ sub _insert_contact {
             undef,
             $members,
             undef,
+            $custom_fields,
         );
 
         my $note = $c->request()->params()->{note};
@@ -266,7 +267,7 @@ sub _update_contact {
     my $new_phone_numbers = $self->_new_phone_numbers( $c, \@errors );
     my $updated_phone_numbers = $self->_updated_phone_numbers( $c, \@errors );
 
-    my $new_custom_fields = $self->_new_custom_fields( $c, \@errors );
+    my $custom_fields = $self->_custom_fields( $c, \@errors );
 
     my $new_members;
     if ( $real_contact->can('members') ) {
@@ -318,7 +319,7 @@ sub _update_contact {
             $updated_phone_numbers,
             $new_members,
             $updated_members,
-            $new_custom_fields,
+            $custom_fields,
         );
     };
 
@@ -373,7 +374,14 @@ sub _update_or_add_contact_data {
         );
     }
 
-    # XXX - how to delete a custom field value?
+    my %values = map { $_->[0]->custom_field_id() => $_->[1] } @{$custom_fields};
+
+    for my $field ( $contact->custom_fields()->all() ) {
+        if ( string_is_empty( $values{ $field->custom_field_id() } ) ) {
+            $field->delete_value_for_contact( contact => $contact );
+        }
+    }
+
     for my $pair ( @{$custom_fields} ) {
         $pair->[0]->set_value_for_contact(
             contact => $contact,

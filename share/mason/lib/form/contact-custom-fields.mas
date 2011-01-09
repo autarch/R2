@@ -2,12 +2,13 @@
 <fieldset>
   <legend><% $group->name() %></legend>
 
-<& .fields, group => $group &>
+<& .fields, group => $group, contact => $contact &>
 
 </fieldset>
 % }
 
 <%args>
+$contact => undef
 $contact_type
 </%args>
 
@@ -23,7 +24,8 @@ my $groups = $c->account()->$meth();
     <label class="for-field" for="custom_field_<% $field->custom_field_id() %>">
       <% $field->label() %><% $field->label() =~ /[\?:]$/ ? q{} : q{:} %>
     </label>
-    <& '/lib/form/custom-field-widgets/' . $field->widget_name() . '.mas', field => $field &>
+% my $value = $contact ? $contact->custom_field_value( $field->custom_field_id() ) : undef;
+    <& '/lib/form/custom-field-widgets/' . $field->widget_name() . '.mas', field => $field, value => $value &>
 %   if ( $field->is_required() ) {
     <span class="required" title="this field is required">*</span>
 %   }
@@ -38,6 +40,7 @@ my $groups = $c->account()->$meth();
 % }
 
 <%args>
+$contact
 $group
 </%args>
 
