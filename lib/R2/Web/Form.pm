@@ -88,8 +88,7 @@ sub _fill_errors {
     my $errors = $self->errors();
     return unless @{$errors};
 
-    my $error_div = $self->_dom()->createElement('div');
-    $error_div->className('form-error');
+    my $error_div;
 
     for my $error ( @{$errors} ) {
         if ( ref $error && $error->{field} ) {
@@ -105,12 +104,17 @@ sub _fill_errors {
             my $p = $self->_create_error_para(
                 ref $error ? $error->{message} : $error );
 
+            $error_div ||= $self->_dom()->createElement('div');
+
             $error_div->appendChild($p);
         }
     }
 
-    my $form = $self->_dom()->getElementsByTagName('form')->[0];
-    if ( @{ $error_div->childNodes() } ) {
+    if ($error_div) {
+        my $form = $self->_dom()->getElementsByTagName('form')->[0];
+
+        $error_div->className('form-error');
+
         $form->insertBefore( $error_div, $form->firstChild() );
     }
 }
