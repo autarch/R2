@@ -36,6 +36,7 @@
 @dark-green: #5b824c;
 @orange: #ff7400;
 @light-yellow: #ffffd9;
+@error-orange: #fcc841;
 
 @dark-green-border-light: @dark-green + #555;
 @dark-green-border-dark:  @dark-green - #222;
@@ -294,7 +295,7 @@ form {
 
     div.form-error {
         border: 1px solid black;
-        margin: 0.3em 2em 0.3em 0;
+        margin: 0.3em 2em 1em 0;
         padding: 0.3em;
 
         p {
@@ -303,11 +304,11 @@ form {
     }
 
     div.form-error, form div.error {
-        background-color: #FCC841;
+        background-color: @error-orange;
     }
 
     div.error {
-        background-color: orange;
+        background-color: @error-orange;
 
         p.error-message {
             margin-bottom: 0.1em;
