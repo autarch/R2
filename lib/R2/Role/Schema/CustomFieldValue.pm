@@ -5,6 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use Fey::Placeholder;
+use R2::Types;
 
 use MooseX::Role::Parameterized;
 use MooseX::Params::Validate qw( validated_list );
@@ -17,8 +18,8 @@ with 'R2::Role::Schema::DataValidator' => {
     steps              => ['_ValidateValue'],
 };
 
-parameter 'value_column' => (
-    isa     => 'Str',
+parameter value_column => (
+    isa     => Str,
     default => 'value',
 );
 
@@ -41,7 +42,7 @@ role {
         ->and  ( $table->column('contact_id'),
                  '=', Fey::Placeholder->new() );
     #>>>
-    method 'replace_value_for_contact' => sub {
+    method replace_value_for_contact => sub {
         my $class = shift;
         my ( $field, $contact, $value ) = validated_list(
             \@_,
@@ -69,6 +70,8 @@ role {
             }
         );
     };
+
+    
 };
 
 sub _replace_value_for_contact {
