@@ -269,28 +269,29 @@ table.standard-table {
 
 /* === Forms === */
 
-fieldset {
-    background-color: @super-light-green;
-    border-top: 1px solid @medium-green;
-    margin-right: 2em;
-    padding: 0.5em;
-    padding-bottom: 1em;
-
-    legend {
-        background-color: @medium-green;
-        color: white;
-        font-weight: bold;
-        padding: 0.4em;
-        text-shadow: 1px 1px #666;
-        .rounded-corners-top(6px);
-    }
-}
-
-fieldset.last {
-    padding-bottom: 0;
-}
-
 form {
+    fieldset {
+        background-color: @super-light-green;
+        border-top: 1px solid @medium-green;
+        margin-right: 2em;
+        padding: 0.5em 0.2em;
+        padding-bottom: 1em;
+
+        legend {
+            background-color: @medium-green;
+            color: white;
+            font-weight: bold;
+            margin-left: 0.4em;
+            padding: 0.4em;
+            text-shadow: 1px 1px #666;
+            .rounded-corners-top(6px);
+        }
+    }
+
+    fieldset.last {
+        padding-bottom: 0;
+    }
+
     div.form-error {
         border: 1px solid black;
         margin: 0.3em 2em 0.3em 0;
@@ -306,20 +307,19 @@ form {
     }
 
     div.error {
-        margin-top: 2px;
+        background-color: orange;
 
         p.error-message {
             margin-bottom: 0.1em;
-        }
 
-        p span {
-            font-size: 85%;
+            span {
+                font-size: 85%;
+            }
         }
     }
 
     div.form-item { 
-        clear: both;
-        padding: 0.4em 0 0.4em 0;
+        padding: 0.4em;
     }
 
     div.repeat-group {
@@ -381,6 +381,7 @@ form {
 
     a.add-another {
         font-size: 90%;
+        padding-left: 0.4em;
     }
 
     input.text,
