@@ -33,24 +33,6 @@
     <a href="#" class="add-another" id="email-address-repeater">Add another email address</a>
   </fieldset>
 
-  <fieldset>
-    <legend>Websites</legend>
-
-% if ($websites) {
-%   while ( my $website = $websites->next() ) {
-    <div id="JS-website-<% $website->website_id() %>" class="repeat-group">
-      <& .website, website => $website, id => $website->website_id() &>
-    </div>
-%   }
-% }
-
-    <div class="JS-repeatable-group-website repeat-group">
-      <& .website, id => 'new1' &>
-    </div>
-
-    <a href="#" class="add-another" id="website-repeater">Add another website</a>
-  </fieldset>
-
 <%args>
 $contact => undef
 </%args>
@@ -58,10 +40,6 @@ $contact => undef
 <%init>
 my $emails;
 $emails = $contact->email_addresses()
-    if $contact;
-
-my $websites;
-$websites = $contact->websites()
     if $contact;
 </%init>
 
@@ -102,40 +80,5 @@ $websites = $contact->websites()
 $id
 $email_address => undef
 $is_preferred => 0
-</%args>
-</%def>
-
-<%def .website>
-% if ($website) {
-      <input type="hidden" name="website_id" value="<% $id %>" />
-% }
-
-      <&| /lib/filter/form.mas,
-          is_fragment => 1,
-          prefix      => 'website',
-          suffix      => q{-} . $id,
-          objects     => $website ? [ $website ] : [] &>
-      <div class="form-item">
-        <label class="for-field" for="label-<% $id %>">Label:</label>
-        <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />
-        <a class="<% $website ? 'JS-delete-div' : 'delete-repeated-group' %>"
-           style="<% $website ? q{} : 'display: none' %>"
-           href="#"
-           title="delete this website">X</a>
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="uri-<% $id %>">URI:</label>
-        <input type="text" class="text medium" name="uri-<% $id %>" id="uri-<% $id %>" />
-      </div>
-
-      <div class="form-item">
-        <label class="secondary" for="website_note-<% $id %>">Note:</label>
-        <input type="text" class="text wide" name="website_note-<% $id %>" id="website_note-<% $id %>" />
-      </div>
-      </&>
-<%args>
-$id
-$website => undef
 </%args>
 </%def>
