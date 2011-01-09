@@ -1,6 +1,6 @@
     <&| /lib/filter/form.mas,
         is_fragment => 1,
-        objects     => $contact ? [ $contact ] : [] &>
+        objects     => $contact ? [ $contact ] : [ \%defaults ] &>
     <div class="form-item">
       <label class="for-field" >Mail is ok?</label>
       <div class="radio-group">
@@ -47,3 +47,7 @@
 <%args>
 $contact => undef
 </%args>
+
+<%init>
+my %defaults = ( allows_mail => 1, allows_phone => 1, allows_trade => 0 );
+</%init>
