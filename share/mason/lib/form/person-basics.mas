@@ -59,9 +59,9 @@
       <input type="text" class="text narrow" name="gender_text" id="gender_text" />
     </div>
 
-<& /lib/form/contact-ok-fields.mas &>
+<& /lib/form/contact-ok-fields.mas, contact => $person &>
 
-<& /lib/form/contact-image.mas &>
+<& /lib/form/contact-image.mas, contact => $person &>
 
 % unless ($person) {
 <& /lib/form/contact-note.mas &>
@@ -72,4 +72,3 @@
 <%args>
 $person => undef
 </%args>
-
