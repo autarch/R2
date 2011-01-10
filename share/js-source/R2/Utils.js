@@ -19,6 +19,10 @@ R2.Utils.firstParentWithTagName = function ( child, tag_name ) {
 R2.Utils.cleanNode = function ( node, except ) {
     var children = node.childNodes;
 
+    if ( ! children.length ) {
+        return;
+    }
+
     var keep = {};
     if ( typeof except != "undefined" ) {
         for ( var i = 0; i < except.length; i++ ) {
