@@ -67,7 +67,7 @@ R2.FormWidget.AjaxSearch.prototype._instrumentSubmit = function () {
 };
 
 R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
-    if ( this.req ) {
+    if ( this.req && this.req.transport ) {
         this.req.transport.abort();
     }
 
