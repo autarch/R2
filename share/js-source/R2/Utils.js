@@ -17,6 +17,10 @@ R2.Utils.firstParentWithTagName = function ( child, tag_name ) {
 };
 
 R2.Utils.cleanNode = function ( node, except ) {
+    if ( ! node ) {
+        return;
+    }
+
     var children = node.childNodes;
 
     if ( ! children.length ) {
