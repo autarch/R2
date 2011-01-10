@@ -20,14 +20,17 @@ R2.FormWithMemberSearch = function () {
 
     this.form = R2.Utils.firstParentWithTagName( search_div, "FORM" );
     this.uri = $("member-search-uri").value;
-    this.results = $("member-search-results");
+    this.results_div = $("member-search-results");
     this.selected = $("member-search-selected");
+    this.person_ids = {};
 
     this._instrumentResultsClose();
     this._instrumentMemberSearch();
 };
 
 R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
+    var self = this;
+
     DOM.Events.addListener( $("member-search-results-close"),
                             "click",
                             function (e) {
@@ -36,7 +39,7 @@ R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
                                     e.stopPropagation();
                                 }
 
-                                this._hideResults();
+                                self._hideResults();
                             }
                           );
 };
@@ -44,99 +47,58 @@ R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
 R2.FormWithMemberSearch.prototype._instrumentMemberSearch = function () {
     new R2.FormWidget.AjaxSearch( this.uri,
                                   "member",
-                                  this._onSearchSubmit(),
-                                  this._handleEmptySubmit(),
-                                  this._populateResults(),
-                                  this._handleError()
+                                  this._onSearchSubmitFunction(),
+                                  this._handleEmptySubmitFunction(),
+                                  this._populateResultsFunction(),
+                                  this._handleErrorFunction()
                                 );
 };
 
-R2.FormWithMemberSearch.prototype._onSearchSubmit = function () {
+R2.FormWithMemberSearch.prototype._onSearchSubmitFunction = function () {
     var self = this;
 
     var func = function () {
-        R2.Utils.cleanNode( self.results, [ "member-search-results-close" ] );
-        self.results.appendChild( document.createTextNode("Searching ...") );
+        R2.Utils.cleanNode( self.results_div, [ "member-search-results-close" ] );
+        self.results_div.appendChild( document.createTextNode("Searching ...") );
 
-        self.results.style.opacity = 0;
-        DOM.Element.show( self.results );
+        self.results_div.style.opacity = 0;
+        DOM.Element.show( self.results_div );
 
-        Animation.Fade.fade( { "elementId":     self.results.id,
+        Animation.Fade.fade( { "elementId":     self.results_div.id,
                                "targetOpacity": 1 } );
     };
 
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._populateResults = function (results) {
+R2.FormWithMemberSearch.prototype._populateResultsFunction = function () {
     var self = this;
 
-    var func = function () {
-        R2.Utils.cleanNode( self.results, [ "member-search-results-close" ] );
+    var func = function (results) {
+        R2.Utils.cleanNode( self.results_div, [ "member-search-results-close" ] );
 
         if ( results.length > 0 ) {
             var text = "Found " + results.length;
             text += results.length == 1 ? " match:" : " matches:";
 
-            self.results.appendChild( document.createTextNode(text) );
+            self.results_div.appendChild( document.createTextNode(text) );
 
             var table = self._createResultsTable();
             table.id = "member-search-results-table";
 
             for ( var i = 0; i < results.length; i++ ) {
-                var tr = document.createElement("tr");
-
-                var id = R2.Utils.makeUniqueId();
-                results[i].id = id;
-
-                var name_td = document.createElement("td");
-                name_td.appendChild( document.createTextNode( results[i].name ) );
-                name_td.className = "name";
-
-                tr.appendChild(name_td);
-
-                var position_td = document.createElement("td");
-                position_td.className = "position";
-                var position = document.createElement("input");
-                position.type = "text";
-                position.name = "position-for-" + id;
-                position.className = "text";
-
-                position_td.appendChild(position);
-
-                tr.appendChild(position_td);
-
-                var adder_td = document.createElement("td");
-                adder_td.className = "button";
-                var adder = document.createElement("button");
-                adder.type = "button";
-                adder.appendChild( document.createTextNode("add") );
-                adder.id = "adder-" + id;
-
-                DOM.Events.addListener( adder,
-                                        "click",
-                                        self._makeAddFunction( tr, results[i], position )
-                                      );
-
-                DOM.Events.addListener( position,
-                                        "keypress",
-                                        self._makePositionEnterFunction(adder)
-                                      );
-
-                adder_td.appendChild(adder);
-
-                tr.appendChild(adder_td);
+                var tr = self._createResultRow( results[i] );
 
                 table.appendChild(tr);
             }
 
-            self.results.appendChild(table);
+            self.results_div.appendChild(table);
         }
         else {
-            self.results.appendChild( document.createTextNode("No people found that matched your search.") );
+            self.results_div.appendChild( document.createTextNode("No people found that matched your search.") );
         }
 
-        DOM.Element.show( self.results );
+        DOM.Element.show( self.results_div );
     };
 
     return func;
@@ -175,7 +137,63 @@ R2.FormWithMemberSearch.prototype._createResultsTable = function () {
     return table;
 };
 
-R2.FormWithMemberSearch.prototype._makeAddFunction = function ( tr, res, pos ) {
+R2.FormWithMemberSearch.prototype._createResultRow = function (result) {
+    var tr = document.createElement("tr");
+
+    var id = R2.Utils.makeUniqueId();
+    result.id = id;
+
+    var name_td = document.createElement("td");
+    name_td.appendChild( document.createTextNode( result.name ) );
+    name_td.className = "name";
+
+    tr.appendChild(name_td);
+
+    if ( this.person_ids[ result.person_id ] ) {
+        var already_td = document.createElement("td");
+        already_td.colSpan = 2;
+        already_td.appendChild( document.createTextNode("Already a member") );
+
+        tr.appendChild(already_td);
+    }
+    else {
+        var position_td = document.createElement("td");
+        position_td.className = "position";
+        var position = document.createElement("input");
+        position.type = "text";
+        position.name = "position-for-" + id;
+        position.className = "text";
+
+        position_td.appendChild(position);
+
+        tr.appendChild(position_td);
+
+        var adder_td = document.createElement("td");
+        adder_td.className = "button";
+        var adder = document.createElement("button");
+        adder.type = "button";
+        adder.appendChild( document.createTextNode("add") );
+        adder.id = "adder-" + id;
+
+        DOM.Events.addListener( adder,
+                                "click",
+                                this._addMemberFunction( tr, result, position )
+                              );
+
+        DOM.Events.addListener( position,
+                                "keypress",
+                                this._positionEnterFunction(adder)
+                              );
+
+        adder_td.appendChild(adder);
+
+        tr.appendChild(adder_td);
+    }
+
+    return tr;
+};
+
+R2.FormWithMemberSearch.prototype._addMemberFunction = function ( tr, res, pos ) {
     var results_tr = tr;
     var result     = res;
     var position   = pos;
@@ -203,7 +221,7 @@ R2.FormWithMemberSearch.prototype._makeAddFunction = function ( tr, res, pos ) {
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._makePositionEnterFunction = function (button) {
+R2.FormWithMemberSearch.prototype._positionEnterFunction = function (button) {
     var adder = button;
 
     var func = function (e) {
@@ -263,7 +281,7 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
 
     DOM.Events.addListener( remover,
                             "click",
-                            this._makeRemoveFunction( tr, result )
+                            this.removeMemberFunction( tr, result )
                           );
 
     remover_td.appendChild(remover);
@@ -287,11 +305,13 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
         this.selected.appendChild(table);
     }
 
+    this.person_ids[ result.person_id ] = 1;
+
     Animation.Fade.fade( { "elementId":     ( table.style.opacity == 0 ? table.id : tr.id ),
                            "targetOpacity": 1 } );
 };
 
-R2.FormWithMemberSearch.prototype._makeRemoveFunction = function ( tr, result ) {
+R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( tr, result ) {
     var selected_tr = tr;
     var res = result;
 
@@ -343,42 +363,42 @@ R2.FormWithMemberSearch.prototype._addEmptyResultsP = function () {
 };
 
 R2.FormWithMemberSearch.prototype._hideResults = function () {
-    this.results.style.opacity = 1;
+    this.results_div.style.opacity = 1;
 
-    var results = this.results;
-    Animation.Fade.fade( { "elementId":     this.results.id,
+    var results = this.results_div;
+    Animation.Fade.fade( { "elementId":     this.results_div.id,
                            "targetOpacity": 0,
                            "onFinish":
                            function () { DOM.Element.hide(results); } }
                        );
 };
 
-R2.FormWithMemberSearch.prototype._handleEmptySubmit = function () {
+R2.FormWithMemberSearch.prototype._handleEmptySubmitFunction = function () {
     var self = this;
 
     var func = function () {
-        R2.Utils.cleanNode( self.results, [ "member-search-results-close" ] );
+        R2.Utils.cleanNode( self.results_div, [ "member-search-results-close" ] );
 
         var text = "You must provide a name to search for.";
-        self.results.appendChild( document.createTextNode(text) );
+        self.results_div.appendChild( document.createTextNode(text) );
 
-        DOM.Element.show( self.results );
+        DOM.Element.show( self.results_div );
     };
 
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._handleError = function (results) {
+R2.FormWithMemberSearch.prototype._handleErrorFunction = function (results) {
     var self = this;
 
     var func = function () {
-        R2.Utils.cleanNode( self.results, [ "member-search-results-close" ] );
+        R2.Utils.cleanNode( self.results_div, [ "member-search-results-close" ] );
 
         var text = "An error occurred when searching for matching people."
         text += " Sometimes self error is temporary, so feel free to try again."
         text += " If self error persists, please contact support.";
 
-        self.results.appendChild( document.createTextNode(text) );
+        self.results_div.appendChild( document.createTextNode(text) );
     };
 
     return func;
