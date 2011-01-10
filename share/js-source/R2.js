@@ -10,7 +10,7 @@ if ( typeof R2 == "undefined" ) {
 
 R2.instrumentAll = function () {
     R2.Form.instrumentAllForms();
-    R2.FormWithMemberSearch.instrumentForm();
+    new R2.FormWithMemberSearch ();
 };
 
 DOM.Ready.onDOMDone( R2.instrumentAll );
