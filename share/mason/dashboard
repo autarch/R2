@@ -14,6 +14,22 @@
 % }
 </ul>
 
+<ul>
+% while ( my $household = $households->next() ) {
+  <li><a href="<% $household->contact()->uri() %>"
+         title="View <% $household->name() %>"><% $household->name() %></a>
+  </li>
+% }
+</ul>
+
+<ul>
+% while ( my $organization = $organizations->next() ) {
+  <li><a href="<% $organization->contact()->uri() %>"
+         title="View <% $organization->name() %>"><% $organization->name() %></a>
+  </li>
+% }
+</ul>
+
 <%shared>
 my $title = 'Dashboard: ' . $c->account()->name();
 </%shared>
@@ -25,6 +41,8 @@ my $account = $c->account();
 my $authz = $c->model('Authz');
 
 my $people = $account->people();
+my $households = $account->households();
+my $organizations = $account->organizations();
 </%init>
 
 <%method title>
