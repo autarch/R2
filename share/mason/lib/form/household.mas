@@ -1,4 +1,4 @@
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas, objects => $household ? [ $household ] : [] &>
 <form class="JS-standard-form"
       action="<% $action %>"
       method="post"
