@@ -446,7 +446,7 @@ CREATE TABLE "PhoneNumber" (
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
        name                  TEXT            NOT NULL,
-       applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
+       applies_to_person     BOOLEAN         NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id            INT8            NOT NULL,
