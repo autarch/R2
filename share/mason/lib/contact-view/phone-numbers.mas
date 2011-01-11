@@ -15,6 +15,7 @@ Does not want to receive phone calls.
 %   if ( $number->is_preferred() ) {
       (Preferred)
 %   }
+    - <% $number->allows_sms() ? 'SMS is ok' : 'No SMS' %>
     <br />
     <% $number->phone_number() %>
 %   if ( ! string_is_empty( $number->note() ) ) {
