@@ -438,6 +438,7 @@ CREATE TABLE "PhoneNumber" (
        phone_number_type_id   INT8           NOT NULL,
        phone_number       TEXT               DEFAULT '',
        is_preferred       BOOLEAN            DEFAULT FALSE,
+       allows_sms         BOOLEAN            DEFAULT FALSE,
        note               TEXT               NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
