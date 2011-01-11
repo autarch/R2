@@ -71,7 +71,7 @@ my @phone_number_types;
         <input type="radio" name="phone_number_is_preferred" value="<% $id %>"
                <% $is_preferred ? q{checked="checked"} : q{} | n %>
                id="phone_number_is_preferred-<% $id %>" />
-        <label class="for-radio selected" for="phone_number_is_preferred-<% $id %>"
+        <label class="for-radio <% $is_preferred ? 'selected' : q{} %>" for="phone_number_is_preferred-<% $id %>"
                id="for-phone_number_is_preferred-<% $id %>">This is the preferred number</label>
       </div>
       </&>

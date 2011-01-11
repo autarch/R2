@@ -99,7 +99,7 @@ my @countries;
         <input type="radio" name="address_is_preferred" value="<% $id %>"
                <% $is_preferred ? q{checked="checked"} : q{} | n %>
                id="address_is_preferred-<% $id %>" />
-        <label class="for-radio selected" for="address_is_preferred-<% $id %>"
+        <label class="for-radio <% $is_preferred ? 'selected' : q{} %>" for="address_is_preferred-<% $id %>"
                id="for-address_is_preferred-<% $id %>">This is the preferred address</label>
       </div>
       </&>
