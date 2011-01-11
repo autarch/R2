@@ -340,8 +340,8 @@ sub _new_repeatable_param_sets {
 sub _updated_repeatable_param_sets {
     my $self           = shift;
     my $class          = shift;
-    my $id_field       = shift;
     my $key            = shift;
+    shift;
     my $exclude_filter = shift;
     my $has_preferred  = shift;
 
