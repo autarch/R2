@@ -33,12 +33,16 @@ my @phone_number_types;
 </%shared>
 
 <%def .phone_number>
+% if ($phone_number) {
+      <input type="hidden" name="phone_number_id" value="<% $id %>" />
+% }
+
       <&| /lib/filter/form.mas,
           is_fragment => 1,
           prefix      => 'phone_number',
           suffix      => q{-} . $id,
           exclude     => ['phone_number_is_preferred'],
-          objects     => $phone_number ? [ $phone_number ] : [] &>
+          objects     => $phone_number ? [ $phone_number ] : [ { allows_sms => 0 } ] &>
       <div class="form-item">
         <label class="for-field" for="phone_number-<% $id %>" id="for-phone_number-<% $id %>">Phone number:</label>
         <select name="phone_number_type_id-<% $id %>">
@@ -54,8 +58,13 @@ my @phone_number_types;
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="phone_number_note-<% $id %>">Note:</label>
-        <input type="text" class="text wide" name="phone_number_note-<% $id %>" id="phone_number_note-<% $id %>" />
+        <label class="secondary" for="phone_number_allows_sms-<% $id %>">Is SMS ok?</label>
+        <div class="radio-group">
+          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-yes" value="1" />
+          <label class="for-radio" for="allows_sms-yes" id="for-allows_sms-yes">Yes</label>
+          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-no" value="0" />
+          <label class="for-radio" for="allows_sms-no" id="for-allows_sms-no">No</label>
+        </div>
       </div>
 
       <div class="form-item no-label">

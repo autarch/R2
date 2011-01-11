@@ -34,6 +34,10 @@ my @countries;
 </%shared>
 
 <%def .address>
+% if ($address) {
+      <input type="hidden" name="address_id" value="<% $id %>" />
+% }
+
       <&| /lib/filter/form.mas,
           is_fragment => 1,
           prefix      => 'address',
