@@ -60,10 +60,10 @@ my @phone_number_types;
       <div class="form-item">
         <label class="secondary" for="phone_number_allows_sms-<% $id %>">Is SMS ok?</label>
         <div class="radio-group">
-          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-yes" value="1" />
-          <label class="for-radio" for="allows_sms-yes" id="for-allows_sms-yes">Yes</label>
-          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-no" value="0" />
-          <label class="for-radio" for="allows_sms-no" id="for-allows_sms-no">No</label>
+          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-yes-<% $id %>" value="1" />
+          <label class="for-radio" for="allows_sms-yes-<% $id %>" id="for-allows_sms-yes-<% $id %>">Yes</label>
+          <input type="radio" class="radio" name="allows_sms-<% $id %>" id="allows_sms-no-<% $id %>" value="0" />
+          <label class="for-radio" for="allows_sms-no-<% $id %>" id="for-allows_sms-no-<% $id %>">No</label>
         </div>
       </div>
 
