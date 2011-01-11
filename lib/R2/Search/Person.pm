@@ -8,11 +8,18 @@ use Fey::Literal::Function;
 use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
 use R2::Schema;
+use R2::Types qw( ArrayRef );
 
 use Moose;
 use MooseX::ClassAttribute;
 
 extends 'R2::Search';
+
+has account => (
+    is       => 'ro',
+    isa      => 'R2::Schema::Account',
+    required => 1,
+);
 
 {
     my $schema = R2::Schema->Schema();
@@ -44,10 +51,10 @@ sub people {
 
     $select->select( $schema->table('Person') );
 
+    $self->_apply_where_clauses($select);
+
     $select->order_by(
         $schema->table('Person')->columns( 'last_name', 'first_name' ) );
-
-    $self->_apply_where_clauses($select);
 
     $self->_apply_limit($select);
 
@@ -55,7 +62,7 @@ sub people {
         classes => 'R2::Schema::Person',
         dbh     => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
         select  => $select,
-        bind_params => [ $self->account()->account_id() ],
+        bind_params => [ $self->account()->account_id(), $select->bind_params() ],
     );
 }
 
@@ -75,11 +82,13 @@ sub person_count {
 
     my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
-    return $dbh->selectrow_arrayref( $select->sql($dbh), {},
-        $self->account()->account_id() )->[0];
-}
+    my $row = $dbh->selectrow_arrayref(
+        $select->sql($dbh), {},
+        $self->account()->account_id(), $select->bind_params(),
+    );
 
-sub _apply_where_clauses { }
+    return $row ? $row->[0] : 0;
+}
 
 __PACKAGE__->meta()->make_immutable();
 

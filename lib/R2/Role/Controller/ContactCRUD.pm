@@ -210,6 +210,7 @@ sub _insert_contact {
 
         $self->_update_or_add_contact_data(
             $contact,
+            $contact->real_contact(),
             $user,
             $emails,
             undef,
@@ -220,7 +221,6 @@ sub _insert_contact {
             $phone_numbers,
             undef,
             $members,
-            undef,
             $custom_fields,
         );
 
@@ -269,12 +269,10 @@ sub _update_contact {
 
     my $custom_fields = $self->_custom_fields( $c, \@errors );
 
-    my $new_members;
+    my $members;
     if ( $real_contact->can('members') ) {
-        $new_members = $c->request()->members();
+        $members = $c->request()->members();
     }
-
-    my $updated_members;
 
     if (@errors) {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
@@ -304,10 +302,11 @@ sub _update_contact {
             $contact_p->{image_file_id} = $file->file_id();
         }
 
-        $contact->real_contact()->update( %{$contact_p}, user => $user );
+        $real_contact->update( %{$contact_p}, user => $user );
 
         $self->_update_or_add_contact_data(
             $contact,
+            $real_contact,
             $user,
             $new_emails,
             $updated_emails,
@@ -317,8 +316,7 @@ sub _update_contact {
             $updated_addresses,
             $new_phone_numbers,
             $updated_phone_numbers,
-            $new_members,
-            $updated_members,
+            $members,
             $custom_fields,
         );
     };
@@ -329,6 +327,7 @@ sub _update_contact {
 sub _update_or_add_contact_data {
     my $self              = shift;
     my $contact           = shift;
+    my $real_contact      = shift;
     my $user              = shift;
     my $new_emails        = shift;
     my $updated_emails    = shift;
@@ -338,8 +337,7 @@ sub _update_or_add_contact_data {
     my $updated_addresses = shift;
     my $new_numbers       = shift;
     my $updated_numbers   = shift;
-    my $new_members       = shift;
-    my $updated_members   = shift;
+    my $members           = shift;
     my $custom_fields     = shift;
 
     $contact->update_or_add_email_addresses(
@@ -366,11 +364,10 @@ sub _update_or_add_contact_data {
         $user,
     );
 
-    if ( $contact->can('update_or_add_members') ) {
-        $contact->update_or_add_members(
-            $updated_members || {},
-            $new_members,
-            $user,
+    if ( $real_contact->can('members') ) {
+        $real_contact->update_members(
+            members => $members || [],
+            user => $user,
         );
     }
 

@@ -415,8 +415,7 @@ sub members {
         my $position = $params->{ 'position-' . $suffix };
 
         my %member = ( person_id => $params->{$key} );
-        $member{position} = $position
-            unless string_is_empty($position);
+        $member{position} = $position;
 
         push @members, \%member;
     }

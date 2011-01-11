@@ -23,9 +23,45 @@ R2.FormWithMemberSearch = function () {
     this.results_div = $("member-search-results");
     this.selected = $("member-search-selected");
     this.person_ids = {};
+    this.remover_listeners = {};
 
+    this._instrumentExistingTable();
     this._instrumentResultsClose();
     this._instrumentMemberSearch();
+};
+
+R2.FormWithMemberSearch.prototype._instrumentExistingTable = function () {
+    var table = $( "member-search-selected-table" );
+
+    if ( ! table ) {
+        return;
+    }
+
+    var self = this;
+
+    var buttons = DOM.Find.getElementsByAttributes( { tagName: "BUTTON" },
+                                                    table );
+
+    for ( var i = 0; i < buttons.length; i++ ) {
+        var matches = buttons[i].name.match( /remove-(\d+)/ );
+
+        var person_id = matches[1];
+
+        if ( ! person_id ) {
+            continue;
+        }
+
+        this.person_ids[person_id] = 1;
+
+        var tr = buttons[i].parentNode.parentNode;
+
+        tr.id = R2.Utils.makeUniqueId();
+
+        var result = { "person_id": person_id };
+        var hidden_name = "person_id-existing-" + person_id;
+
+        this._instrumentRemoveButton( buttons[i], tr, result, hidden_name );
+    }
 };
 
 R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
@@ -159,6 +195,7 @@ R2.FormWithMemberSearch.prototype._createResultRow = function (result) {
     else {
         var position_td = document.createElement("td");
         position_td.className = "position";
+
         var position = document.createElement("input");
         position.type = "text";
         position.name = "position-for-" + id;
@@ -208,7 +245,7 @@ R2.FormWithMemberSearch.prototype._addMemberFunction = function ( tr, res, pos )
         var parent = results_tr.parentNode;
         parent.removeChild(results_tr);
 
-        var other_tr = DOM.Find.getElementsByAttributes( { tagName:   "TR" },
+        var other_tr = DOM.Find.getElementsByAttributes( { tagName: "TR" },
                                                          parent );
 
         if ( other_tr.length == 1 ) {
@@ -248,10 +285,20 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
     }
 
     var table = $( "member-search-selected-table" );
-    if ( ! table ) {
+    var tbody;
+
+    if (table) {
+        var elts = DOM.Find.getElementsByAttributes( { tagName: "TBODY" },
+                                                     table );
+        tbody = elts[0];
+    }
+    else {
         table = this._createResultsTable();
         table.id = "member-search-selected-table";
         table.style.opacity = 0;
+
+        var tbody = document.createElement("tbody");
+        table.appendChild(tbody);
     }
 
     var tr = document.createElement("tr");
@@ -266,8 +313,13 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
 
     var position_td = document.createElement("td");
     position_td.className = "position";
-    position_td.appendChild
-        ( document.createTextNode( typeof position_name != "undefined" ? position_name : "" ) );
+
+    var position_input = document.createElement("input");
+    position_input.type = "text";
+    position_input.name = "position-" + result.id;
+    position_input.value = typeof position_name != "undefined" ? position_name : "";
+
+    position_td.appendChild(position_input);
 
     tr.appendChild(position_td);
 
@@ -275,31 +327,23 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
     remover_td.className = "button";
     var remover = document.createElement("button");
     remover.type = "button";
+    remover.name = "remove-" + result.id;
     remover.appendChild( document.createTextNode("remove") );
 
     tr.appendChild(remover_td);
 
-    DOM.Events.addListener( remover,
-                            "click",
-                            this.removeMemberFunction( tr, result )
-                          );
-
     remover_td.appendChild(remover);
 
-    table.appendChild(tr);
+    tbody.appendChild(tr);
 
     var person_id = document.createElement("input");
     person_id.type = "hidden";
     person_id.name = "person_id-" + result.id;
     person_id.value = result.person_id;
 
-    var position = document.createElement("input");
-    position.type = "hidden";
-    position.name = "position-" + result.id;
-    position.value = position_name;
-
     this.form.appendChild(person_id);
-    this.form.appendChild(position);
+
+    this._instrumentRemoveButton( remover, tr, result, person_id.name );
 
     if ( table.style.opacity == 0 ) {
         this.selected.appendChild(table);
@@ -311,44 +355,59 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
                            "targetOpacity": 1 } );
 };
 
-R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( tr, result ) {
+R2.FormWithMemberSearch.prototype._instrumentRemoveButton = function ( remover, tr, result, hidden_name ) {
+    this.remover_listeners[ remover.name ] =
+        DOM.Events.addListener( remover,
+                                "click",
+                                this.removeMemberFunction( remover, tr, result, hidden_name )
+                              );
+};
+
+R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( button, tr, result, hidden_name ) {
+    var remover = button;
     var selected_tr = tr;
     var res = result;
+    var input_name = hidden_name;
 
     var self = this;
     var func = function (e) {
+        DOM.Events.removeListener( self.remover_listeners[ remover.name ] );
+
         e.preventDefault();
         if ( e.stopPropogation ) {
             e.stopPropagation();
         }
 
-        Animation.Fade.fade( { "elementId":     tr.id,
+        selected_tr.style.opacity = 1;
+
+        Animation.Fade.fade( { "elementId":     selected_tr.id,
                                "targetOpacity": 0,
                                "onFinish":
-                               function () { self._removeSelectedTr(tr); } } );
+                               function () { self._removeSelectedTr(selected_tr); } } );
 
-        var hidden = DOM.Find.getElementsByAttributes( { tagName:   "INPUT",
-                                                         type:      "hidden",
-                                                         name:      "person_id",
-                                                         value:     res.person_id },
+        var hidden = DOM.Find.getElementsByAttributes( { tagName: "INPUT",
+                                                         type:    "hidden",
+                                                         name:    input_name },
                                                        self.form );
 
-        if ( hidden.length ) {
-            hidden[0].parentNode.removeChild( hidden[0] );
-        }
+        hidden[0].parentNode.removeChild( hidden[0] );
+
+        delete self.person_ids[ res.person_id ];
     };
 
     return func;
 };
 
 R2.FormWithMemberSearch.prototype._removeSelectedTr = function (tr) {
-    var table = tr.parentNode;
-    table.removeChild(tr);
+    var tbody = tr.parentNode;
 
-    var other_tr = DOM.Find.getElementsByAttributes( { tagName:   "TR" },
-                                                     table );
+    tbody.removeChild(tr);
 
-    if ( other_tr.length == 1 ) {
+    var other_tr = DOM.Find.getElementsByAttributes( { tagName: "TR" },
+                                                     tbody );
+
+    if ( other_tr.length == 0 ) {
+        var table = tbody.parentNode;
         table.parentNode.removeChild(table);
         this._addEmptyResultsP();
     }

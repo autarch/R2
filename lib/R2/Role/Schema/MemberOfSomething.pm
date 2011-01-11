@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use R2::Util qw( string_is_empty );
+
 use Moose::Role;
 
 sub other_contact_id_for_history {

@@ -11,7 +11,47 @@
         </div>
 
         <div id="member-search-selected">
+% if ($members) {
+          <table id="member-search-selected-table">
+            <thead>
+              <tr>
+                <th class="name">Name</th>
+                <th class="position">Position</th>
+                <th class="button"></th>
+              </tr>
+            </thead>
+            <tbody>
+%   while ( my ( $person, $membership ) = $members->next() ) {
+              <tr>
+                <td class="name"><% $person->full_name() %></td>
+                <td class="position">
+                  <input type="text"
+                         name="position-existing-<% $person->person_id() %>"
+                         value="<% $membership->position() %>" />
+                </td>
+                <td class="button">
+                  <button type="button" name="remove-<% $person->person_id %>">remove</button>
+                  <input type="hidden"
+                         name="person_id-existing-<% $person->person_id() %>"
+                         value="<% $person->person_id() %>" />
+                </td>
+              </tr>
+%   }
+            </tbody>
+          </table>
+% }
+% else {
           <p id="member-search-empty">No members yet</p>
+% }
         </div>
       </div>
     </div>
+
+<%args>
+$contact => undef
+</%args>
+
+<%init>
+my $members;
+$members = $contact->members() if $contact && $contact->member_count();
+</%Init>

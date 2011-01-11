@@ -22,6 +22,8 @@ sub _apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
+    super();
+
     # The theory is that if there's more than 2 parts then it's
     # probably a last name with a space in it, as opposed to someone
     # giving us first, middle & last names.
@@ -30,35 +32,32 @@ sub _apply_where_clauses {
     # Chinese characters, which are written without spaces.
     my @parts = split /\s+/, lc $self->name(), 2;
     if ( @parts == 1 ) {
-        $select->where('(')->where(
-            Fey::Literal::Function->new(
-                'LOWER', $Schema->table('Person')->column('first_name')
-            ),
-            'LIKE',
-            lc $parts[0] . '%'
-            )->where('or')->where(
-            Fey::Literal::Function->new(
-                'LOWER', $Schema->table('Person')->column('last_name')
-            ),
-            'LIKE',
-            $parts[0] . '%'
-            )->where(')');
+        #<<<
+        $select
+            ->where('(')
+            ->where( $Schema->table('Person')->column('first_name'),
+                     'LIKE',
+                     lc $parts[0] . '%' )
+            ->where('or')
+            ->where( $Schema->table('Person')->column('last_name'),
+                     'LIKE',
+                     $parts[0] . '%' )
+            ->where(')');
+        #>>>
     }
     else {
-        $select->where(
-            Fey::Literal::Function->new(
-                'LOWER', $Schema->table('Person')->column('first_name')
-            ),
-            'LIKE',
-            $parts[0] . '%'
-            )->where(
-            Fey::Literal::Function->new(
-                'LOWER', $Schema->table('Person')->column('last_name')
-            ),
-            'LIKE',
-            $parts[1] . '%'
-            );
+        #<<<
+        $select
+            ->where( $Schema->table('Person')->column('first_name'),
+                     'LIKE',
+                     $parts[0] . '%' )
+            ->where( $Schema->table('Person')->column('last_name'),
+                     'LIKE',
+                     $parts[1] . '%' );
+        #>>>
     }
+
+    return;
 }
 
 __PACKAGE__->meta()->make_immutable();

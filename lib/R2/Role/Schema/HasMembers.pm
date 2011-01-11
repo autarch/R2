@@ -9,6 +9,7 @@ use Fey::Placeholder;
 use R2::Exceptions qw( data_validation_error );
 use R2::Schema;
 use R2::Schema::Person;
+use R2::Types qw( ArrayRef HashRef Int Str );
 use MooseX::Params::Validate qw( validated_list );
 
 use MooseX::Role::Parameterized;
@@ -27,7 +28,7 @@ has 'members' => (
 
 has 'member_count' => (
     is      => 'ro',
-    isa     => 'Int',
+    isa     => Int,
     lazy    => 1,
     builder => '_build_member_count',
 );
@@ -36,8 +37,8 @@ sub add_member {
     my $self = shift;
     my ( $person_id, $position, $user ) = validated_list(
         \@_,
-        person_id => { isa => 'Int' },
-        position  => { isa => 'Str', default => q{} },
+        person_id => { isa => Int },
+        position  => { isa => Str, default => q{} },
         user      => { isa => 'R2::Schema::User' },
     );
 
@@ -55,6 +56,63 @@ sub add_member {
         position  => $position,
         user      => $user,
     );
+}
+
+sub remove_member {
+    my $self = shift;
+    my ( $person_id, $user ) = validated_list(
+        \@_,
+        person_id => { isa => Int },
+        user      => { isa => 'R2::Schema::User' },
+    );
+
+    my $class = ( ref $self ) . 'Member';
+
+    my $member = $class->new(
+        $self->pk_values_hash(),
+        person_id => $person_id,
+    );
+
+    return unless $member;
+
+    $member->delete( user => $user );
+
+    return;
+}
+
+sub update_members {
+    my $self = shift;
+    my ( $members, $user ) = validated_list(
+        \@_,
+        members => { isa => ArrayRef [HashRef] },
+        user => { isa => 'R2::Schema::User' },
+    );
+
+    my %new_members = map { $_->{person_id} => $_ } @{$members};
+
+    my $current_members = $self->members();
+
+    while ( my ( undef, $membership ) = $current_members->next() ) {
+        my $id = $membership->person_id();
+
+        unless ( $new_members{$id} ) {
+            $membership->delete( user => $user );
+        }
+        else {
+            $membership->update(
+                position => $new_members{$id}->{position},
+            );
+
+            delete $new_members{$id};
+        }
+    }
+
+    for my $new_member ( values %new_members ) {
+        $self->add_member(
+            %{$new_member},
+            user => $user,
+        );
+    }
 }
 
 # If these were regular subs they'd end up getting composed into the
