@@ -40,7 +40,7 @@ sub _build_files {
 
     $js->add('R2');
 
-    return [ map { file($_) } $js->files() ];
+    return [ $dir->file('jquery-1.4.4.js'), map { file($_) } $js->files() ];
 }
 
 sub _build_target_file {

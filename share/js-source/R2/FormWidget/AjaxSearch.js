@@ -1,5 +1,4 @@
 JSAN.use('DOM.Events');
-JSAN.use('DOM.Utils');
 JSAN.use('HTTP.Request');
 
 

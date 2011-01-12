@@ -1,8 +1,3 @@
-JSAN.use('Animation.Fade');
-JSAN.use('DOM.Events');
-JSAN.use('DOM.Find');
-JSAN.use('DOM.Utils');
-JSAN.use('R2.Element');
 JSAN.use('R2.FormWidget.DivDeleter');
 
 if ( typeof R2 == "undefined" ) {
@@ -14,15 +9,14 @@ if ( typeof R2.FormWidget == "undefined" ) {
 }
 
 R2.FormWidget.RepeatableGroup = function ( div, form ) {
-    this.html = div.innerHTML;
+    this.html = div.html();
     this.repeat_count = 1;
 
     this.form = form;
 
-    var matches = div.className.match( /JS-repeatable-group-(\S+)/ );
-    var type = matches[1];
+    var type = div.attr("class").match( /JS-repeatable-group-(\S+)/ )[1];
 
-    var repeater = $( type + "-repeater" );
+    var repeater = $( "#" + type + "-repeater" );
 
     if ( ! repeater ) {
         return;
@@ -32,20 +26,18 @@ R2.FormWidget.RepeatableGroup = function ( div, form ) {
 
     var self = this;
 
-    DOM.Events.addListener( repeater,
-                            "click",
-                            function (e) { self._repeatGroup(e) }
-                          );
+    repeater.click(
+        function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self._repeatGroup( $( e.currentTarget ) );
+        }
+    );
 };
 
 R2.FormWidget._idSequence = 0;
 
-R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
-    e.preventDefault();
-    if ( e.stopPropogation ) {
-        e.stopPropagation();
-    }
-
+R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (target) {
     this.repeat_count++;
 
     /* this HTML regexing is super-hacky, but doing it via
@@ -58,26 +50,27 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
                         /* this is for the "delete this group" piece of the repeater */
                         .replace( /display: none/g, "" );
 
-    var div = document.createElement("div");
-    div.id = "R2-RepeatableGroup-" + R2.FormWidget._idSequence++;
+    var div = $("<div/>");
+    div.attr(
+        "id", "R2-RepeatableGroup-" + R2.FormWidget._idSequence++,
+        "class", "repeat-group"
+    );
 
-    div.className = "repeat-group";
+    div.hide();
 
-    div.innerHTML = html;
-
-    div.style.opacity = 0;
+    div.html(html);
 
     this._instrumentDeleter(div);
 
-    this.repeater.parentNode.insertBefore( div, this.repeater );
+    this.repeater.before(div);
 
     this.form.instrumentRadioButtons();
 
-    var pos = R2.Element.realPosition( e.currentTarget );
+    var pos = target.position();
 
     /* This puts the repeater link at the bottom of the screen */
     var to = pos.top - document.documentElement.clientHeight;
-    to += e.currentTarget.offsetHeight;
+    to += target.outerHeight();
 
     var current = window.pageYOffset;
     /* damn you, IE */
@@ -89,18 +82,13 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (e) {
         window.scrollTo( 0, to );
     }
 
-    div.style.opacity = 0;
-
-    Animation.Fade.fade( { "elementId":     div.id,
-                           "targetOpacity": 1 } );
+    div.fadeIn(500);
 }
 
 R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
-    var deleter = DOM.Find.getElementsByAttributes( { tagName:   "A",
-                                                      className: "delete-repeated-group",
-                                                    }, div )[0];
+    var deleter = $( "a.delete-repeated-group", div ).first();
 
-    if ( ! deleter ) {
+    if ( ! deleter.length ) {
         return;
     }
 

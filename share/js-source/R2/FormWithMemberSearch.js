@@ -1,11 +1,8 @@
 JSAN.use('Animation.Fade');
 JSAN.use('DOM.Element');
 JSAN.use('DOM.Events');
-JSAN.use('DOM.Find');
 JSAN.use('DOM.Utils');
 JSAN.use('R2.FormWidget.AjaxSearch');
-JSAN.use('R2.Utils');
-
 
 if ( typeof R2 == "undefined" ) {
     R2 = {};
@@ -39,8 +36,7 @@ R2.FormWithMemberSearch.prototype._instrumentExistingTable = function () {
 
     var self = this;
 
-    var buttons = DOM.Find.getElementsByAttributes( { tagName: "BUTTON" },
-                                                    table );
+    var buttons = $( "button", table );
 
     for ( var i = 0; i < buttons.length; i++ ) {
         var matches = buttons[i].name.match( /remove-(\d+)/ );
@@ -245,8 +241,7 @@ R2.FormWithMemberSearch.prototype._addMemberFunction = function ( tr, res, pos )
         var parent = results_tr.parentNode;
         parent.removeChild(results_tr);
 
-        var other_tr = DOM.Find.getElementsByAttributes( { tagName: "TR" },
-                                                         parent );
+        var other_tr = $( "tr", parent );
 
         if ( other_tr.length == 1 ) {
             self._hideResults();
@@ -288,8 +283,7 @@ R2.FormWithMemberSearch.prototype._appendResult = function ( result, position_na
     var tbody;
 
     if (table) {
-        var elts = DOM.Find.getElementsByAttributes( { tagName: "TBODY" },
-                                                     table );
+        var elts = $( "tbody", table );
         tbody = elts[0];
     }
     else {
@@ -385,10 +379,7 @@ R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( button, tr, 
                                "onFinish":
                                function () { self._removeSelectedTr(selected_tr); } } );
 
-        var hidden = DOM.Find.getElementsByAttributes( { tagName: "INPUT",
-                                                         type:    "hidden",
-                                                         name:    input_name },
-                                                       self.form );
+        var hidden = $( ':hidden["name=' + input_name + '"]', self.form );
 
         hidden[0].parentNode.removeChild( hidden[0] );
 
@@ -403,8 +394,7 @@ R2.FormWithMemberSearch.prototype._removeSelectedTr = function (tr) {
 
     tbody.removeChild(tr);
 
-    var other_tr = DOM.Find.getElementsByAttributes( { tagName: "TR" },
-                                                     tbody );
+    var other_tr = $( "tr", tbody );
 
     if ( other_tr.length == 0 ) {
         var table = tbody.parentNode;
