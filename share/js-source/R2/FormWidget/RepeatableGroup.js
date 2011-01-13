@@ -9,7 +9,7 @@ if ( typeof R2.FormWidget == "undefined" ) {
 }
 
 R2.FormWidget.RepeatableGroup = function ( div, form ) {
-    this.html = div.html();
+    this.html = div.clone().html();
     this.repeat_count = 1;
 
     this.form = form;
@@ -18,7 +18,7 @@ R2.FormWidget.RepeatableGroup = function ( div, form ) {
 
     var repeater = $( "#" + type + "-repeater" );
 
-    if ( ! repeater ) {
+    if ( ! repeater.length ) {
         return;
     }
 
@@ -40,25 +40,18 @@ R2.FormWidget._idSequence = 0;
 R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (target) {
     this.repeat_count++;
 
-    /* this HTML regexing is super-hacky, but doing it via
-       DOM manipulation does not seem to end up reflected in the
-       innerHTML */
-
-    var html = this.html.replace( /new1/g, "new" + this.repeat_count )
-                        .replace( /class="for-radio selected"/g, "class=\"for-radio\"" )
-                        .replace( /checked="checked"/g, "" )
-                        /* this is for the "delete this group" piece of the repeater */
-                        .replace( /display: none/g, "" );
-
     var div = $("<div/>");
+
+    div.hide();
+
     div.attr(
         "id", "R2-RepeatableGroup-" + R2.FormWidget._idSequence++,
         "class", "repeat-group"
     );
 
-    div.hide();
+    div.html( this.html );
 
-    div.html(html);
+    this._cleanClonedHTML(div);
 
     this._instrumentDeleter(div);
 
@@ -84,6 +77,57 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (target) {
 
     div.fadeIn(500);
 }
+
+R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
+    var count = this.repeat_count;
+
+    div.find("*").filter(
+        function () {
+            return /new1/.test( $(this).attr("name") )
+                || /new1/.test( $(this).attr("id") )
+                || /new1/.test( $(this).attr("for") );
+        }
+    ).each(
+        function () {
+            if ( $(this).attr("id") ) {
+                var id = $(this).attr("id").replace( /new1/g, "new" + count );
+                $(this).attr( "id", id );
+            }
+
+            if ( $(this).attr("name") ) {
+                var name = $(this).attr("name").replace( /new1/g, "new" + count );
+                $(this).attr( "name", name );
+            }
+
+            if ( $(this).attr("for") ) {
+                var for_attr = $(this).attr("for").replace( /new1/g, "new" + count );
+                $(this).attr( "for", for_attr );
+            }
+        }
+    );
+
+    div.find(":radio").filter(
+        function () {
+            return /is_preferred$/.test( $(this).attr("name") );
+        }
+    ).each(
+        function () {
+            $(this).attr( "checked", "" );
+        }
+    );
+
+    div.find("label").filter(
+        function () {
+            return /is_preferred-/.test( $(this).attr("id") );
+        }
+    ).each(
+        function () {
+            $(this).removeClass("selected");
+        }
+    );
+
+    return;
+};
 
 R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
     var deleter = $( "a.delete-repeated-group", div ).first();
