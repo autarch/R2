@@ -292,6 +292,7 @@ CREATE TABLE "ContactMessagingProvider" (
        contact_id         INT8               NOT NULL,
        messaging_provider_id  INT8           NOT NULL,
        screen_name        citext             NOT NULL,
+       note               TEXT               NOT NULL DEFAULT '',
        PRIMARY KEY ( contact_id, messaging_provider_id, screen_name )
 );
 
