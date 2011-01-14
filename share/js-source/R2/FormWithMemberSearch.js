@@ -371,7 +371,7 @@ R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( button, tr, 
             }
         );
 
-        $( ':hidden["name=' + input_name + '"]', self.form ).detach();
+        $( 'input:hidden[name="' + input_name + '"]', self.form ).detach();
 
         delete self.person_ids[ res.person_id ];
     };
