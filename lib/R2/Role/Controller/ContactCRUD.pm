@@ -46,7 +46,7 @@ sub _contact_image {
     return $image;
 }
 
-for my $class_suffix (qw( EmailAddress Website Address PhoneNumber )) {
+for my $class_suffix (qw( EmailAddress Website MessagingProvider Address PhoneNumber )) {
     my $type  = studly_to_calm($class_suffix);
     my $class = 'R2::Schema::' . $class_suffix;
 
@@ -169,6 +169,8 @@ sub _insert_contact {
 
     my $websites = $self->_new_websites( $c, \@errors );
 
+    my $messaging = $self->_new_messaging_providers( $c, \@errors );
+
     my $addresses = $self->_new_addresses( $c, \@errors );
 
     my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
@@ -216,6 +218,8 @@ sub _insert_contact {
             undef,
             $websites,
             undef,
+            $messaging,
+            undef,
             $addresses,
             undef,
             $phone_numbers,
@@ -260,6 +264,9 @@ sub _update_contact {
 
     my $new_websites = $self->_new_websites( $c, \@errors );
     my $updated_websites = $self->_updated_websites( $c, \@errors );
+
+    my $new_messaging = $self->_new_messaging_providers( $c, \@errors );
+    my $updated_messaging = $self->_updated_messaging_providers( $c, \@errors );
 
     my $new_addresses = $self->_new_addresses( $c, \@errors );
     my $updated_addresses = $self->_updated_addresses( $c, \@errors );
@@ -312,6 +319,8 @@ sub _update_contact {
             $updated_emails,
             $new_websites,
             $updated_websites,
+            $new_messaging,
+            $updated_messaging,
             $new_addresses,
             $updated_addresses,
             $new_phone_numbers,
@@ -333,6 +342,8 @@ sub _update_or_add_contact_data {
     my $updated_emails    = shift;
     my $new_websites      = shift;
     my $updated_websites  = shift;
+    my $new_messaging     = shift;
+    my $updated_messaging = shift;
     my $new_addresses     = shift;
     my $updated_addresses = shift;
     my $new_numbers       = shift;
@@ -349,6 +360,12 @@ sub _update_or_add_contact_data {
     $contact->update_or_add_websites(
         $updated_websites || {},
         $new_websites,
+        $user,
+    );
+
+    $contact->update_or_add_messaging_providers(
+        $updated_messaging || {},
+        $new_messaging,
         $user,
     );
 

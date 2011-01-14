@@ -26,9 +26,9 @@ sub seed_data {
 
     R2::Schema::Country->EnsureRequiredCountriesExist();
 
-    require R2::Schema::MessagingProvider;
+    require R2::Schema::MessagingProviderType;
 
-    R2::Schema::MessagingProvider->EnsureRequiredMessageProvidersExist();
+    R2::Schema::MessagingProviderType->EnsureRequiredMessageProviderTypesExist();
 
     require R2::Schema::TimeZone;
 

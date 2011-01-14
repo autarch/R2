@@ -262,6 +262,11 @@ my @objects = (
         field  => 'uri',
         filter => sub { string_is_empty( $_[0]->{uri} ) },
     }, {
+        type          => 'MessagingProvider',
+        field         => 'screen_name',
+        filter        => sub { string_is_empty( $_[0]->{screen_name} ) },
+        has_preferred => 1,
+    }, {
         type  => 'Address',
         field => 'address_type_id',
         filter =>    # If it just has a type and country, we ignore it.

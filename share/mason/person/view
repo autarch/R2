@@ -20,6 +20,8 @@ Gender: <% $gender %>
 
 <& /lib/contact-view/websites.mas, contact => $person &>
 
+<& /lib/contact-view/messaging-providers.mas, contact => $person &>
+
 <& /lib/contact-view/phone-numbers.mas, contact => $person &>
 
 <& /lib/contact-view/addresses.mas, contact => $person &>

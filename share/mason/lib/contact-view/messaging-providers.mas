@@ -1,0 +1,70 @@
+<h2>Instant Messaging <% PL_N( 'Account', scalar @messaging_providers ) %></h2>
+
+<ul>
+% for my $provider (@messaging_providers) {
+<& .provider, provider => $provider, contact => $contact &>
+% }
+</ul>
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my @messaging_providers = $contact->messaging_providers()->all()
+    or return;
+</%init>
+
+<%def .provider>
+  <li class="<% $provider->is_preferred() ? 'preferred' : q{} %>">
+    <% $provider->type()->name() %>
+% if ( $provider->is_preferred() ) {
+      (Preferred)
+% }
+    <br />
+    <strong>Screen name</strong>:
+
+% if ($chat_uri) {
+<a href="<% $chat_uri %>" title="Chat with <% $contact->display_name() %>">\
+% }
+<% $provider->screen_name() %>\
+% if ($chat_uri) {
+</a>
+% }
+
+% if ($status_uri) {
+<img src="<% $status_uri %>" />
+% }
+
+% if ( any { defined } $add_uri, $call_uri, $video_uri ) {
+<br />
+%   if ($add_uri) {
+<a href="<% $add_uri %>" title="Add this contact to your IM client"><img src="/images/icons/im_add.png" height="16" width="16" /></a>
+%   }
+%   if ($call_uri) {
+<a href="<% $call_uri %>" title="Call this contact using your <% $provider->type()->name() %> client"><img src="/images/icons/im_call.png" height="16" width="16" /></a>
+%   }
+%   if ($video_uri) {
+<a href="<% $video_uri %>" title="Video chat with this contact using your <% $provider->type()->name() %> client"><img src="/images/icons/im_video.png" height="16" width="16" /></a>
+%   }
+% }
+
+% if ( ! string_is_empty( $provider->note() ) ) {
+    <br />
+    <span class="messaging-provider-note"><% $provider->note() %></span>
+% }
+  </li>
+
+<%args>
+$provider
+$contact
+</%args>
+
+<%init>
+my $chat_uri = $provider->chat_uri();
+my $status_uri = $provider->status_uri();
+my $add_uri = $provider->add_uri();
+my $call_uri = $provider->call_uri();
+my $video_uri = $provider->video_uri();
+</%init>
+</%def>

@@ -128,6 +128,21 @@ sub _FindOrCreateType {
 
             {
                 system_name => 'ModifyWebsite',
+                description => 'An instant messaging account for the contact was modified',
+            },
+
+            {
+                system_name => 'AddMessagingProvider',
+                description => 'A new instant messagin account was added for the contact',
+            },
+
+            {
+                system_name => 'DeleteMessagingProvider',
+                description => 'An instant messaging account for the contact was deleted',
+            },
+
+            {
+                system_name => 'ModifyMessagingProvider',
                 description => 'A website for the contact was modified',
             },
 

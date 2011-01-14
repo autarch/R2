@@ -1,0 +1,83 @@
+  <fieldset>
+    <legend>Instant Messaging</legend>
+
+% if ($providers) {
+%   while ( my $messaging_provider = $providers->next() ) {
+    <div id="JS-messaging_provider-<% $messaging_provider->messaging_provider_id() %>" class="repeat-group">
+      <& .messaging_provider, messaging_provider => $messaging_provider, id => $messaging_provider->messaging_provider_id(), is_preferred => $messaging_provider->is_preferred() &>
+    </div>
+%   }
+% }
+
+    <div class="JS-repeatable-group-messaging_provider repeat-group">
+      <& .messaging_provider, id => 'new1', is_preferred => ! ( $providers && $providers->index() ) &>
+    </div>
+
+    <a href="#" class="add-another" id="messaging_provider-repeater">Add another messaging_provider</a>
+  </fieldset>
+
+<%args>
+$contact => undef
+</%args>
+
+<%init>
+my $providers;
+$providers = $contact->messaging_providers()
+    if $contact;
+</%init>
+
+<%shared>
+my @messaging_provider_types;
+</%shared>
+
+<%def .messaging_provider>
+% if ($messaging_provider) {
+      <input type="hidden" name="messaging_provider_id" value="<% $id %>" />
+% }
+
+      <&| /lib/filter/form.mas,
+          is_fragment => 1,
+          prefix      => 'messaging_provider',
+          suffix      => q{-} . $id,
+          objects     => $messaging_provider ? [ $messaging_provider ] : [] &>
+      <div class="form-item">
+        <label class="for-field" for="messaging_provider-<% $id %>" id="for-messaging_provider-<% $id %>">Account:</label>
+        <select name="messaging_provider_type_id-<% $id %>">
+% for my $type (@messaging_provider_types) {
+          <option value="<% $type->messaging_provider_type_id() %>"><% $type->name() %></option>
+% }
+        </select>
+        <a class="<% $messaging_provider ? 'JS-delete-div' : 'delete-repeated-group' %>"
+           style="<% $messaging_provider ? q{} : 'display: none' %>"
+           href="#"
+           title="delete this instant messaging account">X</a>
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="screen_name-<% $id %>">Screen name:</label>
+        <input type="text" class="text medium" name="screen_name-<% $id %>" id="screen_name-<% $id %>" />
+      </div>
+
+      <div class="form-item">
+        <label class="secondary" for="messaging_provider_note-<% $id %>">Note:</label>
+        <input type="text" class="text wide" name="messaging_provider_note-<% $id %>" id="messaging_provider_note-<% $id %>" />
+      </div>
+
+      <div class="form-item no-label">
+        <input type="radio" name="messaging_provider_is_preferred" value="<% $id %>"
+               <% $is_preferred ? q{checked="checked"} : q{} | n %>
+               id="messaging_provider_is_preferred-<% $id %>" />
+        <label class="for-radio <% $is_preferred ? 'selected' : q{} %>" for="messaging_provider_is_preferred-<% $id %>"
+               id="for-messaging_provider_is_preferred-<% $id %>">This is the preferred account</label>
+      </div>
+      </&>
+<%args>
+$id
+$messaging_provider => undef
+$is_preferred
+</%args>
+
+<%init>
+@messaging_provider_types = R2::Schema::MessagingProviderType->All()->all();
+</%init>
+</%def>

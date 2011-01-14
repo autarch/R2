@@ -13,9 +13,9 @@ use R2::Image;
 use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::Address;
-use R2::Schema::ContactMessagingProvider;
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
+use R2::Schema::MessagingProvider;
 use R2::Schema::PhoneNumber;
 use R2::Schema::Website;
 use R2::Types qw( PosOrZeroInt Bool HashRef );
@@ -164,18 +164,26 @@ with 'R2::Role::Schema::URIMaker';
         bind_params => sub { $_[0]->contact_id() },
     );
 
-    has messaging_providers => (
-        is       => 'ro',
-        isa      => 'Fey::Object::Iterator::FromSelect',
-        lazy     => 1,
-        builder  => '_build_messaging_providers',
-        init_arg => undef,
+    has_many 'messaging_providers' => (
+        table    => $schema->table('MessagingProvider'),
+        cache    => 1,
+        order_by => [
+            $schema->table('MessagingProvider')->column('is_preferred'),
+            'DESC',
+            $schema->table('MessagingProvider')->column('messaging_provider_type_id'),
+            'ASC',
+        ],
     );
 
-    class_has '_MessagingProviderSelect' => (
-        is      => 'ro',
-        isa     => 'Fey::SQL::Select',
-        builder => '_BuildMessagingProviderSelect',
+    has_one 'preferred_messaging_provider' => (
+        table       => $schema->table('MessagingProvider'),
+        select      => __PACKAGE__->_PreferredThingSelect('MessagingProvider'),
+        bind_params => sub { $_[0]->contact_id() }
+    );
+
+    query messaging_provider_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('MessagingProvider'),
+        bind_params => sub { $_[0]->contact_id() },
     );
 
     has_many 'donations' => (
@@ -304,10 +312,11 @@ sub _build_real_contact {
 }
 
 for my $pair (
-    [ 'email_address', 'email_address' ],
-    [ 'website',       'uri' ],
-    [ 'phone_number',  'phone_number_type_id' ],
-    [ 'address',       'address_type_id' ]
+    [ 'email_address',      'email_address' ],
+    [ 'website',            'uri' ],
+    [ 'messaging_provider', 'screen_name' ],
+    [ 'phone_number',       'phone_number_type_id' ],
+    [ 'address',            'address_type_id' ]
     ) {
 
     my $thing         = $pair->[0];
@@ -385,41 +394,6 @@ for my $pair (
     };
 
     __PACKAGE__->meta()->add_method( $method => $sub );
-}
-
-sub _build_messaging_providers {
-    my $self = shift;
-
-    my $select = $self->_MessagingProviderSelect();
-
-    my $dbh = $self->_dbh($select);
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes => [
-            qw( R2::Schema::ContactMessagingProvider R2::Schema::MessagingProvider )
-        ],
-        dbh         => $dbh,
-        select      => $select,
-        bind_params => [ $self->contact_id() ],
-    );
-}
-
-sub _BuildMessagingProviderSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    #<<<
-    $select
-        ->select( $schema->tables( 'ContactMessagingProvider', 'MessagingProvider' ) )
-        ->from  ( $schema->tables( 'ContactMessagingProvider', 'MessagingProvider' ) )
-        ->where ( $schema->table('ContactMessagingProvider')->column('contact_id'),
-                  '=', Fey::Placeholder->new() )
-        ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' );
-    #>>>
-    return $select;
 }
 
 sub add_donation {

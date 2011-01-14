@@ -43,6 +43,7 @@ use MooseX::ClassAttribute;
                 email_addresses
                 primary_email_address
                 websites
+                messaging_providers
                 addresses
                 primary_address
                 phone_numbers
