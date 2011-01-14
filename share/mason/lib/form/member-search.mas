@@ -20,8 +20,8 @@
                 <th class="button"></th>
               </tr>
             </thead>
-            <tbody>
 %   while ( my ( $person, $membership ) = $members->next() ) {
+            <tbody>
               <tr>
                 <td class="name"><% $person->full_name() %></td>
                 <td class="position">
@@ -36,8 +36,8 @@
                          value="<% $person->person_id() %>" />
                 </td>
               </tr>
-%   }
             </tbody>
+%   }
           </table>
 % }
 % else {
