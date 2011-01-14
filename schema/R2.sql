@@ -288,16 +288,17 @@ CREATE TABLE "Person" (
        gender             citext             NULL
 );
 
-CREATE TABLE "ContactMessagingProvider" (
-       contact_id         INT8               NOT NULL,
-       messaging_provider_id  INT8           NOT NULL,
-       screen_name        citext             NOT NULL,
-       note               TEXT               NOT NULL DEFAULT '',
-       PRIMARY KEY ( contact_id, messaging_provider_id, screen_name )
-);
-
 CREATE TABLE "MessagingProvider" (
        messaging_provider_id  SERIAL8        PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       messaging_provider_type_id  INT8      NOT NULL,
+       screen_name        citext             NOT NULL,
+       is_preferred       BOOLEAN            DEFAULT FALSE,
+       note               TEXT               NOT NULL DEFAULT ''
+);
+
+CREATE TABLE "MessagingProviderType" (
+       messaging_provider_type_id  SERIAL8        PRIMARY KEY,
        name                   citext         UNIQUE  NOT NULL,
        add_uri_template       TEXT           NOT NULL DEFAULT '',
        chat_uri_template      TEXT           NOT NULL DEFAULT '',
@@ -702,12 +703,12 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactMessagingProvider" ADD CONSTRAINT "ContactMessagingProvider_contact_id"
+ALTER TABLE "MessagingProvider" ADD CONSTRAINT "MessagingProvider_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "ContactMessagingProvider" ADD CONSTRAINT "ContactMessagingProvider_messaging_provider_id"
-  FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
+ALTER TABLE "MessagingProvider" ADD CONSTRAINT "MessagingProvider_messaging_provider_type_id"
+  FOREIGN KEY ("messaging_provider_type_id") REFERENCES "MessagingProviderType" ("messaging_provider_type_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "PersonRelationship" ADD CONSTRAINT "PersonRelationship_person_id"
