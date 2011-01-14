@@ -288,11 +288,11 @@ CREATE TABLE "Person" (
        gender             citext             NULL
 );
 
-CREATE TABLE "PersonMessagingProvider" (
-       person_id          INT8               NOT NULL,
+CREATE TABLE "ContactMessagingProvider" (
+       contact_id         INT8               NOT NULL,
        messaging_provider_id  INT8           NOT NULL,
        screen_name        citext             NOT NULL,
-       PRIMARY KEY ( person_id, messaging_provider_id, screen_name )
+       PRIMARY KEY ( contact_id, messaging_provider_id, screen_name )
 );
 
 CREATE TABLE "MessagingProvider" (
@@ -701,11 +701,11 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_person_id"
-  FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
+ALTER TABLE "ContactMessagingProvider" ADD CONSTRAINT "ContactMessagingProvider_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE "PersonMessagingProvider" ADD CONSTRAINT "PersonMessagingProvider_messaging_provider_id"
+ALTER TABLE "ContactMessagingProvider" ADD CONSTRAINT "ContactMessagingProvider_messaging_provider_id"
   FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 

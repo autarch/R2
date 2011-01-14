@@ -6,7 +6,6 @@ use namespace::autoclean;
 
 use DateTime::Format::Strptime;
 use R2::Schema;
-use R2::Schema::PersonMessagingProvider;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
 
@@ -64,15 +63,6 @@ use MooseX::ClassAttribute;
     has_one 'user' => (
         table => $schema->table('User'),
         undef => 1,
-    );
-
-    # XXX - this'd be nicer if it selected the messaging provider in
-    # the same query
-    has_many 'messaging' => (
-        table       => $schema->table('PersonMessagingProvider'),
-        cache       => 1,
-        select      => __PACKAGE__->_MessagingSelect(),
-        bind_params => sub { $_[0]->person_id() },
     );
 
     has 'full_name' => (
@@ -144,26 +134,6 @@ sub _valid_birth_date {
         field   => 'birth_date',
         message => 'Birth date cannot be in the future.',
     };
-}
-
-sub _MessagingSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->table('PersonMessagingProvider') )
-        ->from(
-        $schema->tables( 'PersonMessagingProvider', 'MessagingProvider' ) )
-        ->where(
-        $schema->table('PersonMessagingProvider')->column('person_id'),
-        '=', Fey::Placeholder->new()
-        )
-        ->order_by( $schema->table('MessagingProvider')->column('name'),
-        'ASC' );
-
-    return $select;
 }
 
 sub display_name {

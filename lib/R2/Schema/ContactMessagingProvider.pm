@@ -1,4 +1,4 @@
-package R2::Schema::PersonMessagingProvider;
+package R2::Schema::ContactMessagingProvider;
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use namespace::autoclean;
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::MessagingProvider;
-use R2::Schema::Person;
+use R2::Schema::Contact;
 
 use Fey::ORM::Table;
 
@@ -16,9 +16,9 @@ use Fey::ORM::Table;
 
     has_policy 'R2::Schema::Policy';
 
-    has_table( $schema->table('PersonMessagingProvider') );
+    has_table( $schema->table('ContactMessagingProvider') );
 
-    has_one( $schema->table('Person') );
+    has_one( $schema->table('Contact') );
 
     has_one 'provider' => ( table => $schema->table('MessagingProvider') );
 }

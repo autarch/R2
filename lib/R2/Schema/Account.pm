@@ -11,7 +11,6 @@ use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Exceptions qw( error );
 use R2::Schema::AccountCountry;
-use R2::Schema::AccountMessagingProvider;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
@@ -76,13 +75,6 @@ with 'R2::Role::Schema::URIMaker';
         order_by => [ $schema->table('PhoneNumberType')->column('name') ],
     );
 
-    has_many 'messaging_providers' => (
-        table       => $schema->table('MessagingProvider'),
-        cache       => 1,
-        select      => __PACKAGE__->_BuildMessagingProvidersSelect(),
-        bind_params => sub { $_[0]->account_id() },
-    );
-
     has_many 'custom_field_groups' => (
         table => $schema->table('CustomFieldGroup'),
         cache => 1,
@@ -112,14 +104,6 @@ with 'R2::Role::Schema::URIMaker';
             clearer => '_clear_custom_field_groups_for_' . $type
             );
     }
-
-    has '_messaging_provider_id_hash' => (
-        is       => 'ro',
-        isa      => HashRef,
-        lazy     => 1,
-        builder  => '_build__messaging_provider_id_hash',
-        init_arg => undef,
-    );
 
     has_many 'contact_note_types' => (
         table    => $schema->table('ContactNoteType'),
@@ -181,8 +165,6 @@ sub _initialize {
     R2::Schema::DonationSource->CreateDefaultsForAccount($self);
 
     R2::Schema::DonationCampaign->CreateDefaultsForAccount($self);
-
-    R2::Schema::AccountMessagingProvider->CreateDefaultsForAccount($self);
 
     R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
@@ -329,21 +311,6 @@ for my $pair (
     __PACKAGE__->meta()->add_method( $meth => $sub );
 }
 
-sub has_messaging_provider {
-    my $self     = shift;
-    my $provider = shift;
-
-    return $self->_messaging_provider_id_hash()
-        ->{ $provider->messaging_provider_id() };
-}
-
-sub _build_messaging_provider_id_hash {
-    my $self = shift;
-
-    return { map { $_->messaging_provider_id() => 1 }
-            $self->messaging_providers()->all() };
-}
-
 sub _build_made_a_note_contact_note_type {
     my $self = shift;
 
@@ -383,25 +350,6 @@ sub _BuildCountriesSelect {
            ->order_by( $schema->table('AccountCountry')->column('is_default'),
                        'DESC',
                        $schema->table('Country')->column('name'),
-                       'ASC',
-                     );
-    #>>>
-    return $select;
-}
-
-sub _BuildMessagingProvidersSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    #<<<
-    $select->select( $schema->tables('MessagingProvider') )
-           ->from  ( $schema->tables( 'AccountMessagingProvider', 'MessagingProvider' ) )
-           ->where ( $schema->table('AccountMessagingProvider')->column('account_id'),
-                     '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('MessagingProvider')->column('name'),
                        'ASC',
                      );
     #>>>

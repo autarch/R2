@@ -13,6 +13,7 @@ use R2::Image;
 use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::Address;
+use R2::Schema::ContactMessagingProvider;
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
 use R2::Schema::PhoneNumber;
@@ -163,6 +164,20 @@ with 'R2::Role::Schema::URIMaker';
         bind_params => sub { $_[0]->contact_id() },
     );
 
+    has messaging_providers => (
+        is       => 'ro',
+        isa      => 'Fey::Object::Iterator::FromSelect',
+        lazy     => 1,
+        builder  => '_build_messaging_providers',
+        init_arg => undef,
+    );
+
+    class_has '_MessagingProviderSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildMessagingProviderSelect',
+    );
+
     has_many 'donations' => (
         table    => $schema->table('Donation'),
         order_by => [
@@ -198,7 +213,7 @@ with 'R2::Role::Schema::URIMaker';
     class_has '_HistorySelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
-        default => sub { __PACKAGE__->_BuildHistorySelect() },
+        builder => '_BuildHistorySelect',
     );
 
     has 'history' => (
@@ -370,6 +385,41 @@ for my $pair (
     };
 
     __PACKAGE__->meta()->add_method( $method => $sub );
+}
+
+sub _build_messaging_providers {
+    my $self = shift;
+
+    my $select = $self->_MessagingProviderSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes => [
+            qw( R2::Schema::ContactMessagingProvider R2::Schema::MessagingProvider )
+        ],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->contact_id() ],
+    );
+}
+
+sub _BuildMessagingProviderSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables( 'ContactMessagingProvider', 'MessagingProvider' ) )
+        ->from  ( $schema->tables( 'ContactMessagingProvider', 'MessagingProvider' ) )
+        ->where ( $schema->table('ContactMessagingProvider')->column('contact_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('MessagingProvider')->column('name'), 'ASC' );
+    #>>>
+    return $select;
 }
 
 sub add_donation {

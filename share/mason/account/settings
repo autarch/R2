@@ -44,11 +44,6 @@
     <& /lib/help-text/contact-note-type.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'messaging_providers_form' ) %>"
-       title="Instant messaging providers">Instant messaging providers</a>
-    <& /lib/help-text/messaging-providers.mas &>
-  </li>
-  <li>
     <a href="<% $account->uri( view => 'users_form' ) %>"
        title="Account users">Account users</a>
     <p>
