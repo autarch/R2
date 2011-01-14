@@ -126,6 +126,8 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
         }
     );
 
+    div.find("a.delete-repeated-group").show();
+
     return;
 };
 
