@@ -1,6 +1,5 @@
 JSAN.use('R2.FormWidget.LabeledRadioButton');
 JSAN.use('R2.FormWidget.RepeatableGroup');
-JSAN.use('R2.FormWidget.PairedMultiSelect');
 JSAN.use('R2.Utils');
 
 if ( typeof R2 == "undefined" ) {
@@ -13,7 +12,6 @@ R2.Form = function (form) {
     this.instrumentRadioButtons();
     this._instrumentRepeatableGroups();
     this._instrumentDivDeleters();
-    this._instrumentPairedMultiSelects();
 };
 
 R2.Form.instrumentAllForms = function () {
@@ -31,7 +29,7 @@ R2.Form.prototype.instrumentRadioButtons = function () {
         function() {
             var label = $(this).next();
 
-            if ( ! label ) {
+            if ( ! label.length ) {
                 return;
             }
 
@@ -65,25 +63,4 @@ R2.Form.prototype._instrumentDivDeleters = function () {
             );
         }
     );
-};
-
-R2.Form.prototype._instrumentPairedMultiSelects = function () {
-    var selects = $( "select", this.form );
-
-    var ids = {};
-    for ( var i = 0; i < selects.length; i++ ) {
-        var matches = selects[i].id.match( /^(wpms-\w+)-/ );
-
-        if ( ! matches ) {
-            continue;
-        }
-
-        if ( ids[ matches[1] ] ) {
-            continue;
-        }
-
-        ids[ matches[1] ] = 1;
-
-        R2.FormWidget.PairedMultiSelect.newFromPrefix( matches[1] );
-    }
 };

@@ -1,5 +1,3 @@
-JSAN.use('DOM.Events');
-
 if ( typeof R2 == "undefined" ) {
     R2 = {};
 }

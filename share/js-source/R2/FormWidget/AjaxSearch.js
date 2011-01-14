@@ -1,7 +1,3 @@
-JSAN.use('DOM.Events');
-JSAN.use('HTTP.Request');
-
-
 if ( typeof R2 == "undefined" ) {
     R2 = {};
 }
@@ -10,15 +6,15 @@ if ( typeof R2.FormWidget == "undefined" ) {
     R2.FormWidget = {};
 }
 
-R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_empty, on_success, on_failure ) {
-    this.text     = $( prefix + "-search-text" );
-    this.submit   = $( prefix + "-search-submit" );
+R2.FormWidget.AjaxSearch = function ( url, prefix, on_submit, on_empty, on_success, on_failure ) {
+    this.text   = $( "#" + prefix + "-search-text" );
+    this.submit = $( "#" + prefix + "-search-submit" );
 
-    if ( ! ( this.text && this.submit ) ) {
+    if ( ! ( this.text.length && this.submit.length ) ) {
         return;
     }
 
-    this.uri        = uri;
+    this.url        = url;
     this.on_submit  = on_submit;
     this.on_empty   = on_empty;
     this.on_success = on_success;
@@ -31,38 +27,31 @@ R2.FormWidget.AjaxSearch = function ( uri, prefix, on_submit, on_empty, on_succe
 R2.FormWidget.AjaxSearch.prototype._instrumentTextInput = function () {
     var self = this;
 
-    DOM.Events.addListener( this.text,
-                            "keypress",
-                            function (e) {
-                                if ( e.keyCode != 13 ) {
-                                    return e.keyCode;
-                                }
+    this.text.keypress(
+        function (e) {
+            if ( e.which != 13 ) {
+                return e.which;
+            }
 
-                                self.submit.click();
+            self.submit.click();
 
-                                e.preventDefault();
-                                if ( e.stopPropogation ) {
-                                    e.stopPropagation();
-                                }
-                            }
-                          );
-
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    );
 };
 
 R2.FormWidget.AjaxSearch.prototype._instrumentSubmit = function () {
     var self = this;
 
-    DOM.Events.addListener( this.submit,
-                            "click",
-                            function (e) {
-                                e.preventDefault();
-                                if ( e.stopPropogation ) {
-                                    e.stopPropagation();
-                                }
+    this.submit.click(
+        function (e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                                self._submitSearch();
-                            }
-                          );
+            self._submitSearch();
+        }
+    );
 };
 
 R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
@@ -70,7 +59,7 @@ R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
         this.req.transport.abort();
     }
 
-    if ( this.text.value.length == 0 ) {
+    if ( this.text.val().length == 0 ) {
         this.on_empty();
 
         return;
@@ -78,26 +67,29 @@ R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
 
     var self = this;
 
-    this.req = new HTTP.Request ( { "method": "get",
-                                    "parameters": this._parameters(),
-                                    "onSuccess": function (trans) { self._handleSuccess(trans) },
-                                    "onFailure": function (trans) { self._handleFailure(trans) }
-                                  }
-                                );
-
     this.on_submit();
 
-    this.req.request( this.uri );
+    $.ajax(
+        {
+            "url":      this.url,
+            "type":     "GET",
+            "data":     this._parameters(),
+            "dataType": "json",
+            "success" : function (data) { self._handleSuccess(data) },
+            "error":    function (xhr, status, error) { self._handleFailure(xhr) }
+        }
+    );
 };
 
 R2.FormWidget.AjaxSearch.prototype._parameters = function () {
-    return encodeURIComponent( this.text.name ) + "=" + encodeURIComponent( this.text.value );
+    var params = {};
+    params[ this.text.attr("name") ] = this.text.val();
+
+    return params;
 }
 
-R2.FormWidget.AjaxSearch.prototype._handleSuccess = function (trans) {
-    var results = eval( "(" + trans.responseText + ")" );
-
-    this.on_success(results);
+R2.FormWidget.AjaxSearch.prototype._handleSuccess = function (data) {
+    this.on_success(data);
 };
 
 R2.FormWidget.AjaxSearch.prototype._handleFailure = function (trans) {
