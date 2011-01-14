@@ -272,9 +272,9 @@ my @objects = (
     }, {
         type  => 'PhoneNumber',
         field => 'phone_number_type_id',
-        filter =>    # If it just has a type, we ignore it.
+        filter =>    # If it just has a type and allows_sms, we ignore it.
             sub {
-            ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 1;
+            ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 2;
             },
         has_preferred => 1,
     },
