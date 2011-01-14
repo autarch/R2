@@ -292,7 +292,7 @@ CREATE TABLE "PersonMessagingProvider" (
        person_id          INT8               NOT NULL,
        messaging_provider_id  INT8           NOT NULL,
        screen_name        citext             NOT NULL,
-       PRIMARY KEY ( person_id, messaging_provider_id )
+       PRIMARY KEY ( person_id, messaging_provider_id, screen_name )
 );
 
 CREATE TABLE "MessagingProvider" (
@@ -303,12 +303,6 @@ CREATE TABLE "MessagingProvider" (
        call_uri_template      TEXT           NOT NULL DEFAULT '',
        video_uri_template     TEXT           NOT NULL DEFAULT '',
        status_uri_template    TEXT           NOT NULL DEFAULT ''
-);
-
-CREATE TABLE "AccountMessagingProvider" (
-       account_id         INT8               NOT NULL,
-       messaging_provider_id  INT8           NOT NULL,
-       PRIMARY KEY (account_id, messaging_provider_id)
 );
 
 CREATE TABLE "PersonRelationship" (
@@ -730,14 +724,6 @@ ALTER TABLE "PersonRelationship" ADD CONSTRAINT "PersonRelationship_other_person
 ALTER TABLE "RelationshipType" ADD CONSTRAINT "RelationshipType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "AccountMessagingProvider" ADD CONSTRAINT "AccountMessagingProvider_account_id"
-  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE "AccountMessagingProvider" ADD CONSTRAINT "AccountMessagingProvider_messaging_provider_id"
-  FOREIGN KEY ("messaging_provider_id") REFERENCES "MessagingProvider" ("messaging_provider_id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "Household" ADD CONSTRAINT "Household_household_id"
   FOREIGN KEY ("household_id") REFERENCES "Contact" ("contact_id")
