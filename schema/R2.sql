@@ -465,9 +465,7 @@ CREATE TABLE "Donation" (
        note               TEXT               NOT NULL DEFAULT '',
        CONSTRAINT valid_amount CHECK ( amount > 0.00 ),
        CONSTRAINT valid_value_for_donor CHECK ( value_for_donor >= 0.00 ),
-       CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 ),
-       CONSTRAINT account_id_external_id_ck
-                  UNIQUE ( account_id, external_id )
+       CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 )
 );
 
 CREATE TABLE "DonationSource" (
