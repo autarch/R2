@@ -5,7 +5,8 @@
 % if ($donation) {
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 % }
-  <input type="hidden" name="date_format" value="<% $c->user()->date_format_for_jquery() %>" />
+  <input type="hidden" name="datepicker_dateFormat" value="<% $c->user()->date_format_for_jquery() %>" />
+  <input type="hidden" name="datepicker_yearRange" value="-20:+2" />
 
   <fieldset>
     <legend>Add a new donation</legend>

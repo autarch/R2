@@ -1,4 +1,5 @@
-  <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
+  <input type="hidden" name="datepicker_dateFormat" value="<% $c->user()->date_format_for_jquery() %>" />
+  <input type="hidden" name="datepicker_yearRange" value="-110:+1" />
 
   <fieldset>
     <legend>The Basics</legend>
@@ -68,3 +69,9 @@
 <%args>
 $person => undef
 </%args>
+
+<%init>
+my $this_year = DateTime->today()->year();
+my $min_year = $this_year - 110;
+my $max_year = $this_year + 1;
+</%init>

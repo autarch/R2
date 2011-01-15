@@ -69,11 +69,21 @@ R2.Form.prototype._instrumentDivDeleters = function () {
 R2.Form.prototype._instrumentDateFields = function () {
     var self = this;
 
-    var date_format = $('input[name="date_format"]').val();
+    var options = { "changeMonth": true,
+                    "changeYear":  true };
+
+    $('input[name^="datepicker_"]').each(
+        function () {
+            var matches = $(this).attr("name").match( /datepicker_(\w+)/ );
+            var key = matches[1];
+
+            options[key] = $(this).val();
+        }
+    );
 
     $("input.date").each(
         function () {
-            $(this).datepicker( { "dateFormat": date_format } );
+            $(this).datepicker(options);
         }
     );
 };
