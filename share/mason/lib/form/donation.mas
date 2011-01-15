@@ -4,6 +4,8 @@
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 % }
 
+  <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
+
   <fieldset>
     <legend>Add a new donation</legend>
 
@@ -21,10 +23,14 @@
       <label class="for-field" for="donation_date">Date:</label>
       <input type="text" class="text narrow" name="donation_date" id="donation_date"
              value="<% $c->user()->format_date( $donation ? $donation->donation_date() : DateTime->now() ) %>" />
-      <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="is_recurring">Recurring donation?</label>
+      <input type="checkbox" class="checkbox" name="is_recurring" id="is_recurring" value="1" />
       <div class="help-text">
         <p>
-          <% $c->user()->date_format() %>
+          Was this donation part of an ongoing recurring donation?
         </p>
       </div>
     </div>
@@ -57,8 +63,8 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="receipt_sent">Receipt sent date:</label>
-      <input class="checkbox" type="checkbox" name="receipt_sent" value="1" />
+      <label class="for-field" for="receipt_date">Receipt sent date:</label>
+      <input type="text" class="text narrow date" name="receipt_date" id="receipt_date" />
     </div>
 
     <div class="form-item">
@@ -79,6 +85,17 @@
         <p>
           If your organization did not receive the full amount
           donated, enter the transaction cost here.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="external_id">External id:</label>
+      <input type="text" class="text medium" name="external_id" id="external_id" />
+      <div class="help-text">
+        <p>
+          If this donation was made through a system which exposes some sort
+          of unique id, you can enter that id here.
         </p>
       </div>
     </div>
