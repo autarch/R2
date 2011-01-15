@@ -461,11 +461,13 @@ CREATE TABLE "Donation" (
        donation_source_id INT8               NOT NULL,
        donation_campaign_id  INT8            NOT NULL,
        payment_type_id    INT8               NOT NULL,
-       external_id        TEXT               UNIQUE NULL,
+       external_id        TEXT               NULL,
        note               TEXT               NOT NULL DEFAULT '',
        CONSTRAINT valid_amount CHECK ( amount > 0.00 ),
        CONSTRAINT valid_value_for_donor CHECK ( value_for_donor >= 0.00 ),
-       CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 )
+       CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 ),
+       CONSTRAINT account_id_external_id_ck
+                  UNIQUE ( account_id, external_id )
 );
 
 CREATE TABLE "DonationSource" (
