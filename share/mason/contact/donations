@@ -24,9 +24,9 @@
   <tbody>
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
-      <td>$<% $donation->amount() %></td>
-      <td>$<% $donation->value_for_donor() %></td>
-      <td>$<% $donation->transaction_cost() %></td>
+      <td><% $format->format_price( $donation->amount() ) %></td>
+      <td><% $format->format_price( $donation->value_for_donor() ) %></td>
+      <td><% $format->format_price( $donation->transaction_cost() ) %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->campaign()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
@@ -50,8 +50,8 @@
 </table>
 
 <ul class="table-summary donation-totals">
-  <li>Total for the last 12 months: <% $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) %></li>
-  <li>Total for all time: <% $contact->donation_total() %></li>
+  <li>Total for the last 12 months: <% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></li>
+  <li>Total for all time: <% $format->format_price( $contact->donation_total() ) %></li>
 </ul>
 
 % } else {
@@ -72,6 +72,7 @@ $can_edit_donations
 
 <%init>
 my $donations = $contact->donations();
+my $format = Number::Format->new( INT_CURR_SYMBOL => '$' );
 </%init>
 
 <%method title>

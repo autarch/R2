@@ -18,6 +18,7 @@ use base 'Catalyst::View::Mason';
 
 # used in templates
 use HTML::FillInForm;
+use Number::Format;
 use Path::Class;
 use R2::Config;
 use R2::Web::Form;
