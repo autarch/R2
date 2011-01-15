@@ -33,7 +33,7 @@ my @messaging_providers = $contact->messaging_providers()->all()
 % }
 
 % if ($status_uri) {
-<img src="<% $status_uri %>" />
+<img src="<% $status_uri %>" height="16" />
 % }
 
 % if ( any { defined } $add_uri, $call_uri, $video_uri ) {
