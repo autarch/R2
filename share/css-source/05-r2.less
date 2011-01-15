@@ -56,15 +56,29 @@ body {
     font-size: 105%;
 }
 
+#global-nav {
+    font-size: 80%;
+    margin: 5px 0;
+    padding: 0;
+    text-align: right;
+
+    li {
+        display: inline;
+        list-style: none;
+
+        a {
+            padding-right: 0.5em;
+        }
+    }
+}
+
 #header {
     background-color: @dark-green;
-    margin-top: 10px;
     padding-top: 1.5em;
 
     h1 {
         color: white;
-        margin: 0;
-        margin-left: 10px;
+        margin: 0 0 0.5em 10px;
     }
 }
 
@@ -74,23 +88,6 @@ body {
     font-size: 90%;
     padding: 1em 0.5em;
     text-align: center;
-}
-
-#global-nav {
-    font-size: 80%;
-    margin: 0 1em 0 0;
-    padding-left: 8px;
-    text-align: left;
-
-    li {
-        display: inline;
-        list-style: none;
-
-        a {
-            color: white;
-            padding-right: 0.5em;
-        }
-    }
 }
 
 #tabs {
