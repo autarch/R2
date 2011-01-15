@@ -1,10 +1,11 @@
-<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date' ] &>
-<form action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>" method="post">
+<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date', 'receipt_date' ] &>
+<form class="JS-standard-form"
+      action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>"
+      method="post">
 % if ($donation) {
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 % }
-
-  <input type="hidden" name="date_format" value="<% $c->user()->date_format() %>" />
+  <input type="hidden" name="date_format" value="<% $c->user()->date_format_for_jquery() %>" />
 
   <fieldset>
     <legend>Add a new donation</legend>
@@ -21,7 +22,7 @@
 
     <div class="form-item">
       <label class="for-field" for="donation_date">Date:</label>
-      <input type="text" class="text narrow" name="donation_date" id="donation_date"
+      <input type="text" class="text narrow date" name="donation_date" id="donation_date"
              value="<% $c->user()->format_date( $donation ? $donation->donation_date() : DateTime->now() ) %>" />
     </div>
 
@@ -64,7 +65,8 @@
 
     <div class="form-item">
       <label class="for-field" for="receipt_date">Receipt sent date:</label>
-      <input type="text" class="text narrow date" name="receipt_date" id="receipt_date" />
+      <input type="text" class="text narrow date" name="receipt_date" id="receipt_date"
+             value="<% $donation && $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ) : q{} %>" />
     </div>
 
     <div class="form-item">

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use DateTime::Format::Strptime;
+use DateTime::Format::Natural;
 use Number::Format qw( format_number );
 use R2::Schema::DonationCampaign;
 use R2::Schema::DonationSource;
@@ -16,7 +16,7 @@ use Scalar::Util qw( looks_like_number );
 use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
-    { steps => [qw( _validate_amount _valid_donation_date )] };
+    { steps => [qw( _validate_amount _valid_donation_date _valid_receipt_date )] };
 with 'R2::Role::Schema::URIMaker';
 
 {
@@ -83,14 +83,11 @@ sub _valid_donation_date {
     my $p         = shift;
     my $is_insert = shift;
 
-    my $format = delete $p->{date_format} || '%y-%m-%d';
-
     return if string_is_empty( $p->{donation_date} );
 
     return if blessed $p->{donation_date};
 
-    my $parser = DateTime::Format::Strptime->new(
-        pattern   => $format,
+    my $parser = DateTime::Format::Natural->new(
         time_zone => 'floating',
     );
 
@@ -101,6 +98,34 @@ sub _valid_donation_date {
         message => 'This does not seem to be a valid date.',
         }
         unless $dt;
+
+    $p->{donation_date} = $dt;
+
+    return;
+}
+
+sub _valid_receipt_date {
+    my $self      = shift;
+    my $p         = shift;
+    my $is_insert = shift;
+
+    return if string_is_empty( $p->{receipt_date} );
+
+    return if blessed $p->{receipt_date};
+
+    my $parser = DateTime::Format::Natural->new(
+        time_zone => 'floating',
+    );
+
+    my $dt = $parser->parse_datetime( $p->{receipt_date} );
+
+    return {
+        field   => 'donation_date',
+        message => 'This does not seem to be a valid date.',
+        }
+        unless $dt;
+
+    $p->{receipt_date} = $dt;
 
     return;
 }

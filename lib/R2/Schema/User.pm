@@ -37,6 +37,14 @@ has date_format => (
     default  => sub { $_[0]->_dt_locale()->date_format_medium() },
 );
 
+has date_format_for_jquery => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_date_format_for_jquery',
+);
+
 has time_format => (
     is       => 'ro',
     isa      => Str,
@@ -200,6 +208,39 @@ sub _FindOrCreateSystemUser {
         is_disabled    => 1,
         is_system_user => 1,
     );
+}
+
+sub _build_date_format_for_jquery {
+    my $self = shift;
+
+    my $format = $self->date_format();
+    #<<<
+    $format        =~ s/y{3,}/yy/
+        or $format =~ s/yy/y/
+        or $format =~ s/y/yy/
+        or $format =~ s/u+/yy/;
+
+    $format        =~ s/MMMMM/M/
+        or $format =~ s/MMMM/MM/
+        or $format =~ s/MMM/M/
+        or $format =~ s/MM/mm/
+        or $format =~ s/M/m/;
+
+    $format        =~ s/LLLLL/M/
+        or $format =~ s/LLLL/MM/
+        or $format =~ s/LLL/M/
+        or $format =~ s/L{1,2}/mm/;
+
+    $format        =~ s/EEEEE/D/
+        or $format =~ s/EEEE/DD/
+        or $format =~ s/E{1,3}/D/;
+
+    $format        =~ s/eeeee/D/
+        or $format =~ s/eeee/DD/
+        or $format =~ s/e{1,3}/D/;
+    #>>>
+
+    return $format;
 }
 
 sub format_date {

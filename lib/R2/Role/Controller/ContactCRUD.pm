@@ -23,9 +23,6 @@ sub _contact_params_for_class {
     my %p = $c->request()->$params_method();
     $p{account_id} = $c->account()->account_id();
 
-    my $format = $c->request()->params()->{date_format};
-    $p{date_format} = $format if defined $format;
-
     return \%p;
 }
 

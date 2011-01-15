@@ -12,6 +12,7 @@ R2.Form = function (form) {
     this.instrumentRadioButtons();
     this._instrumentRepeatableGroups();
     this._instrumentDivDeleters();
+    this._instrumentDateFields();
 };
 
 R2.Form.instrumentAllForms = function () {
@@ -61,6 +62,18 @@ R2.Form.prototype._instrumentDivDeleters = function () {
                 $(this).closest("div.repeat-group").first(),
                 $(this)
             );
+        }
+    );
+};
+
+R2.Form.prototype._instrumentDateFields = function () {
+    var self = this;
+
+    var date_format = $('input[name="date_format"]').val();
+
+    $("input.date").each(
+        function () {
+            $(this).datepicker( { "dateFormat": date_format } );
         }
     );
 };

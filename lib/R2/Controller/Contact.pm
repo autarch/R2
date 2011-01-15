@@ -230,9 +230,8 @@ sub donations_POST : Private {
     );
 
     my %p = $c->request()->donation_params();
-    $p{date_format} = $c->request()->params()->{date_format};
 
-    eval { $contact->add_donation(%p); };
+    eval { $contact->add_donation( %p, user => $c->user() ); };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
@@ -296,11 +295,10 @@ sub donation_PUT {
     );
 
     my %p = $c->request()->donation_params();
-    $p{date_format} = $c->request()->params()->{date_format};
 
     my $donation = $c->stash()->{donation};
 
-    eval { $donation->update(%p); };
+    eval { $donation->update( %p, user => $c->user() ); };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
@@ -328,7 +326,7 @@ sub donation_DELETE {
 
     my $donation = $c->stash()->{donation};
 
-    eval { $donation->delete(); };
+    eval { $donation->delete( user => $c->user() ); };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

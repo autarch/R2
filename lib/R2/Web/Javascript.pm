@@ -40,7 +40,11 @@ sub _build_files {
 
     $js->add('R2');
 
-    return [ $dir->file('jquery-1.4.4.js'), map { file($_) } $js->files() ];
+    return [
+        $dir->file('jquery-1.4.4.js'),
+        $dir->file('jquery-ui-1.8.8.custom.min.js'),
+        map { file($_) } $js->files()
+    ];
 }
 
 sub _build_target_file {

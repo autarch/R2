@@ -30,7 +30,7 @@
       <td><% $donation->source()->name() %></td>
       <td><% $donation->campaign()->name() %></td>
       <td><% $donation->payment_type()->name() %></td>
-      <td><% $donation->receipt_sent() ? 'yes' : 'no' %></td>
+      <td><% $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ): 'not sent' %></td>
 %     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>

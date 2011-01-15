@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use DateTime::Format::Strptime;
+use DateTime::Format::Natural;
 use R2::Schema;
 use R2::Util qw( string_is_empty );
 use Scalar::Util qw( blessed );
@@ -106,8 +106,6 @@ sub _valid_birth_date {
     my $p         = shift;
     my $is_insert = shift;
 
-    my $format = delete $p->{date_format};
-
     return if string_is_empty( $p->{birth_date} );
 
     my $dt;
@@ -115,8 +113,7 @@ sub _valid_birth_date {
         $dt = $p->{birth_date};
     }
     else {
-        my $parser = DateTime::Format::Strptime->new(
-            pattern   => $format,
+        my $parser = DateTime::Format::Natural->new(
             time_zone => 'floating',
         );
 
