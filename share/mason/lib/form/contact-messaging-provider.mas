@@ -3,13 +3,13 @@
 
 % if ($providers) {
 %   while ( my $messaging_provider = $providers->next() ) {
-    <div id="JS-messaging_provider-<% $messaging_provider->messaging_provider_id() %>" class="repeat-group">
+    <div class="JS-repeat-group">
       <& .messaging_provider, messaging_provider => $messaging_provider, id => $messaging_provider->messaging_provider_id(), is_preferred => $messaging_provider->is_preferred() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-messaging_provider repeat-group">
+    <div class="JS-repeatable-group-messaging_provider JS-repeat-group">
       <& .messaging_provider, id => 'new1', is_preferred => ! ( $providers && $providers->index() ) &>
     </div>
 
@@ -48,7 +48,7 @@ my @messaging_provider_types;
           <option value="<% $type->messaging_provider_type_id() %>"><% $type->name() %></option>
 % }
         </select>
-        <a class="<% $messaging_provider ? 'JS-delete-div' : 'delete-repeated-group' %>"
+        <a class="JS-delete-div"
            style="<% $messaging_provider ? q{} : 'display: none' %>"
            href="#"
            title="delete this instant messaging account">X</a>

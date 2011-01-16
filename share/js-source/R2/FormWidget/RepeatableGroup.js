@@ -126,13 +126,13 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
         }
     );
 
-    div.find("a.delete-repeated-group").show();
+    div.find("a.JS-delete-div").show();
 
     return;
 };
 
 R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
-    var deleter = $( "a.delete-repeated-group", div ).first();
+    var deleter = $( "a.JS-delete-div", div ).first();
 
     if ( ! deleter.length ) {
         return;

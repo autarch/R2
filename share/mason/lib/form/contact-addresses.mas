@@ -3,13 +3,13 @@
 
 % if ($addresses) {
 %   while ( my $address = $addresses->next() ) {
-    <div id="JS-address-<% $address->address_id() %>" class="repeat-group">
+    <div class="JS-repeat-group">
       <& .address, address => $address, id => $address->address_id(), is_preferred => $address->is_preferred(), contact_type => $contact_type &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-address repeat-group">
+    <div class="JS-repeatable-group-address JS-repeat-group">
       <& .address, id => 'new1', is_preferred => ! ( $addresses && $addresses->index() ), contact_type => $contact_type &>
     </div>
 
@@ -51,7 +51,7 @@ my @countries;
           <option value="<% $type->address_type_id() %>"><% $type->name() %></option>
 % }
         </select>
-        <a class="<% $address ? 'JS-delete-div' : 'delete-repeated-group' %>"
+        <a class="JS-delete-div"
            style="<% $address ? q{} : 'display: none' %>"
            href="#"
            title="delete this address">X</a>

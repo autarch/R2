@@ -59,7 +59,7 @@ R2.Form.prototype._instrumentDivDeleters = function () {
     anchors.each(
         function () {
             new R2.FormWidget.DivDeleter(
-                $(this).closest("div.repeat-group").first(),
+                $(this).closest("div.JS-repeat-group").first(),
                 $(this)
             );
         }

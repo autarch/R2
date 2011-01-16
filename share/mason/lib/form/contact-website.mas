@@ -3,13 +3,13 @@
 
 % if ($websites) {
 %   while ( my $website = $websites->next() ) {
-    <div id="JS-website-<% $website->website_id() %>" class="repeat-group">
+    <div class="JS-repeat-group">
       <& .website, website => $website, id => $website->website_id() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-website repeat-group">
+    <div class="JS-repeatable-group-website JS-repeat-group">
       <& .website, id => 'new1' &>
     </div>
 
@@ -39,7 +39,7 @@ $websites = $contact->websites()
       <div class="form-item">
         <label class="for-field" for="label-<% $id %>">Label:</label>
         <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />
-        <a class="<% $website ? 'JS-delete-div' : 'delete-repeated-group' %>"
+        <a class="JS-delete-div"
            style="<% $website ? q{} : 'display: none' %>"
            href="#"
            title="delete this website">X</a>

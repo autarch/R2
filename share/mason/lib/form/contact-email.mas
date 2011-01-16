@@ -20,13 +20,13 @@
 
 % if ($emails) {
 %   while ( my $email = $emails->next() ) {
-    <div id="JS-email-address-<% $email->email_address_id() %>" class="repeat-group">
+    <div class="JS-repeat-group">
       <& .email_address, email_address => $email, id => $email->email_address_id(), is_preferred => $email->is_preferred() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-email-address repeat-group">
+    <div class="JS-repeatable-group-email-address JS-repeat-group">
       <& .email_address, id => 'new1', is_preferred => ! ( $emails && $emails->index() ) &>
     </div>
 
@@ -57,7 +57,7 @@ $emails = $contact->email_addresses()
       <div class="form-item">
         <label class="for-field" for="email_address-<% $id %>">Email address:</label>
         <input type="text" class="text medium" name="email_address-<% $id %>" id="email_address-<% $id %>" />
-        <a class="<% $email_address ? 'JS-delete-div' : 'delete-repeated-group' %>"
+        <a class="JS-delete-div"
            style="<% $email_address ? q{} : 'display: none' %>"
            href="#"
            title="delete this email address">X</a>
