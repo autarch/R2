@@ -3,13 +3,13 @@
 
 % if ($addresses) {
 %   while ( my $address = $addresses->next() ) {
-    <div class="JS-repeat-group">
+    <div class="JS-repeat-group JS-repeat-type-address repeat-group">
       <& .address, address => $address, id => $address->address_id(), is_preferred => $address->is_preferred(), contact_type => $contact_type &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-address JS-repeat-group">
+    <div class="JS-repeatable-group-address JS-repeat-group JS-repeat-type-address repeat-group">
       <& .address, id => 'new1', is_preferred => ! ( $addresses && $addresses->index() ), contact_type => $contact_type &>
     </div>
 

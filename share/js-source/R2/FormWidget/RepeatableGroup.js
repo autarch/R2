@@ -10,6 +10,7 @@ if ( typeof R2.FormWidget == "undefined" ) {
 
 R2.FormWidget.RepeatableGroup = function ( div, form ) {
     this.html = div.clone().html();
+    this.classes = div.attr("class");
     this.repeat_count = 1;
 
     this.form = form;
@@ -44,10 +45,8 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (target) {
 
     div.hide();
 
-    div.attr(
-        "id", "R2-RepeatableGroup-" + R2.FormWidget._idSequence++,
-        "class", "repeat-group"
-    );
+    div.attr( "id", "R2-RepeatableGroup-" + R2.FormWidget._idSequence++ );
+    div.attr( "class", this.classes );
 
     div.html( this.html );
 
@@ -132,7 +131,7 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 };
 
 R2.FormWidget.RepeatableGroup.prototype._instrumentDeleter = function (div) {
-    var deleter = $( "a.JS-delete-div", div ).first();
+    var deleter = div.find("a.JS-delete-div").first();
 
     if ( ! deleter.length ) {
         return;

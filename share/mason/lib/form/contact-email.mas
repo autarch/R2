@@ -20,13 +20,13 @@
 
 % if ($emails) {
 %   while ( my $email = $emails->next() ) {
-    <div class="JS-repeat-group">
+    <div class="JS-repeat-group JS-repeat-type-email-address repeat-group">
       <& .email_address, email_address => $email, id => $email->email_address_id(), is_preferred => $email->is_preferred() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-email-address JS-repeat-group">
+    <div class="JS-repeatable-group-email-address JS-repeat-group JS-repeat-type-email-address repeat-group">
       <& .email_address, id => 'new1', is_preferred => ! ( $emails && $emails->index() ) &>
     </div>
 

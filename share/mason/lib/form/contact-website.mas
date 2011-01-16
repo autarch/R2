@@ -3,13 +3,13 @@
 
 % if ($websites) {
 %   while ( my $website = $websites->next() ) {
-    <div class="JS-repeat-group">
+    <div class="JS-repeat-group JS-repeat-type-website repeat-group">
       <& .website, website => $website, id => $website->website_id() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-website JS-repeat-group">
+    <div class="JS-repeatable-group-website JS-repeat-group JS-repeat-type-website repeat-group">
       <& .website, id => 'new1' &>
     </div>
 

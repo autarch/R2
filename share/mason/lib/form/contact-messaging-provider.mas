@@ -3,13 +3,13 @@
 
 % if ($providers) {
 %   while ( my $messaging_provider = $providers->next() ) {
-    <div class="JS-repeat-group">
+    <div class="JS-repeat-group JS-repeat-type-messaging-provider repeat-group">
       <& .messaging_provider, messaging_provider => $messaging_provider, id => $messaging_provider->messaging_provider_id(), is_preferred => $messaging_provider->is_preferred() &>
     </div>
 %   }
 % }
 
-    <div class="JS-repeatable-group-messaging_provider JS-repeat-group">
+    <div class="JS-repeatable-group-messaging_provider JS-repeat-group JS-repeat-type-messaging-provider repeat-group">
       <& .messaging_provider, id => 'new1', is_preferred => ! ( $providers && $providers->index() ) &>
     </div>
 
