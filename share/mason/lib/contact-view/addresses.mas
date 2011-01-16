@@ -32,7 +32,7 @@ Does not want to receive postal mail.
     </address>
 
 %   if ( ! string_is_empty( $address->note() ) ) {
-    <p class="address-note">
+    <p class="note">
       <% $address->note() %>
     </p>
 %   }

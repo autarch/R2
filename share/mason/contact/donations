@@ -14,12 +14,10 @@
     <tr>
       <th>Date</th>
       <th>Amount</th>
-      <th>Gift</th>
-      <th>Trans.</th>
       <th>Source</th>
       <th>Campaign</th>
-      <th>Payment</th>
       <th>Receipt</th>
+      <th></th>
 %   if ($can_edit_donations) {
       <th></th>
       <th></th>
@@ -31,12 +29,10 @@
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
       <td><% $format->format_price( $donation->amount() ) %></td>
-      <td><% $format->format_price( $donation->value_for_donor() ) %></td>
-      <td><% $format->format_price( $donation->transaction_cost() ) %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->campaign()->name() %></td>
-      <td><% $donation->payment_type()->name() %></td>
       <td><% $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ): 'not sent' %></td>
+      <td><a href="<% $donation->uri() %>">Details</a></td>
 %     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>

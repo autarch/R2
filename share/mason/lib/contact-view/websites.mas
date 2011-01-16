@@ -7,7 +7,7 @@
     <a href="<% $website->uri() %>"
        title="<% $website->label() %> for <% $contact->display_name() %>"><% $website->uri() %></a>
 %   if ( my $note = $website->note() ) {
-    <p class="website-note">
+    <p class="note">
       <% $note %>
     </p>
 %   } 

@@ -51,7 +51,7 @@ my @messaging_providers = $contact->messaging_providers()->all()
 
 % if ( ! string_is_empty( $provider->note() ) ) {
     <br />
-    <span class="messaging-provider-note"><% $provider->note() %></span>
+    <span class="note"><% $provider->note() %></span>
 % }
   </li>
 

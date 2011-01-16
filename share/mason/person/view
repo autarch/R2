@@ -1,4 +1,4 @@
-<div id="contact-view">
+<div id="detail-view">
 
 <& /lib/contact-view/summary.mas, contact => $person, show_image => 1 &>
 

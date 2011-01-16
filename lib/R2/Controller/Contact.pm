@@ -196,8 +196,7 @@ sub contact_PUT : Private {
     $c->redirect_and_detach( $contact->uri() );
 }
 
-sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) :
-    ActionClass('+R2::Action::REST') {
+sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub donations_GET_html : Private {
@@ -218,6 +217,16 @@ sub donations_GET_html : Private {
 sub new_donation_form : Chained('_set_contact') : PathPart('new_donation_form') : Args(0) {
     my $self = shift;
     my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    $self->_check_authz(
+        $c,
+        'user_can_edit_contact',
+        { contact => $contact },
+        'You are not allowed to add donations.',
+        $contact->uri( view => 'donations' ),
+    );
 
     $c->stash()->{template} = "/contact/new_donation_form";
 }
@@ -250,8 +259,7 @@ sub donations_POST : Private {
     $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
 }
 
-sub _set_donation : Chained('_set_contact') : PathPart('donation') :
-    CaptureArgs(1) {
+sub _set_donation : Chained('_set_contact') : PathPart('donation') : CaptureArgs(1) {
     my $self        = shift;
     my $c           = shift;
     my $donation_id = shift;
@@ -266,8 +274,7 @@ sub _set_donation : Chained('_set_contact') : PathPart('donation') :
     $c->stash()->{donation} = $donation;
 }
 
-sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') :
-    Args(0) {
+sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
@@ -285,6 +292,23 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') :
 }
 
 sub donation : Chained('_set_donation') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
+}
+
+sub donation_GET_html {
+    my $self = shift;
+    my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    $c->stash()->{tabs}[1]->set_is_selected(1);
+
+    $c->stash()->{can_edit_donations}
+        = $c->model('Authz')->user_can_edit_contact(
+        user    => $c->user(),
+        contact => $c->stash()->{contact},
+        );
+
+    $c->stash()->{template} = '/donation/view';
 }
 
 sub donation_PUT {
