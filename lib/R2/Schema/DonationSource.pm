@@ -33,7 +33,7 @@ sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    for my $name (qw( mail online )) {
+    for my $name (qw( Mail Online )) {
         $class->insert(
             name       => $name,
             account_id => $account->account_id(),
