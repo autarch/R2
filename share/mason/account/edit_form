@@ -22,6 +22,15 @@
     </div>
 
     <div class="form-item">
+      <label class="for-field" for="fiscal_year_start_month">Start of fiscal year:</label>
+      <select name="fiscal_year_start_month">
+% for my $num ( 1..12 ) {
+        <option value="<% $num %>"><% $Months[ $num - 1 ] %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
       <label class="for-field" for="default_time_zone">Default time zone:</label>
       <select name="default_time_zone">
 % while ( my $zone = $zones->next() ) {
@@ -58,6 +67,10 @@ $account
 my $zones = R2::Schema::TimeZone->ByCountry('us');
 my $domains = R2::Schema::Domain->All();
 </%init>
+
+<%once>
+my @Months = @{ DateTime::Locale->load('en_US')->month_stand_alone_wide() };
+</%once>
 
 <%method title>
 Edit <% $account->name() %>
