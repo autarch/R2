@@ -215,6 +215,13 @@ sub donations_GET_html : Private {
     $c->stash()->{template} = '/contact/donations';
 }
 
+sub new_donation_form : Chained('_set_contact') : PathPart('new_donation_form') : Args(0) {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{template} = "/contact/new_donation_form";
+}
+
 sub donations_POST : Private {
     my $self = shift;
     my $c    = shift;

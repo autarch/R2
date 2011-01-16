@@ -1,0 +1,12 @@
+<& /lib/form/donation.mas, contact => $contact &>
+
+<%args>
+$contact
+</%args>
+
+<%method title>
+New donation from <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>
