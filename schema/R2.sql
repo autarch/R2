@@ -33,8 +33,11 @@ CREATE TABLE "Account" (
        name                     TEXT            UNIQUE  NOT NULL,
        domain_id                INTEGER         NOT NULL,
        default_time_zone        TEXT            NOT NULL DEFAULT 'UTC',
+       fiscal_year_start_month  INTEGER         NOT NULL DEFAULT 1,
        creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT valid_fiscal_year_start_month
+                  CHECK ( fiscal_year_start_month >= 1 AND fiscal_year_start_month <= 12 )
 );
 
 CREATE TABLE "Role" (
