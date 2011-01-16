@@ -18,7 +18,7 @@
     <legend>Countries</legend>
 
     <ul>
-% while ( my ( $account_country, $country ) = $countries->next() ) {
+% while ( my ( $country, $account_country ) = $countries->next() ) {
       <li>
         <% $country->name() %>
 %   if ( $account_country->is_default() ) {

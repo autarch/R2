@@ -115,7 +115,7 @@ my $meth = 'address_types_for_' . $contact_type;
 my @address_types = @{ $c->account()->$meth() }
     unless @address_types;
 
-my @countries = $c->account()->countries()->all()
+my @countries = map { $_->[0] } $c->account()->countries()->all()
     unless @countries;
 </%init>
 </%def>
