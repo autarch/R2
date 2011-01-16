@@ -22,8 +22,8 @@ R2.FormWidget.DivDeleter = function ( div, deleter ) {
             self.div.fadeOut(
                 500,
                 function () {
-                    self._maybeMovePreferred();
                     self.div.detach();
+                    self._maybeMovePreferred();
                 }
             );
         }
