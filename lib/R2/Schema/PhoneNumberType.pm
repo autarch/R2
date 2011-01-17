@@ -71,6 +71,9 @@ with 'R2::Role::Schema::AppliesToContactTypes';
     );
 }
 
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('account_id') };
+
 sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
@@ -84,18 +87,18 @@ sub CreateDefaultsForAccount {
     );
 
     $class->insert(
-        name                    => 'Office',
-        applies_to_person       => 1,
-        applies_to_household    => 0,
-        applies_to_organization => 1,
-        account_id              => $account->account_id(),
-    );
-
-    $class->insert(
         name                    => 'Cell',
         applies_to_person       => 1,
         applies_to_household    => 0,
         applies_to_organization => 0,
+        account_id              => $account->account_id(),
+    );
+
+    $class->insert(
+        name                    => 'Office',
+        applies_to_person       => 1,
+        applies_to_household    => 0,
+        applies_to_organization => 1,
         account_id              => $account->account_id(),
     );
 

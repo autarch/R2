@@ -423,11 +423,14 @@ CREATE TABLE "TimeZone" (
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
+       display_order      pos_int            NOT NULL,
        applies_to_person  BOOLEAN            NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT AddressType_account_id_display_order_unique
+                  UNIQUE ( account_id, display_order )
 );
 
 -- Consider a trigger to enforce one primary phone number per contact?
@@ -477,25 +480,34 @@ CREATE TABLE "Donation" (
 CREATE TABLE "DonationSource" (
        donation_source_id SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
+       display_order      pos_int            NOT NULL,
        account_id         INT8               NOT NULL,
        is_active          BOOLEAN            DEFAULT TRUE,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT DonationSource_account_id_display_order_unique
+                  UNIQUE ( account_id, display_order )
 );
 
 CREATE TABLE "DonationCampaign" (
        donation_campaign_id  SERIAL8         PRIMARY KEY,
        name               TEXT               NOT NULL,
+       display_order      pos_int            NOT NULL,
        account_id         INT8               NOT NULL,
        is_active          BOOLEAN            DEFAULT TRUE,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT DonationCampaign_account_id_display_order_unique
+                  UNIQUE ( account_id, display_order )
 );
 
 CREATE TABLE "PaymentType" (
        payment_type_id    SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
+       display_order      pos_int            NOT NULL,
        account_id         INT8               NOT NULL,
        is_active          BOOLEAN            DEFAULT TRUE,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT PaymentType_account_id_display_order_unique
+                  UNIQUE ( account_id, display_order )
 );
 
 CREATE TABLE "Session" (

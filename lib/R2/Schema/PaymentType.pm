@@ -30,11 +30,14 @@ use Fey::ORM::Table;
     );
 }
 
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('account_id') };
+
 sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    for my $name ( 'cash', 'check', 'credit card', 'in-kind (non-monetary)' )
+    for my $name ( 'credit card', 'check', 'cash', 'in-kind (non-monetary)' )
     {
         $class->insert(
             name       => $name,

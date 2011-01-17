@@ -29,11 +29,14 @@ use MooseX::ClassAttribute;
     );
 }
 
+with 'R2::Role::Schema::HasDisplayOrder' =>
+    { related_column => __PACKAGE__->Table()->column('account_id') };
+
 sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    for my $name (qw( Mail Online )) {
+    for my $name (qw( Online Mail )) {
         $class->insert(
             name       => $name,
             account_id => $account->account_id(),

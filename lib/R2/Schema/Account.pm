@@ -48,31 +48,31 @@ with 'R2::Role::Schema::URIMaker';
     has_many 'donation_sources' => (
         table    => $schema->table('DonationSource'),
         cache    => 1,
-        order_by => [ $schema->table('DonationSource')->column('name') ],
+        order_by => [ $schema->table('DonationSource')->column('display_order') ],
     );
 
     has_many 'donation_campaigns' => (
         table    => $schema->table('DonationCampaign'),
         cache    => 1,
-        order_by => [ $schema->table('DonationCampaign')->column('name') ],
+        order_by => [ $schema->table('DonationCampaign')->column('display_order') ],
     );
 
     has_many 'payment_types' => (
         table    => $schema->table('PaymentType'),
         cache    => 1,
-        order_by => [ $schema->table('PaymentType')->column('name') ],
+        order_by => [ $schema->table('PaymentType')->column('display_order') ],
     );
 
     has_many 'address_types' => (
         table    => $schema->table('AddressType'),
         cache    => 1,
-        order_by => [ $schema->table('AddressType')->column('name') ],
+        order_by => [ $schema->table('AddressType')->column('display_order') ],
     );
 
     has_many 'phone_number_types' => (
         table    => $schema->table('PhoneNumberType'),
         cache    => 1,
-        order_by => [ $schema->table('PhoneNumberType')->column('name') ],
+        order_by => [ $schema->table('PhoneNumberType')->column('display_order') ],
     );
 
     has_many 'custom_field_groups' => (
