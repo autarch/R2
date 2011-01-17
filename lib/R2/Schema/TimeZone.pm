@@ -71,7 +71,7 @@ sub ByCountry {
     my $class   = shift;
     my $country = shift;
 
-    my $select = $class->_SelectByCountrySQL();
+    my $select = $class->_ByCountrySQL();
 
     my $dbh = $class->_dbh($select);
 
