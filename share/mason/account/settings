@@ -29,11 +29,6 @@
     <& /lib/help-text/address-type.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'countries_form' ) %>"
-       title="Countries for addresses">Countries for addresses</a>
-    <& /lib/help-text/countries.mas &>
-  </li>
-  <li>
     <a href="<% $account->uri( view => 'phone_number_types_form' ) %>"
        title="Phone numbers types">Phone number types</a>
     <& /lib/help-text/phone-number-type.mas &>

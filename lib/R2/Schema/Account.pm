@@ -10,11 +10,9 @@ use Fey::Object::Iterator::FromSelect::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Exceptions qw( error );
-use R2::Schema::AccountCountry;
 use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
-use R2::Schema::Country;
 use R2::Schema::CustomFieldGroup;
 use R2::Schema::Domain;
 use R2::Schema::DonationSource;
@@ -123,12 +121,6 @@ with 'R2::Role::Schema::URIMaker';
         builder => '_build_made_a_note_contact_note_type',
     );
 
-    class_has '_CountriesSelect' => (
-        is      => 'ro',
-        isa     => 'Fey::SQL::Select',
-        default => sub { __PACKAGE__->_BuildCountriesSelect() },
-    );
-
     class_has '_UsersWithRolesSelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
@@ -171,13 +163,6 @@ sub _initialize {
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
 
     R2::Schema::RelationshipType->CreateDefaultsForAccount($self);
-
-    for my $code (qw( us ca )) {
-        $self->add_country(
-            country => R2::Schema::Country->new( iso_code => $code ),
-            is_default => ( $code eq 'us' ? 1 : 0 ),
-        );
-    }
 }
 
 sub add_user {
@@ -207,36 +192,6 @@ sub users_with_roles {
         dbh     => $dbh,
         select  => $select,
         bind_params => [ $self->account_id() ],
-    );
-}
-
-sub countries {
-    my $self = shift;
-
-    my $select = $self->_CountriesSelect();
-
-    my $dbh = $self->_dbh($select);
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes => [ 'R2::Schema::Country', 'R2::Schema::AccountCountry' ],
-        dbh     => $dbh,
-        select  => $select,
-        bind_params => [ $self->account_id() ],
-    );
-}
-
-sub add_country {
-    my $self = shift;
-    my ( $country, $is_default ) = validated_list(
-        \@_,
-        country    => { isa => 'R2::Schema::Country' },
-        is_default => { isa => Bool },
-    );
-
-    R2::Schema::AccountCountry->insert(
-        account_id => $self->account_id(),
-        iso_code   => $country->iso_code(),
-        is_default => $is_default,
     );
 }
 
@@ -318,42 +273,6 @@ sub _build_made_a_note_contact_note_type {
         description => 'Made a note',
         account_id  => $self->account_id(),
     );
-}
-
-sub _build_countries {
-    my $self = shift;
-
-    my $select = $self->_CountriesSelect();
-
-    my $dbh = $self->_dbh($select);
-
-    return Fey::Object::Iterator::FromSelect::Caching->new(
-        classes => [qw( R2::Schema::Country  )],
-        dbh     => $dbh,
-        select  => $select,
-        bind_params => [ $self->account_id() ],
-    );
-}
-
-sub _BuildCountriesSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    #<<<
-    $select->select( $schema->tables( 'Country', 'AccountCountry' ) )
-           ->from  ( $schema->tables( 'AccountCountry', 'Country' ) )
-           ->where ( $schema->table('AccountCountry')->column('account_id'),
-                     '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('AccountCountry')->column('is_default'),
-                       'DESC',
-                       $schema->table('Country')->column('name'),
-                       'ASC',
-                     );
-    #>>>
-    return $select;
 }
 
 sub _BuildUsersWithRolesSelect {

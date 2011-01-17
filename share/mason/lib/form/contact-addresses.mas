@@ -30,7 +30,6 @@ $addresses = $contact->addresses()
 
 <%shared>
 my @address_types;
-my @countries;
 </%shared>
 
 <%def .address>
@@ -83,11 +82,8 @@ my @countries;
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="iso_code-<% $id %>">Country:</label>
-        <select name="iso_code-<% $id %>" id="iso_code-<% $id %>" />
-% for my $country (@countries) {
-          <option value="<% $country->iso_code() %>"><% $country->name() %></option>
-% }
+        <label class="secondary" for="country-<% $id %>">Country:</label>
+        <input type="text" class="text" name="country-<% $id %>" id="country-<% $id %>" />
       </div>
 
       <div class="form-item">
@@ -114,8 +110,5 @@ $is_preferred
 my $meth = 'address_types_for_' . $contact_type;
 my @address_types = @{ $c->account()->$meth() }
     unless @address_types;
-
-my @countries = map { $_->[0] } $c->account()->countries()->all()
-    unless @countries;
 </%init>
 </%def>

@@ -64,7 +64,7 @@ $account
 </%args>
 
 <%init>
-my $zones = R2::Schema::TimeZone->ByCountry('us');
+my $zones = R2::Schema::TimeZone->ByCountry('United States');
 my $domains = R2::Schema::Domain->All();
 </%init>
 

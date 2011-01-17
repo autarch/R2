@@ -382,7 +382,7 @@ CREATE TABLE "Address" (
        city               citext             NOT NULL DEFAULT '',
        region             citext             NOT NULL DEFAULT '',
        postal_code        citext             NOT NULL DEFAULT '',
-       iso_code           CHAR(2)            NOT NULL,
+       country            citext             NOT NULL,
        latitude           FLOAT              NULL,
        longitude          FLOAT              NULL,
        -- The address as returned by a geocoding service like Google
@@ -393,31 +393,16 @@ CREATE TABLE "Address" (
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "AccountCountry" (
-       account_id         INT8               NOT NULL,
-       iso_code           CHAR(2)            NOT NULL,
-       is_default         BOOLEAN            NOT NULL DEFAULT FALSE,
-       PRIMARY KEY (account_id, iso_code)
-);
-
-CREATE TABLE "Country" (
-       iso_code           CHAR(2)            PRIMARY KEY,
-       name               TEXT               UNIQUE  NOT NULL,
-       CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
-       CONSTRAINT valid_name CHECK ( name != '' )
-);
-
 CREATE TABLE "TimeZone" (
        olson_name         TEXT               PRIMARY KEY,
-       iso_code           CHAR(2)            NOT NULL,
        description        VARCHAR(100)       NOT NULL,
+       country            citext             NOT NULL,
        display_order      INTEGER            NOT NULL,
        CONSTRAINT valid_olson_name CHECK ( olson_name != '' ),
-       CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
        CONSTRAINT valid_description CHECK ( description != '' ),
        CONSTRAINT valid_display_order CHECK ( display_order > 0 ),
-       CONSTRAINT TimeZone_iso_code_display_order_unique
-                  UNIQUE ( iso_code, display_order )
+       CONSTRAINT TimeZone_country_display_order_unique
+                  UNIQUE ( country, display_order )
 );
 
 CREATE TABLE "AddressType" (
@@ -535,18 +520,6 @@ ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_user_id"
 
 ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_role_id"
   FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_account_id"
-  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "AccountCountry" ADD CONSTRAINT "AccountCountry_iso_code"
-  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "TimeZone" ADD CONSTRAINT "TimeZone_iso_code"
-  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "File" ADD CONSTRAINT "File_account_id"
@@ -775,10 +748,6 @@ ALTER TABLE "EmailAddress" ADD CONSTRAINT "EmailAddress_contact_id"
 
 ALTER TABLE "Address" ADD CONSTRAINT "Address_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "Address" ADD CONSTRAINT "Address_iso_code"
-  FOREIGN KEY ("iso_code") REFERENCES "Country" ("iso_code")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Address" ADD CONSTRAINT "Address_address_type_id"

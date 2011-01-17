@@ -17,24 +17,22 @@ use MooseX::ClassAttribute;
 
     has_table( $schema->table('TimeZone') );
 
-    has_one( $schema->table('Country') );
-
-    class_has '_SelectByCountrySQL' => (
+    class_has '_ByCountrySQL' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
         lazy    => 1,
-        default => \&_MakeSelectByCountrySQL,
+        builder => '_BuildByCountrySQL',
     );
 }
 
 with 'R2::Role::Schema::HasDisplayOrder' =>
-    { related_column => __PACKAGE__->Table()->column('iso_code') };
+    { related_column => __PACKAGE__->Table()->column('country') };
 
 sub EnsureRequiredTimeZonesExist {
     my $class = shift;
 
     my %zones = (
-        us => [
+        'United States' => [
             [ 'America/New_York',      'US East Coast' ],
             [ 'America/Chicago',       'US Midwest' ],
             [ 'America/Denver',        'US Mountain' ],
@@ -46,7 +44,7 @@ sub EnsureRequiredTimeZonesExist {
             [ 'Pacific/Guam',          'Guam' ],
         ],
 
-        ca => [
+        'Canada' => [
             [ 'America/Montreal',  'Quebec' ],
             [ 'America/Toronto',   'Ontario' ],
             [ 'America/Winnipeg',  'Manitoba' ],
@@ -58,20 +56,20 @@ sub EnsureRequiredTimeZonesExist {
         ],
     );
 
-    for my $iso_code ( keys %zones ) {
-        for my $zone ( @{ $zones{$iso_code} } ) {
+    for my $country ( keys %zones ) {
+        for my $zone ( @{ $zones{$country} } ) {
             $class->insert(
-                olson_name    => $zone->[0],
-                iso_code      => $iso_code,
-                description   => $zone->[1],
+                olson_name  => $zone->[0],
+                description => $zone->[1],
+                country     => $country,
             );
         }
     }
 }
 
 sub ByCountry {
-    my $class    = shift;
-    my $iso_code = shift;
+    my $class   = shift;
+    my $country = shift;
 
     my $select = $class->_SelectByCountrySQL();
 
@@ -81,11 +79,11 @@ sub ByCountry {
         classes     => $class,
         dbh         => $dbh,
         select      => $select,
-        bind_params => [$iso_code],
+        bind_params => [$country],
     );
 }
 
-sub _MakeSelectByCountrySQL {
+sub _BuildByCountrySQL {
     my $class = __PACKAGE__;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
@@ -94,7 +92,7 @@ sub _MakeSelectByCountrySQL {
 
     $select->select( $schema->table('TimeZone') )
         ->from( $schema->tables('TimeZone') )->where(
-        $schema->table('TimeZone')->column('iso_code'),
+        $schema->table('TimeZone')->column('country'),
         '=', Fey::Placeholder->new()
         )->order_by( $schema->table('TimeZone')->column('display_order') );
 

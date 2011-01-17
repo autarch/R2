@@ -28,7 +28,7 @@ Does not want to receive postal mail.
       <% $address->city_region_postal_code() %>
 % }
       <br />
-      <% $address->country()->name() %>
+      <% $address->country() %>
     </address>
 
 %   if ( ! string_is_empty( $address->note() ) ) {

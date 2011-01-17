@@ -221,18 +221,6 @@ sub address_type_POST : Private {
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
 }
 
-sub countries_form : Chained('_set_account') : PathPart('countries_form') : Args(0) {
-}
-
-sub country : Chained('_set_account') : PathPart('country') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub country_POST : Private {
-    my $self = shift;
-    my $c    = shift;
-
-}
-
 sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) {
 }
 

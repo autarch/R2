@@ -25,8 +25,6 @@ with 'R2::Role::Schema::DataValidator';
 
     has_one 'type' => ( table => $schema->table('AddressType') );
 
-    has_one( $schema->table('Country') );
-
     has 'city_region_postal_code' => (
         is      => 'ro',
         isa     => 'Str|Undef',

@@ -269,9 +269,9 @@ my @objects = (
     }, {
         type  => 'Address',
         field => 'address_type_id',
-        filter =>    # If it just has a type and country, we ignore it.
+        filter =>    # If it just has a type we ignore it.
             sub {
-            ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 2;
+            ( true { !string_is_empty($_) } values %{ $_[0] } ) <= 1;
             },
         has_preferred => 1,
     }, {

@@ -16,6 +16,7 @@
 
   <fieldset>
     <legend>Payment Types</legend>
+
 % while ( my $type = $types->next() ) {
       <input class="text medium no-label" type="text" name="payment_type_name_<% $type->payment_type_id() %>"
              value="<% $type->name() %>" />

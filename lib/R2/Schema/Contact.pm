@@ -105,7 +105,7 @@ with 'R2::Role::Schema::URIMaker';
         order_by => [
             $schema->table('Address')->column('is_preferred'),
             'DESC',
-            $schema->table('Address')->column('iso_code'),
+            $schema->table('Address')->column('country'),
             'ASC',
             $schema->table('Address')->column('region'),
             'ASC',
