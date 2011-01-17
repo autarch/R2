@@ -98,6 +98,14 @@ sub CreateDefaultsForAccount {
         applies_to_organization => 0,
         account_id              => $account->account_id(),
     );
+
+    $class->insert(
+        name                    => 'Fax',
+        applies_to_person       => 1,
+        applies_to_household    => 1,
+        applies_to_organization => 1,
+        account_id              => $account->account_id(),
+    );
 }
 
 __PACKAGE__->meta()->make_immutable();
