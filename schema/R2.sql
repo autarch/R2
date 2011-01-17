@@ -130,7 +130,7 @@ CREATE TABLE "CustomFieldGroup" (
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization        BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id                     INT8         NOT NULL,
-       CONSTRAINT account_id_display_order_unique
+       CONSTRAINT CustomFieldGroup_account_id_display_order_unique
                   UNIQUE ( account_id, display_order )
 );
 
@@ -147,7 +147,7 @@ CREATE TABLE "CustomField" (
        display_order            pos_int      NOT NULL,
        account_id               INT8         NOT NULL,
        custom_field_group_id    INT8         NOT NULL,
-       CONSTRAINT custom_field_group_id_display_order_unique
+       CONSTRAINT CustomField_custom_field_group_id_display_order_unique
                   UNIQUE ( custom_field_group_id, display_order )
 );
 
@@ -205,7 +205,7 @@ CREATE TABLE "CustomFieldSelectOption" (
        custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    TEXT         NOT NULL,
-       CONSTRAINT custom_field_id_display_order_unique
+       CONSTRAINT CustomFieldSelectOption_custom_field_id_display_order_unique
                   UNIQUE ( custom_field_id, display_order )
 );
 
@@ -238,7 +238,7 @@ CREATE TABLE "ContactNoteType" (
        is_system_defined  BOOLEAN            NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT description_account_id_unique UNIQUE ( description, account_id )
+       CONSTRAINT ContactNoteType_description_account_id_unique UNIQUE ( description, account_id )
 );
 
 CREATE TABLE "ContactHistory" (
@@ -277,7 +277,7 @@ CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
        tag              citext          NOT NULL,
        account_id       INT8            NOT NULL,
-       CONSTRAINT tag_account_id_unique UNIQUE ( tag, account_id )
+       CONSTRAINT Tag_tag_account_id_unique UNIQUE ( tag, account_id )
 );
 
 CREATE TABLE "Person" (
@@ -416,7 +416,7 @@ CREATE TABLE "TimeZone" (
        CONSTRAINT valid_iso_code CHECK ( iso_code != '' ),
        CONSTRAINT valid_description CHECK ( description != '' ),
        CONSTRAINT valid_display_order CHECK ( display_order > 0 ),
-       CONSTRAINT iso_code_display_order_unique
+       CONSTRAINT TimeZone_iso_code_display_order_unique
                   UNIQUE ( iso_code, display_order )
 );
 
@@ -445,11 +445,14 @@ CREATE TABLE "PhoneNumber" (
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
        name                  TEXT            NOT NULL,
+       display_order         pos_int         NOT NULL,
        applies_to_person     BOOLEAN         NOT NULL DEFAULT FALSE,
        applies_to_household     BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id            INT8            NOT NULL,
-       CONSTRAINT valid_name CHECK ( name != '' )
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT PhoneNumberType_account_id_display_order_unique
+                  UNIQUE ( account_id, display_order )
 );
 
 CREATE TABLE "Donation" (
