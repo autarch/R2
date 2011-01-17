@@ -18,8 +18,10 @@ sub user_can_view_account {
         account => { isa => 'R2::Schema::Account' },
     );
 
-    return $self->_require_at_least( $user->user_id(), $account->account_id(),
-        'Admin' );
+    return $self->_require_at_least(
+        $user->user_id(), $account->account_id(),
+        'Admin'
+    );
 }
 
 sub user_can_edit_account {
@@ -30,8 +32,10 @@ sub user_can_edit_account {
         account => { isa => 'R2::Schema::Account' },
     );
 
-    return $self->_require_at_least( $user->user_id(), $account->account_id(),
-        'Admin' );
+    return $self->_require_at_least(
+        $user->user_id(), $account->account_id(),
+        'Admin'
+    );
 }
 
 sub user_can_view_contact {
@@ -42,8 +46,10 @@ sub user_can_view_contact {
         contact => { isa => 'R2::Schema::Contact' },
     );
 
-    return $self->_require_at_least( $user->user_id(), $contact->account_id(),
-        'Member' );
+    return $self->_require_at_least(
+        $user->user_id(), $contact->account_id(),
+        'Member'
+    );
 }
 
 sub user_can_edit_contact {
@@ -56,8 +62,10 @@ sub user_can_edit_contact {
 
     return 0 unless $user->account_id() == $contact->account_id();
 
-    return $self->_require_at_least( $user->user_id(), $contact->account_id(),
-        'Editor' );
+    return $self->_require_at_least(
+        $user->user_id(), $contact->account_id(),
+        'Editor'
+    );
 }
 
 sub user_can_add_contact {
@@ -68,8 +76,10 @@ sub user_can_add_contact {
         account => { isa => 'R2::Schema::Account' },
     );
 
-    return $self->_require_at_least( $user->user_id(), $account->account_id(),
-        'Editor' );
+    return $self->_require_at_least(
+        $user->user_id(), $account->account_id(),
+        'Editor'
+    );
 }
 
 {
