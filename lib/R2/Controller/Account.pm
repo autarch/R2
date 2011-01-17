@@ -124,7 +124,7 @@ sub donation_source_POST : Private {
             . $account->name()
             . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'donation_sources_form' ) );
 }
 
 sub donation_campaigns_form : Chained('_set_account') : PathPart('donation_campaigns_form') : Args(0) {
@@ -156,7 +156,7 @@ sub donation_campaign_POST : Private {
             . $account->name()
             . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'donation_campaigns_form' ) );
 }
 
 sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) {
@@ -187,7 +187,7 @@ sub payment_type_POST : Private {
         ->add_message(
         'The payment types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'donation_settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'payment_types_form' ) );
 }
 
 sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) {
@@ -218,7 +218,7 @@ sub address_type_POST : Private {
         ->add_message(
         'The address types for ' . $account->name() . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'address_types_form' ) );
 }
 
 sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) {
@@ -250,7 +250,7 @@ sub phone_number_type_POST : Private {
             . $account->name()
             . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'phone_number_types_form' ) );
 }
 
 sub contact_note_types_form : Chained('_set_account') : PathPart('contact_note_types_form') : Args(0) {
@@ -282,7 +282,7 @@ sub contact_note_type_POST : Private {
             . $account->name()
             . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'contact_note_types_form' ) );
 }
 
 sub messaging_providers_form : Chained('_set_account') : PathPart('messaging_providers_form') : Args(0) {
@@ -314,7 +314,7 @@ sub messaging_provider_POST : Private {
             . $account->name()
             . ' have been updated' );
 
-    $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+    $c->redirect_and_detach( $account->uri( view => 'messaging_providers_form' ) );
 }
 
 sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) {
