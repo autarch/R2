@@ -52,6 +52,9 @@
 </table>
 
 <ul class="table-summary donation-totals">
+  <li>Total during this fiscal year
+      (started <% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):
+      <% $format->format_price( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></li>
   <li>Total for the last 12 months: <% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></li>
   <li>Total for all time: <% $format->format_price( $contact->donation_total() ) %></li>
 </ul>

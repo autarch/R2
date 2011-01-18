@@ -114,6 +114,13 @@ with 'R2::Role::Schema::URIMaker';
         ],
     );
 
+    has fiscal_year_start_date => (
+        is      => 'ro',
+        isa     => 'DateTime',
+        lazy    => 1,
+        builder => '_build_fiscal_year_start_date',
+    );
+
     has 'made_a_note_contact_note_type' => (
         is      => 'ro',
         isa     => 'R2::Schema::ContactNoteType',
@@ -163,6 +170,25 @@ sub _initialize {
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
 
     R2::Schema::RelationshipType->CreateDefaultsForAccount($self);
+}
+
+sub _build_fiscal_year_start_date {
+    my $self = shift;
+
+    my $today = DateTime->today( time_zone => 'floating' )
+        ->truncate( to => 'month' );
+
+    my $sub;
+    if ( $today->month() < $self->fiscal_year_start_month() ) {
+        $sub = 12 - ( $self->fiscal_year_start_month() - $today->month() );
+    }
+    else {
+        $sub = $today->month() - $self->fiscal_year_start_month();
+    }
+
+    $today->subtract( months => $sub );
+
+    return $today;
 }
 
 sub add_user {
