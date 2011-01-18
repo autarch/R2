@@ -406,6 +406,9 @@ sub custom_field_group_POST : Private {
         $account->uri( view => 'custom_field_groups_form' ) );
 }
 
+sub users_form : Chained('_set_account') : PathPart('users_form') : Args(0) {
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
