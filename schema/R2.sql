@@ -42,7 +42,7 @@ CREATE TABLE "Account" (
 
 CREATE TABLE "Role" (
        role_id                  SERIAL          PRIMARY KEY,
-       name                     citext          UNIQUE  NOT NULL
+       name                     TEXT            UNIQUE  NOT NULL
 );
 
 CREATE TABLE "AccountUserRole" (
@@ -295,7 +295,7 @@ CREATE TABLE "MessagingProvider" (
        messaging_provider_id  SERIAL8        PRIMARY KEY,
        contact_id         INT8               NOT NULL,
        messaging_provider_type_id  INT8      NOT NULL,
-       screen_name        citext             NOT NULL,
+       screen_name        TEXT               NOT NULL,
        is_preferred       BOOLEAN            DEFAULT FALSE,
        note               TEXT               NOT NULL DEFAULT ''
 );
