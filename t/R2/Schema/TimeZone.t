@@ -10,7 +10,7 @@ use R2::Test::RealSchema;
 use R2::Schema::TimeZone;
 
 {
-    my $iter = R2::Schema::TimeZone->ByCountry('us');
+    my $iter = R2::Schema::TimeZone->ByCountry('United States');
 
     is_deeply(
         [ map { $_->olson_name() } $iter->all() ],
