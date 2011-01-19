@@ -90,16 +90,11 @@ my $address_type = $account->address_types()->next();
     );
 
     for my $test (@tests) {
-        my $address = $contact->update_or_add_addresses(
-            {},
-            [
-                {
-                    %{ $test->[0] },
-                    iso_code        => 'us',
-                    address_type_id => $address_type->address_type_id(),
-                },
-            ],
-            R2::Schema::User->SystemUser(),
+        my $address = R2::Schema::Address->insert(
+            %{ $test->[0] },
+            address_type_id => $address_type->address_type_id(),
+            contact_id      => $contact->contact_id(),
+            user            => R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',
@@ -153,17 +148,11 @@ my $address_type = $account->address_types()->next();
     );
 
     for my $test (@tests) {
-        my $address = $contact->update_or_add_addresses(
-            {},
-            [
-                {
-                    %{ $test->[0] },
-                    iso_code        => 'us',
-                    address_type_id => $address_type->address_type_id(),
-                    user            => R2::Schema::User->SystemUser(),
-                },
-            ],
-            R2::Schema::User->SystemUser(),
+        my $address = R2::Schema::Address->insert(
+            %{ $test->[0] },
+            address_type_id => $address_type->address_type_id(),
+            contact_id      => $contact->contact_id(),
+            user            => R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',
@@ -178,14 +167,14 @@ my $address_type = $account->address_types()->next();
 }
 
 {
-    my $address = $contact->add_address(
+    my $address = R2::Schema::Address->insert(
         street_1        => '100 Some St',
         city            => 'Opolis',
         region          => 'MN',
         postal_code     => '55555',
         address_type_id => 1,
-        iso_code        => 'us',
         address_type_id => $address_type->address_type_id(),
+        contact_id      => $contact->contact_id(),
         user            => R2::Schema::User->SystemUser(),
     );
 

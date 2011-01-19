@@ -86,10 +86,11 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         user       => R2::Schema::User->SystemUser(),
     );
 
-    $person->contact()->add_address(
+    R2::Schema::Address->insert(
         city            => 'Minneapolis',
         address_type_id => $type->address_type_id(),
-        iso_code        => 'us',
+        country         => 'us',
+        contact_id      => $person->contact_id(),
         user            => R2::Schema::User->SystemUser(),
     );
 
