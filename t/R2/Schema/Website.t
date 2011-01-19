@@ -21,9 +21,10 @@ my $contact = R2::Schema::Person->insert(
 )->contact();
 
 {
-    my $website = $contact->add_website(
-        uri  => 'urth.org',
-        user => R2::Schema::User->SystemUser(),
+    my $website = R2::Schema::Website->insert(
+        uri        => 'urth.org',
+        contact_id => $contact->contact_id(),
+        user       => R2::Schema::User->SystemUser(),
     );
 
     is(
@@ -34,9 +35,10 @@ my $contact = R2::Schema::Person->insert(
 
 {
     eval {
-        $contact->add_website(
-            uri  => 'urth',
-            user => R2::Schema::User->SystemUser(),
+        R2::Schema::Website->insert(
+            uri        => 'urth',
+            contact_id => $contact->contact_id(),
+            user       => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -52,9 +54,10 @@ my $contact = R2::Schema::Person->insert(
 
 {
     eval {
-        $contact->add_website(
-            uri  => 'urth.foo',
-            user => R2::Schema::User->SystemUser(),
+        R2::Schema::Website->insert(
+            uri        => 'urth.foo',
+            contact_id => $contact->contact_id(),
+            user       => R2::Schema::User->SystemUser(),
         );
     };
 
