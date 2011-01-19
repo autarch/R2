@@ -381,7 +381,7 @@ CREATE TABLE "Address" (
        city               citext             NOT NULL DEFAULT '',
        region             citext             NOT NULL DEFAULT '',
        postal_code        citext             NOT NULL DEFAULT '',
-       country            citext             NOT NULL,
+       country            citext             NOT NULL DEFAULT '',
        latitude           FLOAT              NULL,
        longitude          FLOAT              NULL,
        -- The address as returned by a geocoding service like Google
