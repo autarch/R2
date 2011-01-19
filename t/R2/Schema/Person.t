@@ -104,11 +104,10 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     eval {
         R2::Schema::Person->insert(
-            first_name  => 'Dave',
-            birth_date  => $dt->strftime('%Y-%m-%d'),
-            date_format => '%Y-%m-%d',
-            account_id  => $account->account_id(),
-            user        => R2::Schema::User->SystemUser(),
+            first_name => 'Dave',
+            birth_date => $dt->strftime('%Y-%m-%d'),
+            account_id => $account->account_id(),
+            user       => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -127,11 +126,10 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     eval {
         R2::Schema::Person->insert(
-            first_name  => 'Dave',
-            birth_date  => '01-03-1973',
-            date_format => '%Y-%m-%d',
-            account_id  => $account->account_id(),
-            user        => R2::Schema::User->SystemUser(),
+            first_name => 'Dave',
+            birth_date => 'foobar',
+            account_id => $account->account_id(),
+            user       => R2::Schema::User->SystemUser(),
         );
     };
 
@@ -143,18 +141,6 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         $e[0]->{message}, q{Birth date does not seem to be a valid date.},
         'got expected error message'
     );
-}
-
-{
-    my $person = R2::Schema::Person->insert(
-        first_name  => 'Dave',
-        birth_date  => '1973-06-23',
-        date_format => '%Y-%m-%d',
-        account_id  => $account->account_id(),
-        user        => R2::Schema::User->SystemUser(),
-    );
-
-    ok( $person, 'date_format gets removed from insert parameters' );
 }
 
 done_testing();
