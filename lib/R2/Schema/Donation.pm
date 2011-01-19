@@ -97,7 +97,7 @@ sub _valid_donation_date {
         field   => 'donation_date',
         message => 'This does not seem to be a valid date.',
         }
-        unless $dt;
+        unless $dt && !$parser->error();
 
     $p->{donation_date} = $dt;
 
@@ -123,7 +123,7 @@ sub _valid_receipt_date {
         field   => 'donation_date',
         message => 'This does not seem to be a valid date.',
         }
-        unless $dt;
+        unless $dt && !$parser->error();
 
     $p->{receipt_date} = $dt;
 

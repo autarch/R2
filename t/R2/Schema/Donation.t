@@ -135,7 +135,7 @@ my $payment_type = $account->payment_types()->next();
             donation_source_id   => $source->donation_source_id(),
             payment_type_id      => $payment_type->payment_type_id(),
             amount               => 12,
-            donation_date        => 0,
+            donation_date        => 'foobar',
             user                 => R2::Schema::User->SystemUser(),
         );
     };

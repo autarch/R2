@@ -123,7 +123,7 @@ sub _valid_birth_date {
             field   => 'birth_date',
             message => 'Birth date does not seem to be a valid date.',
             }
-            unless $dt;
+            unless $dt && !$parser->error();
     }
 
     return if DateTime->today( time_zone => 'floating' ) >= $dt;
