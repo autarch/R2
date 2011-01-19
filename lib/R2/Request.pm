@@ -45,6 +45,12 @@ sub account_params {
     return $self->_params_for_classes( ['R2::Schema::Account'] );
 }
 
+sub user_params {
+    my $self = shift;
+
+    return $self->_params_for_classes( ['R2::Schema::User'] );
+}
+
 sub donation_params {
     my $self = shift;
 

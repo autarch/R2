@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use LWPx::ParanoidAgent;
+use List::AllUtils qw( any );
 use R2::Schema::User;
 use R2::Util qw( string_is_empty );
 
@@ -115,14 +115,89 @@ sub _login_user {
     $c->redirect_and_detach($redirect_to);
 }
 
-sub edit_form : Local {
+sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
+    my $self    = shift;
+    my $c       = shift;
+    my $user_id = shift;
+
+    my $user = R2::Schema::User->new( user_id => $user_id );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $user;
+
+    unless (
+        uc $c->request()->method() eq 'GET'
+        || $c->model('Authz')->user_can_edit_user(
+            user       => $c->user(),
+            other_user => $user,
+        )
+        ) {
+        $c->redirect_with_error(
+            error => 'You are not authorized to edit this user',
+            uri   => $c->domain()->application_uri( path => q{} ),
+        );
+    }
+
+    $c->stash()->{user} = $user;
+}
+
+sub user : Chained('_set_user') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
+}
+
+sub user_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{return_to} 
-        = $c->request()->parameters->{return_to}
-        || $c->session_object()->form_data()->{return_to}
-        || $c->domain()->application_uri( path => q{} );
+    $c->stash()->{template} = '/dashboard';
+}
+
+sub user_PUT : Private {
+    my $self = shift;
+    my $c    = shift;
+
+    my %p = $c->request()->user_params();
+    delete $p{is_system_admin}
+        unless $c->user()->is_system_admin();
+    delete $p{is_disabled}
+        unless $c->user()->role()->name() eq 'Admin';
+
+    my $user = $c->stash()->{user};
+
+    delete @p{ 'password', 'password2' }
+        unless any { ! string_is_empty($_) } @p{ 'password', 'password2' };
+
+    eval { $user->update(%p) };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error     => $e,
+            uri       => $user->uri( view => 'edit_form' ),
+            form_data => $c->request()->params(),
+        );
+    }
+
+    $c->session_object()
+        ->add_message(
+        'The ' . $user->display_name() . ' user has been updated' );
+
+    $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
+}
+
+sub edit_form : Chained('_set_user') : PathPath('edit_form') : Args(0) {
+    my $self = shift;
+    my $c    = shift;
+
+    unless (
+        $c->model('Authz')->user_can_edit_user(
+            user       => $c->user(),
+            other_user => $c->stash()->{user},
+        )
+        ) {
+        $c->redirect_with_error(
+            error => 'You are not authorized to edit this user',
+            uri   => $c->domain()->application_uri( path => q{} ),
+        );
+    }
 }
 
 __PACKAGE__->meta()->make_immutable();

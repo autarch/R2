@@ -38,6 +38,20 @@ sub user_can_edit_account {
     );
 }
 
+sub user_can_edit_user {
+    my $self = shift;
+    my ( $user, $other_user ) = validated_list(
+        \@_,
+        user       => { isa => 'R2::Schema::User' },
+        other_user => { isa => 'R2::Schema::User' },
+    );
+
+    return $self->_require_at_least(
+        $user, $other_user->account_id(),
+        'Admin'
+    );
+}
+
 sub user_can_view_contact {
     my $self = shift;
     my ( $user, $contact ) = validated_list(

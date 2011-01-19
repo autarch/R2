@@ -1,0 +1,80 @@
+<&| /lib/filter/form.mas,
+    objects => $user ? [ $user ] : [],
+    exclude => [ 'password', 'password2' ],
+  &>
+<form class="JS-standard-form"
+      action="<% $action %>"
+      method="post"
+      enctype="multipart/form-data">
+
+% if ($user) {
+<input type="hidden" name="x-tunneled-method" value="PUT" />
+% }
+
+  <fieldset>
+    <legend>User information</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="username">Username:</label>
+      <input type="text" class="text wide" name="username" id="username" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="password">Password:</label>
+      <input type="password" class="text wide" name="password" id="password" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="password2">Confirm password:</label>
+      <input type="password2" class="text wide" name="password2" id="password2" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="time_zone">Time zone:</label>
+      <select name="time_zone">
+% while ( my $zone = $zones->next() ) {
+        <option value="<% $zone->olson_name() %>"><% $zone->description() %></option>
+% }
+        <option value="UTC">UTC</option>
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="role_id">Role:</label>
+      <select name="role_id">
+% while ( my $role = $roles->next() ) {
+        <option value="<% $role->role_id() %>"><% $role->name() %></option>
+% }
+      </select>
+    </div>
+
+% if ( $c->user()->is_system_admin() ) {
+    <div class="form-item">
+      <label class="for-field" for="is_system_user">System-wide admin:</label>
+      <div class="radio-group">
+        <input type="radio" class="radio" name="is_system_user" id="is_system_user-yes" value="1" checked="checked" />
+        <label class="for-radio selected" for="is_system_user-yes" id="for-is_system_user-yes">Yes</label>
+        <input type="radio" class="radio" name="is_system_user" id="is_system_user-no" value="0" />
+        <label class="for-radio" for="is_system_user-no" id="for-is_system_user-no">No</label>
+      </div>
+    </div>
+% }
+    
+  </fieldset>
+
+  <div class="form-item">
+    <input class="submit" type="submit" value="Submit" />
+  </div>
+
+</form>
+</&>
+
+<%args>
+$user => undef
+</%args>
+
+<%init>
+my $action = $user ? $user->uri() : $c->account()->uri( view => 'user' );
+my $zones = R2::Schema::TimeZone->ByCountry('United States');
+my $roles = R2::Schema::Role->All();
+</%init>

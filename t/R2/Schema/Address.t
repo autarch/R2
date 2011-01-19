@@ -90,11 +90,16 @@ my $address_type = $account->address_types()->next();
     );
 
     for my $test (@tests) {
-        my $address = $contact->add_address(
-            %{ $test->[0] },
-            iso_code        => 'us',
-            address_type_id => $address_type->address_type_id(),
-            user            => R2::Schema::User->SystemUser(),
+        my $address = $contact->update_or_add_addresses(
+            {},
+            [
+                {
+                    %{ $test->[0] },
+                    iso_code        => 'us',
+                    address_type_id => $address_type->address_type_id(),
+                },
+            ],
+            R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',
@@ -148,11 +153,17 @@ my $address_type = $account->address_types()->next();
     );
 
     for my $test (@tests) {
-        my $address = $contact->add_address(
-            %{ $test->[0] },
-            iso_code        => 'us',
-            address_type_id => $address_type->address_type_id(),
-            user            => R2::Schema::User->SystemUser(),
+        my $address = $contact->update_or_add_addresses(
+            {},
+            [
+                {
+                    %{ $test->[0] },
+                    iso_code        => 'us',
+                    address_type_id => $address_type->address_type_id(),
+                    user            => R2::Schema::User->SystemUser(),
+                },
+            ],
+            R2::Schema::User->SystemUser(),
         );
 
         my $desc = join ', ',

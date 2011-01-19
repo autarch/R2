@@ -1,4 +1,10 @@
-foo
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<& /lib/form/user.mas, user => $user &>
 
 <%args>
 $account => undef
@@ -6,12 +12,8 @@ $user
 </%args>
 
 <%method title>
-<% $name %>
+<% $user->display_name() %>
 <%args>
 $user
 </%args>
-
-<%init>
-my $name = $user->person() ? $user->person()->display_name() : $user->username();
-</%init>
 </%method>
