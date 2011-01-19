@@ -23,7 +23,7 @@ like(
     'generated file contains expected header'
 );
 like(
-    $content, qr{\Q/* /home/autarch/projects/R2/share/js-source/R2.js */},
+    $content, qr{\Q/* \E.+\QR2/share/js-source/R2.js */},
     'generated file contains comment with original file names'
 );
 
