@@ -165,7 +165,6 @@ my $contact = R2::Schema::Person->insert(
                 street_1        => '99 Some Drive',
                 city            => 'Minneapolis',
                 region          => 'MN',
-                iso_code        => 'us',
             },
         ],
         R2::Schema::User->SystemUser(),
