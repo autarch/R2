@@ -424,8 +424,8 @@ R2.FormWithMemberSearch.prototype._handleErrorFunction = function (results) {
         self._cleanResultsDiv();
 
         var text = "An error occurred when searching for matching people."
-        text += " Sometimes self error is temporary, so feel free to try again."
-        text += " If self error persists, please contact support.";
+        text += " Sometimes this error is temporary, so feel free to try again."
+        text += " If this error persists, please contact support.";
 
         self.results_div.append( document.createTextNode(text) );
     };
