@@ -29,9 +29,7 @@ my $account;
         qw(
         donation_sources donation_campaigns payment_types
         address_types phone_number_types
-        messaging_providers
-        contact_note_types
-        countries )
+        contact_note_types )
         ) {
 
         my @objects = $account->$meth()->all();
@@ -43,38 +41,19 @@ my $account;
 }
 
 {
-    $account->add_country(
-        country => R2::Schema::Country->new(
-            iso_code => $_,
-        ),
-        is_default => 0,
-    ) for 'gu', 'gb';
-
-    is_deeply(
-        [ map { $_->name() } $account->countries()->all() ],
-        [ 'United States', 'Canada', 'Guam', 'United Kingdom' ],
-        'countries returns default country first, then ordered by name'
-    );
-}
-
-{
     my $bob = R2::Schema::User->insert(
         first_name    => 'Bob',
         email_address => 'bob@example.com',
         password      => 'foo',
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Member()->role_id(),
         user          => $user,
-    );
-
-    $account->add_user(
-        user => $bob,
-        role => R2::Schema::Role->Member(),
     );
 
     is_deeply(
         users_with_roles_data($account),
         [ [ 'bob@example.com', 'Member' ] ],
-        'got expected users after calling add_users'
+        'got expected users after inserting user for the account'
     );
 
     my $lisa = R2::Schema::User->insert(
@@ -82,14 +61,8 @@ my $account;
         email_address => 'lisa@example.com',
         password      => 'foo',
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Admin()->role_id(),
         user          => $user,
-    );
-
-    my $role = R2::Schema::Role->Member();
-
-    $account->add_user(
-        user => $lisa,
-        role => R2::Schema::Role->Admin(),
     );
 
     is_deeply(
@@ -98,7 +71,7 @@ my $account;
             [ 'bob@example.com',  'Member' ],
             [ 'lisa@example.com', 'Admin' ],
         ],
-        'got expected users after calling add_users'
+        'got expected users after inserting another user'
     );
 }
 
@@ -108,8 +81,8 @@ my $account;
 
     $account->update_or_add_donation_sources(
         {
-            $sources{mail}->donation_source_id()   => { name => 'male' },
-            $sources{online}->donation_source_id() => { name => 'theft' },
+            $sources{Online}->donation_source_id() => { name => 'theft' },
+            $sources{Mail}->donation_source_id()   => { name => 'male' },
         },
         [
             { name => 'lemonade stand' },
@@ -118,7 +91,7 @@ my $account;
     );
 
     is_deeply(
-        [ map { $_->name() } $account->donation_sources()->all() ],
+        [ sort map { $_->name() } $account->donation_sources()->all() ],
         [ 'bake sale', 'lemonade stand', 'male', 'theft' ],
         'got expected donation sources after update_or_add_donation_sources'
     );
@@ -162,7 +135,7 @@ my $account;
     );
 
     is_deeply(
-        [ map { $_->name() } $account->payment_types()->all() ],
+        [ sort map { $_->name() } $account->payment_types()->all() ],
         [ 'archaic paper', 'cookies', 'cowrie shells', 'favors' ],
         'got expected payment types after update_or_add_payment_types'
     );
@@ -205,7 +178,9 @@ my $account;
                     applies_to_organization => $_->applies_to_organization(),
                     applies_to_person       => $_->applies_to_person(),
                 }
-                } $account->address_types()->all()
+                }
+                sort { $a->name() cmp $b->name() }
+                $account->address_types()->all()
         ],
         [
             {
@@ -267,7 +242,9 @@ my $account;
                     applies_to_organization => $_->applies_to_organization(),
                     applies_to_person       => $_->applies_to_person(),
                 }
-                } $account->phone_number_types()->all()
+                }
+                sort { $a->name() cmp $b->name() }
+                $account->phone_number_types()->all()
         ],
         [
             {
