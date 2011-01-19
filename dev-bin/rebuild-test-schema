@@ -11,8 +11,10 @@ use MIME::Base64 qw( encode_base64 );
 use R2::DatabaseManager;
 use Storable qw( nfreeze );
 
+my $db_name = $ENV{HUDSON_URL} ? 'R2Hudson_$ENV{BUILD_NUMBER}' : 'R2Test';
+
 R2::DatabaseManager->new(
-    db_name          => 'R2Test',
+    db_name          => $db_name,
     drop             => 1,
     seed             => 0,
     quiet            => 1,
@@ -21,7 +23,7 @@ R2::DatabaseManager->new(
 
 require R2::Config;
 
-R2::Config->instance()->_set_database_name('R2Test');
+R2::Config->instance()->_set_database_name($db_name);
 
 require R2::Schema;
 

@@ -11,6 +11,8 @@ use File::Slurp qw( read_file );
 use Path::Class qw( file );
 use Test::More;
 
+my $DB_NAME = $ENV{HUDSON_URL} ? 'R2Hudson_$ENV{BUILD_NUMBER}' : 'R2Test';
+
 sub import {
     eval {
         DBI->connect(
@@ -40,7 +42,7 @@ sub import {
 
     # Need to explicitly override anything that might be found in an existing
     # config file
-    R2::Config->instance()->_set_database_name('R2Test');
+    R2::Config->instance()->_set_database_name($DB_NAME);
     R2::Config->instance()->_set_database_username(q{});
     R2::Config->instance()->_set_database_password(q{});
 
@@ -50,7 +52,7 @@ sub import {
 sub _database_exists {
     my $dbh = eval {
         DBI->connect(
-            'dbi:Pg:dbname=R2Test',
+            "dbi:Pg:dbname=$DB_NAME",
             q{}, q{}, {
                 RaiseError         => 1,
                 PrintError         => 0,
@@ -73,12 +75,12 @@ sub _database_exists {
 }
 
 sub _recreate_database {
-    diag('Creating R2Test database');
+    diag("Creating $DB_NAME database");
 
     require R2::DatabaseManager;
 
     my $man = R2::DatabaseManager->new(
-        db_name => 'R2Test',
+        db_name => $DB_NAME,
         drop    => 1,
         quiet   => 1,
     );
@@ -88,7 +90,7 @@ sub _recreate_database {
 
 sub _clean_tables {
     my $dbh = DBI->connect(
-        'dbi:Pg:dbname=R2Test',
+        "dbi:Pg:dbname=$DB_NAME",
         q{}, q{}, {
             RaiseError         => 1,
             PrintError         => 0,
@@ -97,7 +99,7 @@ sub _clean_tables {
         },
     );
 
-    diag('Cleaning tables in existing R2Test database');
+    diag("Cleaning tables in existing $DB_NAME database");
 
     my @tables;
     for my $stmt ( _ddl_statements() ) {
