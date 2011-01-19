@@ -22,8 +22,9 @@ like(
     $content, qr[\Qvar JSAN = { "use": function () {} };],
     'generated file contains expected header'
 );
+
 like(
-    $content, qr{\Q/* \E.+\QR2/share/js-source/R2.js */},
+    $content, qr{\Q/* \E.+\Qshare/js-source/R2.js */},
     'generated file contains comment with original file names'
 );
 
