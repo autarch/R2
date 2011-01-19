@@ -115,6 +115,42 @@ sub _login_user {
     $c->redirect_and_detach($redirect_to);
 }
 
+sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
+    my $self       = shift;
+    my $c          = shift;
+    my $user_id = shift;
+
+    my $user = R2::Schema::User->new( user_id => $user_id );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $user;
+
+    unless (
+        uc $c->request()->method() eq 'GET'
+        || $c->model('Authz')->user_can_edit_account(
+            user    => $c->user(),
+            account => $account,
+        )
+        ) {
+        $c->redirect_with_error(
+            error => 'You are not authorized to edit this account',
+            uri   => $c->domain()->application_uri( path => q{} ),
+        );
+    }
+
+    $c->stash()->{account} = $account;
+}
+
+sub edit_form : Local {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{return_to} 
+        = $c->request()->parameters->{return_to}
+        || $c->session_object()->form_data()->{return_to}
+        || $c->domain()->application_uri( path => q{} );
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

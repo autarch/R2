@@ -208,16 +208,31 @@ sub add_user {
 
 sub users_with_roles {
     my $self = shift;
+    my ($include_disabled) = validated_list(
+        \@_,
+        include_disabled => { isa => Bool, default => 0 },
+    );
 
     my $select = $self->_UsersWithRolesSelect();
+
+    unless ($include_disabled) {
+        $select = $select->clone();
+
+        my $schema = R2::Schema->Schema();
+
+        $select->where(
+            $schema->table('User')->column('is_disabled'),
+            '=', 0
+        );
+    }
 
     my $dbh = $self->_dbh($select);
 
     return Fey::Object::Iterator::FromSelect->new(
-        classes => [qw( R2::Schema::User R2::Schema::Role  )],
-        dbh     => $dbh,
-        select  => $select,
-        bind_params => [ $self->account_id() ],
+        classes     => [qw( R2::Schema::User R2::Schema::Role  )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->account_id(), $select->bind_params() ],
     );
 }
 

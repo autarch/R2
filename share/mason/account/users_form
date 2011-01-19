@@ -4,6 +4,16 @@
   </h1>
 </div>
 
+<p>
+% if ($include_disabled) {
+Showing disabled user users.
+<a href="<% $account->uri( view => 'users_form' ) %>">Only show active users</a>.
+% } else {
+Only showing active users.
+<a href="<% $account->uri( view => 'users_form', query => { include_disabled => 1 } ) %>">Include disabled users</a>.
+% }
+</p>
+
 <table class="standard-table">
   <thead>
     <tr>
@@ -11,6 +21,8 @@
       <th>Username</th>
       <th>Added</th>
       <th>Permissions</th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
 % while ( my ( $user, $role ) = $users->next() ) {
@@ -20,6 +32,13 @@
       <td><% $user->username() %></td>
       <td><% $c->user()->format_date( $user->creation_datetime() ) %></td>
       <td><% $role->name() %></td>
+      <td><a href="<% $user->uri( view => 'edit_form' ) %>">edit</a></td>
+      <td>
+        <form class="inline" action="<% $user->uri() %>" method="post">
+          <input type="hidden" name="is_disabled" value="1" />
+          <input type="submit" class="submit" value="Disable" />
+        </form>
+      </td>
     </tr>
   </tbody>
 % }
@@ -31,10 +50,11 @@
 
 <%args>
 $account
+$include_disabled => 0
 </%args>
 
 <%init>
-my $users = $account->users_with_roles();
+my $users = $account->users_with_roles( include_disabled => $include_disabled );
 </%init>
 
 <%method title>
