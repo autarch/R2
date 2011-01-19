@@ -26,9 +26,5 @@ like(
     $content, qr{\Q/* /home/autarch/projects/R2/share/js-source/R2.js */},
     'generated file contains comment with original file names'
 );
-like(
-    $content, qr[\Qfunction IEPreventDefault(){rval=false;}],
-    'generated file is squished'
-);
 
 done_testing();
