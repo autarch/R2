@@ -19,6 +19,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         email_address => 'joe.smith@example.com',
         password      => 'password',
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Member()->role_id(),
         user          => R2::Schema::User->SystemUser,
     );
 
@@ -42,6 +43,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         email_address => 'bubba.smith@example.com',
         is_disabled   => 1,
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Member()->role_id(),
         user          => R2::Schema::User->SystemUser,
     );
 
@@ -58,6 +60,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
             last_name  => 'Smith',
             password   => 'whatever',
             account_id => $account->account_id(),,
+            role_id    => R2::Schema::Role->Member()->role_id(),
             user       => R2::Schema::User->SystemUser,
         );
     };
@@ -79,6 +82,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
             first_name => 'Bubba',
             last_name  => 'Smith',
             account_id => $account->account_id(),,
+            role_id    => R2::Schema::Role->Member()->role_id(),
             user       => R2::Schema::User->SystemUser,
         );
     };
@@ -104,6 +108,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         password      => 'password',
         locale_code   => 'fr_FR',
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Member()->role_id(),
         user          => R2::Schema::User->SystemUser,
     );
 
@@ -128,12 +133,13 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $user = R2::Schema::User->insert(
-        first_name  => 'Joe',
-        last_name   => 'Smith',
-        username    => 'joe.smith',
-        password    => 'password',
-        account_id  => $account->account_id(),
-        user        => R2::Schema::User->SystemUser,
+        first_name => 'Joe',
+        last_name  => 'Smith',
+        username   => 'joe.smith',
+        password   => 'password',
+        account_id => $account->account_id(),
+        role_id    => R2::Schema::Role->Member()->role_id(),
+        user       => R2::Schema::User->SystemUser,
     );
 
     is(
