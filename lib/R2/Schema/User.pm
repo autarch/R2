@@ -61,6 +61,14 @@ has datetime_format => (
     default  => sub { $_[0]->_dt_locale()->datetime_format_medium() },
 );
 
+has display_name => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_display_name',
+);
+
 class_has SystemUser => (
     is      => 'ro',
     isa     => __PACKAGE__,
@@ -122,26 +130,28 @@ around 'insert' => sub {
     my $email_address = delete $p{email_address};
 
     my $sub = sub {
-        my $person = R2::Schema::Person->insert(
-            %person_p,
-            user => $p{user},
-        );
-
-        unless ( string_is_empty($email_address) ) {
-            R2::Schema::EmailAddress->insert(
-                email_address => $email_address,
-                contact_id    => $person->person_id(),
-                is_preferred  => 1,
-                user          => $p{user},
+        my $person;
+        if ( $p{account_id} ) {
+            $person = R2::Schema::Person->insert(
+                %person_p,
+                user => $p{user},
             );
+
+            unless ( string_is_empty($email_address) ) {
+                R2::Schema::EmailAddress->insert(
+                    email_address => $email_address,
+                    contact_id    => $person->person_id(),
+                    is_preferred  => 1,
+                    user          => $p{user},
+                );
+            }
+
+            $user_p{person_id} = $person->person_id();
         }
 
-        my $user = $class->$orig(
-            %user_p,
-            person_id => $person->person_id(),
-        );
+        my $user = $class->$orig(%user_p);
 
-        $user->_set_person($person);
+        $user->_set_person($person) if $person;
 
         return $user;
     };
@@ -218,7 +228,7 @@ sub _FindOrCreateSystemUser {
     return $user if $user;
 
     # Hack to avoid our around wrapper.
-    return $class->Fey::Object::Table::insert(
+    return $class->insert(
         user_id        => -1,
         username       => 'R2 System User',
         password       => '*unusable*',
@@ -276,6 +286,14 @@ sub format_datetime {
     return $dt->clone()->set( locale => $self->locale_code() )
         ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->datetime_format() );
+}
+
+sub _build_display_name {
+    my $self = shift;
+
+    return $self->person()
+        ? $self->person()->display_name()
+        : $self->username();
 }
 
 sub _base_uri_path {
