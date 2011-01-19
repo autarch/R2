@@ -75,6 +75,14 @@ class_has SystemUser => (
 
     has_table( $schema->table('User') );
 
+    has_one account => (
+        table => $schema->table('Account'),
+    );
+
+    has_one role => (
+        table => $schema->table('Role'),
+    );
+
     has_one 'person' => (
         table   => $schema->table('Person'),
         handles => [
@@ -100,15 +108,24 @@ around 'insert' => sub {
     }
 
     my %user_p
-        = map { $_ => delete $p{$_} }
+        = map { $_ => $p{$_} }
         grep { $class->Table()->column($_) } keys %p;
+
+    my %person_p = map { $_ => $p{$_} }
+        grep {
+               R2::Schema::Person->Table()->column($_)
+            || R2::Schema::Contact->Table()->column($_)
+        } keys %p;
 
     $user_p{username} ||= $p{email_address};
 
     my $email_address = delete $p{email_address};
 
     my $sub = sub {
-        my $person = R2::Schema::Person->insert(%p);
+        my $person = R2::Schema::Person->insert(
+            %person_p,
+            user => $p{user},
+        );
 
         unless ( string_is_empty($email_address) ) {
             R2::Schema::EmailAddress->insert(

@@ -95,12 +95,8 @@ sub make_account {
         last_name     => $last_name,
         gender        => 'male',
         account_id    => $account->account_id(),
+        role_id       => R2::Schema::Role->Admin()->role_id(),
         user          => R2::Schema::User->SystemUser(),
-    );
-
-    $account->add_user(
-        user => $user,
-        role => R2::Schema::Role->Admin(),
     );
 
     if ($VERBOSE) {

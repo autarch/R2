@@ -24,6 +24,8 @@ CREATE TABLE "User" (
        is_disabled              BOOLEAN         DEFAULT FALSE,
        is_system_user           BOOLEAN         DEFAULT FALSE,
        person_id                INT8            NULL,
+       account_id               INT8            NULL,
+       role_id                  INTEGER         NULL,
        CONSTRAINT valid_username CHECK ( username != '' ),
        CONSTRAINT valid_password CHECK ( password != '' )
 );
@@ -43,13 +45,6 @@ CREATE TABLE "Account" (
 CREATE TABLE "Role" (
        role_id                  SERIAL          PRIMARY KEY,
        name                     TEXT            UNIQUE  NOT NULL
-);
-
-CREATE TABLE "AccountUserRole" (
-       account_id         INTEGER            NOT NULL,
-       user_id            INT8               NOT NULL,
-       role_id            INTEGER            NOT NULL,
-       PRIMARY KEY ( account_id, user_id )
 );
 
 CREATE DOMAIN hostname AS citext
@@ -506,20 +501,16 @@ ALTER TABLE "User" ADD CONSTRAINT "User_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Person" ("person_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "Account" ADD CONSTRAINT "Account_domain_id"
-  FOREIGN KEY ("domain_id") REFERENCES "Domain" ("domain_id")
-  ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_account_id"
+ALTER TABLE "User" ADD CONSTRAINT "User_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_user_id"
-  FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
+ALTER TABLE "User" ADD CONSTRAINT "User_role_id"
+  FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "AccountUserRole" ADD CONSTRAINT "AccountUserRole_role_id"
-  FOREIGN KEY ("role_id") REFERENCES "Role" ("role_id")
+ALTER TABLE "Account" ADD CONSTRAINT "Account_domain_id"
+  FOREIGN KEY ("domain_id") REFERENCES "Domain" ("domain_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "File" ADD CONSTRAINT "File_account_id"

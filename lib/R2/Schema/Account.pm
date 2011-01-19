@@ -10,7 +10,6 @@ use Fey::Object::Iterator::FromSelect::Caching;
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Exceptions qw( error );
-use R2::Schema::AccountUserRole;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
 use R2::Schema::CustomFieldGroup;
@@ -191,21 +190,6 @@ sub _build_fiscal_year_start_date {
     return $today;
 }
 
-sub add_user {
-    my $self = shift;
-    my ( $user, $role ) = validated_list(
-        \@_,
-        user => { isa => 'R2::Schema::User' },
-        role => { isa => 'R2::Schema::Role' },
-    );
-
-    R2::Schema::AccountUserRole->insert(
-        account_id => $self->account_id(),
-        user_id    => $user->user_id(),
-        role_id    => $role->role_id(),
-    );
-}
-
 sub users_with_roles {
     my $self = shift;
     my ($include_disabled) = validated_list(
@@ -234,6 +218,24 @@ sub users_with_roles {
         select      => $select,
         bind_params => [ $self->account_id(), $select->bind_params() ],
     );
+}
+
+sub _BuildUsersWithRolesSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables( 'User', 'Role' ) )
+        ->from  ( $schema->tables( 'User', 'Role' ) )
+        ->where ( $schema->table('User')->column('account_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('User')->column('username') );
+    #>>>
+    return $select;
 }
 
 for my $pair (
@@ -314,24 +316,6 @@ sub _build_made_a_note_contact_note_type {
         description => 'Made a note',
         account_id  => $self->account_id(),
     );
-}
-
-sub _BuildUsersWithRolesSelect {
-    my $class = shift;
-
-    my $select = R2::Schema->SQLFactoryClass()->new_select();
-
-    my $schema = R2::Schema->Schema();
-
-    #<<<
-    $select->select( $schema->tables( 'User', 'Role' ) )
-           ->from( $schema->tables( 'AccountUserRole', 'User' ) )
-           ->from( $schema->tables( 'AccountUserRole', 'Role' ) )
-           ->where( $schema->table('AccountUserRole')->column('account_id'),
-                    '=', Fey::Placeholder->new() )
-           ->order_by( $schema->table('User')->column('username') );
-    #>>>
-    return $select;
 }
 
 sub _AddSQLMethods {

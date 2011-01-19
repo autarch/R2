@@ -19,7 +19,7 @@ sub user_can_view_account {
     );
 
     return $self->_require_at_least(
-        $user->user_id(), $account->account_id(),
+        $user, $account->account_id(),
         'Admin'
     );
 }
@@ -33,7 +33,7 @@ sub user_can_edit_account {
     );
 
     return $self->_require_at_least(
-        $user->user_id(), $account->account_id(),
+        $user, $account->account_id(),
         'Admin'
     );
 }
@@ -47,7 +47,7 @@ sub user_can_view_contact {
     );
 
     return $self->_require_at_least(
-        $user->user_id(), $contact->account_id(),
+        $user, $contact->account_id(),
         'Member'
     );
 }
@@ -63,7 +63,7 @@ sub user_can_edit_contact {
     return 0 unless $user->account_id() == $contact->account_id();
 
     return $self->_require_at_least(
-        $user->user_id(), $contact->account_id(),
+        $user, $contact->account_id(),
         'Editor'
     );
 }
@@ -77,7 +77,7 @@ sub user_can_add_contact {
     );
 
     return $self->_require_at_least(
-        $user->user_id(), $account->account_id(),
+        $user, $account->account_id(),
         'Editor'
     );
 }
@@ -97,18 +97,11 @@ sub user_can_add_contact {
 
     sub _require_at_least {
         my $self       = shift;
-        my $user_id    = shift;
+        my $user       = shift;
         my $account_id = shift;
         my $required   = shift;
 
-        my $acr = R2::Schema::AccountUserRole->new(
-            account_id => $account_id,
-            user_id    => $user_id,
-        );
-
-        return 0 unless $acr;
-
-        my $role = $acr->role();
+        my $role = $user->role();
 
         return $RoleRank{ $role->name() } >= $RoleRank{$required} ? 1 : 0;
     }
