@@ -94,18 +94,6 @@ EOF
         ],
     );
 
-    ok(
-        (
-            !any {
-                $_->can('tagName')
-                    && lc $_->tagName() eq 'div'
-                    && $_->className eq 'form-error';
-            }
-            $form->childNodes()
-        ),
-        'form does not have a generic error div'
-    );
-
     text1_error_div_tests($form);
 }
 
