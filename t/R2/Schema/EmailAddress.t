@@ -22,8 +22,9 @@ my $contact = R2::Schema::Person->insert(
 
 {
     eval {
-        $contact->add_email_address(
+        R2::Schema::EmailAddress->insert(
             email_address => '@example.com',
+            contact_id    => $contact->contact_id(),
             user          => R2::Schema::User->SystemUser(),
         );
     };
@@ -40,8 +41,9 @@ my $contact = R2::Schema::Person->insert(
 
 {
     eval {
-        $contact->add_email_address(
+        R2::Schema::EmailAddress->insert(
             email_address => 'bob@not a domain.com',
+            contact_id    => $contact->contact_id(),
             user          => R2::Schema::User->SystemUser(),
         );
     };
