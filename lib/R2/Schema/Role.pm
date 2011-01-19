@@ -24,6 +24,13 @@ use MooseX::ClassAttribute;
             default => sub { __PACKAGE__->_FindOrCreateRole($role) },
         );
     }
+
+    class_has '_SelectAllSQL' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        lazy    => 1,
+        builder => '_BuildSelectAllSQL',
+    );
 }
 
 sub EnsureRequiredRolesExist {
@@ -41,6 +48,36 @@ sub _FindOrCreateRole {
     $role ||= $class->insert( name => $name );
 
     return $role;
+}
+
+sub All {
+    my $class = shift;
+
+    my $select = $class->_SelectAllSQL();
+
+    my $dbh = $class->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes => $class,
+        dbh     => $dbh,
+        select  => $select,
+    );
+}
+
+sub _BuildSelectAllSQL {
+    my $class = __PACKAGE__;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->table('Role') )
+        ->from  ( $schema->tables('Role') )
+        ->order_by( $schema->table('Role')->column('name') );
+    #>>>
+    return $select;
 }
 
 __PACKAGE__->meta()->make_immutable();
