@@ -1,0 +1,18 @@
+<div id="summary">
+  <h1>
+   <& SELF:title, %ARGS &>
+  </h1>
+</div>
+
+<& /lib/form/user.mas &>
+
+<%args>
+$account
+</%args>
+
+<%method title>
+New user for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

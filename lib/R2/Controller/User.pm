@@ -166,9 +166,20 @@ sub user_PUT : Private {
     delete @p{ 'password', 'password2' }
         unless any { ! string_is_empty($_) } @p{ 'password', 'password2' };
 
-    eval { $user->update(%p) };
+    my @errors;
 
-    if ( my $e = $@ ) {
+    unless ( ( $p{password} // q{} ) eq ( $p{password2} // q{} ) ) {
+        push @errors, 'The two passwords you provided did not match.';
+    }
+
+    eval { $user->update( %p, user => $c->user() ) };
+
+    push @errors, $@
+        if $@;
+
+    if (@errors) {
+        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+
         $c->redirect_with_error(
             error     => $e,
             uri       => $user->uri( view => 'edit_form' ),
@@ -176,9 +187,12 @@ sub user_PUT : Private {
         );
     }
 
-    $c->session_object()
-        ->add_message(
-        'The ' . $user->display_name() . ' user has been updated' );
+    my $whos
+        = $c->user()->user_id() == $user->user_id()
+        ? 'Your '
+        : $user->display_name . q{'s};
+
+    $c->session_object()->add_message( $whos . ' account has been updated' );
 
     $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
 }
