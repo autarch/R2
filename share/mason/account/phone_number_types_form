@@ -11,7 +11,7 @@
 <& /lib/help-text/phone-number-type.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $account->uri( view => 'phone_number_type' ) %>"
+<form action="<% $account->uri( view => 'phone_number_types' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

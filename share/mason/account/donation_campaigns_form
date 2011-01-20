@@ -11,7 +11,7 @@
 <& /lib/help-text/donation-campaign.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $account->uri( view => 'donation_campaign' ) %>"
+<form action="<% $account->uri( view => 'donation_campaigns' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

@@ -11,7 +11,7 @@
 <& /lib/help-text/payment-type.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $account->uri( view => 'payment_type' ) %>"
+<form action="<% $account->uri( view => 'payment_types' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

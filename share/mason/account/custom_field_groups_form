@@ -9,7 +9,7 @@
 </p>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $account->uri( view => 'custom_field_group' ) %>"
+<form action="<% $account->uri( view => 'custom_field_groups' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>

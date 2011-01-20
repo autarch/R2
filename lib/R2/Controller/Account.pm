@@ -91,10 +91,10 @@ sub donation_settings : Chained('_set_account') : PathPart('donation_settings') 
 sub donation_sources_form : Chained('_set_account') : PathPart('donation_sources_form') : Args(0) {
 }
 
-sub donation_source : Chained('_set_account') : PathPart('donation_source') : Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_source_collection : Chained('_set_account') : PathPart('donation_sources') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub donation_source_POST : Private {
+sub donation_source_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -123,10 +123,10 @@ sub donation_source_POST : Private {
 sub donation_campaigns_form : Chained('_set_account') : PathPart('donation_campaigns_form') : Args(0) {
 }
 
-sub donation_campaign : Chained('_set_account') : PathPart('donation_campaign') : Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_campaign_collection : Chained('_set_account') : PathPart('donation_campaigns') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub donation_campaign_POST : Private {
+sub donation_campaign_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -155,10 +155,10 @@ sub donation_campaign_POST : Private {
 sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) {
 }
 
-sub payment_type : Chained('_set_account') : PathPart('payment_type') : Args(0) : ActionClass('+R2::Action::REST') {
+sub payment_type_collection : Chained('_set_account') : PathPart('payment_types') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub payment_type_POST : Private {
+sub payment_type_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -186,10 +186,10 @@ sub payment_type_POST : Private {
 sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) {
 }
 
-sub address_type : Chained('_set_account') : PathPart('address_type') : Args(0) : ActionClass('+R2::Action::REST') {
+sub address_type_collection : Chained('_set_account') : PathPart('address_types') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub address_type_POST : Private {
+sub address_type_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -217,10 +217,10 @@ sub address_type_POST : Private {
 sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) {
 }
 
-sub phone_number_type : Chained('_set_account') : PathPart('phone_number_type') : Args(0) : ActionClass('+R2::Action::REST') {
+sub phone_number_type_collection : Chained('_set_account') : PathPart('phone_number_types') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub phone_number_type_POST : Private {
+sub phone_number_type_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -249,10 +249,10 @@ sub phone_number_type_POST : Private {
 sub contact_note_types_form : Chained('_set_account') : PathPart('contact_note_types_form') : Args(0) {
 }
 
-sub contact_note_type : Chained('_set_account') : PathPart('contact_note_type') : Args(0) : ActionClass('+R2::Action::REST') {
+sub contact_note_type_collection : Chained('_set_account') : PathPart('contact_note_types') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub contact_note_type_POST : Private {
+sub contact_note_type_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -281,7 +281,7 @@ sub contact_note_type_POST : Private {
 sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) {
 }
 
-sub custom_field_group_collection : Chained('_set_account') : PathPart('custom_field_group') : Args(0) : ActionClass('+R2::Action::REST') {
+sub custom_field_group_collection : Chained('_set_account') : PathPart('custom_field_groups') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
 sub custom_field_group_collection_POST : Private {
@@ -311,8 +311,7 @@ sub custom_field_group_collection_POST : Private {
         $account->uri( view => 'custom_field_groups_form' ) );
 }
 
-sub _set_custom_field_group : Chained('_set_account') :
-    PathPart('custom_field_group') : CaptureArgs(1) {
+sub _set_custom_field_group : Chained('_set_account') : PathPart('custom_field_group') : CaptureArgs(1) {
     my $self                  = shift;
     my $c                     = shift;
     my $custom_field_group_id = shift;
@@ -367,10 +366,10 @@ sub custom_field_group_POST : Private {
         $account->uri( view => 'custom_field_groups_form' ) );
 }
 
-sub users_collection : Chained('_set_account') : PathPart('users') : Args(0) : ActionClass('+R2::Action::REST') {
+sub user_collection : Chained('_set_account') : PathPart('users') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub users_collection_GET_html {
+sub user_collection_GET_html {
     my $self = shift;
     my $c    = shift;
 
@@ -430,21 +429,22 @@ before [
     qw( settings
         edit_form
         donation_settings
-        donation_sources_form donation_source
+        donation_sources_form
+        donation_source_collection
         donation_campaigns_form
-        donation_campaign
+        donation_campaign_collection
         payment_types_form
-        payment_type
+        payment_type_collection
         address_types_form
-        address_type
+        address_type_collection
         phone_number_types_form
-        phone_number_type
+        phone_number_type_collection
         contact_note_types_form
-        contact_note_type
+        contact_note_type_collection
         custom_field_groups_form
         custom_field_group_collection
         custom_field_group
-        users_collection
+        user_collection
         new_user_form
         )
     ] => sub {

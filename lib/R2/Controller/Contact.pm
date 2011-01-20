@@ -206,10 +206,10 @@ sub contact_PUT : Private {
     $c->redirect_and_detach( $contact->uri() );
 }
 
-sub donations : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') {
+sub donation_collection : Chained('_set_contact') : PathPart('donations') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub donations_GET_html : Private {
+sub donation_collection_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -238,7 +238,7 @@ sub new_donation_form : Chained('_set_contact') : PathPart('new_donation_form') 
     $c->stash()->{template} = "/contact/new_donation_form";
 }
 
-sub donations_POST : Private {
+sub donation_collection_POST : Private {
     my $self = shift;
     my $c    = shift;
 
@@ -395,6 +395,50 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
     $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
+sub note_collection : Chained('_set_contact') : PathPart('notes') : Args(0) : ActionClass('+R2::Action::REST') {
+}
+
+sub note_collection_GET_html : Private {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{tabs}[2]->set_is_selected(1);
+
+    $c->stash()->{can_edit_notes}
+        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
+
+    $c->stash()->{template} = '/contact/notes';
+}
+
+sub note_collection_POST : Private {
+    my $self = shift;
+    my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    $self->_check_authz(
+        $c,
+        'can_edit_contact',
+        { contact => $contact },
+        'You are not allowed to add notes.',
+        $contact->uri( view => 'notes' ),
+    );
+
+    my %p = $c->request()->note_params();
+    $p{datetime_format} = $c->request()->params()->{datetime_format};
+
+    eval { $contact->add_note( %p, user_id => $c->user()->user_id(), ); };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error => $e,
+            uri   => $contact->uri( view => 'notes' ),
+        );
+    }
+
+    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
+}
+
 sub _set_note : Chained('_set_contact') : PathPart('note') : CaptureArgs(1) {
     my $self            = shift;
     my $c               = shift;
@@ -425,50 +469,6 @@ sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0) {
     );
 
     $c->stash()->{template} = '/note/edit_form';
-}
-
-sub notes : Chained('_set_contact') : PathPart('notes') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub notes_GET_html : Private {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{tabs}[2]->set_is_selected(1);
-
-    $c->stash()->{can_edit_notes}
-        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
-
-    $c->stash()->{template} = '/contact/notes';
-}
-
-sub notes_POST : Private {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to add notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    my %p = $c->request()->note_params();
-    $p{datetime_format} = $c->request()->params()->{datetime_format};
-
-    eval { $contact->add_note( %p, user_id => $c->user()->user_id(), ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri( view => 'notes' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
 }
 
 sub note : Chained('_set_note') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
@@ -555,10 +555,10 @@ sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') 
     $c->stash()->{template} = '/shared/confirm_deletion';
 }
 
-sub history : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') {
+sub history_collection : Chained('_set_contact') : PathPart('history') : Args(0) : ActionClass('+R2::Action::REST') {
 }
 
-sub history_GET_html : Private {
+sub history_collection_GET_html : Private {
     my $self = shift;
     my $c    = shift;
 

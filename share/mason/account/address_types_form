@@ -11,7 +11,7 @@
 <& /lib/help-text/address-type.mas &>
 
 <&| /lib/filter/form.mas &>
-<form action="<% $account->uri( view => 'address_type' ) %>"
+<form action="<% $account->uri( view => 'address_types' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>
