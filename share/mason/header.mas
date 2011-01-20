@@ -1,6 +1,6 @@
   <ul id="global-nav">
 % if ( $c->user() ) {
-%   if ( $c->model('Authz')->user_can_edit_account( user => $c->user(), account => $c->account() ) ) {
+%   if ( $c->user()->can_edit_account( account => $c->account() ) ) {
     <li><a href="<% $c->account()->uri( view => 'settings' ) %>" title="Account settings">Account</a></li>
 %   }
     <li><a href="<% $c->user()->uri( view => 'preferences') %>" title="Your application prefences">Prefs</a></li>

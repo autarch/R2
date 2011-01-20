@@ -25,7 +25,7 @@ sub new_person_form : Local {
 
     $self->_check_authz(
         $c,
-        'user_can_add_contact',
+        'can_add_contact',
         { account => $c->account() },
         'You are not allowed to add contacts.',
         $c->account()->uri(),
@@ -40,7 +40,7 @@ sub new_household_form : Local {
 
     $self->_check_authz(
         $c,
-        'user_can_add_contact',
+        'can_add_contact',
         { account => $c->account() },
         'You are not allowed to add contacts.',
         $c->account()->uri(),
@@ -55,7 +55,7 @@ sub new_organization_form : Local {
 
     $self->_check_authz(
         $c,
-        'user_can_add_contact',
+        'can_add_contact',
         { account => $c->account() },
         'You are not allowed to add contacts.',
         $c->account()->uri(),
@@ -76,7 +76,7 @@ sub _set_contact : Chained('/account/_set_account') : PathPart('contact') : Capt
 
     $self->_check_authz(
         $c,
-        'user_can_view_contact',
+        'can_view_contact',
         { contact => $contact },
         'You are not authorized to view this contact',
         $c->account()->uri(),
@@ -167,9 +167,19 @@ sub edit_form : Chained('_set_contact') : PathPart('edit_form') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
-    my $type = lc $c->stash->{contact}->contact_type();
+    my $contact = $c->stash->{contact};
 
-    $c->stash()->{$type} = $c->stash()->{contact}->$type();
+    $self->_check_authz(
+        $c,
+        'can_edit_contact',
+        { contact => $contact },
+        'You are not authorized to edit this contact',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    my $type = lc $contact->contact_type();
+
+    $c->stash()->{$type} = $contact->$type();
 
     $c->stash()->{template} = "/$type/edit_form";
 }
@@ -182,10 +192,10 @@ sub contact_PUT : Private {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
-        'You are not allowed to edit contacts.',
-        $c->account()->uri(),
+        'You are not authorized to edit this contact',
+        $c->domain()->application_uri( path => q{} ),
     );
 
     $self->_update_contact(
@@ -206,10 +216,7 @@ sub donations_GET_html : Private {
     $c->stash()->{tabs}[1]->set_is_selected(1);
 
     $c->stash()->{can_edit_donations}
-        = $c->model('Authz')->user_can_edit_contact(
-        user    => $c->user(),
-        contact => $c->stash()->{contact},
-        );
+        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
 
     $c->stash()->{template} = '/contact/donations';
 }
@@ -222,7 +229,7 @@ sub new_donation_form : Chained('_set_contact') : PathPart('new_donation_form') 
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to add donations.',
         $contact->uri( view => 'donations' ),
@@ -239,7 +246,7 @@ sub donations_POST : Private {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to add donations.',
         $contact->uri( view => 'donations' ),
@@ -282,7 +289,7 @@ sub donation_edit_form : Chained('_set_donation') : PathPart('edit_form') : Args
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to edit donations.',
         $contact->uri( view => 'donations' ),
@@ -303,10 +310,7 @@ sub donation_GET_html {
     $c->stash()->{tabs}[1]->set_is_selected(1);
 
     $c->stash()->{can_edit_donations}
-        = $c->model('Authz')->user_can_edit_contact(
-        user    => $c->user(),
-        contact => $c->stash()->{contact},
-        );
+        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
 
     $c->stash()->{template} = '/donation/view';
 }
@@ -319,7 +323,7 @@ sub donation_PUT {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to edit donations.',
         $contact->uri( view => 'donations' ),
@@ -349,7 +353,7 @@ sub donation_DELETE {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to delete donations.',
         $contact->uri( view => 'donations' ),
@@ -377,7 +381,7 @@ sub donation_confirm_deletion : Chained('_set_donation') : PathPart('confirm_del
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to delete donations.',
         $contact->uri( view => 'donations' ),
@@ -414,7 +418,7 @@ sub note_edit_form : Chained('_set_note') : PathPart('edit_form') : Args(0) {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to edit notes.',
         $contact->uri( view => 'notes' ),
@@ -432,10 +436,8 @@ sub notes_GET_html : Private {
 
     $c->stash()->{tabs}[2]->set_is_selected(1);
 
-    $c->stash()->{can_edit_notes} = $c->model('Authz')->user_can_edit_contact(
-        user    => $c->user(),
-        contact => $c->stash()->{contact},
-    );
+    $c->stash()->{can_edit_notes}
+        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
 
     $c->stash()->{template} = '/contact/notes';
 }
@@ -448,7 +450,7 @@ sub notes_POST : Private {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to add notes.',
         $contact->uri( view => 'notes' ),
@@ -480,7 +482,7 @@ sub note_PUT {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to edit notes.',
         $contact->uri( view => 'notes' ),
@@ -511,7 +513,7 @@ sub note_DELETE {
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to delete notes.',
         $contact->uri( view => 'notes' ),
@@ -539,7 +541,7 @@ sub note_confirm_deletion : Chained('_set_note') : PathPart('confirm_deletion') 
 
     $self->_check_authz(
         $c,
-        'user_can_edit_contact',
+        'can_edit_contact',
         { contact => $contact },
         'You are not allowed to delete notes.',
         $contact->uri( view => 'notes' ),
@@ -563,10 +565,7 @@ sub history_GET_html : Private {
     $c->stash()->{tabs}[4]->set_is_selected(1);
 
     $c->stash()->{can_edit_contact}
-        = $c->model('Authz')->user_can_edit_contact(
-        user    => $c->user(),
-        contact => $c->stash()->{contact},
-        );
+        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
 
     $c->stash()->{template} = '/contact/history';
 }

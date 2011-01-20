@@ -9,7 +9,7 @@
       </p>
 
 
-% if ( $authz->user_can_add_contact( user => $user, account => $account ) ) {
+% if ( $c->user()->can_add_contact( account => $account ) ) {
       <h2>Add a ...</h2>
       <ul>
         <li>
@@ -51,8 +51,5 @@
     </div>
 
 <%init>
-my $user = $c->user();
-my $account = $user->account();
-
-my $authz = $c->model('Authz');
+my $account = $c->user()->account();
 </%init>

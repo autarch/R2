@@ -39,7 +39,7 @@
     <& /lib/help-text/contact-note-type.mas &>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'users_form' ) %>"
+    <a href="<% $account->uri( view => 'users' ) %>"
        title="Account users">Account users</a>
     <p>
       Add, edit, or delete users for this account.

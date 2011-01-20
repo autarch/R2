@@ -94,10 +94,7 @@ sub _check_authz {
     my $uri          = shift;
 
     return
-        if $c->model('Authz')->$authz_method(
-                user => $c->user(),
-                %{$authz_params},
-        );
+        if $c->user()->$authz_method( %{$authz_params} );
 
     $c->redirect_with_error(
         error => $error,

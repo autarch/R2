@@ -7,6 +7,7 @@ use namespace::autoclean;
 use Authen::Passphrase::BlowfishCrypt;
 use DateTime::Locale;
 use List::AllUtils qw( first );
+use MooseX::Params::Validate qw( validated_list );
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
@@ -115,8 +116,7 @@ around 'insert' => sub {
         $p{password} = $class->_password_as_rfc2307( $p{password} );
     }
 
-    my %user_p
-        = map { $_ => $p{$_} }
+    my %user_p = map { $_ => $p{$_} }
         grep { $class->Table()->column($_) } keys %p;
 
     my %person_p = map { $_ => $p{$_} }
@@ -170,7 +170,31 @@ around update => sub {
 
     $p{last_modified_datetime} = Fey::Literal::Function->new('NOW');
 
-    return $self->$orig(%p);
+    my %user_p = map { $_ => $p{$_} }
+        grep { $self->Table()->column($_) } keys %p;
+
+    my %person_p = map { $_ => $p{$_} }
+        grep {
+               R2::Schema::Person->Table()->column($_)
+            || R2::Schema::Contact->Table()->column($_)
+        } keys %p;
+
+    my $sub = sub {
+        my $person = $self->person();
+
+        if ($person) {
+            $person->update(
+                %person_p,
+                user => $p{user},
+            );
+        }
+
+        $self->$orig(%user_p);
+    };
+
+    R2::Schema->RunInTransaction($sub);
+
+    return;
 };
 
 sub _require_username_or_email {
@@ -301,6 +325,111 @@ sub _base_uri_path {
 
     return '/user/' . $self->user_id();
 }
+
+sub can_view_account {
+    my $self = shift;
+    my ($account) = validated_list(
+        \@_,
+        account => { isa => 'R2::Schema::Account' },
+    );
+
+    return $self->_require_at_least(
+        $account->account_id(),
+        'Member'
+    );
+}
+
+sub can_edit_account {
+    my $self = shift;
+    my ($account) = validated_list(
+        \@_,
+        account => { isa => 'R2::Schema::Account' },
+    );
+
+    return $self->_require_at_least(
+        $account->account_id(),
+        'Admin'
+    );
+}
+
+sub can_edit_user {
+    my $self = shift;
+    my ($user) = validated_list(
+        \@_,
+        user => { isa => 'R2::Schema::User' },
+    );
+
+    return 1 if $self->user_id() == $user->user_id();
+
+    return $self->_require_at_least(
+        $user->account_id(),
+        'Admin'
+    );
+}
+
+sub can_view_contact {
+    my $self = shift;
+    my ($contact) = validated_list(
+        \@_,
+        contact => { isa => 'R2::Schema::Contact' },
+    );
+
+    return $self->_require_at_least(
+        $contact->account_id(),
+        'Member'
+    );
+}
+
+sub can_edit_contact {
+    my $self = shift;
+    my ($contact) = validated_list(
+        \@_,
+        contact => { isa => 'R2::Schema::Contact' },
+    );
+
+    return $self->_require_at_least(
+        $contact->account_id(),
+        'Editor'
+    );
+}
+
+sub can_add_contact {
+    my $self = shift;
+    my ($account) = validated_list(
+        \@_,
+        account => { isa => 'R2::Schema::Account' },
+    );
+
+    return $self->_require_at_least(
+        $account->account_id(),
+        'Editor'
+    );
+}
+
+{
+
+    # This could go in the DBMS, but I'm uncomfortable with making
+    # this a formal part of the data model. There could be additional
+    # roles in the future that don't fit into this sort of scheme, so
+    # keeping this ranking in code preserves the flexibility to
+    # eliminate it entirely.
+    my %RoleRank = (
+        Member => 1,
+        Editor => 2,
+        Admin  => 3,
+    );
+
+    sub _require_at_least {
+        my $self       = shift;
+        my $account_id = shift;
+        my $required   = shift;
+
+        my $role = $self->role();
+
+        return $RoleRank{ $role->name() } >= $RoleRank{$required} ? 1 : 0;
+    }
+}
+
 
 __PACKAGE__->meta()->make_immutable();
 

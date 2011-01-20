@@ -125,16 +125,23 @@ sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $user;
 
-    unless (
-        uc $c->request()->method() eq 'GET'
-        || $c->model('Authz')->user_can_edit_user(
-            user       => $c->user(),
-            other_user => $user,
-        )
-        ) {
-        $c->redirect_with_error(
-            error => 'You are not authorized to edit this user',
-            uri   => $c->domain()->application_uri( path => q{} ),
+    $self->_check_authz(
+        $c,
+        'can_view_user',
+        { user => $user },
+        'You are not authorized to view this user',
+        $c->account()->uri(),
+    );
+
+    $c->user()->can_edit_user( other_user => $user )
+
+    unless ( uc $c->request()->method() eq 'GET' ) {
+        $self->_check_authz(
+            $c,
+            'can_edit_user',
+            { user => $user },
+            'You are not authorized to edit this user',
+            $c->account()->uri(),
         );
     }
 
@@ -201,17 +208,13 @@ sub edit_form : Chained('_set_user') : PathPath('edit_form') : Args(0) {
     my $self = shift;
     my $c    = shift;
 
-    unless (
-        $c->model('Authz')->user_can_edit_user(
-            user       => $c->user(),
-            other_user => $c->stash()->{user},
-        )
-        ) {
-        $c->redirect_with_error(
-            error => 'You are not authorized to edit this user',
-            uri   => $c->domain()->application_uri( path => q{} ),
-        );
-    }
+    $self->_check_authz(
+        $c,
+        'can_edit_user',
+        { user => $user },
+        'You are not authorized to edit this user',
+        $c->account()->uri(),
+    );
 }
 
 __PACKAGE__->meta()->make_immutable();

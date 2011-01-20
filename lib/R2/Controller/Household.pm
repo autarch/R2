@@ -22,7 +22,7 @@ sub household_POST {
 
     $self->_check_authz(
         $c,
-        'user_can_add_contact',
+        'can_add_contact',
         { account => $c->account() },
         'You are not allowed to add contacts.',
         $c->account()->uri(),
