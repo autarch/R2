@@ -209,7 +209,7 @@ sub edit_form : Chained('_set_user') : PathPath('edit_form') : Args(0) {
     $self->_check_authz(
         $c,
         'can_edit_user',
-        { user => $user },
+        { user => $c->stash()->{user} },
         'You are not authorized to edit this user',
         $c->account()->uri(),
     );
