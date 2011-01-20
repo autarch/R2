@@ -133,8 +133,6 @@ sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
         $c->account()->uri(),
     );
 
-    $c->user()->can_edit_user( other_user => $user )
-
     unless ( uc $c->request()->method() eq 'GET' ) {
         $self->_check_authz(
             $c,
