@@ -15,7 +15,7 @@
     <legend>User information</legend>
 
     <div class="form-item">
-      <label class="for-field" for="username">Username:</label>
+      <label class="for-field" for="username">Email address:</label>
       <input type="text" class="text wide" name="username" id="username" />
     </div>
 
@@ -27,6 +27,16 @@
     <div class="form-item">
       <label class="for-field" for="password2">Confirm password:</label>
       <input type="password2" class="text wide" name="password2" id="password2" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="first_name">First name:</label>
+      <input type="text" class="text wide" name="first_name" id="first_name" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="last_name">Last name:</label>
+      <input type="text" class="text wide" name="last_name" id="last_name" />
     </div>
 
     <div class="form-item">
