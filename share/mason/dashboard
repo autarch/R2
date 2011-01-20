@@ -35,10 +35,7 @@ my $title = 'Dashboard: ' . $c->account()->name();
 </%shared>
 
 <%init>
-my $user = $c->user();
 my $account = $c->account();
-
-my $authz = $c->model('Authz');
 
 my $people = $account->people();
 my $households = $account->households();
