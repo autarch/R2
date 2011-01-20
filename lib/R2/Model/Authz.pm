@@ -20,7 +20,7 @@ sub user_can_view_account {
 
     return $self->_require_at_least(
         $user, $account->account_id(),
-        'Admin'
+        'Member'
     );
 }
 
