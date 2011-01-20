@@ -7,9 +7,11 @@ use namespace::autoclean;
 use HTTP::Status qw( RC_OK );
 use JSON::XS;
 
+use Carp qw( croak );
 use Moose::Role;
 use MooseX::Params::Validate qw( validated_hash );
 use R2::Types qw( ErrorForSession URIStr HashRef );
+use Scalar::Util qw( blessed );
 
 # These are not available yet?
 #requires qw( redirect_and_detach session_object );
@@ -29,6 +31,10 @@ sub redirect_with_error {
     my %p = validated_hash( \@_, %spec );
 
     die "Must provide a form or error" unless $p{error} || $p{form};
+
+    croak $p{error}
+        unless blessed $p{error}
+            && $p{error}->isa('R2::Exception::DataValidation');
 
     $self->session_object()->add_error( $p{error} )
         if $p{error};
