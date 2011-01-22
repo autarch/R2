@@ -405,7 +405,7 @@ my $contact = R2::Schema::Person->insert(
 
     $email->delete( user => R2::Schema::User->SystemUser() );
 
-    my @history = $contact->history()->all();
+    @history = $contact->history()->all();
 
     is(
         scalar @history, 4,
