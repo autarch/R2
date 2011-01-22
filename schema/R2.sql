@@ -34,6 +34,10 @@ CREATE TABLE "User" (
                           ( account_id IS NOT NULL AND role_id IS NOT NULL ) )
 );
 
+CREATE INDEX "User_person_id" ON "User" ("person_id");
+CREATE INDEX "User_account_id" ON "User" ("account_id");
+CREATE INDEX "User_role_id" ON "User" ("role_id");
+
 CREATE TABLE "Account" (
        account_id               SERIAL          PRIMARY KEY,
        name                     TEXT            UNIQUE  NOT NULL,
@@ -45,6 +49,8 @@ CREATE TABLE "Account" (
        CONSTRAINT valid_fiscal_year_start_month
                   CHECK ( fiscal_year_start_month >= 1 AND fiscal_year_start_month <= 12 )
 );
+
+CREATE INDEX "Account_domain_id" ON "Account" ("domain_id");
 
 CREATE TABLE "Role" (
        role_id                  SERIAL          PRIMARY KEY,
@@ -82,6 +88,8 @@ CREATE TABLE "File" (
        account_id         INT8               NOT NULL
 );
 
+CREATE INDEX "File_account_id" ON "File" ("account_id");
+
 CREATE TYPE contact_type AS ENUM ( 'Person', 'Organization', 'Household' );
 
 CREATE DOMAIN uri AS TEXT
@@ -102,6 +110,9 @@ CREATE TABLE "Contact" (
        account_id         INTEGER            NOT NULL
 );
 
+CREATE INDEX "Contact_image_file_id" ON "Contact" ("image_file_id");
+CREATE INDEX "Contact_account_id" ON "Contact" ("account_id");
+
 CREATE TABLE "Group" (
        group_id           SERIAL             PRIMARY KEY,
        name               citext             NOT NULL,
@@ -112,11 +123,15 @@ CREATE TABLE "Group" (
        account_id         INT8               NOT NULL
 );
 
+CREATE INDEX "Group_account_id" ON "Group" ("account_id");
+
 CREATE TABLE "GroupMember" (
        group_id           INT8               NOT NULL,
        contact_id         INT8               NOT NULL,
        PRIMARY KEY ( group_id, contact_id )
 );
+
+CREATE INDEX "GroupMember_contact_id" ON "GroupMember" ("contact_id");
 
 CREATE DOMAIN pos_int AS INTEGER
        CONSTRAINT is_positive CHECK ( VALUE > 0 );
@@ -132,6 +147,8 @@ CREATE TABLE "CustomFieldGroup" (
        CONSTRAINT CustomFieldGroup_account_id_display_order_unique
                   UNIQUE ( account_id, display_order )
 );
+
+CREATE INDEX "CustomFieldGroup_account_id" ON "CustomFieldGroup" ("account_id");
 
 CREATE TYPE custom_field_type AS
        ENUM ( 'Integer', 'Decimal', 'Date', 'DateTime', 'Text', 'File', 'SingleSelect', 'MultiSelect' );
@@ -150,6 +167,11 @@ CREATE TABLE "CustomField" (
                   UNIQUE ( custom_field_group_id, display_order )
 );
 
+CREATE INDEX "CustomField_custom_field_group_id"
+       ON "CustomField" ("custom_field_group_id");
+CREATE INDEX "CustomField_html_widget_id"
+       ON "CustomField" ("html_widget_id");
+
 CREATE TABLE "HTMLWidget" (
        html_widget_id           SERIAL       PRIMARY KEY,
        name                     TEXT         UNIQUE NOT NULL,
@@ -164,12 +186,18 @@ CREATE TABLE "CustomFieldIntegerValue" (
        PRIMARY KEY ( custom_field_id, contact_id )
 );
 
+CREATE INDEX "CustomFieldIntegerValue_custom_field_id"
+       ON "CustomFieldIntegerValue" ("custom_field_id");
+
 CREATE TABLE "CustomFieldDecimalValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    FLOAT8       NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id )
 );
+
+CREATE INDEX "CustomFieldDecimalValue_custom_field_id"
+       ON "CustomFieldDecimalValue" ("custom_field_id");
 
 CREATE TABLE "CustomFieldDateValue" (
        custom_field_id          INT8         NOT NULL,
@@ -178,12 +206,18 @@ CREATE TABLE "CustomFieldDateValue" (
        PRIMARY KEY ( custom_field_id, contact_id )
 );
 
+CREATE INDEX "CustomFieldDateValue_custom_field_id"
+       ON "CustomFieldDateValue" ("custom_field_id");
+
 CREATE TABLE "CustomFieldDateTimeValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    TIMESTAMP WITHOUT TIME ZONE  NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id )
 );
+
+CREATE INDEX "CustomFieldDateTimeValue_custom_field_id"
+       ON "CustomFieldDateTimeValue" ("custom_field_id");
 
 CREATE TABLE "CustomFieldTextValue" (
        custom_field_id          INT8         NOT NULL,
@@ -192,12 +226,18 @@ CREATE TABLE "CustomFieldTextValue" (
        PRIMARY KEY ( custom_field_id, contact_id )
 );
 
+CREATE INDEX "CustomFieldTextValue_custom_field_id"
+       ON "CustomFieldTextValue" ("custom_field_id");
+
 CREATE TABLE "CustomFieldFileValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        value                    BYTEA        NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id )
 );
+
+CREATE INDEX "CustomFieldFileValue_custom_field_id"
+       ON "CustomFieldFileValue" ("custom_field_id");
 
 CREATE TABLE "CustomFieldSelectOption" (
        custom_field_select_option_id INT8    PRIMARY KEY,
@@ -208,12 +248,20 @@ CREATE TABLE "CustomFieldSelectOption" (
                   UNIQUE ( custom_field_id, display_order )
 );
 
+CREATE INDEX "CustomFieldSelectOption_custom_field_id"
+       ON "CustomFieldSelectOption" ("custom_field_id");
+
 CREATE TABLE "CustomFieldSingleSelectValue" (
        custom_field_id          INT8         NOT NULL,
        contact_id               INT8         NOT NULL,
        custom_field_select_option_id  INT8   NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id )
 );
+
+CREATE INDEX "CustomFieldSingleSelectValue_custom_field_id"
+       ON "CustomFieldSingleSelectValue" ("custom_field_id");
+CREATE INDEX "CustomFieldSingleSelectValue_custom_field_select_option_id"
+       ON "CustomFieldSingleSelectValue" ("custom_field_select_option_id");
        
 CREATE TABLE "CustomFieldMultiSelectValue" (
        custom_field_id          INT8         NOT NULL,
@@ -221,6 +269,11 @@ CREATE TABLE "CustomFieldMultiSelectValue" (
        custom_field_select_option_id  INT8   NOT NULL,
        PRIMARY KEY ( custom_field_id, contact_id, custom_field_select_option_id )
 );
+
+CREATE INDEX "CustomFieldMultiSelectValue_custom_field_id"
+       ON "CustomFieldMultiSelectValue" ("custom_field_id");
+CREATE INDEX "CustomFieldMultiSelectValue_custom_field_select_option_id"
+       ON "CustomFieldMultiSelectValue" ("custom_field_select_option_id");
 
 CREATE TABLE "ContactNote" (
        contact_note_id    SERIAL8            PRIMARY KEY,
@@ -231,6 +284,9 @@ CREATE TABLE "ContactNote" (
        note_datetime      TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX "ContactNote_contact_id" ON "ContactNote" ("contact_id");
+CREATE INDEX "ContactNote_contact_note_type_id" ON "ContactNote" ("contact_note_type_id");
+
 CREATE TABLE "ContactNoteType" (
        contact_note_type_id  SERIAL          PRIMARY KEY,
        description        TEXT               NOT NULL,
@@ -239,6 +295,8 @@ CREATE TABLE "ContactNoteType" (
        CONSTRAINT valid_description CHECK ( description != '' ),
        CONSTRAINT ContactNoteType_description_account_id_unique UNIQUE ( description, account_id )
 );
+
+CREATE INDEX "ContactNoteType_account_id" ON "ContactNoteType" ("account_id");
 
 CREATE TABLE "ContactHistory" (
        contact_history_id SERIAL8            PRIMARY KEY,
@@ -259,6 +317,15 @@ CREATE TABLE "ContactHistory" (
        CONSTRAINT contact_id_ne_other_contact_id CHECK ( contact_id != other_contact_id )
 );
 
+CREATE INDEX "ContactHistory_contact_id" ON "ContactHistory" ("contact_id");
+CREATE INDEX "ContactHistory_contact_history_type_id"
+       ON "ContactHistory" ("contact_history_type_id");
+CREATE INDEX "ContactHistory_user_id" ON "ContactHistory" ("user_id");
+CREATE INDEX "ContactHistory_email_address_id" ON "ContactHistory" ("email_address_id");
+CREATE INDEX "ContactHistory_website_id" ON "ContactHistory" ("website_id");
+CREATE INDEX "ContactHistory_phone_number_id" ON "ContactHistory" ("phone_number_id");
+CREATE INDEX "ContactHistory_other_contact_id" ON "ContactHistory" ("other_contact_id");
+
 CREATE TABLE "ContactHistoryType" (
        contact_history_type_id  SERIAL       PRIMARY KEY,
        system_name        TEXT               UNIQUE  NOT NULL,
@@ -272,12 +339,16 @@ CREATE TABLE "ContactTag" (
        tag_id           INT8            NOT NULL
 );
 
+CREATE INDEX "ContactTag_tag_id" ON "ContactTag" ("tag_id");
+
 CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
        tag              citext          NOT NULL,
        account_id       INT8            NOT NULL,
        CONSTRAINT Tag_tag_account_id_unique UNIQUE ( tag, account_id )
 );
+
+CREATE INDEX "Tag_account_id" ON "Tag" ("account_id");
 
 CREATE TABLE "Person" (
        person_id          INT8               PRIMARY KEY,
@@ -299,6 +370,10 @@ CREATE TABLE "MessagingProvider" (
        note               TEXT               NOT NULL DEFAULT ''
 );
 
+CREATE INDEX "MessagingProvider_contact_id" ON "MessagingProvider" ("contact_id");
+CREATE INDEX "MessagingProvider_messaging_provider_type_id"
+       ON "MessagingProvider" ("messaging_provider_type_id");
+
 CREATE TABLE "MessagingProviderType" (
        messaging_provider_type_id  SERIAL8        PRIMARY KEY,
        name                   citext         UNIQUE  NOT NULL,
@@ -317,12 +392,19 @@ CREATE TABLE "PersonRelationship" (
        PRIMARY KEY ( person_id, relationship_type_id, other_person_id )
 );
 
+CREATE INDEX "PersonRelationship_relationship_type_id"
+       ON "PersonRelationship" ("relationship_type_id");
+CREATE INDEX "PersonRelationship_other_person_id"
+       ON "PersonRelationship" ("other_person_id");
+
 CREATE TABLE "RelationshipType" (
        relationship_type_id  SERIAL8         PRIMARY KEY,
        account_id          INT8              NOT NULL,
        name                TEXT              NOT NULL,
        inverse_name        TEXT              NOT NULL
 );   
+
+CREATE INDEX "RelationshipType_account_id" ON "RelationshipType" ("account_id");
 
 CREATE TABLE "Household" (
        household_id       SERIAL8            PRIMARY KEY,
@@ -338,6 +420,8 @@ CREATE TABLE "HouseholdMember" (
        PRIMARY KEY ( household_id, person_id )
 );
 
+CREATE INDEX "HouseholdMember_person_id" ON "HouseholdMember" ("person_id");
+
 CREATE TABLE "Organization" (
        organization_id    INT8               PRIMARY KEY,
        name               citext             NOT NULL,
@@ -352,6 +436,8 @@ CREATE TABLE "OrganizationMember" (
        PRIMARY KEY ( organization_id, person_id )
 );
 
+CREATE INDEX "OrganizationMember_person_id" ON "OrganizationMember" ("person_id");
+
 -- It's tempting to make the email address unique, but contacts could
 -- share an email address, especially in the case of a household and a
 -- person in the household, or an organization.
@@ -363,6 +449,8 @@ CREATE TABLE "EmailAddress" (
        note               TEXT               NOT NULL DEFAULT ''
 );
 
+CREATE INDEX "EmailAddress_contact_id" ON "EmailAddress" ("contact_id");
+
 CREATE TABLE "Website" (
        website_id         SERIAL8            PRIMARY KEY,
        contact_id         INT8               NOT NULL,
@@ -370,6 +458,8 @@ CREATE TABLE "Website" (
        uri                uri                NOT NULL,
        note               TEXT               NOT NULL DEFAULT ''
 );
+
+CREATE INDEX "Website_contact_id" ON "Website" ("contact_id");
 
 -- Consider a trigger to enforce one primary address per contact?
 CREATE TABLE "Address" (
@@ -392,17 +482,8 @@ CREATE TABLE "Address" (
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "TimeZone" (
-       olson_name         TEXT               PRIMARY KEY,
-       description        VARCHAR(100)       NOT NULL,
-       country            citext             NOT NULL,
-       display_order      INTEGER            NOT NULL,
-       CONSTRAINT valid_olson_name CHECK ( olson_name != '' ),
-       CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT valid_display_order CHECK ( display_order > 0 ),
-       CONSTRAINT TimeZone_country_display_order_unique
-                  UNIQUE ( country, display_order )
-);
+CREATE INDEX "Address_contact_id" ON "Address" ("contact_id");
+CREATE INDEX "Address_address_type_id" ON "Address" ("address_type_id");
 
 CREATE TABLE "AddressType" (
        address_type_id    SERIAL8            PRIMARY KEY,
@@ -417,6 +498,20 @@ CREATE TABLE "AddressType" (
                   UNIQUE ( account_id, display_order )
 );
 
+CREATE INDEX "AddressType_account_id" ON "AddressType" ("account_id");
+
+CREATE TABLE "TimeZone" (
+       olson_name         TEXT               PRIMARY KEY,
+       description        VARCHAR(100)       NOT NULL,
+       country            citext             NOT NULL,
+       display_order      INTEGER            NOT NULL,
+       CONSTRAINT valid_olson_name CHECK ( olson_name != '' ),
+       CONSTRAINT valid_description CHECK ( description != '' ),
+       CONSTRAINT valid_display_order CHECK ( display_order > 0 ),
+       CONSTRAINT TimeZone_country_display_order_unique
+                  UNIQUE ( country, display_order )
+);
+
 -- Consider a trigger to enforce one primary phone number per contact?
 CREATE TABLE "PhoneNumber" (
        phone_number_id    SERIAL8            PRIMARY KEY,
@@ -428,6 +523,10 @@ CREATE TABLE "PhoneNumber" (
        note               TEXT               NOT NULL DEFAULT '',
        creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX "PhoneNumber_contact_id" ON "PhoneNumber" ("contact_id");
+CREATE INDEX "PhoneNumber_phone_number_type_id"
+       ON "PhoneNumber" ("phone_number_type_id");
 
 CREATE TABLE "PhoneNumberType" (
        phone_number_type_id  SERIAL8         PRIMARY KEY,
@@ -441,6 +540,8 @@ CREATE TABLE "PhoneNumberType" (
        CONSTRAINT PhoneNumberType_account_id_display_order_unique
                   UNIQUE ( account_id, display_order )
 );
+
+CREATE INDEX "PhoneNumberType_account_id" ON "PhoneNumberType" ("account_id");
 
 CREATE TABLE "Donation" (
        donation_id        SERIAL8            PRIMARY KEY,
@@ -461,6 +562,11 @@ CREATE TABLE "Donation" (
        CONSTRAINT valid_transaction_cost CHECK ( transaction_cost >= 0.00 )
 );
 
+CREATE INDEX "Donation_contact_id" ON "Donation" ("contact_id");
+CREATE INDEX "Donation_donation_source_id" ON "Donation" ("donation_source_id");
+CREATE INDEX "Donation_donation_campaign_id" ON "Donation" ("donation_campaign_id");
+CREATE INDEX "Donation_payment_type_id" ON "Donation" ("payment_type_id");
+
 CREATE TABLE "DonationSource" (
        donation_source_id SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
@@ -471,6 +577,8 @@ CREATE TABLE "DonationSource" (
        CONSTRAINT DonationSource_account_id_display_order_unique
                   UNIQUE ( account_id, display_order )
 );
+
+CREATE INDEX "DonationSource_account_id" ON "DonationSource" ("account_id");
 
 CREATE TABLE "DonationCampaign" (
        donation_campaign_id  SERIAL8         PRIMARY KEY,
@@ -483,6 +591,8 @@ CREATE TABLE "DonationCampaign" (
                   UNIQUE ( account_id, display_order )
 );
 
+CREATE INDEX "DonationCampaign_account_id" ON "DonationCampaign" ("account_id");
+
 CREATE TABLE "PaymentType" (
        payment_type_id    SERIAL8            PRIMARY KEY,
        name               TEXT               NOT NULL,
@@ -493,6 +603,8 @@ CREATE TABLE "PaymentType" (
        CONSTRAINT PaymentType_account_id_display_order_unique
                   UNIQUE ( account_id, display_order )
 );
+
+CREATE INDEX "PaymentType_account_id" ON "PaymentType" ("account_id");
 
 CREATE TABLE "Session" (
        id                 CHAR(72)           PRIMARY KEY,
