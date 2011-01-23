@@ -3,7 +3,9 @@ package R2::View::Mason;
 use strict;
 use warnings;
 
-use base 'Catalyst::View::Mason';
+use Moose;
+
+extends 'Catalyst::View::HTML::Mason';
 
 {
 
@@ -33,9 +35,9 @@ use R2::Util qw( string_is_empty );
             $config->cache_dir()->subdir( 'mason', 'web' )->stringify(),
         error_mode           => 'fatal',
         in_package           => 'R2::Mason::Web',
-        use_match            => 0,
         default_escape_flags => 'h',
-                 );
+        allow_globals        => ['$c'],
+    );
 
     if ( $config->is_production() ) {
         $config{static_source} = 1;
@@ -43,8 +45,17 @@ use R2::Util qw( string_is_empty );
             = $config->etc_dir()->file('mason-touch')->stringify();
     }
 
-    __PACKAGE__->config( \%config );
+    __PACKAGE__->config( interp_args => \%config );
 }
+
+around render => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    local $R2::Mason::Web::c = $_[0];
+
+    return $self->$orig(@_);
+};
 
 # sub new
 # {
