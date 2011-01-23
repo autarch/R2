@@ -9,10 +9,11 @@ use R2::Schema::User;
 use R2::Util qw( string_is_empty );
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-sub login_form : Local {
+get login_form => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -20,28 +21,27 @@ sub login_form : Local {
         = $c->request()->parameters->{return_to}
         || $c->session_object()->form_data()->{return_to}
         || $c->domain()->application_uri( path => q{} );
-}
 
-sub authentication : Local : ActionClass('+R2::Action::REST') {
-}
+    $c->stash()->{template} = '/user/login_form';
+};
 
-sub authentication_GET_html {
+get_html authentication => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
     my $method = $c->request()->param('x-tunneled-method');
 
     if ( $method && $method eq 'DELETE' ) {
-        $self->authentication_DELETE($c);
+        $self->_authentication_delete($c);
         return;
     }
     else {
         $c->redirect_and_detach(
             $c->domain()->application_uri( path => '/user/login_form' ) );
     }
-}
+};
 
-sub authentication_POST {
+post authentication => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -63,8 +63,9 @@ sub authentication_POST {
         if ( $user->is_disabled() ) {
             push @errors, 'This account has been disabled.';
         }
-        elsif ( ! $user->check_password($pw) ) {
-            push @errors, 'The username or password you provided was not valid.';
+        elsif ( !$user->check_password($pw) ) {
+            push @errors,
+                'The username or password you provided was not valid.';
         }
     }
 
@@ -78,9 +79,11 @@ sub authentication_POST {
     }
 
     $self->_login_user( $c, $user );
-}
+};
 
-sub authentication_DELETE {
+del authentication => args 0 => \&_authentication_delete;
+
+sub _authentication_delete {
     my $self = shift;
     my $c    = shift;
 
@@ -91,7 +94,7 @@ sub authentication_DELETE {
     my $redirect = $c->request()->parameters()->{return_to}
         || $c->domain()->application_uri( path => q{} );
     $c->redirect_and_detach($redirect);
-}
+};
 
 sub _login_user {
     my $self = shift;
@@ -115,7 +118,7 @@ sub _login_user {
     $c->redirect_and_detach($redirect_to);
 }
 
-sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
+chain_point _set_user => chained '/' => path_part 'user' => capture_args 1 => sub {
     my $self    = shift;
     my $c       = shift;
     my $user_id = shift;
@@ -144,19 +147,16 @@ sub _set_user : Chained('/') : PathPart('user') : CaptureArgs(1) {
     }
 
     $c->stash()->{user} = $user;
-}
+};
 
-sub user : Chained('_set_user') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub user_GET_html : Private {
+get_html '' => chained '_set_user' => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
     $c->stash()->{template} = '/dashboard';
-}
+};
 
-sub user_PUT : Private {
+put '' => chained '_set_user' => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -169,7 +169,7 @@ sub user_PUT : Private {
     my $user = $c->stash()->{user};
 
     delete @p{ 'password', 'password2' }
-        unless any { ! string_is_empty($_) } @p{ 'password', 'password2' };
+        unless any { !string_is_empty($_) } @p{ 'password', 'password2' };
 
     my @errors;
 
@@ -200,9 +200,9 @@ sub user_PUT : Private {
     $c->session_object()->add_message( $whos . ' account has been updated' );
 
     $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
-}
+};
 
-sub edit_form : Chained('_set_user') : PathPath('edit_form') : Args(0) {
+get edit_form => chained '_set_user' => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -213,7 +213,7 @@ sub edit_form : Chained('_set_user') : PathPath('edit_form') : Args(0) {
         'You are not authorized to edit this user',
         $c->account()->uri(),
     );
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 
