@@ -8,15 +8,16 @@ use R2::Schema::Household;
 use R2::Util qw( string_is_empty );
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-sub household : Chained('/account/_set_account') : PathPart('household') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub household_POST {
+post household
+    => chained '/account/_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -34,7 +35,7 @@ sub household_POST {
     );
 
     $c->redirect_and_detach( $household->uri() );
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 

@@ -13,15 +13,16 @@ use R2::Search::Person::ByName;
 use R2::Util qw( string_is_empty );
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-sub person : Chained('/account/_set_account') : PathPart('person') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub person_GET {
+get person
+    => chained '/account/_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -46,9 +47,12 @@ sub person_GET {
         $c,
         entity => \@people,
     );
-}
+};
 
-sub person_POST {
+post person
+    => chained '/account/_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -66,7 +70,7 @@ sub person_POST {
     );
 
     $c->redirect_and_detach( $person->contact()->uri() );
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 

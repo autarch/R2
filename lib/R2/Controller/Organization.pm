@@ -8,15 +8,16 @@ use R2::Schema::Organization;
 use R2::Util qw( string_is_empty );
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-sub organization : Chained('/account/_set_account') : PathPart('organization') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub organization_POST {
+post organization
+    => chained '/account/_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -34,7 +35,7 @@ sub organization_POST {
     );
 
     $c->redirect_and_detach( $organization->uri() );
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 
