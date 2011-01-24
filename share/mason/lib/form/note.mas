@@ -1,8 +1,12 @@
-<&| /lib/filter/form.mas, objects => [ $note ], exclude => [ 'note_datetime' ] &>
-<form action="<% $note ? $note->uri() : $contact->uri( view => 'notes' ) %>" method="post">
+<&| /lib/filter/form.mas, objects => [ $note ], exclude => [ 'note_date' ] &>
+<form class="JS-standard-form"
+      action="<% $note ? $note->uri() : $contact->uri( view => 'notes' ) %>"
+      method="post">
 % if ($note) {
   <input type="hidden" name="x-tunneled-method" value="PUT" />
 % }
+  <input type="hidden" name="datepicker_dateFormat" value="<% $c->user()->date_format_for_jquery() %>" />
+  <input type="hidden" name="datepicker_yearRange" value="-20:+2" />
 
   <fieldset>
     <legend>Add a new note</legend>
@@ -17,15 +21,9 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="note_datetime">When?</label>
-      <input type="text" class="text medium" name="note_datetime" id="note_datetime"
-             value="<% $c->user()->format_datetime( $note ? $note->note_datetime() : DateTime->now() ) %>" />
-      <input type="hidden" name="datetime_format" value="<% $c->user()->datetime_format() %>" />
-      <div class="help-text">
-        <p>
-          <% $c->user()->datetime_format() %>
-        </p>
-      </div>
+      <label class="for-field" for="note_date">When?</label>
+      <input type="text" class="text narrow date" name="note_date" id="note_date"
+             value="<% $c->user()->format_date( $note ? $note->note_datetime() : DateTime->now() ) %>" />
     </div>
 
     <div class="form-item">
