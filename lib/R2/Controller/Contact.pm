@@ -342,7 +342,7 @@ for my $type ( qw( donation note ) ) {
 
             my $contact = $c->stash()->{contact};
 
-            $c->stash()->{tabs}[1]->set_is_selected(1);
+            $c->tab_by_id($plural)->set_is_selected(1);
 
             $c->stash()->{$edit_perm} = $c->user()
                 ->can_edit_contact( contact => $c->stash()->{contact} );
