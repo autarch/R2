@@ -2,6 +2,12 @@
   <h1><& SELF:title, %ARGS &> <& /lib/contact-view/contact-icon.mas, contact => $contact &></h1>
 </div>
 
+% if ($can_edit_notes) {
+<p>
+  <a href="<% $contact->uri( view => 'new_note_form' ) %>">Record a new note</a>.
+</p>
+% }
+
 % if ($count) {
 <table class="standard-table">
   <thead>
@@ -40,10 +46,6 @@
 </table>
 % } else {
 <p>Nobody has made any notes for this contact yet</p>
-% }
-
-% if ($can_edit_notes) {
-<& /lib/form/note.mas, contact => $contact &>
 % }
 
 <%args>

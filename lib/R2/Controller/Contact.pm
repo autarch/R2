@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use Lingua::EN::Inflect qw( PL_N );
 use R2::Schema;
 use R2::Schema::Address;
 use R2::Schema::Contact;
@@ -195,392 +196,245 @@ get_html edit_form
     $c->stash()->{template} = "/$type/edit_form";
 };
 
-get_html donations
-    => chained '_set_contact'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{tabs}[1]->set_is_selected(1);
-
-    $c->stash()->{can_edit_donations}
-        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
-
-    $c->stash()->{template} = '/contact/donations';
-};
-
-get_html new_donation_form
-    => chained '_set_contact'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to add donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    $c->stash()->{template} = "/contact/new_donation_form";
-};
-
-post donations
-    => chained '_set_contact'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to add donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    my %p = $c->request()->donation_params();
-
-    eval { $contact->add_donation( %p, user => $c->user() ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri( view => 'donations' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
-};
-
-chain_point _set_donation
-    => chained '_set_contact'
-    => path_part 'donation'
-    => capture_args 1
-    => sub {
-    my $self        = shift;
-    my $c           = shift;
-    my $donation_id = shift;
-
-    my $donation = R2::Schema::Donation->new( donation_id => $donation_id );
-
-    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
-        unless $donation
-            && $donation->contact_id()
-            == $c->stash()->{contact}->contact_id();
-
-    $c->stash()->{donation} = $donation;
-};
-
-get_html edit_form
-    => chained '_set_donation'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to edit donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    $c->stash()->{template} = '/donation/edit_form';
-};
-
-get_html q{}
-    => chained '_set_donation'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
+for my $type ( qw( donation note ) ) {
+    my $plural = PL_N($type);
+
+    my $edit_perm = "can_edit_$plural";
+    my $collection_template = "/contact/$plural";
+
+    get_html $plural
+        => chained '_set_contact'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            $c->stash()->{tabs}[1]->set_is_selected(1);
+
+            $c->stash()->{$edit_perm}
+                = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
+
+            $c->stash()->{template} = $collection_template;
+        };
+
+    my $new_form = "new_${type}_form";
+    get_html $new_form
+        => chained '_set_contact'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            $c->stash()->{template} = "/contact/$new_form";
+        };
+
+    my $params_method = "${type}_params";
+    my $add_method = "add_$type";
+    my $user_params_for_add
+        = $type eq 'donation'
+        ? sub { ( user    => $_[0]->user() ) }
+        : sub { ( user_id => $_[0]->user()->user_id() ) };
+
+    post $plural
+        => chained '_set_contact'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            my %p = $c->request()->$params_method();
+
+            eval { $contact->$add_method( %p, $user_params_for_add->($c) ); };
+
+            if ( my $e = $@ ) {
+                $c->redirect_with_error(
+                    error => $e,
+                    uri   => $contact->uri( view => $new_form ),
+                );
+            }
+
+            $c->redirect_and_detach( $contact->uri( view => $plural ) );
+        };
+
+    my $entity_chain_point = "_set_$type";
+    my $class = 'R2::Schema::'
+        . ( $type eq 'donation' ? 'Donation' : 'ContactNote' );
+    my $id_col = $type eq 'donation' ? 'donation_id' : 'contact_note_id';
+
+    chain_point $entity_chain_point
+        => chained '_set_contact'
+        => path_part $type
+        => capture_args 1
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+            my $id   = shift;
+
+            my $entity = $class->new( $id_col => $id );
+
+            $c->redirect_and_detach(
+                $c->domain()->application_uri( path => q{} ) )
+                unless $entity
+                    && $entity->contact_id()
+                    == $c->stash()->{contact}->contact_id();
+
+            $c->stash()->{$type} = $entity;
+        };
 
-    my $contact = $c->stash()->{contact};
-
-    $c->stash()->{tabs}[1]->set_is_selected(1);
-
-    $c->stash()->{can_edit_donations}
-        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
-
-    $c->stash()->{template} = '/donation/view';
-};
-
-put q{}
-    => chained '_set_donation'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to edit donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    my %p = $c->request()->donation_params();
-
-    my $donation = $c->stash()->{donation};
-
-    eval { $donation->update( %p, user => $c->user() ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $donation->uri( view => 'edit_form' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
-};
-
-del q{}
-    => chained '_set_donation'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to delete donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    my $donation = $c->stash()->{donation};
-
-    eval { $donation->delete( user => $c->user() ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri( view => 'donations' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'donations' ) );
-};
-
-get_html confirm_deletion
-    => chained '_set_donation'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to delete donations.',
-        $contact->uri( view => 'donations' ),
-    );
-
-    my $donation = $c->stash()->{donation};
-
-    $c->stash()->{type} = 'donation';
-    $c->stash()->{uri}  = $donation->uri();
-
-    $c->stash()->{template} = '/shared/confirm_deletion';
-};
-
-get_html notes
-    => chained '_set_contact'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{tabs}[2]->set_is_selected(1);
-
-    $c->stash()->{can_edit_notes}
-        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
-
-    $c->stash()->{template} = '/contact/notes';
-};
-
-post notes
-    => chained '_set_contact'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to add notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    my %p = $c->request()->note_params();
-    $p{datetime_format} = $c->request()->params()->{datetime_format};
-
-    eval { $contact->add_note( %p, user_id => $c->user()->user_id(), ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri( view => 'notes' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
-};
-
-chain_point _set_note
-    => chained '_set_contact'
-    => path_part 'note'
-    => capture_args 1
-    => sub {
-    my $self            = shift;
-    my $c               = shift;
-    my $contact_note_id = shift;
-
-    my $note
-        = R2::Schema::ContactNote->new( contact_note_id => $contact_note_id );
-
-    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
-        unless $note
-            && $note->contact_id() == $c->stash()->{contact}->contact_id();
-
-    $c->stash()->{note} = $note;
-};
-
-get_html edit_form
-    => chained '_set_note'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to edit notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    $c->stash()->{template} = '/note/edit_form';
-};
-
-put q{}
-    => chained '_set_note'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to edit notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    my %p = $c->request()->note_params();
-    $p{datetime_format} = $c->request()->params()->{datetime_format};
-
-    my $note = $c->stash()->{note};
-
-    eval { $note->update(%p); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $note->uri( view => 'edit_form' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
-};
-
-del q{}
-    => chained '_set_note'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to delete notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    my $note = $c->stash()->{note};
-
-    eval { $note->delete(); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri( view => 'notes' ),
-        );
-    }
-
-    $c->redirect_and_detach( $contact->uri( view => 'notes' ) );
-};
-
-get_html confirm_deletion
-    => chained '_set_note'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    my $contact = $c->stash()->{contact};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_contact',
-        { contact => $contact },
-        'You are not allowed to delete notes.',
-        $contact->uri( view => 'notes' ),
-    );
-
-    my $note = $c->stash()->{note};
-
-    $c->stash()->{type} = 'note';
-    $c->stash()->{uri}  = $note->uri();
-
-    $c->stash()->{template} = '/shared/confirm_deletion';
-};
+    my $edit_template = "/$type/edit_form";
+
+    get_html edit_form
+        => chained $entity_chain_point
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            $c->stash()->{template} = $edit_template;
+        };
+
+    my $view_template = "/$type/view";
+    get_html q{}
+        => chained $entity_chain_point
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $c->stash()->{tabs}[1]->set_is_selected(1);
+
+            $c->stash()->{$edit_perm} = $c->user()
+                ->can_edit_contact( contact => $c->stash()->{contact} );
+
+            $c->stash()->{template} = $view_template;
+        };
+
+    my $user_params_for_update
+        = $type eq 'donation'
+        ? sub { ( user    => $_[0]->user() ) }
+        : sub { () };
+
+    put q{}
+        => chained $entity_chain_point
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            my %p = $c->request()->$params_method();
+
+            my $entity = $c->stash()->{$type};
+
+            eval { $entity->update( %p, $user_params_for_update->($c) ); };
+
+            if ( my $e = $@ ) {
+                $c->redirect_with_error(
+                    error => $e,
+                    uri   => $entity->uri( view => 'edit_form' ),
+                );
+            }
+
+            $c->redirect_and_detach( $contact->uri( view => $plural ) );
+        };
+
+    del q{}
+        => chained $entity_chain_point
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            my $entity = $c->stash()->{$type};
+
+            eval { $entity->delete( user => $c->user() ); };
+
+            if ( my $e = $@ ) {
+                $c->redirect_with_error(
+                    error => $e,
+                    uri   => $contact->uri( view => $plural ),
+                );
+            }
+
+            $c->redirect_and_detach( $contact->uri( view => $plural ) );
+        };
+
+    get_html confirm_deletion
+        => chained $entity_chain_point
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $contact = $c->stash()->{contact};
+
+            $self->_check_authz(
+                $c,
+                'can_edit_contact',
+                { contact => $contact },
+                "You are not allowed to add $plural.",
+                $contact->uri( view => $plural ),
+            );
+
+            my $entity = $c->stash()->{$type};
+
+            $c->stash()->{type} = $type;
+            $c->stash()->{uri}  = $entity->uri();
+
+            $c->stash()->{template} = '/shared/confirm_deletion';
+        };
+}
 
 get_html history
     => chained '_set_contact'
