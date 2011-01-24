@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Moose::Role;
-
+use DateTime::Format::Natural;
 use List::AllUtils qw( true );
 use R2::Util qw( string_is_empty );
+
+use Moose::Role;
 
 with 'Catalyst::TraitFor::Request::REST::ForBrowsers';
 
@@ -63,8 +64,28 @@ sub note_params {
 
     my %p = $self->_params_for_classes( ['R2::Schema::ContactNote'] );
 
+    my $parser = DateTime::Format::Natural->new(
+        time_zone => 'floating',
+    );
+
     my $params = $self->params();
-    $p{note_datetime} = join q{ }, @{$params}{ 'note_date', 'note_time' };
+
+    # This is all to work around a bug where DT::F::Natural cannot parse dates
+    # like "Jan 24, 2010 12:09pm" - see RT #65072
+    my $date = $parser->parse_datetime( $params->{note_date} );
+    my $time;
+    if ( $parser->success() ) {
+        $time = $parser->parse_datetime( $params->{note_time} );
+
+        if ( $parser->success() ) {
+            $date->set(
+                hour   => $time->hour(),
+                minute => $time->minute(),
+            );
+
+            $p{note_datetime} = $date;
+        }
+    }
 
     return %p;
 }
