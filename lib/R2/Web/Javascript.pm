@@ -42,7 +42,8 @@ sub _build_files {
 
     return [
         $dir->file('jquery-1.4.4.js'),
-        $dir->file('jquery-ui-1.8.8.custom.min.js'),
+        $dir->file('jquery-ui-1.8.9.custom.min.js'),
+        $dir->file('jquery-timepickr-0.7.0a.js'),
         map { file($_) } $js->files()
     ];
 }
