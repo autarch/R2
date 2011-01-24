@@ -37,7 +37,7 @@ sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    for my $name ( 'credit card', 'check', 'cash', 'in-kind (non-monetary)' )
+    for my $name ( 'Credit card', 'Check', 'Cash', 'In-kind (non-monetary)' )
     {
         $class->insert(
             name       => $name,
