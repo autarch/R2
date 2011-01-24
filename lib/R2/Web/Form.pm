@@ -93,16 +93,15 @@ sub _fill_errors {
 
     for my $error ( @{$errors} ) {
         if ( ref $error && $error->{field} ) {
-            my $div = $self->_get_div_for_field( $error->{field} )
-                or next;
+            if ( my $div = $self->_get_div_for_field( $error->{field} ) ) {
 
-            $div->className( $div->className() . ' error' );
+                $div->className( $div->className() . ' error' );
 
-            my $p = $self->_create_error_para( $error->{message} );
-            $div->insertBefore( $p, $div->firstChild() );
+                my $p = $self->_create_error_para( $error->{message} );
+                $div->insertBefore( $p, $div->firstChild() );
+            }
         }
 
-        use Data::Dumper::Concise; warn Dumper($error);
         my $p = $self->_create_error_para(
             ref $error ? $error->{message} : $error );
 
