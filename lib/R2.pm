@@ -47,6 +47,7 @@ with qw(
     R2::AppRole::Account
     R2::AppRole::Domain
     R2::AppRole::RedirectWithError
+    R2::AppRole::Tabs
     R2::AppRole::User
 );
 

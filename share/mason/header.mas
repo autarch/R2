@@ -17,12 +17,12 @@
 
     <div id="tabs">
       <ul>
-% for my $tab (@tabs) {
+% for my $tab ( $c->tabs() ) {
         <li class="<% $tab->is_selected() ? 'selected' : '' %>"
             ><a href="<% $tab->uri() %>"
                 title="<% $tab->tooltip %>"><% $tab->label() %></a></li>
 % }
-% if ( ! @tabs ) {
+% unless ( $c->has_tabs() ) {
         <!-- we need an element here or else the height of the header
              is different for a page with tabs vs one without -->
         <li class="invisible">&nbsp;</li>
@@ -30,7 +30,3 @@
       </ul>
     </div>
   </div>
-
-<%args>
-@tabs => ()
-</%args>

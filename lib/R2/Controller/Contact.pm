@@ -66,19 +66,21 @@ chain_point _set_contact
         $c->account()->uri(),
     );
 
-    $c->stash()->{tabs} = $self->_contact_view_tabs($contact);
+    $self->_add_contact_view_tabs( $c, $contact );
 
     $c->stash()->{contact} = $contact;
 
     $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
 };
 
-sub _contact_view_tabs {
+sub _add_contact_view_tabs {
     my $self    = shift;
+    my $c       = shift;
     my $contact = shift;
 
-    return [
-        map { R2::Web::Tab->new( %{$_} ) }{
+    $c->add_tab($_)
+        for (
+        {
             uri     => $contact->uri(),
             label   => 'basics',
             tooltip => 'Name, email, address, phone, etc.',
@@ -101,8 +103,8 @@ sub _contact_view_tabs {
             tooltip => 'Changes to this '
                 . lc $contact->contact_type()
                 . q{'s data},
-        },
-    ];
+        }
+        );
 }
 
 get_html q{}
@@ -114,7 +116,7 @@ get_html q{}
 
     my $contact = $c->stash()->{contact};
 
-    $c->stash()->{tabs}[0]->set_is_selected(1);
+    $c->tab_by_id('basics')->set_is_selected(1);
 
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
@@ -189,6 +191,8 @@ get_html edit_form
         $c->domain()->application_uri( path => q{} ),
     );
 
+    $c->tab_by_id('basics')->set_is_selected(1);
+
     my $type = lc $contact->contact_type();
 
     $c->stash()->{$type} = $contact->$type();
@@ -209,7 +213,7 @@ for my $type ( qw( donation note ) ) {
             my $self = shift;
             my $c    = shift;
 
-            $c->stash()->{tabs}[1]->set_is_selected(1);
+            $c->tab_by_id($plural)->set_is_selected(1);
 
             $c->stash()->{$edit_perm}
                 = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
@@ -234,6 +238,8 @@ for my $type ( qw( donation note ) ) {
                 "You are not allowed to add $plural.",
                 $contact->uri( view => $plural ),
             );
+
+            $c->tab_by_id($plural)->set_is_selected(1);
 
             $c->stash()->{template} = "/contact/$new_form";
         };
@@ -320,14 +326,17 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
+            $c->tab_by_id($plural)->set_is_selected(1);
+
             $c->stash()->{template} = $edit_template;
         };
 
-    my $view_template = "/$type/view";
-    get_html q{}
-        => chained $entity_chain_point
-        => args 0
-        => sub {
+    if ( $type eq 'donation' ) {
+        my $view_template = "/$type/view";
+        get_html q{}
+            => chained $entity_chain_point
+            => args 0
+            => sub {
             my $self = shift;
             my $c    = shift;
 
@@ -338,8 +347,11 @@ for my $type ( qw( donation note ) ) {
             $c->stash()->{$edit_perm} = $c->user()
                 ->can_edit_contact( contact => $c->stash()->{contact} );
 
+            $c->tab_by_id($plural)->set_is_selected(1);
+
             $c->stash()->{template} = $view_template;
         };
+    }
 
     my $user_params_for_update
         = $type eq 'donation'
@@ -427,6 +439,8 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
+            $c->tab_by_id($plural)->set_is_selected(1);
+
             my $entity = $c->stash()->{$type};
 
             $c->stash()->{type} = $type;
@@ -443,7 +457,7 @@ get_html history
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{tabs}[4]->set_is_selected(1);
+    $c->tab_by_id('history')->set_is_selected(1);
 
     $c->stash()->{can_edit_contact}
         = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
