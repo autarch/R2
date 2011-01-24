@@ -79,53 +79,46 @@ sub _validate_amount {
 }
 
 sub _valid_donation_date {
-    my $self      = shift;
-    my $p         = shift;
-    my $is_insert = shift;
+    my $self = shift;
 
-    return if string_is_empty( $p->{donation_date} );
-
-    return if blessed $p->{donation_date};
-
-    my $parser = DateTime::Format::Natural->new(
-        time_zone => 'floating',
-    );
-
-    my $dt = $parser->parse_datetime( $p->{donation_date} );
-
-    return {
-        field   => 'donation_date',
-        message => 'This does not seem to be a valid date.',
-        }
-        unless $dt && !$parser->error();
-
-    $p->{donation_date} = $dt;
-
-    return;
+    return $self->_valid_date( @_, 'donation_date' );
 }
 
 sub _valid_receipt_date {
+    my $self = shift;
+
+    return $self->_valid_date( @_, 'receipt_date' );
+}
+
+sub _valid_gift_sent_date {
+    my $self = shift;
+
+    return $self->_valid_date( @_, 'gift_sent_date' );
+}
+
+sub _valid_date {
     my $self      = shift;
     my $p         = shift;
     my $is_insert = shift;
+    my $field     = shift;
 
-    return if string_is_empty( $p->{receipt_date} );
+    return if string_is_empty( $p->{$field} );
 
-    return if blessed $p->{receipt_date};
+    return if blessed $p->{$field};
 
     my $parser = DateTime::Format::Natural->new(
         time_zone => 'floating',
     );
 
-    my $dt = $parser->parse_datetime( $p->{receipt_date} );
+    my $dt = $parser->parse_datetime( $p->{$field} );
 
     return {
-        field   => 'donation_date',
+        field   => '$field',
         message => 'This does not seem to be a valid date.',
         }
         unless $dt && !$parser->error();
 
-    $p->{receipt_date} = $dt;
+    $p->{$field} = $dt;
 
     return;
 }

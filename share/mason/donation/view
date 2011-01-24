@@ -3,22 +3,56 @@
 </div>
 
 <p>
+  <a href="<% $donation->contact()->uri( view => 'donations' ) %>">All donations</a>.
+</p>
+
+<p>
   <a href="<% $donation->uri( view => 'edit_form' ) %>">Edit this donation</a>.
 </p>
 
 <div id="detail-view">
-  <h2>Gift Details</h2>
+  <h2>Donation Details</h2>
 
-  <ul>
-    <li>Amount: <% $donation->amount() %></li>
-    <li>
-  </ul>
+  <div class="yui3-g label-and-value">
+    <div class="yui3-u-2-5 label"><span>Amount:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() ) %></span></div>
+% if ( $donation->transaction_cost() != 0 ) {
+    <div class="yui3-u-2-5 label"><span>Transaction Cost:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->transaction_cost() ) %></span></div>
+    <div class="yui3-u-2-5 label"><span>Net:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() - $donation->transaction_cost() ) %></span></div>
+% }
+    <div class="yui3-u-2-5 label"><span>Recurring Donation?</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->is_recurring() ? 'Yes' : 'No' %></span></div>
+% if ( $donation->gift_item() ) {
+    <div class="yui3-u-2-5 label"><span>Thank-you gift:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->gift_item() %></span></div>
+    <div class="yui3-u-2-5 label"><span>Gift sent?</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->gift_sent_date() ? $c->user()->format_date( $donation->gift_sent_date() ) : 'No' %></span></div>
+% }
+% if ( $donation->value_for_donor() != 0 ) {
+    <div class="yui3-u-2-5 label"><span>Value for donor:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->value_for_donor() ) %></span></div>
+    <div class="yui3-u-2-5 label"><span>Tax-deductible amount:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() - $donation->value_for_donor() ) %></span></div>
+% }
+    <div class="yui3-u-2-5 label"><span>Payment type:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->payment_type()->name() %></span></div>
+    <div class="yui3-u-2-5 label"><span>Source:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->source()->name() %></span></div>
+    <div class="yui3-u-2-5 label"><span>Campaign:</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->campaign()->name() %></span></div>
+  </div>
 </div>
 
 <%args>
 $donation
 $contact
 </%args>
+
+<%init>
+my $format = Number::Format->new( INT_CURR_SYMBOL => '$' );
+</%init>
 
 <%method title>
 Donation made on <% $c->user()->format_date( $donation->donation_date() ) %> from <% $real_contact->display_name() %>

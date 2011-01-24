@@ -211,12 +211,25 @@ body {
     }
 }
 
-ul.table-summary {
-    margin-top: 0;
-}
+div.label-and-value {
+    padding-bottom: 1em;
 
-ul.donation-totals li {
-    font-weight: bold;
+    .label {
+        background-color: @light-gray;
+        font-weight: bold;
+
+        span {
+            margin-left: 1em;
+        }
+    }
+
+    .value {
+        background-color: @light-yellow;
+
+        span {
+            margin-left: 1em;
+        }
+    }
 }
 
 /* === Tables === */

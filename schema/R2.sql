@@ -548,6 +548,8 @@ CREATE TABLE "Donation" (
        amount             NUMERIC(13,2)      NOT NULL,
        donation_date      DATE               NOT NULL,
        contact_id         INT8               NOT NULL,
+       gift_item          TEXT               NOT NULL DEFAULT '',
+       gift_sent_date     DATE               NULL,
        value_for_donor    NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        transaction_cost   NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        is_recurring       BOOL               NOT NULL DEFAULT FALSE,

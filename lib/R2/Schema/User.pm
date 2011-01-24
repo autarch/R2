@@ -298,6 +298,8 @@ sub format_date {
     my $self = shift;
     my $dt   = shift;
 
+    return q{} unless $dt;
+
     return $dt->clone()->set( locale => $self->locale_code() )
         ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->date_format() );
@@ -307,6 +309,8 @@ sub format_time {
     my $self = shift;
     my $dt   = shift;
 
+    return q{} unless $dt;
+
     return $dt->clone()->set( locale => $self->locale_code() )
         ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->time_format() );
@@ -315,6 +319,8 @@ sub format_time {
 sub format_datetime {
     my $self = shift;
     my $dt   = shift;
+
+    return q{} unless $dt;
 
     return $dt->clone()->set( locale => $self->locale_code() )
         ->set_time_zone( $self->time_zone() )

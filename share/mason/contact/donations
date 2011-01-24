@@ -17,7 +17,6 @@
       <th>Source</th>
       <th>Campaign</th>
       <th>Receipt</th>
-      <th></th>
 %   if ($can_edit_donations) {
       <th></th>
       <th></th>
@@ -27,12 +26,11 @@
 %   while ( my $donation = $donations->next() ) {
   <tbody>
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
-      <td><% $c->user()->format_date( $donation->donation_date() ) %></td>
+      <td><a href="<% $donation->uri() %>" title="Details for this donation"><% $c->user()->format_date( $donation->donation_date() ) %></a></td>
       <td><% $format->format_price( $donation->amount() ) %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->campaign()->name() %></td>
       <td><% $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ): 'not sent' %></td>
-      <td><a href="<% $donation->uri() %>">Details</a></td>
 %     if ($can_edit_donations) {
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
@@ -51,13 +49,14 @@
 %   }
 </table>
 
-<ul class="table-summary donation-totals">
-  <li>Total during this fiscal year
-      (started <% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):
-      <% $format->format_price( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></li>
-  <li>Total for the last 12 months: <% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></li>
-  <li>Total for all time: <% $format->format_price( $contact->donation_total() ) %></li>
-</ul>
+<div class="yui3-g label-and-value">
+  <div class="yui3-u-2-5 label"><span>Fiscal year total (<% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):</span></div>
+  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></span></div>
+  <div class="yui3-u-2-5 label"><span>12 month total:</span></div>
+  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></span></div>
+  <div class="yui3-u-2-5 label"><span>Total for all time:</span></div>
+  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total() ) %></span></div>
+</div>
 
 % } else {
 <p>

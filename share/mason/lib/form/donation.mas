@@ -1,4 +1,4 @@
-<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date', 'receipt_date' ] &>
+<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date', 'gift_sent_date', 'receipt_date' ] &>
 <form class="JS-standard-form"
       action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>"
       method="post">
@@ -71,12 +71,23 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="value_for_donor">Donor gift value:</label>
+      <label class="for-field" for="gift_item">Donor thank-you item:</label>
+      <input type="text" class="text medium" name="gift_item" id="gift_item" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="gift_sent_date">Thank-you item sent date:</label>
+      <input type="text" class="text narrow date" name="gift_sent_date" id="gift_sent_date"
+             value="<% $c->user()->format_date( $donation ? $donation->gift_sent_date() : DateTime->now() ) %>" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="value_for_donor">Donor thank-you value:</label>
       <input type="text" class="text narrow" name="value_for_donor" id="value_for_donor" value="0.00" />
       <div class="help-text">
         <p>
-          If the donor received a gift in return for this donation,
-          enter the value of the gift here.
+          If the donor received a gift or something else of value in return
+          for this donation, enter that value here.
         </p>
       </div>
     </div>
