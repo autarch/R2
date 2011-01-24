@@ -124,8 +124,8 @@ my $account;
 
     $account->update_or_add_payment_types(
         {
-            $types{cash}->payment_type_id() => { name => 'cowrie shells' },
-            $types{check}->payment_type_id() =>
+            $types{Cash}->payment_type_id() => { name => 'cowrie shells' },
+            $types{Check}->payment_type_id() =>
                 { name => 'archaic paper' },
         },
         [
