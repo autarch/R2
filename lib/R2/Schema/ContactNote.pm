@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use DateTime::Format::Pg;
-use DateTime::Format::Strptime;
+use DateTime::Format::Natural;
 use R2::Schema;
 use R2::Schema::Contact;
 use R2::Util qw( string_is_empty );
@@ -35,24 +34,23 @@ sub _valid_note_datetime {
     my $p         = shift;
     my $is_insert = shift;
 
-    my $format = delete $p->{datetime_format};
-
     return if string_is_empty( $p->{note_datetime} );
 
     return if blessed $p->{note_datetime};
 
-    my $parser = DateTime::Format::Strptime->new(
-        pattern   => $format,
+    my $parser = DateTime::Format::Natural->new(
         time_zone => 'floating',
     );
 
     my $dt = $parser->parse_datetime( $p->{note_datetime} );
 
     return {
-        field   => 'donation_date',
-        message => 'This does not seem to be a valid date.',
+        field   => 'note_datetime',
+        message => 'This does not seem to be a valid date/time.',
         }
-        unless $dt;
+        unless $dt && !$parser->error();
+
+    $p->{note_datetime} = $dt;
 
     return;
 }
