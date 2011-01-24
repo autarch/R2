@@ -51,7 +51,7 @@ has time_format => (
     isa      => Str,
     init_arg => undef,
     lazy     => 1,
-    default  => sub { $_[0]->_dt_locale()->time_format_medium() },
+    default  => sub { $_[0]->_dt_locale()->time_format_short() },
 );
 
 has datetime_format => (
@@ -301,6 +301,15 @@ sub format_date {
     return $dt->clone()->set( locale => $self->locale_code() )
         ->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->date_format() );
+}
+
+sub format_time {
+    my $self = shift;
+    my $dt   = shift;
+
+    return $dt->clone()->set( locale => $self->locale_code() )
+        ->set_time_zone( $self->time_zone() )
+        ->format_cldr( $self->time_format() );
 }
 
 sub format_datetime {

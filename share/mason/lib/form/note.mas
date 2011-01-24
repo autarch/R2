@@ -24,6 +24,8 @@
       <label class="for-field" for="note_date">When?</label>
       <input type="text" class="text narrow date" name="note_date" id="note_date"
              value="<% $c->user()->format_date( $note ? $note->note_datetime() : DateTime->now() ) %>" />
+      <input type="text" class="text narrow time" name="note_time" id="note_time"
+             value="<% $c->user()->format_time( $note ? $note->note_datetime() : DateTime->now() ) %>" />
     </div>
 
     <div class="form-item">

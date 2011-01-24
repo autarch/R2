@@ -6,6 +6,7 @@ use namespace::autoclean;
 
 use JavaScript::Minifier::XS qw( minify );
 use JSAN::ServerSide 0.04;
+use List::AllUtils qw( first );
 use Path::Class;
 use R2::Config;
 use R2::Types qw( Bool );
@@ -40,10 +41,11 @@ sub _build_files {
 
     $js->add('R2');
 
+    my @jquery_files = grep { $_->basename() =~ /^jquery/ } $dir->children();
+
     return [
-        $dir->file('jquery-1.4.4.js'),
-        $dir->file('jquery-ui-1.8.9.custom.min.js'),
-        $dir->file('jquery-timepickr-0.7.0a.js'),
+        ( first { $_->basename() =~ /^jquery-\d/ } @jquery_files ),
+        ( first { $_->basename() =~ /^jquery-ui-/ } @jquery_files ),
         map { file($_) } $js->files()
     ];
 }
