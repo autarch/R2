@@ -8,10 +8,15 @@ use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1) {
+chain_point _set_account
+    => chained '/'
+    => path_part 'account'
+    => capture_args 1
+    => sub {
     my $self       = shift;
     my $c          = shift;
     my $account_id = shift;
@@ -40,19 +45,22 @@ sub _set_account : Chained('/') : PathPart('account') : CaptureArgs(1) {
     }
 
     $c->stash()->{account} = $account;
-}
+};
 
-sub account : Chained('_set_account') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub account_GET_html : Private {
+get_html q{}
+    => chained '_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
     $c->stash()->{template} = '/dashboard';
-}
+};
 
-sub account_PUT : Private {
+put q{}
+    => chained '_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -77,24 +85,51 @@ sub account_PUT : Private {
         'The ' . $account->name() . ' account has been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'settings' ) );
+};
+
+{
+    my @paths = qw(
+        settings
+        edit_form
+        donation_settings
+        donation_sources_form
+        donation_campaigns_form
+        payment_types_form
+        address_types_form
+        phone_number_types_form
+        contact_note_types_form
+        custom_field_groups_form
+        users
+        new_user_form
+    );
+
+    for my $path (@paths) {
+        my $template = '/account/' . $path;
+
+        get_html $path
+            => chained '_set_account'
+            => args 0
+            => sub {
+                my $self = shift;
+                my $c    = shift;
+
+                $self->_check_authz(
+                    $c,
+                    'can_edit_account',
+                    { account => $c->account() },
+                    'You are not authorized to edit this account',
+                    $c->domain()->application_uri( path => q{} ),
+                );
+
+                $c->stash()->{template} = $template;
+            };
+    }
 }
 
-sub settings : Chained('_set_account') : PathPart('settings') : Args(0) {
-}
-
-sub edit_form : Chained('_set_account') : PathPart('edit_form') : Args(0) {
-}
-
-sub donation_settings : Chained('_set_account') : PathPart('donation_settings') : Args(0) {
-}
-
-sub donation_sources_form : Chained('_set_account') : PathPart('donation_sources_form') : Args(0) {
-}
-
-sub donation_source_collection : Chained('_set_account') : PathPart('donation_sources') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub donation_source_collection_POST : Private {
+post donation_sources
+    => chained '_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -118,15 +153,12 @@ sub donation_source_collection_POST : Private {
             . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'donation_sources_form' ) );
-}
+};
 
-sub donation_campaigns_form : Chained('_set_account') : PathPart('donation_campaigns_form') : Args(0) {
-}
-
-sub donation_campaign_collection : Chained('_set_account') : PathPart('donation_campaigns') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub donation_campaign_collection_POST : Private {
+post donation_campaigns
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -150,15 +182,12 @@ sub donation_campaign_collection_POST : Private {
             . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'donation_campaigns_form' ) );
-}
+};
 
-sub payment_types_form : Chained('_set_account') : PathPart('payment_types_form') : Args(0) {
-}
-
-sub payment_type_collection : Chained('_set_account') : PathPart('payment_types') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub payment_type_collection_POST : Private {
+post payment_types
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -181,15 +210,12 @@ sub payment_type_collection_POST : Private {
         'The payment types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'payment_types_form' ) );
-}
+};
 
-sub address_types_form : Chained('_set_account') : PathPart('address_types_form') : Args(0) {
-}
-
-sub address_type_collection : Chained('_set_account') : PathPart('address_types') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub address_type_collection_POST : Private {
+post address_types
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -212,15 +238,12 @@ sub address_type_collection_POST : Private {
         'The address types for ' . $account->name() . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'address_types_form' ) );
-}
+};
 
-sub phone_number_types_form : Chained('_set_account') : PathPart('phone_number_types_form') : Args(0) {
-}
-
-sub phone_number_type_collection : Chained('_set_account') : PathPart('phone_number_types') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub phone_number_type_collection_POST : Private {
+post phone_number_types
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -244,15 +267,12 @@ sub phone_number_type_collection_POST : Private {
             . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'phone_number_types_form' ) );
-}
+};
 
-sub contact_note_types_form : Chained('_set_account') : PathPart('contact_note_types_form') : Args(0) {
-}
-
-sub contact_note_type_collection : Chained('_set_account') : PathPart('contact_note_types') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub contact_note_type_collection_POST : Private {
+post contact_note_types
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -276,15 +296,12 @@ sub contact_note_type_collection_POST : Private {
             . ' have been updated' );
 
     $c->redirect_and_detach( $account->uri( view => 'contact_note_types_form' ) );
-}
+};
 
-sub custom_field_groups_form : Chained('_set_account') : PathPart('custom_field_groups_form') : Args(0) {
-}
-
-sub custom_field_group_collection : Chained('_set_account') : PathPart('custom_field_groups') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub custom_field_group_collection_POST : Private {
+post custom_field_groups
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -309,9 +326,13 @@ sub custom_field_group_collection_POST : Private {
 
     $c->redirect_and_detach(
         $account->uri( view => 'custom_field_groups_form' ) );
-}
+};
 
-sub _set_custom_field_group : Chained('_set_account') : PathPart('custom_field_group') : CaptureArgs(1) {
+chain_point _set_custom_field_group
+    => chained '_set_account'
+    => path_part 'custom_field_group'
+    => capture_args 1
+    => sub {
     my $self                  = shift;
     my $c                     = shift;
     my $custom_field_group_id = shift;
@@ -323,19 +344,23 @@ sub _set_custom_field_group : Chained('_set_account') : PathPart('custom_field_g
         unless $group;
 
     $c->stash()->{group} = $group;
-}
+};
 
-sub custom_field_group : Chained('_set_custom_field_group') : PathPart('') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub custom_field_group_GET_html : Private {
+get_html q{}
+    =>  chained '_set_custom_field_group'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
     $c->stash()->{template} = '/account/custom_field_group';
-}
+};
 
-sub custom_field_group_POST : Private {
+
+post q{}
+    =>  chained '_set_custom_field_group'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -364,19 +389,12 @@ sub custom_field_group_POST : Private {
 
     $c->redirect_and_detach(
         $account->uri( view => 'custom_field_groups_form' ) );
-}
+};
 
-sub user_collection : Chained('_set_account') : PathPart('users') : Args(0) : ActionClass('+R2::Action::REST') {
-}
-
-sub user_collection_GET_html {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{template} = '/account/users';
-}
-
-sub users_collection_POST {
+post users
+    => chained '_set_account'
+    => args 0
+    => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -418,47 +436,7 @@ sub users_collection_POST {
     $c->session_object()->add_message( $whos . ' account has been updated' );
 
     $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
-
-
-}
-
-sub new_user_form : Chained('_set_account') : PathPart('new_user_form') : Args(0) {
-}
-
-before [
-    qw( settings
-        edit_form
-        donation_settings
-        donation_sources_form
-        donation_source_collection
-        donation_campaigns_form
-        donation_campaign_collection
-        payment_types_form
-        payment_type_collection
-        address_types_form
-        address_type_collection
-        phone_number_types_form
-        phone_number_type_collection
-        contact_note_types_form
-        contact_note_type_collection
-        custom_field_groups_form
-        custom_field_group_collection
-        custom_field_group
-        user_collection
-        new_user_form
-        )
-    ] => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $self->_check_authz(
-        $c,
-        'can_edit_account',
-        { account => $c->account() },
-        'You are not authorized to edit this account',
-        $c->domain()->application_uri( path => q{} ),
-    );
-    };
+};
 
 __PACKAGE__->meta()->make_immutable();
 
