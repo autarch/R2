@@ -13,7 +13,7 @@ use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-get login_form => args 0 => sub {
+get_html login_form => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -202,7 +202,10 @@ put '' => chained '_set_user' => args 0 => sub {
     $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
 };
 
-get edit_form => chained '_set_user' => args 0 => sub {
+get_html edit_form
+    => chained '_set_user'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 

@@ -11,7 +11,7 @@ use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-get 'search/contact'
+get_html 'search/contact'
     => chained '/account/_set_account'
     => args 0
     => sub {
