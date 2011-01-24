@@ -13,15 +13,15 @@
       <h2>Add a ...</h2>
       <ul>
         <li>
-          <a href="<% $c->domain()->application_uri( path => '/contact/new_person_form' ) %>"
+          <a href="<% $c->account()->uri( view => 'new_person_form' ) %>"
              title="Add a new person">Person</a>
         </li>
         <li>
-          <a href="<% $c->domain()->application_uri( path => '/contact/new_household_form' ) %>"
+          <a href="<% $c->account()->uri( view => 'new_household_form' ) %>"
              title="Add a new household">Household</a>
         </li>
         <li>
-          <a href="<% $c->domain()->application_uri( path => '/contact/new_organization_form' ) %>"
+          <a href="<% $c->account()->uri( view => 'new_organization_form' ) %>"
              title="Add a new organization">Organization</a>
         </li>
       </ul>
