@@ -7,10 +7,14 @@ use namespace::autoclean;
 use R2::Search::Contact;
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Args(0) {
+get 'search/contact'
+    => chained '/account/_set_account'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -21,7 +25,7 @@ sub contact : Chained('/account/_set_account') : PathPart('search/contact') : Ar
     );
 
     $c->stash()->{template} = '/search/contact_list';
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 

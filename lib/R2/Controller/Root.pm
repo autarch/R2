@@ -8,19 +8,20 @@ use R2::Config;
 use R2::Exceptions;
 
 use Moose;
+use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
 __PACKAGE__->config()->{namespace} = '';
 
-sub root : Path('/') : Args(0) {
+get q{} => args 0 => sub {
     my $self = shift;
     my $c    = shift;
 
     $c->redirect_and_detach( $c->account()->uri() );
-}
+};
 
-sub exit : Path('/exit') : Args(0) {
+get 'exit' => args 0 => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -28,9 +29,9 @@ sub exit : Path('/exit') : Args(0) {
         if R2::Config->instance()->is_production();
 
     exit 0;
-}
+};
 
-sub die : Path('/die') : Args(0) {
+get 'die' => args 0 => sub  {
     my $self = shift;
     my $c    = shift;
 
@@ -38,15 +39,15 @@ sub die : Path('/die') : Args(0) {
         if R2::Config->instance()->is_production();
 
     die 'Dead';
-}
+};
 
-sub robots_txt : Path('/robots.txt') : Args(0) {
+get 'robots.txt' => args 0 => sub  {
     my $self = shift;
     my $c    = shift;
 
     $c->response()->content_type('text/plain');
     $c->response()->body("User-agent: *\nDisallow: /\n");
-}
+};
 
 __PACKAGE__->meta()->make_immutable();
 
