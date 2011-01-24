@@ -61,7 +61,12 @@ sub donation_params {
 sub note_params {
     my $self = shift;
 
-    return $self->_params_for_classes( ['R2::Schema::ContactNote'] );
+    my %p = $self->_params_for_classes( ['R2::Schema::ContactNote'] );
+
+    my $params = $self->params();
+    $p{note_datetime} = join q{ }, @{$params}{ 'note_date', 'note_time' };
+
+    return %p;
 }
 
 sub donation_sources {
