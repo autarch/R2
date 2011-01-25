@@ -185,8 +185,7 @@ with 'R2::Role::Schema::URIMaker';
         select      => __PACKAGE__->_CountContactsInTableSelect('MessagingProvider'),
         bind_params => sub { $_[0]->contact_id() },
     );
-    {
-        local $::D=1;
+
     has_many 'donations' => (
         table => $schema->table('Donation'),
         fk    => (
@@ -206,7 +205,7 @@ with 'R2::Role::Schema::URIMaker';
         ],
         cache => 1,
     );
-    }
+
     query donation_count => (
         select      => __PACKAGE__->_CountContactsInTableSelect('Donation'),
         bind_params => sub { $_[0]->contact_id() },
