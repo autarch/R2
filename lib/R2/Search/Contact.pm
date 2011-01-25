@@ -29,12 +29,15 @@ has 'account' => (
 
     my $select_base = R2::Schema->SQLFactoryClass()->new_select();
 
-    $select_base->from( $schema->table('Contact'), 'left',
-        $schema->table('Person') )
+    #<<<
+    $select_base
         ->from( $schema->table('Contact'), 'left',
-        $schema->table('Household') )
+                $schema->table('Person') )
         ->from( $schema->table('Contact'), 'left',
-        $schema->table('Organization') );
+                $schema->table('Household') )
+        ->from( $schema->table('Contact'), 'left',
+                $schema->table('Organization') );
+    #>>>
 
     $select_base->where(
         $schema->table('Contact')->column('account_id'),
@@ -54,23 +57,26 @@ has 'account' => (
 
         my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
+        #<<<
         my $term
-            = Fey::Literal::Term->new( 'CASE '
-                . $schema->table('Contact')->column('contact_type')
-                ->sql_or_alias($dbh)
-                . q{ WHEN 'Person' THEN }
-                . $schema->table('Person')->column('last_name')
-                ->sql_or_alias($dbh)
-                . q{ || ' ' || }
-                . $schema->table('Person')->column('first_name')
-                ->sql_or_alias($dbh)
-                . q{ WHEN 'Household' THEN }
-                . $schema->table('Household')->column('name')
-                ->sql_or_alias($dbh)
-                . q{ ELSE }
-                . $schema->table('Organization')->column('name')
-                ->sql_or_alias($dbh) 
-                . q{ END} );
+            = Fey::Literal::Term
+                ->new( 'CASE '
+                       . $schema->table('Contact')->column('contact_type')
+                       ->sql_or_alias($dbh)
+                       . q{ WHEN 'Person' THEN }
+                       . $schema->table('Person')->column('last_name')
+                       ->sql_or_alias($dbh)
+                       . q{ || ' ' || }
+                       . $schema->table('Person')->column('first_name')
+                       ->sql_or_alias($dbh)
+                       . q{ WHEN 'Household' THEN }
+                       . $schema->table('Household')->column('name')
+                       ->sql_or_alias($dbh)
+                       . q{ ELSE }
+                       . $schema->table('Organization')->column('name')
+                       ->sql_or_alias($dbh)
+                       . q{ END} );
+        #>>>
 
         $term->set_alias_name('_orderable_name');
 
@@ -113,8 +119,12 @@ sub contact_count {
 
     my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
-    return $dbh->selectrow_arrayref( $select->sql($dbh), {},
-        $self->account()->account_id() )->[0];
+    my $row = $dbh->selectrow_arrayref(
+        $select->sql($dbh), {},
+        $self->account()->account_id()
+    );
+
+    return $row ? $row->[0] : 0;
 }
 
 __PACKAGE__->meta()->make_immutable();
