@@ -1,3 +1,4 @@
+JSAN.use('R2.FormWidget.ContactSearch');
 JSAN.use('R2.FormWidget.LabeledRadioButton');
 JSAN.use('R2.FormWidget.MemberSearch');
 JSAN.use('R2.FormWidget.RepeatableGroup');

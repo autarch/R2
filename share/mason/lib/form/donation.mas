@@ -1,4 +1,7 @@
-<&| /lib/filter/form.mas, objects => [ $donation ], exclude => [ 'donation_date', 'gift_sent_date', 'receipt_date' ] &>
+<&| /lib/filter/form.mas,
+    objects => [ $donation ],
+    exclude => [ 'donation_date', 'gift_sent_date', 'receipt_date', 'dedicated_to_contact_id' ]
+  &>
 <form class="JS-standard-form"
       action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>"
       method="post">
@@ -111,10 +114,28 @@
       </select>
     </div>
 
-    <div class="form-item">
-      <label class="for-field" for="dedicated_to">Dedicated to:</label>
-      <input type="text" class="text medium" name="dedicated_to" id="dedicated_to"
-             value="" />
+    <div id="contact-search" class="form-item">
+      <input type="hidden" name="search_uri" id="JS-contact-search-uri"
+             value="<% $c->account()->uri( view => 'contact' ) %>" />
+      <input type="hidden" name="dedicated_to_contact_id" />
+
+      <label class="for-field" for="contact-search-text">Dedicated to:</label>
+      <input type="text" class="text medium" name="dedicated_to" id="contact-search-text"
+             value="<% $dedication_contact ? $dedication_contact->real_contact()->display_name() : $dedication_contact %>" />
+      <button id="contact-search-submit" type="button">Search</button>
+
+      <div class="ajax-search-results" id="contact-search-results" style="display: none">
+        <p class="ajax-search-results-close" >
+          <a href="#" id="contact-search-results-close">X</a>
+        </p>
+      </div>
+
+      <div class="help-text">
+        <p>
+          Search for an existing contact. If no match is found, a new contact
+          will be created.
+        </p>
+      </div>
     </div>
 
     <div class="form-item">
@@ -151,4 +172,7 @@ $donation => undef
 my $sources = $c->account()->donation_sources();
 my $campaigns = $c->account()->donation_campaigns();
 my $payment_types = $c->account()->payment_types();
+
+my $dedication_contact;
+$dedication_contact = $donation->dedicated_to_contact() if $donation;
 </%init>

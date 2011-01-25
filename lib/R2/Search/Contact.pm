@@ -92,6 +92,8 @@ has 'account' => (
 
         $select->select( $schema->table('Contact'), $order_by_func );
 
+        $self->_apply_where_clauses($select);
+
         $select->order_by($order_by_func);
 
         $self->_apply_limit($select);
@@ -100,10 +102,12 @@ has 'account' => (
             classes => 'R2::Schema::Contact',
             dbh => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
             select      => $select,
-            bind_params => [ $self->account()->account_id() ],
+            bind_params => [ $self->account()->account_id(), $select->bind_params() ],
         );
     }
 }
+
+sub _apply_where_clauses { }
 
 sub contact_count {
     my $self = shift;
@@ -121,7 +125,7 @@ sub contact_count {
 
     my $row = $dbh->selectrow_arrayref(
         $select->sql($dbh), {},
-        $self->account()->account_id()
+        $self->account()->account_id(), $select->bind_params(),
     );
 
     return $row ? $row->[0] : 0;

@@ -83,6 +83,7 @@ R2.FormWidget.AjaxSearch.prototype._submitSearch = function () {
 
 R2.FormWidget.AjaxSearch.prototype._parameters = function () {
     var params = {};
+    params.name_param = this.text.attr("name");
     params[ this.text.attr("name") ] = this.text.val();
 
     return params;

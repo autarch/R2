@@ -262,6 +262,8 @@ with 'R2::Role::Schema::URIMaker';
     );
 }
 
+with 'R2::Role::Schema::Serializes';
+
 sub _CountContactsInTableSelect {
     my $class = shift;
     my $table_name = shift;

@@ -110,6 +110,7 @@ R2.FormWidget.MemberSearch.prototype._populateResultsFunction = function () {
             self.results_div.append( document.createTextNode(text) );
 
             var table = self._createResultsTable();
+            table.addClass("ajax-search-results-table");
             table.attr( "id", "member-search-results-table" );
 
             for ( var i = 0; i < results.length; i++ ) {
@@ -178,7 +179,7 @@ R2.FormWidget.MemberSearch.prototype._createResultRow = function (result) {
     result.id = id;
 
     var name_td = $("<td/>");
-    name_td.append( document.createTextNode( result.name ) );
+    name_td.append( document.createTextNode( result.display_name ) );
     name_td.addClass(name);
 
     tr.append(name_td);
@@ -286,6 +287,7 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
     }
     else {
         table = this._createResultsTable();
+        table.addClass("ajax-search-selected-table");
         table.attr( "id", "member-search-selected-table" );
 
         var tbody = $("<tbody/>");
@@ -302,7 +304,7 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
 
     var name_td = $("<td/>");
     name_td.addClass("name");
-    name_td.append( document.createTextNode( result.name ) );
+    name_td.append( document.createTextNode( result.display_name ) );
 
     tr.append(name_td);
 
@@ -397,6 +399,7 @@ R2.FormWidget.MemberSearch.prototype._removeSelectedTr = function (tr) {
 R2.FormWidget.MemberSearch.prototype._addEmptyResultsP = function () {
     var p = $("<p/>");
     p.append( document.createTextNode("No members yet") );
+    p.addClass("ajax-search-empty");
     p.attr( "id", "member-search-empty" );
 
     this.selected.append(p);

@@ -12,7 +12,7 @@ use MooseX::Role::Parameterized;
 #
 # has_one 'contact' => ...
 
-requires '_build_friendly_name', 'display_name';
+requires '_build_friendly_name', 'display_name', 'serialize';
 
 has 'friendly_name' => (
     is      => 'ro',
@@ -25,6 +25,18 @@ parameter 'steps' => (
     isa      => 'ArrayRef[Str]',
     required => 1,
 );
+
+around serialize => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return {
+        %{ $self->$orig() },
+        %{ $self->contact()->serialize() },
+        contact_type => $self->contact_type(),
+        display_name => $self->display_name(),
+    };
+};
 
 around 'insert' => sub {
     my $orig  = shift;

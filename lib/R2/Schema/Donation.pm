@@ -167,7 +167,7 @@ sub summary {
     my $self = shift;
 
     return $self->formatted_amount() . ' from '
-        . $self->contact()->real_contact()->full_name();
+        . $self->contact()->real_contact()->display_name();
 }
 
 __PACKAGE__->meta()->make_immutable();

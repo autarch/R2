@@ -6,13 +6,13 @@
                value="<% $c->account()->uri( view => 'person' ) %>" />
         <button id="member-search-submit" type="button">Search</button>
 
-        <div id="member-search-results" style="display: none">
-          <a href="#" id="member-search-results-close">X</a>
+        <div class="ajax-search-results" id="member-search-results" style="display: none">
+          <a href="#" class="ajax-search-results-close" id="member-search-results-close">X</a>
         </div>
 
         <div id="member-search-selected">
 % if ($members) {
-          <table id="member-search-selected-table">
+          <table class="ajax-search-selected-table" id="member-search-selected-table">
             <thead>
               <tr>
                 <th class="name">Name</th>

@@ -49,6 +49,8 @@ use MooseX::ClassAttribute;
         { membership_table => $schema->table('OrganizationMember') };
 }
 
+with 'R2::Role::Schema::Serializes';
+
 with 'R2::Role::Schema::ActsAsContact' => { steps => [] };
 
 with 'R2::Role::Schema::HistoryRecorder';

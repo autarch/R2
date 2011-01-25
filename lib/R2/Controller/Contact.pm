@@ -12,6 +12,7 @@ use R2::Schema::ContactNote;
 use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
+use R2::Search::Contact::ByName;
 use R2::Util qw( string_is_empty );
 use R2::Web::Tab;
 
@@ -44,6 +45,35 @@ for my $type (qw( person household organization )) {
         $c->stash()->{template} = $template;
     };
 }
+
+get q{}
+    => chained '/account/_set_account'
+    => path_part 'contact'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $params = $c->request()->params();
+    my $name = $params->{ $params->{name_param} };
+
+    my @contacts;
+    if ( !string_is_empty($name) ) {
+        my $contacts = R2::Search::Contact::ByName->new(
+            account => $c->account(),
+            name    => $name,
+        )->contacts();
+
+        while ( my $contact = $contacts->next() ) {
+            push @contacts, $contact->real_contact()->serialize();
+        }
+    }
+
+    return $self->status_ok(
+        $c,
+        entity => \@contacts,
+    );
+};
 
 chain_point _set_contact
     => chained '/account/_set_account'

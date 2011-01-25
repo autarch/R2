@@ -36,10 +36,7 @@ get person
         )->people();
 
         while ( my $person = $people->next() ) {
-            push @people, {
-                name      => $person->full_name(),
-                person_id => $person->person_id(),
-                };
+            push @people, $person->serialize();
         }
     }
 
