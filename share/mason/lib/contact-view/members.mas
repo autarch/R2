@@ -1,4 +1,4 @@
-<h2><% PL_N( 'Member', $contact->member_count() ) %></h2>
+<h2>Members</h2>
 
 <ul>
 % while ( my ( $person, $membership ) = $members->next() ) {
