@@ -5,6 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use DateTime::Format::Natural;
+use List::AllUtils qw( first );
 use Number::Format qw( format_number );
 use R2::Schema::DonationCampaign;
 use R2::Schema::DonationSource;
@@ -32,7 +33,31 @@ with 'R2::Role::Schema::URIMaker';
 
     has_one( $schema->table('PaymentType') );
 
-    has_one( $schema->table('Contact') );
+    my @fks = $schema->foreign_keys_between_tables(
+        $schema->tables( 'Donation', 'Contact' ) );
+
+    has_one contact => (
+        table => $schema->table('Contact'),
+        fk    => (
+            first {
+                $_->has_column(
+                    $schema->table('Donation')->column('contact_id') );
+            }
+            @fks
+        ),
+    );
+
+    has_one dedicated_to_contact => (
+        table => $schema->table('Contact'),
+        fk    => (
+            first {
+                $_->has_column( $schema->table('Donation')
+                        ->column('dedicated_to_contact_id') );
+            }
+            @fks
+        ),
+        undef => 1,
+    );
 
     has formatted_amount => (
         is       => 'ro',

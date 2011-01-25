@@ -8,7 +8,7 @@ use Fey::Literal::String;
 use Fey::Object::Iterator::FromArray;
 use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
-use List::AllUtils qw( any uniq );
+use List::AllUtils qw( any first uniq );
 use R2::Image;
 use R2::CustomFieldType;
 use R2::Schema;
@@ -185,9 +185,19 @@ with 'R2::Role::Schema::URIMaker';
         select      => __PACKAGE__->_CountContactsInTableSelect('MessagingProvider'),
         bind_params => sub { $_[0]->contact_id() },
     );
-
+    {
+        local $::D=1;
     has_many 'donations' => (
-        table    => $schema->table('Donation'),
+        table => $schema->table('Donation'),
+        fk    => (
+            first {
+                $_->has_column(
+                    $schema->table('Donation')->column('contact_id') );
+            }
+            $schema->foreign_keys_between_tables(
+                $schema->tables( 'Contact', 'Donation' )
+            )
+        ),
         order_by => [
             $schema->table('Donation')->column('donation_date'),
             'DESC',
@@ -196,7 +206,7 @@ with 'R2::Role::Schema::URIMaker';
         ],
         cache => 1,
     );
-
+    }
     query donation_count => (
         select      => __PACKAGE__->_CountContactsInTableSelect('Donation'),
         bind_params => sub { $_[0]->contact_id() },

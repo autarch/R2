@@ -12,6 +12,7 @@ use R2::Schema::ContactNote;
 use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
+use R2::Util qw( string_is_empty );
 use R2::Web::Tab;
 
 use Moose;
@@ -270,7 +271,24 @@ for my $type ( qw( donation note ) ) {
 
             my %p = $c->request()->$params_method();
 
-            eval { $contact->$add_method( %p, $user_params_for_add->($c) ); };
+            eval {
+                R2::Schema->RunInTransaction(
+                    sub {
+                        if ( $type eq 'donation' ) {
+                            $p{dedicated_to_contact_id}
+                                = $self->_dedication_contact($c);
+
+                            delete $p{dedication}
+                                unless $p{dedicated_to_contact_id};
+                        }
+
+                        $contact->$add_method(
+                            %p,
+                            $user_params_for_add->($c),
+                        );
+                    }
+                );
+            };
 
             if ( my $e = $@ ) {
                 $c->redirect_with_error(
@@ -281,6 +299,29 @@ for my $type ( qw( donation note ) ) {
 
             $c->redirect_and_detach( $contact->uri( view => $plural ) );
         };
+
+    sub _dedication_contact {
+        my $self   = shift;
+        my $c = shift;
+
+        my $params = $c->request()->params();
+
+        return $params->{dedicated_to_contact_id}
+            unless string_is_empty( $params->{dedicated_to_contact_id} );
+
+        return if string_is_empty( $params->{dedicated_to} );
+
+        my ( $first, $last ) = split /\s+/, $params->{dedicated_to}, 2;
+
+        my $person = R2::Schema::Person->insert(
+            first_name => $first,
+            last_name  => $last,
+            account_id => $c->account()->account_id(),
+            user       => $c->user(),
+        );
+
+        return $person->contact_id();
+    }
 
     my $entity_chain_point = "_set_$type";
     my $class = 'R2::Schema::'

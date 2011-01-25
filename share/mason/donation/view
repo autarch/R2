@@ -36,6 +36,13 @@
     <div class="yui3-u-2-5 label"><span>Tax-deductible amount:</span></div>
     <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() - $donation->value_for_donor() ) %></span></div>
 % }
+% if ( $donation->dedication() ) {
+    <div class="yui3-u-2-5 label"><span>Dedication:</span></div>
+    <div class="yui3-u-3-5 value"><span>
+        <% $donation->dedication() %>
+        <a href="<% $dedication_contact->uri() %>"><% $dedication_contact->display_name() %></a>
+    </span></div>
+% }
     <div class="yui3-u-2-5 label"><span>Payment type:</span></div>
     <div class="yui3-u-3-5 value"><span><% $donation->payment_type()->name() %></span></div>
     <div class="yui3-u-2-5 label"><span>Source:</span></div>
@@ -52,6 +59,9 @@ $contact
 
 <%init>
 my $format = Number::Format->new( INT_CURR_SYMBOL => '$' );
+my $dedication_contact;
+$dedication_contact = $donation->dedicated_to_contact()->real_contact()
+    if $donation->dedicated_to_contact_id();
 </%init>
 
 <%method title>

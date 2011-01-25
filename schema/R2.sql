@@ -552,6 +552,8 @@ CREATE TABLE "Donation" (
        gift_sent_date     DATE               NULL,
        value_for_donor    NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        transaction_cost   NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
+       dedication         TEXT               NOT NULL DEFAULT '',
+       dedicated_to_contact_id  INT8           NULL,
        is_recurring       BOOL               NOT NULL DEFAULT FALSE,
        receipt_date       DATE               NULL,
        donation_source_id INT8               NOT NULL,
@@ -565,6 +567,7 @@ CREATE TABLE "Donation" (
 );
 
 CREATE INDEX "Donation_contact_id" ON "Donation" ("contact_id");
+CREATE INDEX "Donation_dedicated_to_contact_id" ON "Donation" ("dedicated_to_contact_id");
 CREATE INDEX "Donation_donation_source_id" ON "Donation" ("donation_source_id");
 CREATE INDEX "Donation_donation_campaign_id" ON "Donation" ("donation_campaign_id");
 CREATE INDEX "Donation_payment_type_id" ON "Donation" ("payment_type_id");
@@ -887,6 +890,10 @@ ALTER TABLE "Donation" ADD CONSTRAINT "Donation_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "Donation" ADD CONSTRAINT "Donation_dedicated_to_contact_id"
+  FOREIGN KEY ("dedicated_to_contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_source_id"
   FOREIGN KEY ("donation_source_id") REFERENCES "DonationSource" ("donation_source_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -899,13 +906,13 @@ ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_campaign_id"
   FOREIGN KEY ("donation_campaign_id") REFERENCES "DonationCampaign" ("donation_campaign_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "DonationCampaign" ADD CONSTRAINT "DonationCampaign_account_id"
-  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_payment_type_id"
   FOREIGN KEY ("payment_type_id") REFERENCES "PaymentType" ("payment_type_id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "DonationCampaign" ADD CONSTRAINT "DonationCampaign_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "PaymentType" ADD CONSTRAINT "PaymentType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
