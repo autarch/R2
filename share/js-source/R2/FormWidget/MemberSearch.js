@@ -5,6 +5,10 @@ if ( typeof R2 == "undefined" ) {
     R2 = {};
 }
 
+if ( typeof R2.FormWidget == "undefined" ) {
+    R2.FormWidget = {};
+}
+
 R2.FormWidget.MemberSearch = function () {
     var search_div = $("#member-search");
 
