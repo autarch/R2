@@ -5,7 +5,7 @@ if ( typeof R2 == "undefined" ) {
     R2 = {};
 }
 
-R2.FormWithMemberSearch = function () {
+R2.FormWidget.MemberSearch = function () {
     var search_div = $("#member-search");
 
     if ( ! search_div.length ) {
@@ -23,7 +23,7 @@ R2.FormWithMemberSearch = function () {
     this._instrumentMemberSearch();
 };
 
-R2.FormWithMemberSearch.prototype._instrumentExistingTable = function () {
+R2.FormWidget.MemberSearch.prototype._instrumentExistingTable = function () {
     var table = $("#member-search-selected-table");
 
     if ( ! table.length ) {
@@ -55,7 +55,7 @@ R2.FormWithMemberSearch.prototype._instrumentExistingTable = function () {
     );
 };
 
-R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
+R2.FormWidget.MemberSearch.prototype._instrumentResultsClose = function () {
     var self = this;
 
     $("#member-search-results-close").click(
@@ -68,7 +68,7 @@ R2.FormWithMemberSearch.prototype._instrumentResultsClose = function () {
     );
 };
 
-R2.FormWithMemberSearch.prototype._instrumentMemberSearch = function () {
+R2.FormWidget.MemberSearch.prototype._instrumentMemberSearch = function () {
     new R2.FormWidget.AjaxSearch(
         this.uri,
         "member",
@@ -79,7 +79,7 @@ R2.FormWithMemberSearch.prototype._instrumentMemberSearch = function () {
     );
 };
 
-R2.FormWithMemberSearch.prototype._onSearchSubmitFunction = function () {
+R2.FormWidget.MemberSearch.prototype._onSearchSubmitFunction = function () {
     var self = this;
 
     var func = function () {
@@ -93,7 +93,7 @@ R2.FormWithMemberSearch.prototype._onSearchSubmitFunction = function () {
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._populateResultsFunction = function () {
+R2.FormWidget.MemberSearch.prototype._populateResultsFunction = function () {
     var self = this;
 
     var func = function (results) {
@@ -126,7 +126,7 @@ R2.FormWithMemberSearch.prototype._populateResultsFunction = function () {
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._cleanResultsDiv = function () {
+R2.FormWidget.MemberSearch.prototype._cleanResultsDiv = function () {
     this.results_div.contents().filter(
         function () {
             return $(this).attr("id") != "member-search-results-close";
@@ -134,7 +134,7 @@ R2.FormWithMemberSearch.prototype._cleanResultsDiv = function () {
     ).remove();
 };
 
-R2.FormWithMemberSearch.prototype._createResultsTable = function () {
+R2.FormWidget.MemberSearch.prototype._createResultsTable = function () {
     var table = $("<table/>");
 
     var thead = $("<thead/>");
@@ -167,7 +167,7 @@ R2.FormWithMemberSearch.prototype._createResultsTable = function () {
     return table;
 };
 
-R2.FormWithMemberSearch.prototype._createResultRow = function (result) {
+R2.FormWidget.MemberSearch.prototype._createResultRow = function (result) {
     var tr = $("<tr/>");
 
     var id = R2.Utils.makeUniqueId();
@@ -223,7 +223,7 @@ R2.FormWithMemberSearch.prototype._createResultRow = function (result) {
     return tr;
 };
 
-R2.FormWithMemberSearch.prototype._addMemberFunction = function ( tr, res, pos ) {
+R2.FormWidget.MemberSearch.prototype._addMemberFunction = function ( tr, res, pos ) {
     var results_tr = tr;
     var result     = res;
     var position   = pos;
@@ -252,7 +252,7 @@ R2.FormWithMemberSearch.prototype._addMemberFunction = function ( tr, res, pos )
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._positionEnterFunction = function (button) {
+R2.FormWidget.MemberSearch.prototype._positionEnterFunction = function (button) {
     var adder = button;
 
     var func = function (e) {
@@ -269,7 +269,7 @@ R2.FormWithMemberSearch.prototype._positionEnterFunction = function (button) {
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._appendResultToSelected = function ( result, position_name ) {
+R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result, position_name ) {
     $("#member-search-empty").detach();
 
     var elt_to_fade;
@@ -345,13 +345,13 @@ R2.FormWithMemberSearch.prototype._appendResultToSelected = function ( result, p
     elt_to_fade.fadeIn(500);
 };
 
-R2.FormWithMemberSearch.prototype._instrumentRemoveButton = function ( remover, tr, result, hidden_name ) {
+R2.FormWidget.MemberSearch.prototype._instrumentRemoveButton = function ( remover, tr, result, hidden_name ) {
     remover.click(
         this.removeMemberFunction( remover, tr, result, hidden_name )
     );
 };
 
-R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( button, tr, result, hidden_name ) {
+R2.FormWidget.MemberSearch.prototype.removeMemberFunction = function ( button, tr, result, hidden_name ) {
     var remover = button;
     var selected_tr = tr;
     var res = result;
@@ -379,7 +379,7 @@ R2.FormWithMemberSearch.prototype.removeMemberFunction = function ( button, tr, 
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._removeSelectedTr = function (tr) {
+R2.FormWidget.MemberSearch.prototype._removeSelectedTr = function (tr) {
     var table = tr.closest("table");
 
     tr.closest("tbody").detach();
@@ -390,7 +390,7 @@ R2.FormWithMemberSearch.prototype._removeSelectedTr = function (tr) {
     }
 };
 
-R2.FormWithMemberSearch.prototype._addEmptyResultsP = function () {
+R2.FormWidget.MemberSearch.prototype._addEmptyResultsP = function () {
     var p = $("<p/>");
     p.append( document.createTextNode("No members yet") );
     p.attr( "id", "member-search-empty" );
@@ -398,11 +398,11 @@ R2.FormWithMemberSearch.prototype._addEmptyResultsP = function () {
     this.selected.append(p);
 };
 
-R2.FormWithMemberSearch.prototype._hideResults = function () {
+R2.FormWidget.MemberSearch.prototype._hideResults = function () {
     this.results_div.fadeOut(500);
 };
 
-R2.FormWithMemberSearch.prototype._handleEmptySubmitFunction = function () {
+R2.FormWidget.MemberSearch.prototype._handleEmptySubmitFunction = function () {
     var self = this;
 
     var func = function () {
@@ -417,7 +417,7 @@ R2.FormWithMemberSearch.prototype._handleEmptySubmitFunction = function () {
     return func;
 };
 
-R2.FormWithMemberSearch.prototype._handleErrorFunction = function (results) {
+R2.FormWidget.MemberSearch.prototype._handleErrorFunction = function (results) {
     var self = this;
 
     var func = function () {
