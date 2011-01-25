@@ -7,10 +7,12 @@
         <button id="member-search-submit" type="button">Search</button>
 
         <div class="ajax-search-results" id="member-search-results" style="display: none">
-          <a href="#" class="ajax-search-results-close" id="member-search-results-close">X</a>
+          <div class="ajax-search-results-close" >
+            <a href="#" id="member-search-results-close">X</a>
+          </div>
         </div>
 
-        <div id="member-search-selected">
+        <div class="ajax-search-selected" id="member-search-selected">
 % if ($members) {
           <table class="ajax-search-selected-table" id="member-search-selected-table">
             <thead>

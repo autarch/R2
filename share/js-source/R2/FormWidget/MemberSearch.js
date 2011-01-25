@@ -134,7 +134,12 @@ R2.FormWidget.MemberSearch.prototype._populateResultsFunction = function () {
 R2.FormWidget.MemberSearch.prototype._cleanResultsDiv = function () {
     this.results_div.contents().filter(
         function () {
-            return $(this).attr("id") != "member-search-results-close";
+            if ( $(this).attr("id") == "member-search-results-close"
+                 || $(this).find("#member-search-results-close").length ) {
+                return 0;
+            }
+
+            return 1;
         }
     ).remove();
 };

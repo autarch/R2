@@ -125,9 +125,9 @@
       <button id="contact-search-submit" type="button">Search</button>
 
       <div class="ajax-search-results" id="contact-search-results" style="display: none">
-        <p class="ajax-search-results-close" >
+        <div class="ajax-search-results-close" >
           <a href="#" id="contact-search-results-close">X</a>
-        </p>
+        </div>
       </div>
 
       <div class="help-text">
