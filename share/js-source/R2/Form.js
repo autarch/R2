@@ -1,4 +1,5 @@
 JSAN.use('R2.FormWidget.LabeledRadioButton');
+JSAN.use('R2.FormWidget.MemberSearch');
 JSAN.use('R2.FormWidget.RepeatableGroup');
 JSAN.use('R2.Utils');
 
@@ -13,6 +14,8 @@ R2.Form = function (form) {
     this._instrumentRepeatableGroups();
     this._instrumentDivDeleters();
     this._instrumentDateFields();
+    new R2.FormWidget.MemberSearch;
+    new R2.FormWidget.ContactSearch;
 };
 
 R2.Form.instrumentAllForms = function () {
