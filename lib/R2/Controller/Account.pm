@@ -123,6 +123,9 @@ put q{}
                     $c->domain()->application_uri( path => q{} ),
                 );
 
+                my $params = $c->request()->params();
+                $c->stash()->{$_} = $params->{$_} for keys %{$params};
+
                 $c->stash()->{template} = $template;
             };
     }
