@@ -4,8 +4,10 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use List::AllUtils qw( any );
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
+use R2::Util qw( string_is_empty );
 
 use Moose;
 use CatalystX::Routes;
@@ -391,7 +393,7 @@ post q{}
         $account->uri( view => 'custom_field_groups_form' ) );
 };
 
-post users
+post user
     => chained '_set_account'
     => args 0
     => sub  {
@@ -402,40 +404,47 @@ post users
     delete $p{is_system_admin}
         unless $c->user()->is_system_admin();
 
-    my $user = $c->stash()->{user};
-
     delete @p{ 'password', 'password2' }
-        unless any { ! string_is_empty($_) } @p{ 'password', 'password2' };
+        unless any { !string_is_empty($_) } @p{ 'password', 'password2' };
 
     my @errors;
 
-    unless ( ( $p{password} // q{} ) eq ( $p{password2} // q{} ) ) {
+    my $password2 = $c->request()->params()->{password2};
+
+    unless ( ( $p{password} // q{} ) eq ( $password2 // q{} ) ) {
         push @errors, 'The two passwords you provided did not match.';
     }
 
-    eval { $user->update( %p, user => $c->user() ) };
+    my $account = $c->account();
 
-    push @errors, $@
-        if $@;
+    my $user;
+
+    unless (@errors) {
+        delete $p{password2};
+
+        $p{account_id} = $account->account_id();
+
+        $user = eval { R2::Schema::User->insert( %p, user => $c->user() ) };
+
+        push @errors, $@
+            if $@;
+    }
 
     if (@errors) {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
 
         $c->redirect_with_error(
             error     => $e,
-            uri       => $user->uri( view => 'edit_form' ),
+            uri       => $account->uri( view => 'new_user_form' ),
             form_data => $c->request()->params(),
         );
     }
 
-    my $whos
-        = $c->user()->user_id() == $user->user_id()
-        ? 'Your '
-        : $user->display_name . q{'s};
+    $c->session_object()
+        ->add_message(
+        $user->display_name() . '  has been added to this account' );
 
-    $c->session_object()->add_message( $whos . ' account has been updated' );
-
-    $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
+    $c->redirect_and_detach( $account->uri( view => 'users' ) );
 };
 
 __PACKAGE__->meta()->make_immutable();

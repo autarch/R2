@@ -1,6 +1,6 @@
 <&| /lib/filter/form.mas,
     objects => $user ? [ $user ] : [],
-    exclude => [ 'password', 'password2' ],
+    exclude => [ 'password', 'password2', 'is_system_admin' ],
   &>
 <form class="JS-standard-form"
       action="<% $action %>"
@@ -26,7 +26,7 @@
 
     <div class="form-item">
       <label class="for-field" for="password2">Confirm password:</label>
-      <input type="password2" class="text wide" name="password2" id="password2" />
+      <input type="password" class="text wide" name="password2" id="password2" />
     </div>
 
     <div class="form-item">
@@ -60,12 +60,16 @@
 
 % if ( $c->user()->is_system_admin() ) {
     <div class="form-item">
-      <label class="for-field" for="is_system_user">System-wide admin:</label>
+      <label class="for-field" for="is_system_admin">System-wide admin:</label>
       <div class="radio-group">
-        <input type="radio" class="radio" name="is_system_user" id="is_system_user-yes" value="1" checked="checked" />
-        <label class="for-radio selected" for="is_system_user-yes" id="for-is_system_user-yes">Yes</label>
-        <input type="radio" class="radio" name="is_system_user" id="is_system_user-no" value="0" />
-        <label class="for-radio" for="is_system_user-no" id="for-is_system_user-no">No</label>
+        <input type="radio" class="radio" name="is_system_admin" id="is_system_admin-yes" value="1"
+               <% $is_system_admin ? q{checked="checked"} : q{} %> />
+        <label class="for-radio <% $is_system_admin ? q{selected} : q{} %>"
+               for="is_system_admin-yes" id="for-is_system_admin-yes">Yes</label>
+        <input type="radio" class="radio" name="is_system_admin" id="is_system_admin-no" value="0"
+               <% ! $is_system_admin ? q{checked="checked"} : q{} %> />
+        <label class="for-radio <% ! $is_system_admin ? q{selected} : q{} %>"
+               for="is_system_admin-no" id="for-is_system_admin-no">No</label>
       </div>
     </div>
 % }
@@ -87,4 +91,5 @@ $user => undef
 my $action = $user ? $user->uri() : $c->account()->uri( view => 'user' );
 my $zones = R2::Schema::TimeZone->ByCountry('United States');
 my $roles = R2::Schema::Role->All();
+my $is_system_admin = $user && $user->is_system_admin ? 1 : 0;
 </%init>

@@ -128,14 +128,6 @@ chain_point _set_user => chained '/' => path_part 'user' => capture_args 1 => su
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $user;
 
-    $self->_check_authz(
-        $c,
-        'can_view_user',
-        { user => $user },
-        'You are not authorized to view this user',
-        $c->account()->uri(),
-    );
-
     unless ( uc $c->request()->method() eq 'GET' ) {
         $self->_check_authz(
             $c,
@@ -149,13 +141,6 @@ chain_point _set_user => chained '/' => path_part 'user' => capture_args 1 => su
     $c->stash()->{user} = $user;
 };
 
-get_html '' => chained '_set_user' => args 0 => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->stash()->{template} = '/dashboard';
-};
-
 put '' => chained '_set_user' => args 0 => sub {
     my $self = shift;
     my $c    = shift;
@@ -166,21 +151,25 @@ put '' => chained '_set_user' => args 0 => sub {
     delete $p{is_disabled}
         unless $c->user()->role()->name() eq 'Admin';
 
-    my $user = $c->stash()->{user};
-
     delete @p{ 'password', 'password2' }
         unless any { !string_is_empty($_) } @p{ 'password', 'password2' };
 
     my @errors;
 
-    unless ( ( $p{password} // q{} ) eq ( $p{password2} // q{} ) ) {
+    my $password2 = $c->request()->params()->{password2};
+
+    unless ( ( $p{password} // q{} ) eq ( $password2 // q{} ) ) {
         push @errors, 'The two passwords you provided did not match.';
     }
 
-    eval { $user->update( %p, user => $c->user() ) };
+    my $user = $c->stash()->{user};
 
-    push @errors, $@
-        if $@;
+    unless (@errors) {
+        eval { $user->update( %p, user => $c->user() ) };
+
+        push @errors, $@
+            if $@;
+    }
 
     if (@errors) {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
@@ -199,7 +188,7 @@ put '' => chained '_set_user' => args 0 => sub {
 
     $c->session_object()->add_message( $whos . ' account has been updated' );
 
-    $c->redirect_and_detach( $user->uri( view => 'edit_form' ) );
+    $c->redirect_and_detach( $user->account()->uri( view => 'users' ) );
 };
 
 get_html edit_form
@@ -216,6 +205,8 @@ get_html edit_form
         'You are not authorized to edit this user',
         $c->account()->uri(),
     );
+
+    $c->stash()->{template} = '/user/edit_form';
 };
 
 __PACKAGE__->meta()->make_immutable();
