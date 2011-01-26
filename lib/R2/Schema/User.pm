@@ -6,6 +6,7 @@ use namespace::autoclean;
 
 use Authen::Passphrase::BlowfishCrypt;
 use DateTime::Locale;
+use Email::Valid;
 use List::AllUtils qw( first );
 use MooseX::Params::Validate qw( validated_list );
 use R2::Schema;
@@ -125,10 +126,6 @@ around 'insert' => sub {
             || R2::Schema::Contact->Table()->column($_)
         } keys %p;
 
-    $user_p{username} ||= $p{email_address};
-
-    my $email_address = delete $p{email_address};
-
     my $sub = sub {
         my $person;
         if ( $p{account_id} ) {
@@ -137,9 +134,9 @@ around 'insert' => sub {
                 user => $p{user},
             );
 
-            unless ( string_is_empty($email_address) ) {
+            if ( Email::Valid->address( $user_p{username} ) ) {
                 R2::Schema::EmailAddress->insert(
-                    email_address => $email_address,
+                    email_address => $user_p{username},
                     contact_id    => $person->person_id(),
                     is_preferred  => 1,
                     user          => $p{user},
