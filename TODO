@@ -9,13 +9,6 @@ Edit
 
 - tags, groups
 
-Donations
-
-- in honor/memory of - link to another contact
-- DonationGift
--- name
--- value
-
 Emails
 
 - templated
@@ -28,7 +21,6 @@ Emails
 
 SMS
 
-- PhoneNumber.allow_sms
 - way to send
 
 Reports
