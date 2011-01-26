@@ -24,7 +24,7 @@ Only showing active users.
       <th>Name</th>
       <th>Username</th>
       <th>Added</th>
-      <th>Permissions</th>
+      <th>Role</th>
       <th></th>
       <th></th>
     </tr>
