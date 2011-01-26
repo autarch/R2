@@ -31,7 +31,7 @@ Only showing active users.
   </thead>
 % while ( my ( $user, $role ) = $users->next() ) {
   <tbody>
-    <tr>
+    <tr class="<% $users->index() % 2 ? 'odd' : 'even' %>">
       <td><% $user->person()->display_name() %></td>
       <td><% $user->username() %></td>
       <td><% $c->user()->format_date( $user->creation_datetime() ) %></td>
