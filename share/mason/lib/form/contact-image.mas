@@ -19,6 +19,8 @@ $contact => undef
 </%args>
 
 <%init>
-my $image = $contact->image();
-$image = $contact->image()->resize( height => 100, width => 100 );
+my $image;
+if ( $contact && $contact->image() ) {
+    $image = $contact->image()->resize( height => 100, width => 100 );
+}
 </%init>
