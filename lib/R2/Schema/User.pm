@@ -134,7 +134,7 @@ around 'insert' => sub {
                 user => $p{user},
             );
 
-            if ( Email::Valid->address( $user_p{username} ) ) {
+            if ( Email::Valid->address( $user_p{username} // q{} ) ) {
                 R2::Schema::EmailAddress->insert(
                     email_address => $user_p{username},
                     contact_id    => $person->person_id(),

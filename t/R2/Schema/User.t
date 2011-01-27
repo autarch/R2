@@ -14,13 +14,13 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $user = R2::Schema::User->insert(
-        first_name    => 'Joe',
-        last_name     => 'Smith',
-        email_address => 'joe.smith@example.com',
-        password      => 'password',
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Member()->role_id(),
-        user          => R2::Schema::User->SystemUser,
+        username   => 'joe.smith@example.com',
+        first_name => 'Joe',
+        last_name  => 'Smith',
+        password   => 'password',
+        account_id => $account->account_id(),
+        role_id    => R2::Schema::Role->Member()->role_id(),
+        user       => R2::Schema::User->SystemUser,
     );
 
     ok( $user->person(), 'newly created user has a person' );
@@ -34,17 +34,23 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         length $user->password(), 67,
         'password was crypted'
     );
+
+    is(
+        $user->person()->preferred_email_address()->email_address(),
+        'joe.smith@example.com',
+        'creating a user creates an email address for the associated person'
+    );
 }
 
 {
     my $user = R2::Schema::User->insert(
-        first_name    => 'Bubba',
-        last_name     => 'Smith',
-        email_address => 'bubba.smith@example.com',
-        is_disabled   => 1,
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Member()->role_id(),
-        user          => R2::Schema::User->SystemUser,
+        username    => 'bubba.smith@example.com',
+        first_name  => 'Bubba',
+        last_name   => 'Smith',
+        is_disabled => 1,
+        account_id  => $account->account_id(),
+        role_id     => R2::Schema::Role->Member()->role_id(),
+        user        => R2::Schema::User->SystemUser,
     );
 
     is(
@@ -102,14 +108,14 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $user = R2::Schema::User->insert(
-        first_name    => 'Joe',
-        last_name     => 'Smith',
-        email_address => 'joe.smith2@example.com',
-        password      => 'password',
-        locale_code   => 'fr_FR',
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Member()->role_id(),
-        user          => R2::Schema::User->SystemUser,
+        username    => 'joe.smith2@example.com',
+        first_name  => 'Joe',
+        last_name   => 'Smith',
+        password    => 'password',
+        locale_code => 'fr_FR',
+        account_id  => $account->account_id(),
+        role_id     => R2::Schema::Role->Member()->role_id(),
+        user        => R2::Schema::User->SystemUser,
     );
 
     my $dt = DateTime->new(

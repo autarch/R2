@@ -42,12 +42,12 @@ my $account;
 
 {
     my $bob = R2::Schema::User->insert(
-        first_name    => 'Bob',
-        email_address => 'bob@example.com',
-        password      => 'foo',
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Member()->role_id(),
-        user          => $user,
+        username   => 'bob@example.com',
+        first_name => 'Bob',
+        password   => 'foo',
+        account_id => $account->account_id(),
+        role_id    => R2::Schema::Role->Member()->role_id(),
+        user       => $user,
     );
 
     is_deeply(
@@ -57,12 +57,12 @@ my $account;
     );
 
     my $lisa = R2::Schema::User->insert(
-        first_name    => 'Lisa',
-        email_address => 'lisa@example.com',
-        password      => 'foo',
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Admin()->role_id(),
-        user          => $user,
+        username   => 'lisa@example.com',
+        first_name => 'Lisa',
+        password   => 'foo',
+        account_id => $account->account_id(),
+        role_id    => R2::Schema::Role->Admin()->role_id(),
+        user       => $user,
     );
 
     is_deeply(

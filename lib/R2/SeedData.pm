@@ -87,16 +87,16 @@ sub make_account {
     my $password = 'password';
 
     my $user = R2::Schema::User->insert(
+        username => $email,
         password => $password,
         is_system_admin =>
             ( R2::Schema::User->Count() ? 0 : 1 ),
-        email_address => $email,
-        first_name    => $first_name,
-        last_name     => $last_name,
-        gender        => 'male',
-        account_id    => $account->account_id(),
-        role_id       => R2::Schema::Role->Admin()->role_id(),
-        user          => R2::Schema::User->SystemUser(),
+        first_name => $first_name,
+        last_name  => $last_name,
+        gender     => 'male',
+        account_id => $account->account_id(),
+        role_id    => R2::Schema::Role->Admin()->role_id(),
+        user       => R2::Schema::User->SystemUser(),
     );
 
     if ($VERBOSE) {
