@@ -2,9 +2,23 @@
       <label class="for-field" for="image">Image:</label>
       <input type="file" class="file" name="image" id="image" />
 
+% if ($image) {
+      <br />
+      <img src="<% $image->uri() %>" title="Current photo of <% $contact->display_name() %>" />
+% }
+
       <div class="help-text">
         <p>
           A GIF, JPG, or PNG. Images will be resized so they are no larger than 100x100.
         </p>
       </div>
     </div>
+
+<%args>
+$contact => undef
+</%args>
+
+<%init>
+my $image = $contact->image();
+$image = $contact->image()->resize( height => 100, width => 100 );
+</%init>
