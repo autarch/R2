@@ -108,32 +108,91 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $user = R2::Schema::User->insert(
-        username    => 'joe.smith2@example.com',
-        first_name  => 'Joe',
-        last_name   => 'Smith',
-        password    => 'password',
-        locale_code => 'fr_FR',
-        account_id  => $account->account_id(),
-        role_id     => R2::Schema::Role->Member()->role_id(),
-        user        => R2::Schema::User->SystemUser,
+        username   => 'joe.smith2@example.com',
+        password   => 'password',
+        date_style => 'American',
+        user       => R2::Schema::User->SystemUser,
     );
 
     my $dt = DateTime->new(
         year   => 2008,
         month  => 5,
         day    => 23,
-        hour   => 7,
+        hour   => 17,
         minute => 24,
     );
 
     is(
-        $user->format_date($dt), '23 mai 2008',
+        $user->format_date($dt), 'May 23, 2008',
         'format_date'
     );
 
+    $dt->set( year => DateTime->today()->year() );
+
     is(
-        $user->format_datetime($dt), '23 mai 2008 07:24:00',
-        'format_datetime'
+        $user->format_date($dt), 'May 23',
+        'format_date for same year'
+    );
+
+    $user = R2::Schema::User->insert(
+        username   => 'joe.smith3@example.com',
+        password   => 'password',
+        date_style => 'European',
+        user       => R2::Schema::User->SystemUser,
+    );
+
+    $dt->set( year => 2008 );
+
+    is(
+        $user->format_date($dt), '23 May 2008',
+        'format_date'
+    );
+
+    $dt->set( year => DateTime->today()->year() );
+
+    is(
+        $user->format_date($dt), '23 May',
+        'format_date for same year'
+    );
+
+    $user = R2::Schema::User->insert(
+        username   => 'joe.smith4@example.com',
+        password   => 'password',
+        date_style => 'YMD',
+        user       => R2::Schema::User->SystemUser,
+    );
+
+    $dt->set( year => 2008 );
+
+    is(
+        $user->format_date($dt), '2008-05-23',
+        'format_date'
+    );
+
+    $dt->set( year => DateTime->today()->year() );
+
+    is(
+        $user->format_date($dt), '05-23',
+        'format_date for same year'
+    );
+
+    is(
+        $user->format_time($dt),
+        '5:24 PM',
+        'format_time - 12 hour time'
+    );
+
+    $user = R2::Schema::User->insert(
+        username         => 'joe.smith5@example.com',
+        password         => 'password',
+        use_24_hour_time => 1,
+        user             => R2::Schema::User->SystemUser,
+    );
+
+    is(
+        $user->format_time($dt),
+        '17:24',
+        'format_time - 24 hour time'
     );
 }
 
