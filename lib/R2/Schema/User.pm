@@ -277,7 +277,6 @@ sub _FindOrCreateSystemUser {
     my $user = $class->new( username => 'R2 System User' );
     return $user if $user;
 
-    # Hack to avoid our around wrapper.
     return $class->insert(
         user_id        => -1,
         username       => 'R2 System User',
