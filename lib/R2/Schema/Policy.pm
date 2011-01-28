@@ -51,7 +51,7 @@ transform_all
     => inflate {
         return $_[1] unless defined $_[1];
         my $dt = DateTime::Format::Pg->parse_date( $_[1] );
-        $dt->set_time_zone('UTC');
+        $dt->set_time_zone('floating');
         return $dt;
     };
 #>>>
