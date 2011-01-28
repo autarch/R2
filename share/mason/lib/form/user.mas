@@ -1,5 +1,5 @@
 <&| /lib/filter/form.mas,
-    objects => $user ? [ $user ] : [],
+    objects => $user ? [ $user ] : [ { date_style => 'American', use_24_hour_time => 0 } ],
     exclude => [ 'password', 'password2', 'is_system_admin' ],
   &>
 <form class="JS-standard-form"
@@ -37,6 +37,24 @@
     <div class="form-item">
       <label class="for-field" for="last_name">Last name:</label>
       <input type="text" class="text wide" name="last_name" id="last_name" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="date_style">Date style:</label>
+      <select name="date_style" id="date_style">
+% for my $style ( qw( American European YMD ) ) {
+        <option value="<% $style %>"><% $today->format_cldr( $date_formats{$style} ) %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="use_24_hour_time">Time style:</label>
+      <select name="use_24_hour_time" id="use_24_hour_time">
+% for my $style ( 12, 24 ) {
+        <option value="<% $style == 12 ? 0 : 1 %>"><% $today->format_cldr( $time_formats{$style} ) %></option>
+% }
+      </select>
     </div>
 
     <div class="form-item">
@@ -92,4 +110,8 @@ my $action = $user ? $user->uri() : $c->account()->uri( view => 'user' );
 my $zones = R2::Schema::TimeZone->ByCountry('United States');
 my $roles = R2::Schema::Role->All();
 my $is_system_admin = $user && $user->is_system_admin ? 1 : 0;
+
+my $today = DateTime->now( time_zone => $user ? $user->time_zone() : 'UTC' );
+my %date_formats = R2::Schema::User->DateFormats();
+my %time_formats = R2::Schema::User->TimeFormats();
 </%init>

@@ -13,7 +13,7 @@ use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
 use R2::Schema::Person;
-use R2::Types qw( Str );
+use R2::Types qw( HashRef Str );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
@@ -23,21 +23,42 @@ with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _require_username_or_email )] };
 with 'R2::Role::Schema::URIMaker';
 
-has _dt_locale => (
-    is       => 'ro',
-    isa      => 'DateTime::Locale::Base',
-    init_arg => undef,
-    lazy     => 1,
-    default  => sub { DateTime::Locale->load( $_[0]->locale_code() ) },
-);
+{
+    my %formats = (
+        American => [ 'MMM d, yyyy', 'MMM d' ],
+        European => [ 'd MMM, yyyy', 'd MMM' ],
+        YMD      => [ 'yyyy-MM-dd',  'MM-dd' ],
+    );
 
-has date_format => (
-    is       => 'ro',
-    isa      => Str,
-    init_arg => undef,
-    lazy     => 1,
-    default  => sub { $_[0]->_dt_locale()->date_format_medium() },
-);
+    has date_format => (
+        is       => 'ro',
+        isa      => Str,
+        init_arg => undef,
+        lazy     => 1,
+        default  => sub { $formats{ $_[0]->date_style() }[0] },
+    );
+
+    has date_format_without_year => (
+        is       => 'ro',
+        isa      => Str,
+        init_arg => undef,
+        lazy     => 1,
+        default  => sub { $formats{ $_[0]->date_style() }[1] },
+    );
+
+    class_has _DateFormats => (
+        traits  => ['Hash'],
+        is      => 'ro',
+        isa     => HashRef [Str],
+        lazy    => 1,
+        default => sub {
+            return {
+                map { $_ => $formats{$_}[0] } keys %formats
+            }
+        },
+        handles => { DateFormats => 'elements' },
+    );
+}
 
 has date_format_for_jquery => (
     is       => 'ro',
@@ -47,21 +68,29 @@ has date_format_for_jquery => (
     builder  => '_build_date_format_for_jquery',
 );
 
-has time_format => (
-    is       => 'ro',
-    isa      => Str,
-    init_arg => undef,
-    lazy     => 1,
-    default  => sub { $_[0]->_dt_locale()->time_format_short() },
-);
+{
+    my %formats = (
+        12 => 'hh:mm a',
+        24 => 'HH:mm',
+    );
 
-has datetime_format => (
-    is       => 'ro',
-    isa      => Str,
-    init_arg => undef,
-    lazy     => 1,
-    default  => sub { $_[0]->_dt_locale()->datetime_format_medium() },
-);
+    has time_format => (
+        is       => 'ro',
+        isa      => Str,
+        init_arg => undef,
+        lazy     => 1,
+        default  => sub { $formats{ $_[0]->use_24_hour_time() ? 12 : 24 } },
+    );
+
+    class_has _TimeFormats => (
+        traits  => ['Hash'],
+        is      => 'ro',
+        isa     => HashRef [Str],
+        lazy    => 1,
+        default => sub { \%formats },
+        handles => { TimeFormats => 'elements' },
+    );
+}
 
 has display_name => (
     is       => 'ro',
@@ -297,9 +326,21 @@ sub format_date {
 
     return q{} unless $dt;
 
-    return $dt->clone()->set( locale => $self->locale_code() )
-        ->set_time_zone( $self->time_zone() )
-        ->format_cldr( $self->date_format() );
+    my $format = $self->_date_format_for_dt($dt);
+
+    return $dt->clone()->set_time_zone( $self->time_zone() )
+        ->format_cldr($format);
+}
+
+sub _date_format_for_dt {
+    my $self = shift;
+    my $dt   = shift;
+
+    my $today = DateTime->today( time_zone => $self->time_zone() );
+
+    return $today->year() == $dt->year()
+        ? $self->date_format_without_year()
+        : $self->date_format();
 }
 
 sub format_time {
@@ -308,8 +349,7 @@ sub format_time {
 
     return q{} unless $dt;
 
-    return $dt->clone()->set( locale => $self->locale_code() )
-        ->set_time_zone( $self->time_zone() )
+    return $dt->clone()->set_time_zone( $self->time_zone() )
         ->format_cldr( $self->time_format() );
 }
 
@@ -319,9 +359,11 @@ sub format_datetime {
 
     return q{} unless $dt;
 
-    return $dt->clone()->set( locale => $self->locale_code() )
-        ->set_time_zone( $self->time_zone() )
-        ->format_cldr( $self->datetime_format() );
+    my $format = $self->_date_format_for_dt($dt);
+    $format .= q{ } . $self->time_format();
+
+    return $dt->clone()->set_time_zone( $self->time_zone() )
+        ->format_cldr($format);
 }
 
 sub _build_display_name {

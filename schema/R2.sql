@@ -10,6 +10,8 @@ CREATE TABLE "Version" (
 
 CREATE UNIQUE INDEX only_one_version_row ON "Version" ((TRUE));
 
+CREATE TYPE date_style AS ENUM ( 'American', 'European', 'YMD' );
+
 CREATE TABLE "User" (
        -- will be the same as a person_id
        user_id                  SERIAL8         PRIMARY KEY,
@@ -17,7 +19,8 @@ CREATE TABLE "User" (
        -- RFC2307 Blowfish crypt
        password                 VARCHAR(67)     NOT NULL,
        time_zone                TEXT            NOT NULL DEFAULT 'UTC',
-       locale_code              TEXT            NOT NULL DEFAULT 'en_US',
+       date_style               date_style      NOT NULL DEFAULT 'American',
+       use_24_hour_time         BOOLEAN         DEFAULT FALSE,
        creation_datetime        TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        last_modified_datetime   TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        is_system_admin          BOOLEAN         DEFAULT FALSE,

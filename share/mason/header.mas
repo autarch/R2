@@ -3,7 +3,7 @@
 %   if ( $c->user()->can_edit_account( account => $c->account() ) ) {
     <li><a href="<% $c->account()->uri( view => 'settings' ) %>" title="Account settings">Account</a></li>
 %   }
-    <li><a href="<% $c->user()->uri( view => 'preferences') %>" title="Your application prefences">Prefs</a></li>
+    <li><a href="<% $c->user()->uri( view => 'edit_form') %>" title="Your application preferences">Prefs</a></li>
     <li><a href="<% $c->domain()->application_uri
                  ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
            title="Log out of Rapport">Log Out</a></li>
