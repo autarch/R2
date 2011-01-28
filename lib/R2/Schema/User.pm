@@ -70,7 +70,7 @@ has date_format_for_jquery => (
 
 {
     my %formats = (
-        12 => 'hh:mm a',
+        12 => 'h:mm a',
         24 => 'HH:mm',
     );
 
@@ -79,7 +79,7 @@ has date_format_for_jquery => (
         isa      => Str,
         init_arg => undef,
         lazy     => 1,
-        default  => sub { $formats{ $_[0]->use_24_hour_time() ? 12 : 24 } },
+        default  => sub { $formats{ $_[0]->use_24_hour_time() ? 24 : 12 } },
     );
 
     class_has _TimeFormats => (
