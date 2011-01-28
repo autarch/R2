@@ -26,7 +26,7 @@ with 'R2::Role::Schema::URIMaker';
 {
     my %formats = (
         American => [ 'MMM d, yyyy', 'MMM d' ],
-        European => [ 'd MMM, yyyy', 'd MMM' ],
+        European => [ 'd MMM yyyy', 'd MMM' ],
         YMD      => [ 'yyyy-MM-dd',  'MM-dd' ],
     );
 
