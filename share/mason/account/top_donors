@@ -1,0 +1,24 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &>
+</div>
+
+<ul>
+% while ( my $contact = $donors->next() ) {
+  <li>
+    <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+    - <% $donors->raw_row()->[-1] %>
+  </li>
+% }
+</ul>
+
+<%args>
+$account
+$donors
+</%args>
+
+<%method title>
+Top donors to <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>

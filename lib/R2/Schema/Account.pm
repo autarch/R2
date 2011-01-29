@@ -5,10 +5,11 @@ use warnings;
 use namespace::autoclean;
 
 use Fey::Literal;
+use Fey::Literal::Function;
 use Fey::Object::Iterator::FromArray;
-use Fey::Object::Iterator::FromSelect::Caching;
+use Fey::Object::Iterator::FromSelect;
 use Lingua::EN::Inflect qw( PL_N );
-use List::AllUtils qw( any );
+use List::AllUtils qw( any first );
 use R2::Exceptions qw( error );
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
@@ -130,7 +131,13 @@ with 'R2::Role::Schema::URIMaker';
     class_has '_UsersWithRolesSelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
-        default => sub { __PACKAGE__->_BuildUsersWithRolesSelect() },
+        builder => '_BuildUsersWithRolesSelect',
+    );
+
+    class_has '_TopDonorSelectBase' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildTopDonorSelectBase',
     );
 
     __PACKAGE__->_AddSQLMethods();
@@ -213,7 +220,7 @@ sub users_with_roles {
     my $dbh = $self->_dbh($select);
 
     return Fey::Object::Iterator::FromSelect->new(
-        classes     => [qw( R2::Schema::User R2::Schema::Role  )],
+        classes     => [qw( R2::Schema::User R2::Schema::Role )],
         dbh         => $dbh,
         select      => $select,
         bind_params => [ $self->account_id(), $select->bind_params() ],
@@ -316,6 +323,54 @@ sub _build_made_a_note_contact_note_type {
         description => 'Made a note',
         account_id  => $self->account_id(),
     );
+}
+
+sub top_donors {
+    my $self = shift;
+
+    my $select = $self->_TopDonorSelectBase();
+
+    $select->limit(20);
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Contact )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->account_id() ],
+    );
+}
+
+sub _BuildTopDonorSelectBase {
+    my $class = shift;
+
+    my $schema = R2::Schema->Schema();
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $sum = Fey::Literal::Function->new(
+        'SUM',
+        $schema->table('Donation')->column('amount')
+    );
+
+    my $fk = first {
+        $_->has_column( $schema->table('Donation')->column('contact_id') );
+    }
+    $schema->foreign_keys_between_tables(
+        $schema->tables( 'Contact', 'Donation' ) );
+
+    #<<<
+    $select
+        ->select( $schema->table('Contact'), $sum )
+        ->from( $schema->tables( 'Contact', 'Donation' ), $fk )
+        ->where( $schema->table('Contact')->column('account_id'),
+                 '=', Fey::Placeholder->new() )
+        ->group_by( $schema->table('Contact')->columns() )
+        ->order_by( $sum, 'DESC' );
+    #>>>
+
+    return $select;
 }
 
 sub _AddSQLMethods {

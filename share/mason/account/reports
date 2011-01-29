@@ -1,0 +1,23 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &>
+</div>
+
+<ul>
+  <li>
+    <a href="<% $account->uri( view => 'top_donors' ) %>">Top donors</a>
+    <p>
+      Top donors to <% $account->name() %>
+    </p>
+  </li>
+</ul>
+
+<%args>
+$account
+</%args>
+
+<%method title>
+Reports for <% $account->name() %>
+<%args>
+$account
+</%args>
+</%method>
