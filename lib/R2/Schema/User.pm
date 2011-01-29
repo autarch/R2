@@ -331,6 +331,16 @@ sub format_date {
         ->format_cldr($format);
 }
 
+sub format_date_with_year {
+    my $self = shift;
+    my $dt   = shift;
+
+    return q{} unless $dt;
+
+    return $dt->clone()->set_time_zone( $self->time_zone() )
+        ->format_cldr( $self->date_format() );
+}
+
 sub _date_format_for_dt {
     my $self = shift;
     my $dt   = shift;
