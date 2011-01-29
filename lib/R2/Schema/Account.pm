@@ -24,7 +24,7 @@ use R2::Schema::PhoneNumberType;
 use R2::Schema::Person;
 use R2::Schema::RelationshipType;
 use R2::Schema;
-use R2::Types qw( Bool ArrayRef HashRef PosOrZeroInt );
+use R2::Types qw( ArrayRef Bool HashRef Int PosOrZeroInt );
 use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
@@ -327,10 +327,32 @@ sub _build_made_a_note_contact_note_type {
 
 sub top_donors {
     my $self = shift;
+    my ( $start_date, $end_date, $limit ) = validated_list(
+        \@_,
+        start_date => { isa => 'DateTime', optional => 1 },
+        end_date   => { isa => 'DateTime', optional => 1 },
+        limit      => { isa => Int,        default  => 20 },
+    );
 
-    my $select = $self->_TopDonorSelectBase();
+    my $select = $self->_TopDonorSelectBase()->clone();
 
-    $select->limit(20);
+    my $schema = R2::Schema->Schema();
+
+    if ($start_date) {
+        $select->where(
+            $schema->table('Donation')->column('donation_date'),
+            '>=', DateTime::Format::Pg->format_date($start_date)
+        );
+    }
+
+    if ($end_date) {
+        $select->where(
+            $schema->table('Donation')->column('donation_date'),
+            '<=', DateTime::Format::Pg->format_date($end_date)
+        );
+    }
+
+    $select->limit($limit);
 
     my $dbh = $self->_dbh($select);
 
@@ -338,7 +360,7 @@ sub top_donors {
         classes     => [qw( R2::Schema::Contact )],
         dbh         => $dbh,
         select      => $select,
-        bind_params => [ $self->account_id() ],
+        bind_params => [ $self->account_id(), $select->bind_params() ],
     );
 }
 

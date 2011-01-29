@@ -7,6 +7,7 @@ use namespace::autoclean;
 use List::AllUtils qw( any );
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
+use R2::Web::Form::Report::TopDonors;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -472,7 +473,19 @@ get_html 'top_donors'
 
     $c->tabs()->by_id('Reports')->set_is_selected(1);
 
-    $c->stash()->{donors} = $c->account()->top_donors();
+    my $form = R2::Web::Form::Report::TopDonors->new( user => $c->user() );
+    $form->process(
+        action => $c->account()->uri( view => 'top_donors' ),
+        params => $c->request()->params(),
+    );
+
+    # XXX - form validation errors
+
+    my $form_val = $form->value();
+
+    $c->stash()->{donors} = $c->account()->top_donors($form_val);
+
+    $c->stash()->{form} = $form;
 
     $c->stash()->{template} = '/account/top_donors';
 };

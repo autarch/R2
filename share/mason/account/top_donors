@@ -2,6 +2,61 @@
   <h1><& SELF:title, %ARGS &>
 </div>
 
+<&| /lib/filter/form.mas,
+    data    => $form->fif(),
+  &>
+<form class="JS-standard-form"
+      action="top_donors"
+      method="get">
+  <input type="hidden" name="datepicker_dateFormat" value="<% $c->user()->date_format_for_jquery() %>" />
+
+  <fieldset>
+    <legend>Report Settings</legend>
+
+    <div class="yui3-g horizontal-form">
+      <div class="yui3-u-1-5">
+        <div class="form-item">
+          <label class="for-field" for="start_date">Start date</label>
+          <input class="text narrow date" name="start_date" id="start_date" />
+        </div>
+      </div>
+      <div class="yui3-u-1-5">
+        <div class="form-item">
+          <label class="for-field" for="end_date">End date</label>
+          <input class="text narrow date" name="end_date" id="end_date" />
+        </div>
+      </div>
+      <div class="yui3-u-1-5">
+        <div class="form-item">
+          <label class="for-field" for="limit">Max donors</label>
+          <input class="text narrow" name="limit" id="limit" />
+        </div>
+      </div>
+      <div class="yui3-u-2-5">
+        <div class="form-item">
+          <input class="submit" type="submit" value="Show report" />
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</form>
+</&>
+
+% if ( $start_date && $end_date ) {
+<p>
+  Only including donations from
+  <% $c->user()->format_date($start_date) %> through <% $c->user()->format_date($end_date) %>
+</p>
+% } elsif ($start_date) {
+<p>
+  Only including donations starting on <% $c->user()->format_date($start_date) %>.
+</p>
+% } elsif ($end_date) {
+<p>
+  Only including donations through <% $c->user()->format_date($end_date) %>.
+</p>
+% }
+
 <ul>
 % while ( my $contact = $donors->next() ) {
   <li>
@@ -11,14 +66,40 @@
 % }
 </ul>
 
+% if ( ! $donors->index() ) {
+<p>
+%   if ( $start_date || $end_date ) {
+  There were no donors during this period.
+%   } else {
+  There are no donors to your organization yet.
+%   }
+</p>
+% }
+
 <%args>
 $account
 $donors
+$form
 </%args>
 
+<%init>
+my $start_date = $form->value()->{start_date};
+my $end_date = $form->value()->{end_date};
+</%init>
+
 <%method title>
-Top donors to <% $account->name() %>
+Top
+% if ( $limit == 1 ) {
+Donor
+% } else {
+<% $limit %> Donors
+% }
+to <% $account->name() %>
 <%args>
 $account
+$form
 </%args>
+<%init>
+my $limit = $form->value()->{limit};
+</%init>
 </%method>
