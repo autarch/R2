@@ -32,6 +32,8 @@ sub begin : Private {
             for qw( R2::Web::CSS R2::Web::Javascript );
     }
 
+    $self->_add_global_tabs($c);
+
     return 1;
 }
 
@@ -46,6 +48,32 @@ sub _uri_requires_authen {
     return 0 if $uri->path() =~ m{^/(?:die|robots\.txt|exit)};
 
     return 1;
+}
+
+sub _add_global_tabs {
+    my $self = shift;
+    my $c = shift;
+
+    my $account = $c->account();
+
+    $c->tabs()->add_item($_)
+        for (
+        {
+            uri     => $account->uri(),
+            label   => 'Dashboard',
+            tooltip => $account->name() . ' dashboard',
+        }, {
+            uri     => $account->uri( view => 'contacts' ),
+            label   => 'Contacts',
+            tooltip => 'Search and view contacts',
+        }, {
+            uri     => $account->uri( view => 'reports' ),
+            label   => 'Reports',
+            tooltip => 'Reports on your contacts and donations',
+        },
+        );
+
+    return;
 }
 
 sub end : Private {

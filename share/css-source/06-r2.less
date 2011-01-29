@@ -143,6 +143,34 @@ body {
     }
 }
 
+#local-nav {
+    border-bottom: 1px solid @medium-gray;
+    padding-bottom: 0.2em;
+    margin-bottom: 1em;
+
+    ul {
+        font-size: 90%;
+        margin: 0;
+    }
+
+    li {
+        display: inline;
+        list-style: none;
+        margin-right: 0.5em;
+
+        a {
+            color: @dark-gray;
+        }
+    }
+
+    li.selected {
+        a {
+            color: black;
+            text-decoration: none;
+        }
+    }
+}
+
 #messages {
     background-color: @light-yellow;
     font-size: 90%;
@@ -159,13 +187,6 @@ body {
 
 #content.no-side-nav {
     margin-right: 10px;
-}
-
-#local-nav-content {
-    margin-right: 10px;
-    margin-top: 10px;
-    padding-left: 8px;
-    padding-top: 8px;
 }
 
 #summary {

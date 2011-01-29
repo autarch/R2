@@ -1,4 +1,4 @@
-package R2::Web::Tab;
+package R2::Web::NavItem;
 
 use strict;
 use warnings;
@@ -43,4 +43,4 @@ __PACKAGE__->meta()->make_immutable();
 
 1;
 
-# ABSTRACT: A tab in the web UI
+# ABSTRACT: A nav item in the web UI

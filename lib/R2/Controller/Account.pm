@@ -56,6 +56,8 @@ get_html q{}
     my $self = shift;
     my $c    = shift;
 
+    $c->tabs()->by_id('Dashboard')->set_is_selected(1);
+
     $c->stash()->{template} = '/dashboard';
 };
 
@@ -361,7 +363,6 @@ get_html q{}
     $c->stash()->{template} = '/account/custom_field_group';
 };
 
-
 post q{}
     =>  chained '_set_custom_field_group'
     => args 0
@@ -448,6 +449,32 @@ post user
         $user->display_name() . '  has been added to this account' );
 
     $c->redirect_and_detach( $account->uri( view => 'users' ) );
+};
+
+get_html 'reports'
+    =>  chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->tabs()->by_id('Reports')->set_is_selected(1);
+
+    $c->stash()->{template} = '/account/reports';
+};
+
+get_html 'top_donors'
+    =>  chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->tabs()->by_id('Reports')->set_is_selected(1);
+
+    $c->stash()->{donors} = $c->account()->top_donors();
+
+    $c->stash()->{template} = '/account/top_donors';
 };
 
 __PACKAGE__->meta()->make_immutable();

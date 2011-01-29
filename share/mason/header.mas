@@ -17,12 +17,12 @@
 
     <div id="tabs">
       <ul>
-% for my $tab ( $c->tabs() ) {
+% for my $tab ( $c->tabs()->items() ) {
         <li class="<% $tab->is_selected() ? 'selected' : '' %>"
             ><a href="<% $tab->uri() %>"
                 title="<% $tab->tooltip %>"><% $tab->label() %></a></li>
 % }
-% unless ( $c->has_tabs() ) {
+% unless ( $c->tabs()->has_items() ) {
         <!-- we need an element here or else the height of the header
              is different for a page with tabs vs one without -->
         <li class="invisible">&nbsp;</li>

@@ -14,7 +14,6 @@ use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
 use R2::Search::Contact::ByName;
 use R2::Util qw( string_is_empty );
-use R2::Web::Tab;
 
 use Moose;
 use CatalystX::Routes;
@@ -41,6 +40,8 @@ for my $type (qw( person household organization )) {
             'You are not allowed to add contacts.',
             $c->account()->uri(),
         );
+
+        $c->tabs()->by_id('Contacts')->set_is_selected(1);
 
         $c->stash()->{template} = $template;
     };
@@ -97,23 +98,26 @@ chain_point _set_contact
         $c->account()->uri(),
     );
 
-    $self->_add_contact_view_tabs( $c, $contact );
+    $c->tabs()->by_id('Contacts')->set_is_selected(1);
+
+    $self->_add_contact_view_nav( $c, $contact );
 
     $c->stash()->{contact} = $contact;
 
     $c->stash()->{real_contact} = $c->stash()->{contact}->real_contact();
 };
 
-sub _add_contact_view_tabs {
+sub _add_contact_view_nav {
     my $self    = shift;
     my $c       = shift;
     my $contact = shift;
 
-    $c->add_tab($_)
+    $c->local_nav()->add_item($_)
         for (
         {
             uri     => $contact->uri(),
-            label   => 'basics',
+            id      => 'basics',
+            label   => $contact->real_contact()->display_name(),
             tooltip => 'Name, email, address, phone, etc.',
         }, {
             uri   => $contact->uri( view => 'donations' ),
@@ -147,7 +151,7 @@ get_html q{}
 
     my $contact = $c->stash()->{contact};
 
-    $c->tab_by_id('basics')->set_is_selected(1);
+    $c->local_nav()->by_id('basics')->set_is_selected(1);
 
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
@@ -222,7 +226,7 @@ get_html edit_form
         $c->domain()->application_uri( path => q{} ),
     );
 
-    $c->tab_by_id('basics')->set_is_selected(1);
+    $c->local_nav()->by_id('basics')->set_is_selected(1);
 
     my $type = lc $contact->contact_type();
 
@@ -244,7 +248,7 @@ for my $type ( qw( donation note ) ) {
             my $self = shift;
             my $c    = shift;
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             $c->stash()->{$edit_perm}
                 = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
@@ -270,7 +274,7 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             $c->stash()->{template} = "/contact/$new_form";
         };
@@ -397,7 +401,7 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             $c->stash()->{template} = $edit_template;
         };
@@ -413,12 +417,12 @@ for my $type ( qw( donation note ) ) {
 
             my $contact = $c->stash()->{contact};
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             $c->stash()->{$edit_perm} = $c->user()
                 ->can_edit_contact( contact => $c->stash()->{contact} );
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             $c->stash()->{template} = $view_template;
         };
@@ -510,7 +514,7 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            $c->tab_by_id($plural)->set_is_selected(1);
+            $c->local_nav()->by_id($plural)->set_is_selected(1);
 
             my $entity = $c->stash()->{$type};
 
@@ -528,7 +532,7 @@ get_html history
     my $self = shift;
     my $c    = shift;
 
-    $c->tab_by_id('history')->set_is_selected(1);
+    $c->local_nav()->by_id('history')->set_is_selected(1);
 
     $c->stash()->{can_edit_contact}
         = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
