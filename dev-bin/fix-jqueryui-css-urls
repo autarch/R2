@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Find::Rule;
+use File::Slurp qw( read_file write_file );
+
+my ($file) = File::Find::Rule->name( qr/^\d\d-jquery-ui.+\.css$/ )->in('share');
+
+my $css = read_file($file);
+
+$css =~ s{\Qurl(images}{url(/images/jquery-ui}g;
+
+write_file( $file, $css );
+
