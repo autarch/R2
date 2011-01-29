@@ -21,7 +21,7 @@ my $form_data = R2::Web::FormData->new(
     suffix  => $suffix,
 );
 
-my $form = R2::Web::Form->new(
+my $form = R2::Web::FormMunger->new(
     html        => $m->content(),
     errors      => ( [ $c->session_object()->errors ] ),
     form_data   => $form_data,

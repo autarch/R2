@@ -1,4 +1,4 @@
-package R2::Web::Form;
+package R2::Web::FormMunger;
 
 use strict;
 use warnings;

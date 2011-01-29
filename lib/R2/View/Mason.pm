@@ -23,8 +23,8 @@ use HTML::FillInForm;
 use Number::Format;
 use Path::Class;
 use R2::Config;
-use R2::Web::Form;
 use R2::Web::FormData;
+use R2::Web::FormMunger;
 use R2::Util qw( string_is_empty );
 {
     my $config = R2::Config->instance();
