@@ -73,8 +73,10 @@ R2.Form.prototype._instrumentDivDeleters = function () {
 R2.Form.prototype._instrumentDateFields = function () {
     var self = this;
 
-    var options = { "changeMonth": true,
-                    "changeYear":  true };
+    var options = {
+        "changeMonth": true,
+        "changeYear":  true
+    };
 
     $('input[name^="datepicker_"]').each(
         function () {
