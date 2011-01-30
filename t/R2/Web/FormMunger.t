@@ -6,7 +6,7 @@ use Test::More;
 use HTML::DOM;
 use List::AllUtils qw( any );
 use List::AllUtils qw( first );
-use R2::Web::Form;
+use R2::Web::FormMunger;
 use R2::Web::FormData;
 
 my $html = <<'EOF';
@@ -228,7 +228,7 @@ EOF
 }
 
 sub form_elt_for {
-    my $form = R2::Web::Form->new(
+    my $form = R2::Web::FormMunger->new(
         html => $html,
         @_,
     );
