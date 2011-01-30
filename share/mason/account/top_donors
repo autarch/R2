@@ -57,14 +57,14 @@
 </p>
 % }
 
-<ul>
+<ol>
 % while ( my $contact = $donors->next() ) {
   <li>
     <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
     - <% $donors->raw_row()->[-1] %>
   </li>
 % }
-</ul>
+</ol>
 
 % if ( ! $donors->index() ) {
 <p>
