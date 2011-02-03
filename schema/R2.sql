@@ -102,6 +102,7 @@ CREATE TABLE "Contact" (
        contact_id         SERIAL8            PRIMARY KEY,
        contact_type       contact_type       NOT NULL,
        allows_email       BOOLEAN            NOT NULL DEFAULT TRUE,
+       email_opt_out      BOOLEAN            NOT NULL DEFAULT FALSE,
        allows_mail        BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_phone       BOOLEAN            NOT NULL DEFAULT TRUE,
        allows_trade       BOOLEAN            NOT NULL DEFAULT FALSE,

@@ -1,0 +1,8 @@
+      <p>
+        This <% lc $contact->contact_type() %> has explicitly chosen to not
+        receive email from your organization.
+      </p>
+
+<%args>
+$contact
+</%args>

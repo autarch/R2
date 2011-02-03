@@ -23,6 +23,10 @@ sub _contact_params_for_class {
     my %p = $c->request()->$params_method();
     $p{account_id} = $c->account()->account_id();
 
+    unless ( $c->user()->is_system_admin() ) {
+        delete $p{email_opt_out};
+    }
+
     return \%p;
 }
 
