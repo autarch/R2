@@ -60,7 +60,7 @@
 <ol>
 % while ( my $contact = $donors->next() ) {
   <li>
-    <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+    <a href="<% $contact->uri( view => 'donations' ) %>"><% $contact->real_contact()->display_name() %></a>
     - <% $donors->raw_row()->[-1] %>
   </li>
 % }
