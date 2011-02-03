@@ -5,7 +5,9 @@ use warnings;
 
 use Email::Valid;
 use MooseX::Types -declare => [
-    qw( FileIsImage
+    qw(
+        ContactLike
+        FileIsImage
         PosInt
         PosOrZeroInt
         NonEmptyStr
@@ -14,6 +16,11 @@ use MooseX::Types -declare => [
         )
 ];
 use MooseX::Types::Moose qw( Int Str Defined );
+
+#<<<
+subtype ContactLike
+    as class_type('R2::Schema::Contact')
+       | role_type('R2::Role::Schema::ActsAsContact');
 
 subtype FileIsImage,
     as class_type('R2::Schema::File'),
@@ -35,7 +42,9 @@ subtype NonEmptyStr,
     where { length $_ >= 0 },
     message {'This string must not be empty'};
 
-subtype ErrorForSession, as Defined, where {
+subtype ErrorForSession,
+    as Defined,
+    where {
     return 1;
     return 1 unless ref $_;
     return 1 if eval { @{$_} } && !grep {ref} @{$_};
@@ -47,6 +56,7 @@ subtype ErrorForSession, as Defined, where {
 subtype URIStr, as NonEmptyStr;
 
 coerce URIStr, from class_type('URI'), via { $_->canonical() };
+#>>>
 
 1;
 
