@@ -95,4 +95,14 @@ R2.Form.prototype._instrumentDateFields = function () {
             $(this).datepicker(options);
         }
     );
+
+    if ( $("input.date").length > 0 ) {
+        var form = $("input.date").closest("form");
+
+        form.submit(
+            function () {
+                $(this).find('input[name^="datepicker_"]').detach();
+            }
+        );
+    }
 };
