@@ -15,12 +15,20 @@ use MooseX::Types -declare => [
         URIStr
         )
 ];
-use MooseX::Types::Moose qw( Int Str Defined );
+use MooseX::Types::Moose qw(  Defined Int Object Str );
 
 #<<<
 subtype ContactLike,
-    as class_type('R2::Schema::Contact')
-       | role_type('R2::Role::Schema::ActsAsContact');
+    as Object,
+    where {
+        $_->isa('R2::Schema::Contact')
+            || ( $_->can('does')
+                 && $_->does('R2::Role::Schema::ActsAsContact') );
+    },
+    message {
+        ( ref $_[0] )
+            . ' is not a R2::Schema::Contact, nor does it do R2::Role::Schema::ActsAsContact';
+    };
 
 subtype FileIsImage,
     as class_type('R2::Schema::File'),
