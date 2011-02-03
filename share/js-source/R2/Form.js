@@ -1,4 +1,5 @@
 JSAN.use('R2.FormWidget.ContactSearch');
+JSAN.use('R2.FormWidget.DateRange');
 JSAN.use('R2.FormWidget.LabeledRadioButton');
 JSAN.use('R2.FormWidget.MemberSearch');
 JSAN.use('R2.FormWidget.RepeatableGroup');
@@ -86,6 +87,8 @@ R2.Form.prototype._instrumentDateFields = function () {
             options[key] = $(this).val();
         }
     );
+
+    new R2.FormWidget.DateRange (options);
 
     $("input.date").each(
         function () {
