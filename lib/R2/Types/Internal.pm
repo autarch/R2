@@ -18,7 +18,7 @@ use MooseX::Types -declare => [
 use MooseX::Types::Moose qw( Int Str Defined );
 
 #<<<
-subtype ContactLike
+subtype ContactLike,
     as class_type('R2::Schema::Contact')
        | role_type('R2::Role::Schema::ActsAsContact');
 
