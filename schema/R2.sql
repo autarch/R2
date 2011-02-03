@@ -334,6 +334,21 @@ CREATE TABLE "Tag" (
 
 CREATE INDEX "Tag_account_id" ON "Tag" ("account_id");
 
+-- An email list is simply additional data for a tag
+CREATE TABLE "EmailList" (
+       tag_id           INT8            PRIMARY KEY,
+       description      TEXT            NOT NULL
+);
+
+CREATE TABLE "ContactEmailListOptOut" (
+       tag_id           INT8            NOT NULL,
+       contact_id       INT8            NOT NULL,
+       PRIMARY KEY ( tag_id, contact_id )
+);
+
+CREATE INDEX "ContactEmailListOptOut_contact_id"
+        ON "ContactEmailListOptOut" ("contact_id");
+
 CREATE TABLE "Person" (
        person_id          INT8               PRIMARY KEY,
        salutation         citext             NOT NULL DEFAULT '',
@@ -772,6 +787,18 @@ ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contact_id"
 
 ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_tag_id"
   FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "EmailList" ADD CONSTRAINT "Tag_tag_id"
+  FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactEmailListOptOut" ADD CONSTRAINT "Tag_tag_id"
+  FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactEmailListOptOut" ADD CONSTRAINT "Contact_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
