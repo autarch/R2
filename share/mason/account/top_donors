@@ -44,16 +44,16 @@
 
 % if ( $start_date && $end_date ) {
 <p>
-  Only including donations from
+  Only including donations made from
   <% $c->user()->format_date($start_date) %> through <% $c->user()->format_date($end_date) %>
 </p>
 % } elsif ($start_date) {
 <p>
-  Only including donations starting on <% $c->user()->format_date($start_date) %>.
+  Only including donations made on or after <% $c->user()->format_date($start_date) %>.
 </p>
 % } elsif ($end_date) {
 <p>
-  Only including donations through <% $c->user()->format_date($end_date) %>.
+  Only including donations made on or before <% $c->user()->format_date($end_date) %>.
 </p>
 % }
 
