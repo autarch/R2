@@ -320,7 +320,8 @@ CREATE TABLE "ContactHistoryType" (
 
 CREATE TABLE "ContactTag" (
        contact_id       INT8            NOT NULL,
-       tag_id           INT8            NOT NULL
+       tag_id           INT8            NOT NULL,
+       PRIMARY KEY ( contact_id, tag_id )
 );
 
 CREATE INDEX "ContactTag_tag_id" ON "ContactTag" ("tag_id");
