@@ -21,12 +21,6 @@
     .rounded-corners-bottom(@radius);
 }
 
-.rounded-box (@radius: 6px, @color: black) {
-    .rounded-corners-both(@radius);
-    border: 1px solid @color;
-    margin-bottom: 1em;
-}     
-
 @light-gray: #f3f3f3;
 @medium-gray: #999;
 @dark-gray: #555;
@@ -189,16 +183,49 @@ body {
     margin-right: 10px;
 }
 
+#local-nav-content {
+    margin: 1em 0 0 1em;
+}
+
 #summary {
     h1 {
         margin: 0.2em 0 1em 0;
     }
 }
 
-#detail-view {
+#tags {
+    background-color: @light-gray;
+    border: 1px solid @dark-gray;
+    padding: 0.5em 1em;
+    .rounded-corners-both(6px);
+
+    ul {
+        display: inline;
+        margin: 0;
+
+        li {
+            display: inline;
+        }
+    }
+
     h2 {
+        color: @dark-gray;
+        margin: 0 0 0.5em 0;
+    }
+
+    form {
+        font-size: 90%;
+    }
+}
+
+#detail-view {
+    > h2 {
         border-bottom: 1px solid @dark-gray;
         color: @dark-gray;
+    }
+
+    h2:nth-of-type(1) {
+        margin-top: 0;
     }
 
     h3 {

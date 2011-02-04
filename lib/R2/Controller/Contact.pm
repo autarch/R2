@@ -98,7 +98,8 @@ chain_point _set_contact
         $c->account()->uri(),
     );
 
-    $c->tabs()->by_id('Contacts')->set_is_selected(1);
+    $c->tabs()->by_id('Contacts')->set_is_selected(1)
+        if $c->request()->looks_like_browser();
 
     $self->_add_contact_view_nav( $c, $contact );
 
@@ -529,16 +530,64 @@ get_html history
     => chained '_set_contact'
     => args 0
     => sub {
-    my $self = shift;
-    my $c    = shift;
+        my $self = shift;
+        my $c    = shift;
 
-    $c->local_nav()->by_id('history')->set_is_selected(1);
+        $c->local_nav()->by_id('history')->set_is_selected(1);
 
-    $c->stash()->{can_edit_contact}
-        = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
+        $c->stash()->{can_edit_contact} = $c->user()
+            ->can_edit_contact( contact => $c->stash()->{contact} );
 
-    $c->stash()->{template} = '/contact/history';
-};
+        $c->stash()->{template} = '/contact/history';
+    };
+
+post tags
+    => chained '_set_contact'
+    => args 0
+    => sub {
+        my $self = shift;
+        my $c    = shift;
+
+        my $contact = $c->stash()->{contact};
+
+        $self->_check_authz(
+            $c,
+            'can_edit_contact',
+            { contact => $contact },
+            'You are not authorized to edit this contact',
+            $c->domain()->application_uri( path => q{} ),
+        );
+
+        my @tags = map { s/^\s+|\s+$//; $_ } split /\s*,\s*/,
+            ( $c->request()->params()->{tags} || q{} );
+
+        $contact->add_tags( tags => \@tags ) if @tags;
+
+        $self->_tags_as_entity_response( $c, 'created' );
+    };
+
+sub _tags_as_entity_response {
+    my $self   = shift;
+    my $c      = shift;
+    my $status = shift || 'ok';
+
+    my $contact = $c->stash()->{contact};
+
+    my @tags = map { $_->serialize() } $contact->tags()->all();
+    $_->{'delete_uri'} = $contact->uri( view => 'tag/' . $_->{tag_id} )
+        for @tags;
+
+    my $meth = 'status_' . $status;
+
+    $self->$meth(
+        $c,
+        location => $contact->uri( view => 'tags' ),
+        entity   => {
+            contact_id => $contact->contact_id(),
+            tags       => \@tags,
+        },
+    );
+}
 
 __PACKAGE__->meta()->make_immutable();
 

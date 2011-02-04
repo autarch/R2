@@ -13,7 +13,7 @@ use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
 use R2::Schema::Person;
-use R2::Types qw( HashRef Str );
+use R2::Types qw( ContactLike HashRef Str );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
@@ -434,7 +434,7 @@ sub can_view_contact {
     my $self = shift;
     my ($contact) = validated_list(
         \@_,
-        contact => { isa => 'R2::Schema::Contact' },
+        contact => { isa => ContactLike },
     );
 
     return $self->_require_at_least(
@@ -447,7 +447,7 @@ sub can_edit_contact {
     my $self = shift;
     my ($contact) = validated_list(
         \@_,
-        contact => { isa => 'R2::Schema::Contact' },
+        contact => { isa => ContactLike },
     );
 
     return $self->_require_at_least(

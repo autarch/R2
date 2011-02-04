@@ -13,6 +13,11 @@ parameter skip => (
     default => sub { [] },
 );
 
+parameter add => (
+    isa => ArrayRef [Str],
+    default => sub { [] },
+);
+
 role {
     my $p     = shift;
     my %extra = @_;
@@ -35,15 +40,23 @@ role {
         }
     }
 
+    my @add = @{ $p->add() };
+
     method serialize => sub {
         my $self = shift;
 
-        return {
+        my %ser = (
             map {
                 my $meth = $map{$_};
                 $_ => $self->$meth();
-                } keys %map
-        };
+                } @add,
+            keys %map
+        );
+
+        $ser{uri} = $self->uri()
+            if $self->can('uri');
+
+        return \%ser;
     };
 };
 

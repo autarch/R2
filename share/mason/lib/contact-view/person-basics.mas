@@ -1,0 +1,20 @@
+% if ($bd) {
+<div>
+Birth date: <% $c->user()->format_date($bd) %>
+</div>
+% }
+
+% unless ( string_is_empty($gender) ) {
+<div>
+Gender: <% $gender %>
+</div>
+% }
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my $bd = $contact->birth_date();
+my $gender = $contact->gender();
+</%init>

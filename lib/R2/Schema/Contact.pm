@@ -13,12 +13,14 @@ use R2::Image;
 use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::Address;
+use R2::Schema::ContactTag;
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
 use R2::Schema::MessagingProvider;
 use R2::Schema::PhoneNumber;
+use R2::Schema::Tag;
 use R2::Schema::Website;
-use R2::Types qw( PosOrZeroInt Bool HashRef );
+use R2::Types qw( ArrayRef Bool HashRef PosOrZeroInt Str );
 use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
@@ -225,6 +227,19 @@ with 'R2::Role::Schema::URIMaker';
     query note_count => (
         select      => __PACKAGE__->_CountContactsInTableSelect('ContactNote'),
         bind_params => sub { $_[0]->contact_id() },
+    );
+
+    class_has '_TagsSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildTagsSelect',
+    );
+
+    has tags => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_tags',
     );
 
     class_has '_HistorySelect' => (
@@ -620,6 +635,78 @@ sub has_custom_field_values_for_group {
 
         return \%return;
     }
+}
+
+sub _build_tags {
+    my $self = shift;
+
+    my $select = $self->_TagsSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Tag )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->contact_id() ],
+    );
+}
+
+sub _BuildTagsSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables('Tag') )
+        ->from  ( $schema->tables( 'Tag', 'ContactTag' ) )
+        ->where ( $schema->table('ContactTag')->column('contact_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('Tag')->column('tag') );
+    #>>>
+    return $select;
+}
+
+sub add_tags {
+    my $self = shift;
+    my ($tags) = validated_list(
+        \@_,
+        tags => ArrayRef[Str],
+    );
+
+    my @tag_ids;
+    for my $tag_name ( @{$tags} ) {
+        my %tag_p = (
+            tag        => $tag_name,
+            account_id => $self->account_id(),
+        );
+
+        my $tag;
+        if ( $tag = R2::Schema::Tag->new(%tag_p) ) {
+            next
+                if R2::Schema::ContactTag->new(
+                contact_id => $self->contact_id(),
+                tag_id  => $tag->tag_id(),
+                );
+
+            push @tag_ids, $tag->tag_id();
+        }
+        else {
+            $tag = R2::Schema::Tag->insert(%tag_p);
+
+            push @tag_ids, $tag->tag_id();
+        }
+    }
+
+    R2::Schema::ContactTag->insert_many(
+        map { { contact_id => $self->contact_id(), tag_id => $_, } }
+            @tag_ids )
+        if @tag_ids;
+
+    return;
 }
 
 sub _build_history {

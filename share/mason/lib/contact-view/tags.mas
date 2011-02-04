@@ -1,0 +1,31 @@
+<div id="tags">
+  <h2>Tags</h2>
+
+  <ul id="tags-list">
+% while ( my $tag = $tags->next() ) {
+    <li>
+    <a href="<% $tag->uri() %>"><% $tag->tag() %></a>
+%   if ($can_edit) {
+    <a href="<% $contact->uri( view => 'tag/' . $tag->tag_id() ) %>" class="delete-tag">x</a>
+%   }
+    </li>
+% }
+  </ul>
+
+  <form id="tags-form" action="<% $contact->uri( view => 'tags' ) %>" method="post">
+    <p>
+      Enter tags separated by commas ("Board, Big Donor, ...")
+    </p>
+    <input class="text" type="text" name="tags" />
+    <input type="submit" value="Tag" />
+  </form>
+</div>
+
+<%args>
+$contact
+</%args>
+
+<%init>
+my $tags = $contact->tags();
+my $can_edit = $c->user()->can_edit_contact( contact => $contact );
+</%init>

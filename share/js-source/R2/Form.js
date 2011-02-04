@@ -16,8 +16,8 @@ R2.Form = function (form) {
     this._instrumentRepeatableGroups();
     this._instrumentDivDeleters();
     this._instrumentDateFields();
-    new R2.FormWidget.MemberSearch;
-    new R2.FormWidget.ContactSearch;
+    new R2.FormWidget.MemberSearch ();
+    new R2.FormWidget.ContactSearch ();
 };
 
 R2.Form.instrumentAllForms = function () {

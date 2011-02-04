@@ -2,20 +2,6 @@
 
 <& /lib/contact-view/summary.mas, contact => $person, show_image => 1 &>
 
-<& /lib/contact-view/edit-link.mas, contact => $person &>
-
-% if ($bd) {
-<div>
-Birth date: <% $c->user()->format_date($bd) %>
-</div>
-% }
-
-% unless ( string_is_empty($gender) ) {
-<div>
-Gender: <% $gender %>
-</div>
-% }
-
 <& /lib/contact-view/email-addresses.mas, contact => $person &>
 
 <& /lib/contact-view/websites.mas, contact => $person &>
@@ -33,11 +19,6 @@ Gender: <% $gender %>
 <%args>
 $person
 </%args>
-
-<%init>
-my $bd = $person->birth_date();
-my $gender = $person->gender();
-</%init>
 
 <%method title>
 <% $person->full_name() %>

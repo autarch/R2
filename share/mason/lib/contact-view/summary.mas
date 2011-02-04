@@ -1,12 +1,23 @@
-<div id="summary">
+<div class="yui3-g">
+  <div class="yui3-u-3-5">
+    <div id="summary">
 % if ($image ) {
-  <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
+      <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
 % }
-  <h1>
-    <% $contact->display_name() %>
+      <h1>
+        <% $contact->display_name() %>
 
-    <& /lib/contact-view/contact-icon.mas, contact => $contact &>
-  </h1>
+        <& /lib/contact-view/contact-icon.mas, contact => $contact &>
+      </h1>
+
+      <& /lib/contact-view/edit-link.mas, contact => $contact &>
+
+      <& $basics_comp, contact => $contact &>
+    </div>
+  </div>
+  <div class="yui3-u-2-5">
+    <& /lib/contact-view/tags.mas, contact => $contact &>
+  </div>
 </div>
 
 <%args>
@@ -19,4 +30,6 @@ my $image;
 if ( $show_image && $contact->image() ) {
     $image = $contact->image()->resize( height => 100, width => 100 );
 }
+
+my $basics_comp = '/lib/contact-view/' . ( lc $contact->contact_type() ) . '-basics.mas';
 </%init>

@@ -130,6 +130,15 @@ sub _check_authz {
     );
 }
 
+sub status_forbidden {
+    my $self = shift;
+    my $c = shift;
+
+    $c->response->status(403);
+
+    return;
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
