@@ -790,6 +790,10 @@ ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_tag_id"
   FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "Tag" ADD CONSTRAINT "Account_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "EmailList" ADD CONSTRAINT "Tag_tag_id"
   FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
