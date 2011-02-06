@@ -125,6 +125,7 @@ R2.Tags.prototype._deleteTag = function (uri) {
         {
             "url":     uri,
             "type":    "DELETE",
+            "dataType": "json",
             "success": function (data) { self._handleSuccess(data); }
         }
     );
