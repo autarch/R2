@@ -133,12 +133,21 @@ sub _check_authz {
 
 sub status_forbidden {
     my $self = shift;
-    my $c = shift;
+    my $c    = shift;
 
     $c->response->status(403);
 
     return;
 }
+
+after qr/^status_/ => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->response()->content_type('application/json')
+        if defined $c->response()->body()
+            && length $c->response()->body();
+};
 
 __PACKAGE__->meta()->make_immutable();
 

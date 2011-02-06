@@ -566,6 +566,35 @@ post tags
         $self->_tags_as_entity_response( $c, 'created' );
     };
 
+del tag
+    => chained '_set_contact'
+    => path_part 'tag',
+    => args 1
+    => sub {
+        my $self   = shift;
+        my $c      = shift;
+        my $tag_id = shift;
+
+        my $contact = $c->stash()->{contact};
+
+        $self->_check_authz(
+            $c,
+            'can_edit_contact',
+            { contact => $contact },
+            'You are not authorized to edit this contact',
+            $c->domain()->application_uri( path => q{} ),
+        );
+
+        my $contact_tag = R2::Schema::ContactTag->new(
+            contact_id => $contact->contact_id(),
+            tag_id     => $tag_id
+        );
+
+        $contact_tag->delete() if $contact_tag;
+
+        $self->_tags_as_entity_response($c);
+    };
+
 sub _tags_as_entity_response {
     my $self   = shift;
     my $c      = shift;
@@ -579,14 +608,17 @@ sub _tags_as_entity_response {
 
     my $meth = 'status_' . $status;
 
-    $self->$meth(
-        $c,
-        location => $contact->uri( view => 'tags' ),
-        entity   => {
+    my %p = (
+        entity => {
             contact_id => $contact->contact_id(),
             tags       => \@tags,
         },
     );
+
+    $p{location} = $contact->uri( view => 'tags' )
+        if $status ne 'ok';
+
+    $self->$meth( $c, %p );
 }
 
 __PACKAGE__->meta()->make_immutable();
