@@ -123,9 +123,9 @@ R2.Tags.prototype._deleteTag = function (uri) {
 
     $.ajax(
         {
-            "url":      uri,
-            "type":     "DELETE",
-            "success" : function (data) { self._handleSuccess(data) },
+            "url":     uri,
+            "type":    "DELETE",
+            "success": function (data) { self._handleSuccess(data); }
         }
     );
 };
