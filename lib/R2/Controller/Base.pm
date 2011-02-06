@@ -54,7 +54,8 @@ sub _add_global_tabs {
     my $self = shift;
     my $c = shift;
 
-    my $account = $c->account();
+    my $account = $c->account()
+        or return;
 
     $c->tabs()->add_item($_)
         for (
