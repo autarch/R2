@@ -140,15 +140,6 @@ sub status_forbidden {
     return;
 }
 
-after qr/^status_/ => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $c->response()->content_type('application/json')
-        if defined $c->response()->body()
-            && length $c->response()->body();
-};
-
 __PACKAGE__->meta()->make_immutable();
 
 1;
