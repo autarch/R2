@@ -50,7 +50,7 @@
 </table>
 
 <div class="yui3-g label-and-value">
-  <div class="yui3-u-2-5 label"><span>Fiscal year total (<% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):</span></div>
+  <div class="yui3-u-2-5 label"><span>FY <% $c->account()->fiscal_year_start_date()->year() %> total (<% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):</span></div>
   <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></span></div>
   <div class="yui3-u-2-5 label"><span>12 month total:</span></div>
   <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></span></div>
