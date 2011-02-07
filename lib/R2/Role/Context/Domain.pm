@@ -1,4 +1,4 @@
-package R2::AppRole::Domain;
+package R2::Role::Context::Domain;
 
 use strict;
 use warnings;

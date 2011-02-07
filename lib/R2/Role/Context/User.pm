@@ -1,4 +1,4 @@
-package R2::AppRole::User;
+package R2::Role::Context::User;
 
 use strict;
 use warnings;

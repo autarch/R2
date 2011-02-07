@@ -44,11 +44,11 @@ BEGIN {
 }
 
 with qw(
-    R2::AppRole::Account
-    R2::AppRole::Domain
-    R2::AppRole::NavCollections
-    R2::AppRole::RedirectWithError
-    R2::AppRole::User
+    R2::Role::Context::Account
+    R2::Role::Context::Domain
+    R2::Role::Context::NavCollections
+    R2::Role::Context::RedirectWithError
+    R2::Role::Context::User
 );
 
 {

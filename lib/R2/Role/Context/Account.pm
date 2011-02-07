@@ -1,4 +1,4 @@
-package R2::AppRole::Account;
+package R2::Role::Context::Account;
 
 use strict;
 use warnings;

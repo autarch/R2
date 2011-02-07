@@ -1,4 +1,4 @@
-package R2::AppRole::NavCollections;
+package R2::Role::Context::NavCollections;
 
 use strict;
 use warnings;

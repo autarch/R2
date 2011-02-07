@@ -1,4 +1,4 @@
-package R2::AppRole::RedirectWithError;
+package R2::Role::Context::RedirectWithError;
 
 use strict;
 use warnings;
