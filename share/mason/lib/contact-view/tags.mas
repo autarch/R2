@@ -15,7 +15,7 @@
 
   <form id="tags-form" action="<% $contact->uri( view => 'tags' ) %>" method="post">
     <p>
-      Enter tags separated by commas ("Board, Big Donor, ...")
+      Enter new tags separated by commas ("Board, Big Donor, ...")
     </p>
     <input class="text" type="text" name="tags" />
     <input type="submit" class="submit" value="Tag" />
