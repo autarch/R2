@@ -7,10 +7,6 @@
 
     <& /lib/contact-view/contact-icon.mas, contact => $contact &>
   </h1>
-
-  <& /lib/contact-view/edit-link.mas, contact => $contact &>
-
-  <& $basics_comp, contact => $contact &>
 </div>
 
 <%args>

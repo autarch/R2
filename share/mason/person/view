@@ -2,6 +2,10 @@
 
 <& /lib/contact-view/summary.mas, contact => $person, show_image => 1 &>
 
+<& /lib/contact-view/edit-link.mas, contact => $person &>
+
+<& /lib/contact-view/person-basics.mas, contact => $person &>
+
 <& /lib/contact-view/email-addresses.mas, contact => $person &>
 
 <& /lib/contact-view/websites.mas, contact => $person &>
