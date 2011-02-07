@@ -17,12 +17,12 @@
 <body>
 
 <div id="page">
-<& header.mas, %ARGS &>
+<& /layout/header.mas, %ARGS &>
 
 <div class="yui3-g">
-  <div class="<% $show_side_nav ? 'yui3-u-17-24' : 'yui3-u-1' %>">
+  <div class="<% $show_sidebar ? 'yui3-u-17-24' : 'yui3-u-1' %>">
 
-    <div id="content" class="<% $show_side_nav ? q{} : 'no-side-nav' %>">
+    <div id="content" class="<% $show_sidebar ? q{} : 'no-side-nav' %>">
   <div id="local-nav">
     <ul>
 % for my $nav ( $c->local_nav()->items() ) {
@@ -43,25 +43,25 @@
     </div>
   </div>
 
-% if ( $m->request_comp()->attr('show_side_nav') ) {
+% if ($show_sidebar) {
 <& side-nav.mas, %ARGS &>
 % }
 	
 </div>
 
-<& footer.mas, %ARGS &>
+<& /layout/footer.mas, %ARGS &>
 </div>
 
 </body>
 </html>
 
 <%attr>
-show_side_nav => 1
-side_nav => []
+show_sidebar => 0
+sidebar => []
 </%attr>
 
 <%init>
-my $show_side_nav = $m->request_comp()->attr('show_side_nav');
+my $show_sidebar = $m->request_comp()->attr('show_sidebar');
 </%Init>
 
 <%def .messages>
