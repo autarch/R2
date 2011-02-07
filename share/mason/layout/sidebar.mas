@@ -1,17 +1,15 @@
     <div class="yui3-u-7-24">
-      <div id="local-nav-content">
-        <form action="/contact/search" method="get">
-          <label for="search">Find a contact:</label>
-          <input name="search" id="search" type="text" class="text" value="" />
-        </form>
+      <div id="sidebar-content">
 
-% for my $comp ( @{ $m->request_comp()->attr('side_nav') } ) {
-        <& $comp, %ARGS &>
+% for my $comp ( $c->sidebar()->items() ) {
+        <& "/layout/sidebar/$comp.mas", %ARGS &>
 % }
 
       </div>
     </div>
 
 <%init>
+return unless $c->sidebar()->has_items();
+
 my $account = $c->user()->account();
 </%init>

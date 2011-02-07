@@ -40,7 +40,3 @@ $return_to
 <%method title>
 Log In
 </%method>
-
-<%attr>
-show_side_nav => 0
-</%attr>

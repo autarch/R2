@@ -1,0 +1,4 @@
+        <form action="/contact/search" method="get">
+          <label for="search">Find a contact:</label>
+          <input name="search" id="search" type="text" class="text" value="" />
+        </form>

@@ -48,6 +48,7 @@ with qw(
     R2::Role::Context::Domain
     R2::Role::Context::NavCollections
     R2::Role::Context::RedirectWithError
+    R2::Role::Context::Sidebar
     R2::Role::Context::User
 );
 

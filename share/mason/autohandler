@@ -44,7 +44,7 @@
   </div>
 
 % if ($show_sidebar) {
-<& side-nav.mas, %ARGS &>
+<& /layout/sidebar.mas, %ARGS &>
 % }
 	
 </div>
@@ -61,7 +61,7 @@ sidebar => []
 </%attr>
 
 <%init>
-my $show_sidebar = $m->request_comp()->attr('show_sidebar');
+my $show_sidebar = $c->sidebar()->has_items();
 </%Init>
 
 <%def .messages>

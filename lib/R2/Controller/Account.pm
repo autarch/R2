@@ -59,6 +59,8 @@ get_html q{}
 
     $c->tabs()->by_id('Dashboard')->set_is_selected(1);
 
+    $c->sidebar()->add_item('contact-search');
+
     $c->stash()->{template} = '/dashboard';
 };
 
