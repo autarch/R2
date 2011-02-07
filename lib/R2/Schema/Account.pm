@@ -114,6 +114,19 @@ with 'R2::Role::Schema::URIMaker';
         ],
     );
 
+    class_has '_TagsSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildTagsSelect',
+    );
+
+    has tags => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_tags',
+    );
+
     has fiscal_year_start_date => (
         is      => 'ro',
         isa     => 'DateTime',
@@ -323,6 +336,47 @@ sub _build_made_a_note_contact_note_type {
         description => 'Made a note',
         account_id  => $self->account_id(),
     );
+}
+
+sub _build_tags {
+    my $self = shift;
+
+    my $select = $self->_TagsSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Tag )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->account_id() ],
+    );
+}
+
+sub _BuildTagsSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('ContactTag')->column('contact_id')
+    );
+
+    #<<<
+    $select
+        ->select( $schema->table('Tag'), $count )
+        ->from  ( $schema->table('Tag'),
+                  'left', $schema->tables('ContactTag') )
+        ->where ( $schema->table('Tag')->column('account_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $count, 'DESC',
+                    $schema->table('Tag')->column('tag') )
+        ->group_by( $schema->table('Tag')->columns() );
+    #>>>
+    return $select;
 }
 
 sub top_donors {

@@ -452,6 +452,20 @@ post user
     $c->redirect_and_detach( $account->uri( view => 'users' ) );
 };
 
+get_html 'tags'
+    =>  chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->tabs()->by_id('Tags')->set_is_selected(1);
+
+    $c->stash()->{tags} = $c->stash()->{account}->tags();
+
+    $c->stash()->{template} = '/account/tags';
+};
+
 get_html 'reports'
     =>  chained '_set_account'
     => args 0

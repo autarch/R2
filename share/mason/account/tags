@@ -1,0 +1,27 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &>
+</div>
+
+<ul>
+% while ( my $tag = $tags->next() ) {
+%   my $count = $tags->raw_row()->[-1];
+  <li>
+%   if ($count) {
+    <a href="<% $tag->uri() %>"><% $tag->tag() %></a> - <% $count %></li>
+%   } else {
+    <% $tag->tag() %> - unused
+%   }
+% }
+</ul>
+
+<%args>
+$account
+$tags
+</%args>
+
+<%method title>
+Tags for contacts
+<%args>
+$account
+</%args>
+</%method>
