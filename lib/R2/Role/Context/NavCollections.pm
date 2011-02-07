@@ -4,9 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Scalar::Util qw( blessed );
 use R2::Web::NavCollection;
-use Tie::IxHash;
 
 use Moose::Role;
 
