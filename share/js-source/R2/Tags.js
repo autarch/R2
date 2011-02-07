@@ -13,7 +13,7 @@ R2.Tags = function () {
     this._input = this._form.find('input[name="tags"]');
 
     this._instrumentForm();
-    this._instrumentDeleteForms();
+    this._instrumentDeleteLinks();
 };
 
 R2.Tags.prototype._instrumentForm = function () {
@@ -79,47 +79,39 @@ R2.Tags.prototype._updateTagList = function (data) {
         tag_a.attr( "href", tag.uri );
         tag_a.append( document.createTextNode( tag.tag ) );
 
-        var delete_form = $("<form/>");
-        delete_form.attr( "action", tag.delete_uri );
-        delete_form.attr( "method", "post" );
-        delete_form.addClass("inline delete-tag");
-
-        var submit = $("<input/>");
-        submit.attr( "type", "submit" );
-        submit.attr( "value", "x" );
-        submit.addClass("submit");
-        submit.addClass("small");
-
-        delete_form.append(submit);
+        var delete_a = $("<a/>");
+        delete_a.attr( "href", tag.delete_uri );
+        delete_a.attr( "title", "Remove this tag" );
+        delete_a.addClass("delete-tag ui-button ui-icon ui-icon-circle-close");
 
         var li = $("<li/>");
         li.append(
             img,
             tag_a,
             document.createTextNode(" "),
-            delete_form,
+            delete_a,
             document.createTextNode(" ")
         );
 
         list.append(li);
     }
 
-    this._instrumentDeleteForms();
+    this._instrumentDeleteLinks();
 
     return;
 };
 
-R2.Tags.prototype._instrumentDeleteForms = function () {
+R2.Tags.prototype._instrumentDeleteLinks = function () {
     var self = this;
 
-    $("form.delete-tag").each(
+    $("a.delete-tag").each(
         function () {
             $(this).click(
                 function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
-                    self._deleteTag( $(this).attr("action") );
+                    self._deleteTag( $(this).attr("href") );
                 }
             );
         }

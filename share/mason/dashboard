@@ -30,6 +30,44 @@
 % }
 </ul>
 
+% if ( $c->user()->can_add_contact( account => $account ) ) {
+<h2>Add a ...</h2>
+<ul>
+  <li>
+    <a href="<% $c->account()->uri( view => 'new_person_form' ) %>"
+       title="Add a new person">Person</a>
+  </li>
+  <li>
+    <a href="<% $c->account()->uri( view => 'new_household_form' ) %>"
+       title="Add a new household">Household</a>
+  </li>
+  <li>
+    <a href="<% $c->account()->uri( view => 'new_organization_form' ) %>"
+       title="Add a new organization">Organization</a>
+  </li>
+</ul>
+% }
+
+<h2>View all ...</h2>
+<ul>
+  <li>
+    <a href="<% $account->uri( view => 'search/contact' ) %>"
+       title="Add a new person">Contacts</a>
+  </li>
+  <li>
+    <a href="<% $account->uri( view => 'search/person' ) %>"
+       title="Add a new person">People</a>
+  </li>
+  <li>
+    <a href="<% $account->uri( view => 'search/household' ) %>"
+       title="Add a new household">Households</a>
+  </li>
+  <li>
+    <a href="<% $account->uri( view => 'search/organization' ) %>"
+       title="Add a new organization">Organizations</a>
+  </li>
+</ul>
+
 <%shared>
 my $title = 'Dashboard: ' . $c->account()->name();
 </%shared>

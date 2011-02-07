@@ -1,4 +1,4 @@
-<div id="tags">
+<div class="associated-content" id="tags">
   <h2>Tags</h2>
 
   <ul id="tags-list">
@@ -6,11 +6,8 @@
     <li>
     <a href="<% $tag->uri() %>"><% $tag->tag() %></a>
 %   if ($can_edit) {
-    <form class="inline delete-tag"
-          action="<% $contact->uri( view => 'tag/' . $tag->tag_id() ) %>"
-          method="post">
-      <input type="submit" class="submit small" value="x" />
-    </form>
+    <a href="<% $contact->uri( view => 'tag/' . $tag->tag_id() ) %>"
+       class="delete-tag ui-button ui-icon ui-icon-circle-close" title="Remove this tag">x</a>
 %   }
     </li>
 % }

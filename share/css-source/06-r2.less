@@ -184,21 +184,18 @@ body {
 }
 
 #local-nav-content {
-    margin: 1em 0 0 1em;
-}
+    margin: 0.5em 0 0 1em;
 
-#summary {
-    h1 {
-        margin: 0.2em 0 1em 0;
+    .associated-content {
+        h2 {
+            background-color: @light-green;
+            margin: 0.5em 0 0.5em -7px;
+            padding: 0.2em 0 0.2em 7px;
+        }
     }
 }
 
 #tags {
-    background-color: @light-gray;
-    border: 1px solid @dark-gray;
-    padding: 0.5em 1em;
-    .rounded-corners-both(6px);
-
     ul {
         display: inline;
         margin: 0;
@@ -209,7 +206,6 @@ body {
     }
 
     h2 {
-        color: @dark-gray;
         margin: 0 0 0.5em 0;
     }
 
@@ -219,13 +215,17 @@ body {
 }
 
 #detail-view {
-    > h2 {
-        border-bottom: 1px solid @dark-gray;
-        color: @dark-gray;
+    #summary {
+        h1 {
+            background-color: @light-green;
+            margin: 0 0 0.7em -5px;
+            padding: 0.3em 0 0.3em 5px;
+        }
     }
 
-    h2:nth-of-type(1) {
-        margin-top: 0;
+    h2 {
+        border-bottom: 1px solid @dark-gray;
+        color: @dark-gray;
     }
 
     h3 {
@@ -519,11 +519,6 @@ form {
         color: white;
         font-weight: bold;
         padding: 0.1em;
-    }
-
-    input.small {
-        font-size: 90%;
-        padding: 0.05em;
     }
 
     fieldset input.submit {

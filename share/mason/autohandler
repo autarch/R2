@@ -20,7 +20,7 @@
 <& header.mas, %ARGS &>
 
 <div class="yui3-g">
-  <div class="<% $show_side_nav ? 'yui3-u-4-5' : 'yui3-u-1' %>">
+  <div class="<% $show_side_nav ? 'yui3-u-17-24' : 'yui3-u-1' %>">
 
     <div id="content" class="<% $show_side_nav ? q{} : 'no-side-nav' %>">
   <div id="local-nav">
@@ -57,6 +57,7 @@
 
 <%attr>
 show_side_nav => 1
+side_nav => []
 </%attr>
 
 <%init>

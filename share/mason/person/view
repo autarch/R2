@@ -26,3 +26,7 @@ $person
 $person
 </%args>
 </%method>
+
+<%attr>
+side_nav => [ '/lib/contact-view/tags.mas' ]
+</%attr>
