@@ -41,11 +41,11 @@ sub _build_files {
 
     $js->add('R2');
 
-    my @jquery_files = grep { $_->basename() =~ /^jquery/ } $dir->children();
+    my @non_r2_files = grep { $_->basename() ne 'R2.js' } $dir->children();
 
     return [
-        ( first { $_->basename() =~ /^jquery-\d/ } @jquery_files ),
-        ( first { $_->basename() =~ /^jquery-ui-/ } @jquery_files ),
+        ( first { $_->basename() =~ /^jquery-\d/ } @non_r2_files ),
+        ( first { $_->basename() =~ /^jquery-ui-/ } @non_r2_files ),
         map { file($_) } $js->files()
     ];
 }
