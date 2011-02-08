@@ -76,7 +76,7 @@ sub create_content {
     my $header = $self->header();
     $content .= $header
         unless string_is_empty($header);
-v
+
     for my $file ( @{ $self->files() } ) {
         $content .= "\n\n/* $file */\n\n";
         $content .= eval { $self->_squish( $self->_process($file) ) } || q{};
