@@ -1,14 +1,17 @@
 <ul id="add-contacts">
   <li>
     <a href="<% $c->account()->uri( view => 'new_person_form' ) %>"
+       class="action-button"
        title="Add a new person"><img src="/images/icons/person.png" title="Person" height="16" width="16" /> Add a person</a>
   </li>
   <li>
     <a href="<% $c->account()->uri( view => 'new_household_form' ) %>"
+       class="action-button"
        title="Add a new household"><img src="/images/icons/household.png" title="Household" height="16" width="16" /> Add a household</a>
   </li>
   <li>
     <a href="<% $c->account()->uri( view => 'new_organization_form' ) %>"
+       class="action-button"
        title="Add a new organization"><img src="/images/icons/organization.png" title="Organization" height="16" width="16" /> Add an organization</a>
   </li>
 </ul>
