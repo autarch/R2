@@ -76,10 +76,13 @@ sub create_content {
     my $header = $self->header();
     $content .= $header
         unless string_is_empty($header);
-
+v
     for my $file ( @{ $self->files() } ) {
         $content .= "\n\n/* $file */\n\n";
-        $content .= $self->_squish( $self->_process($file) );
+        $content .= eval { $self->_squish( $self->_process($file) ) } || q{};
+        if ( my $e = $@ ) {
+            die "Error squishing $file: $e\n";
+        }
     }
 
     return $content;
