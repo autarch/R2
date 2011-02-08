@@ -38,16 +38,18 @@ Only showing active users.
       <td><% $role->name() %></td>
       <td><a href="<% $user->uri( view => 'edit_form' ) %>">edit</a></td>
       <td>
+%   if ( $user->user_id() != $c->user->user_id() ) {
         <form class="inline" action="<% $user->uri() %>" method="post">
           <input type="hidden" name="x-tunneled-method" value="PUT" />
-%   if ( $user->is_disabled() ) {
+%     if ( $user->is_disabled() ) {
           <input type="hidden" name="is_disabled" value="0" />
           <input type="submit" class="submit" value="Enable" />
-%   } else {
+%     } else {
           <input type="hidden" name="is_disabled" value="1" />
           <input type="submit" class="submit" value="Disable" />
-%   }
+%     }
         </form>
+%   }
       </td>
     </tr>
   </tbody>
