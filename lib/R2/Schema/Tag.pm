@@ -5,6 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
+use URI::Escape qw( uri_escape_utf8 );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -29,7 +30,7 @@ sub _base_uri_path {
     return
           $self->account()->_base_uri_path()
         . '/tag/'
-        . $self->tag_id();
+        . uri_escape_utf8( $self->tag() );
 }
 
 __PACKAGE__->meta()->make_immutable();
