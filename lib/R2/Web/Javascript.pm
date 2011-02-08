@@ -13,12 +13,6 @@ use R2::Types qw( Bool );
 
 use Moose;
 
-has squish => (
-    is      => 'ro',
-    isa     => Bool,
-    default => sub { R2::Config->instance()->is_production() },
-);
-
 with 'R2::Role::Web::CombinedStaticFiles';
 
 sub _build_header {
@@ -61,8 +55,6 @@ sub _build_target_file {
 sub _squish {
     my $self = shift;
     my $code = shift;
-
-    return $code unless $self->squish();
 
     return minify($code);
 }
