@@ -59,11 +59,18 @@ get_html q{}
 
     $c->tabs()->by_id('Dashboard')->set_is_selected(1);
 
-    $c->sidebar()->add_item('contact-search');
-    $c->sidebar()->add_item('add-contacts');
+    $self->_add_basic_sidebar($c);
 
     $c->stash()->{template} = '/dashboard';
 };
+
+sub _add_basic_sidebar {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->sidebar()->add_item('contact-search');
+    $c->sidebar()->add_item('add-contacts');
+}
 
 put q{}
     => chained '_set_account'
@@ -464,6 +471,8 @@ get_html 'tags'
 
     $c->tabs()->by_id('Tags')->set_is_selected(1);
 
+    $self->_add_basic_sidebar($c);
+
     $c->stash()->{tags} = $c->stash()->{account}->tags();
 
     $c->stash()->{template} = '/account/tags';
@@ -477,6 +486,8 @@ get_html 'reports'
     my $c    = shift;
 
     $c->tabs()->by_id('Reports')->set_is_selected(1);
+
+    $self->_add_basic_sidebar($c);
 
     $c->stash()->{template} = '/account/reports';
 };
