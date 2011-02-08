@@ -75,7 +75,7 @@ R2.FormWidget.RepeatableGroup.prototype._repeatGroup = function (target) {
     }
 
     div.fadeIn(500);
-}
+};
 
 R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
     var count = this.repeat_count;
