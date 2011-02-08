@@ -64,9 +64,7 @@ sub _squish {
 
     return $code unless $self->squish();
 
-    return $code;
-    # XXX - minifier breaks against jquery?
-#    return minify($code);
+    return minify($code);
 }
 
 __PACKAGE__->meta()->make_immutable();
