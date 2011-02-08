@@ -17,10 +17,10 @@ use Moose;
 
 with 'R2::Role::Web::CombinedStaticFiles';
 
-has lessc_path => (
+has sass_path => (
     is      => 'ro',
     isa     => Str,
-    builder => '_build_lessc_path',
+    builder => '_build_sass_path',
 );
 
 sub _build_files {
@@ -32,7 +32,7 @@ sub _build_files {
                   !$_->is_dir()
                 && $_->basename() =~ /^\d+/
                 && $_->basename()
-                =~ /\.(?:css|less)$/
+                =~ /\.s?css$/
             } $dir->children()
     ];
 }
@@ -60,9 +60,9 @@ sub _process {
 
     # We need to delay unlinking of the temp file until after it is read.
     my $temp;
-    if ( $filename =~ /\.less$/ ) {
+    if ( $filename =~ /\.scss$/ ) {
         $temp = File::Temp->new();
-        system( $self->lessc_path(), $filename, $temp->filename() );
+        system( $self->sass_path(), '-C', $filename, $temp->filename() );
         $filename = $temp->filename();
     }
 
@@ -70,16 +70,13 @@ sub _process {
 
 }
 
-sub _build_lessc_path {
+sub _build_sass_path {
     my $self = shift;
 
-    my $bin = which('lessc');
+    my $bin = which('sass');
     return $bin if $bin;
 
-    my $default = '/var/lib/gems/1.8/bin/lessc';
-    return $default if -f $default;
-
-    die "Cannot find lessc in your path or at $default";
+    die "Cannot find sass in your path";
 }
 
 __PACKAGE__->meta()->make_immutable();
