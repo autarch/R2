@@ -34,7 +34,7 @@
       </div>
       <div class="yui3-u-2-5">
         <div class="form-item">
-          <input class="submit" type="submit" value="Show report" />
+          <input class="action-button" type="submit" value="Show report" />
         </div>
       </div>
     </div>

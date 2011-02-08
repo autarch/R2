@@ -182,22 +182,6 @@ body {
     }
 }
 
-.action-button {
-    @include gradient( $medium-green, $dark-green, 25%, 100% );
-    border-top: 1px solid $medium-green-border-light;
-    border-right: 2px solid $medium-green-border-dark;
-    border-bottom: 2px solid $medium-green-border-dark;
-    border-left: 1px solid $medium-green-border-light;
-    color: white;
-    padding: 0.4em;
-    @include rounded-corners-both(6px);
-    text-decoration: none;
-}
-
-.action-button:hover {
-    background: $orange;
-}
-
 #messages {
     background-color: $light-yellow;
     font-size: 90%;
@@ -546,6 +530,10 @@ form {
         width: 30em;
     }
 
+    input.small {
+        font-size: 90%;
+    }
+
     textarea {
         height: 7em;
     }
@@ -558,21 +546,8 @@ form {
         height: 10em;
     }
 
-    input.submit {
-        background-color: $dark-green;
-        border-bottom: 2px solid $dark-green-border-dark;
-        border-left: 1px solid $dark-green-border-light;
-        border-right: 2px solid $dark-green-border-dark;
-        border-top: 1px solid $dark-green-border-light;
-        color: white;
-        font-weight: bold;
-        padding: 0.1em;
-    }
-
-    fieldset input.submit {
-        font-size: 115%;
-        padding: 0.3em;
-        text-shadow: 1px 1px #333;
+    div.form-item input.action-button {
+        font-size: 120%;
     }
 }
 
@@ -641,4 +616,21 @@ form.inline input.submit {
 
 div.custom-field {
     margin-bottom: 0.5em;
+}
+
+.action-button {
+    @include gradient( $medium-green, $dark-green, 25%, 100% );
+    border-top: 1px solid $medium-green-border-light;
+    border-right: 2px solid $medium-green-border-dark;
+    border-bottom: 2px solid $medium-green-border-dark;
+    border-left: 1px solid $medium-green-border-light;
+    color: white;
+    font-weight: bold;
+    padding: 0.4em;
+    @include rounded-corners-both(6px);
+    text-decoration: none;
+}
+
+.action-button:hover {
+    background: $orange;
 }

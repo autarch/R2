@@ -31,7 +31,7 @@
       <td><a href="<% $note->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
         <form class="inline" action="<% $note->uri( view => 'confirm_deletion' ) %>" method="get">
-          <input type="submit" class="submit" value="Delete" />
+          <input type="submit" class="action-button" value="Delete" />
         </form>
       </td>
 %     }
