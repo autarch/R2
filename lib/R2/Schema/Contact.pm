@@ -674,7 +674,7 @@ sub add_tags {
     my $self = shift;
     my ($tags) = validated_list(
         \@_,
-        tags => ArrayRef[Str],
+        tags => ArrayRef [Str],
     );
 
     my @tag_ids;
@@ -689,7 +689,7 @@ sub add_tags {
             next
                 if R2::Schema::ContactTag->new(
                 contact_id => $self->contact_id(),
-                tag_id  => $tag->tag_id(),
+                tag_id     => $tag->tag_id(),
                 );
 
             push @tag_ids, $tag->tag_id();
