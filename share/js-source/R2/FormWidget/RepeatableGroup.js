@@ -82,9 +82,9 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 
     div.find("*").filter(
         function () {
-            return /new1/.test( $(this).attr("name") )
-                || /new1/.test( $(this).attr("id") )
-                || /new1/.test( $(this).attr("for") );
+            return (/new1/).test( $(this).attr("name") )
+                || (/new1/).test( $(this).attr("id") )
+                || (/new1/).test( $(this).attr("for") );
         }
     ).each(
         function () {
@@ -107,7 +107,7 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 
     div.find(":radio").filter(
         function () {
-            return /is_preferred$/.test( $(this).attr("name") );
+            return (/is_preferred$/).test( $(this).attr("name") );
         }
     ).each(
         function () {
@@ -117,7 +117,7 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 
     div.find("label").filter(
         function () {
-            return /is_preferred-/.test( $(this).attr("id") );
+            return (/is_preferred-/).test( $(this).attr("id") );
         }
     ).each(
         function () {
