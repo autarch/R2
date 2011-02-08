@@ -154,6 +154,9 @@ get_html q{}
 
     $c->local_nav()->by_id('basics')->set_is_selected(1);
 
+    $c->sidebar()->add_item('contact-search');
+    $c->sidebar()->add_item('contact-tags');
+
     my $meth = '_display_' . lc $contact->contact_type();
     $self->$meth($c);
 };
