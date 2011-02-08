@@ -4,7 +4,7 @@
 
 % if ($can_edit_notes) {
 <p>
-  <a href="<% $contact->uri( view => 'new_note_form' ) %>">Record a new note</a>.
+  <a class="action-button" href="<% $contact->uri( view => 'new_note_form' ) %>">Record a new note</a>
 </p>
 % }
 
@@ -31,7 +31,7 @@
       <td><a href="<% $note->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
         <form class="inline" action="<% $note->uri( view => 'confirm_deletion' ) %>" method="get">
-          <input type="submit" class="action-button" value="Delete" />
+          <input type="submit" class="action-button small" value="Delete" />
         </form>
       </td>
 %     }

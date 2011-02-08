@@ -4,7 +4,7 @@
 
 % if ($can_edit_donations) {
 <p>
-  <a href="<% $contact->uri( view => 'new_donation_form' ) %>">Record a new donation</a>.
+  <a href="<% $contact->uri( view => 'new_donation_form' ) %>" class="action-button">Record a new donation</a>
 </p>
 % }
 
@@ -35,7 +35,7 @@
       <td><a href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
         <form class="inline" action="<% $donation->uri( view => 'confirm_deletion' ) %>" method="get">
-          <input type="submit" class="action-button" value="Delete" />
+          <input type="submit" class="action-button small" value="Delete" />
         </form>
       </td>
 %     }
@@ -57,12 +57,12 @@
   <div class="yui3-u-2-5 label"><span>Total for all time:</span></div>
   <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total() ) %></span></div>
 </div>
-
 % } else {
 <p>
 <% $real_contact->display_name() %> has not made any donations.
 </p>
 % }
+
 
 <%args>
 $contact
