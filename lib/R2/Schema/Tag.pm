@@ -5,6 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
+use R2::Search::Contact::ByTag;
 use URI::Escape qw( uri_escape_utf8 );
 
 use Fey::ORM::Table;
@@ -23,6 +24,15 @@ with 'R2::Role::Schema::URIMaker';
 }
 
 with 'R2::Role::Schema::Serializes';
+
+sub contacts {
+    my $self = shift;
+
+    return R2::Search::Contact::ByTag->new(
+        account => $self->account(),
+        tag_id  => $self->tag_id(),
+    );
+}
 
 sub _base_uri_path {
     my $self = shift;

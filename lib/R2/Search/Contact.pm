@@ -9,6 +9,7 @@ use Fey::Literal::Term;
 use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
 use R2::Schema;
+use R2::Search::Iterator::RealContact;
 use R2::Types;
 
 use Moose;
@@ -90,7 +91,10 @@ has 'account' => (
 
         my $select = $self->_SelectBase->clone();
 
-        $select->select( $schema->table('Contact'), $order_by_func );
+        $select->select(
+            $schema->tables( 'Person', 'Household', 'Orgainzation' ),
+            $order_by_func
+        );
 
         $self->_apply_where_clauses($select);
 
@@ -98,11 +102,14 @@ has 'account' => (
 
         $self->_apply_limit($select);
 
-        return Fey::Object::Iterator::FromSelect->new(
-            classes => 'R2::Schema::Contact',
+        return R2::Search::Iterator::RealContact->new(
+            classes => [
+                qw( R2::Schema::Person R2::Schema::Household R2::Schema::Organization )
+            ],
             dbh => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
-            select      => $select,
-            bind_params => [ $self->account()->account_id(), $select->bind_params() ],
+            select => $select,
+            bind_params =>
+                [ $self->account()->account_id(), $select->bind_params() ],
         );
     }
 }

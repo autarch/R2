@@ -478,6 +478,32 @@ get_html 'tags'
     $c->stash()->{template} = '/account/tags';
 };
 
+get_html 'tag'
+    =>  chained '_set_account'
+    => args 1
+    => sub {
+    my $self     = shift;
+    my $c        = shift;
+    my $tag_name = shift;
+
+    my $account = $c->stash()->{account};
+    my $tag     = R2::Schema::Tag->new(
+        account_id => $account->account_id(),
+        tag        => $tag_name,
+    );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $tag;
+
+    $c->tabs()->by_id('Tags')->set_is_selected(1);
+
+    $self->_add_basic_sidebar($c);
+
+    $c->stash()->{tag} = $tag;
+
+    $c->stash()->{template} = '/tag/view';
+};
+
 get_html 'reports'
     =>  chained '_set_account'
     => args 0

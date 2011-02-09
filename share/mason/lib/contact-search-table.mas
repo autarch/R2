@@ -1,0 +1,29 @@
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Location</th>
+      <th></th>
+    </tr>
+  </thead>
+% while ( my $contact = $results->next() ) {
+  <tbody>
+    <tr class="<% $results->index() % 2 ? 'odd' : 'even' %>">
+      <td><a href="<% $contact->uri() %>"><% $contact->display_name() %></td>
+      <td></td>
+      <td><a class="action-button small" href="<% $contact->uri( view => 'edit_form' ) %>">Edit</td>
+    </tr>
+  </tbody>
+% }
+</table>
+
+<%args>
+$search
+</%args>
+
+<%init>
+my $count = $search->contact_count();
+my $results;
+$results = $search->contacts()
+    if $count;
+</%init>

@@ -1,0 +1,21 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &>
+</div>
+
+<& /lib/contact-search-table.mas, search => $tag->contacts() &>
+
+<%args>
+$tag
+</%args>
+
+<%init>
+my $search = $tag->contacts();
+my $results = $search->contacts();
+</%init>
+
+<%method title>
+<% $tag->tag() %> - All Contacts
+<%args>
+$tag
+</%args>
+</%method>
