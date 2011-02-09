@@ -128,6 +128,8 @@ sub contact_count {
 
     $select->select($count);
 
+    $self->_apply_where_clauses($select);
+
     my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
 
     my $row = $dbh->selectrow_arrayref(
