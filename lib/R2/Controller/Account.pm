@@ -365,7 +365,7 @@ chain_point _set_custom_field_group
 };
 
 get_html q{}
-    =>  chained '_set_custom_field_group'
+    => chained '_set_custom_field_group'
     => args 0
     => sub {
     my $self = shift;
@@ -375,7 +375,7 @@ get_html q{}
 };
 
 post q{}
-    =>  chained '_set_custom_field_group'
+    => chained '_set_custom_field_group'
     => args 0
     => sub {
     my $self = shift;
@@ -463,7 +463,7 @@ post user
 };
 
 get_html 'tags'
-    =>  chained '_set_account'
+    => chained '_set_account'
     => args 0
     => sub {
     my $self = shift;
@@ -479,7 +479,7 @@ get_html 'tags'
 };
 
 get_html 'tag'
-    =>  chained '_set_account'
+    => chained '_set_account'
     => args 1
     => sub {
     my $self     = shift;
@@ -505,7 +505,7 @@ get_html 'tag'
 };
 
 get_html 'reports'
-    =>  chained '_set_account'
+    => chained '_set_account'
     => args 0
     => sub {
     my $self = shift;
@@ -519,7 +519,7 @@ get_html 'reports'
 };
 
 get_html 'top_donors'
-    =>  chained '_set_account'
+    => chained '_set_account'
     => args 0
     => sub {
     my $self = shift;
