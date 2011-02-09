@@ -52,6 +52,10 @@ $dark-green-border-dark:  $dark-green - #222;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$from}', endColorstr='#{$to}', GradientType=0);
 }
 
+.small {
+    font-size: 90%;
+}
+
 html {
     background-color: $light-gray;
 }
@@ -530,10 +534,6 @@ form {
         width: 30em;
     }
 
-    input.small {
-        font-size: 90%;
-    }
-
     textarea {
         height: 7em;
     }
@@ -633,4 +633,8 @@ div.custom-field {
 
 .action-button:hover {
     background: $orange;
+}
+
+a.action-button {
+    display: inline-block;
 }
