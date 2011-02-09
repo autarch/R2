@@ -24,7 +24,9 @@
       <td><% $count ? $count : 'unused' %></td>
       <td>
 %   if ($count) {
-        <a class="action-button" href="<% $tag->uri( view => 'confirm_deletion' ) %>">Delete</a>
+        <form class="inline" action="<% $tag->uri( view => 'confirm_deletion' ) %>" method="get">
+          <input class="action-button" type="submit" value="Delete" />
+        </form>
 %   } else {
         <form class="inline" action="<% $tag->uri() %>" method="post">
           <input type="hidden" name="x-tunneled-method" value="delete" />

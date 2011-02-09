@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
@@ -526,6 +527,25 @@ del q{}
         $c,
         location => $c->stash()->{account}->uri( view => 'tags' )
     );
+};
+
+get_html confirm_deletion
+    => chained '_set_tag'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $tag = $c->stash()->{tag};
+
+    $c->stash()->{type} = 'tag';
+    $c->stash()->{uri}  = $tag->uri();
+
+    my $count = $tag->contacts()->contact_count();
+    $c->stash()->{extra} = "This tag is currently in use by $count "
+        . PL_N( 'contact', $count ) . q{.};
+
+    $c->stash()->{template} = '/shared/confirm_deletion';
 };
 
 get_html 'reports'

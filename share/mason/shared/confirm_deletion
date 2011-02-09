@@ -2,6 +2,7 @@
 
 <p>
 Are you sure you want to delete this <% $type %>?
+<% $extra %>
 </p>
 
 <form action="<% $uri %>" method="post">
@@ -13,6 +14,7 @@ Are you sure you want to delete this <% $type %>?
 <%args>
 $type
 $uri
+$extra => q{}
 </%args>
 
 <%method title>
