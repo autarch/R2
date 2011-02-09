@@ -1,4 +1,8 @@
 <div id="summary">
+% if ($show_edit_link) {
+  <div class="yui3-g">
+  <div class="yui3-u-4-5">
+% }
 % if ($image ) {
   <img src="<% $image->uri() %>" title="Photo of <% $contact->display_name() %>" id="contact-image" />
 % }
@@ -7,11 +11,22 @@
 
     <& /lib/contact-view/contact-icon.mas, contact => $contact &>
   </h1>
+
+% if ($show_edit_link) {
+  </div>
+  <div class="yui3-u-1-5">
+    <a href="<% $contact->uri( view => 'edit_form' ) %>"
+       class="action-button small"
+       title="Edit <% $contact->display_name() %>">Edit</a>
+  </div>
+  </div>
+% }
 </div>
 
 <%args>
 $contact
 $show_image => 0
+$show_edit_link => 0
 </%args>
 
 <%init>

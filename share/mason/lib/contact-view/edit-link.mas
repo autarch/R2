@@ -1,8 +1,6 @@
-<p>
-  <a href="<% $contact->uri( view => 'edit_form' ) %>"
-     class="action-button"
-     title="Edit <% $contact->display_name() %>">Edit</a>
-</p>
+<a href="<% $contact->uri( view => 'edit_form' ) %>"
+   class="action-button small"
+   title="Edit <% $contact->display_name() %>">Edit</a>
 
 <%args>
 $contact

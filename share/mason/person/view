@@ -1,8 +1,6 @@
 <div id="detail-view">
 
-<& /lib/contact-view/summary.mas, contact => $person, show_image => 1 &>
-
-<& /lib/contact-view/edit-link.mas, contact => $person &>
+<& /lib/contact-view/summary.mas, contact => $person, show_image => 1, show_edit_link => 1 &>
 
 <& /lib/contact-view/person-basics.mas, contact => $person &>
 
