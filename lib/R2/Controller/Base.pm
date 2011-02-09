@@ -139,7 +139,7 @@ sub status_forbidden {
     my $self = shift;
     my $c    = shift;
 
-    $c->response->status(403);
+    $c->response()->status(403);
 
     return;
 }
