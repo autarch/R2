@@ -63,7 +63,7 @@ my %text_types = map { $_ => 1 } qw( citext email_address filename );
 transform_all
     matching { $text_types{ lc $_[0]->type() } } =>
     inflate {
-        return decode( 'utf-8', $_[1] );
+        return Encode::is_utf8( $_[1] ) ? $_[1] : decode( 'utf-8', $_[1] );
     };
 #>>>
 
