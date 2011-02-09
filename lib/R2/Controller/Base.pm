@@ -4,9 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use MooseX::Params::Validate qw( validated_list );
 use R2::Config;
 use R2::JSON;
 use R2::Schema::File;
+use R2::Types qw( Str Object );
 use R2::Web::CSS;
 use R2::Web::Javascript;
 
@@ -133,6 +135,25 @@ sub _check_authz {
         error => $error,
         uri   => $uri,
     );
+}
+
+sub status_no_content {
+    my $self       = shift;
+    my $c          = shift;
+    my ($location) = validated_list(
+        \@_,
+        location => { isa => Str | Object },
+    );
+
+    if ( $c->request()->looks_like_browser() ) {
+        $c->response()->status(302);
+        $c->response()->header( Location => $location );
+    }
+    else {
+        $c->response()->status(204);
+    }
+
+    return;
 }
 
 sub status_forbidden {

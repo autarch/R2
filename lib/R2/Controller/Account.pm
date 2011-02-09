@@ -513,6 +513,21 @@ get_html q{}
     $c->stash()->{template} = '/tag/view';
 };
 
+del q{}
+    => chained '_set_tag'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{tag}->delete();
+
+    $self->status_no_content(
+        $c,
+        location => $c->stash()->{account}->uri( view => 'tags' )
+    );
+};
+
 get_html 'reports'
     => chained '_set_account'
     => args 0

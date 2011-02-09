@@ -2,17 +2,40 @@
   <h1><& SELF:title, %ARGS &>
 </div>
 
-<ul>
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Tag</th>
+      <th># of Contacts</th>
+      <th></th>
+    </tr>
+  </thead>
 % while ( my $tag = $tags->next() ) {
 %   my $count = $tags->raw_row()->[-1];
-  <li>
+  <tbody>
+    <tr class="<% $tags->index() % 2 ? 'odd' : 'even' %>">
+      <td>
 %   if ($count) {
-    <a href="<% $tag->uri() %>"><% $tag->tag() %></a> - <% $count %></li>
+        <a href="<% $tag->uri() %>"><% $tag->tag() %></a>
 %   } else {
-    <% $tag->tag() %> - unused
+      <% $tag->tag() %>
 %   }
+      </td>
+      <td><% $count ? $count : 'unused' %></td>
+      <td>
+%   if ($count) {
+        <a class="action-button" href="<% $tag->uri( view => 'confirm_deletion' ) %>">Delete</a>
+%   } else {
+        <form class="inline" action="<% $tag->uri() %>" method="post">
+          <input type="hidden" name="x-tunneled-method" value="delete" />
+          <input class="action-button" type="submit" value="Delete" />
+        </form>
+%   }
+      </td>
+    </tr>
+  </tbody>
 % }
-</ul>
+</table>
 
 <%args>
 $account
