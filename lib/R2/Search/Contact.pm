@@ -62,19 +62,19 @@ has 'account' => (
             = Fey::Literal::Term
                 ->new( 'CASE '
                        . $schema->table('Contact')->column('contact_type')
-                       ->sql_or_alias($dbh)
+                             ->sql_or_alias($dbh)
                        . q{ WHEN 'Person' THEN }
                        . $schema->table('Person')->column('last_name')
-                       ->sql_or_alias($dbh)
+                             ->sql_or_alias($dbh)
                        . q{ || ' ' || }
                        . $schema->table('Person')->column('first_name')
-                       ->sql_or_alias($dbh)
+                             ->sql_or_alias($dbh)
                        . q{ WHEN 'Household' THEN }
                        . $schema->table('Household')->column('name')
-                       ->sql_or_alias($dbh)
+                             ->sql_or_alias($dbh)
                        . q{ ELSE }
                        . $schema->table('Organization')->column('name')
-                       ->sql_or_alias($dbh)
+                             ->sql_or_alias($dbh)
                        . q{ END} );
         #>>>
 
