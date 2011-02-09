@@ -478,9 +478,10 @@ get_html 'tags'
     $c->stash()->{template} = '/account/tags';
 };
 
-get_html 'tag'
+chain_point _set_tag
     => chained '_set_account'
-    => args 1
+    => path_part 'tag'
+    => capture_args 1
     => sub {
     my $self     = shift;
     my $c        = shift;
@@ -495,11 +496,19 @@ get_html 'tag'
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $tag;
 
+    $c->stash()->{tag} = $tag;
+};
+
+get_html q{}
+    => chained '_set_tag'
+    => args 0
+    => sub {
+    my $self     = shift;
+    my $c        = shift;
+
     $c->tabs()->by_id('Tags')->set_is_selected(1);
 
     $self->_add_basic_sidebar($c);
-
-    $c->stash()->{tag} = $tag;
 
     $c->stash()->{template} = '/tag/view';
 };
