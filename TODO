@@ -7,6 +7,7 @@ Search
 
 Emails
 
+- view
 - templated
 - bounce handling
 - incoming email processing
@@ -24,19 +25,21 @@ Reports
 - Top donors
 - "Expiring" donors
 
+- parameterize reports by donation fields, tags, etc
+
 Custom Fields
 
 - html widgets
 - editing
 
-View
-
-- emails
-
 Import tool
 
 - contacts
 - donations
+
+Events?
+
+- separate events from notes and turn them into first class things?
 
 Tags
 
