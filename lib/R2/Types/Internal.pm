@@ -7,11 +7,11 @@ use Email::Valid;
 use MooseX::Types -declare => [
     qw(
         ContactLike
+        ErrorForSession
         FileIsImage
+        NonEmptyStr
         PosInt
         PosOrZeroInt
-        NonEmptyStr
-        ErrorForSession
         URIStr
         )
 ];
@@ -30,26 +30,6 @@ subtype ContactLike,
             . ' is not a R2::Schema::Contact, nor does it do R2::Role::Schema::ActsAsContact';
     };
 
-subtype FileIsImage,
-    as class_type('R2::Schema::File'),
-    where { $_->is_image() },
-    message { 'This file (' . $_->filename() . ') is not an image' };
-
-subtype PosInt,
-    as Int,
-    where { $_ > 0 },
-    message {'This must be a positive integer'};
-
-subtype PosOrZeroInt,
-    as Int,
-    where { $_ >= 0 },
-    message {'This must be an integer >= 0'};
-
-subtype NonEmptyStr,
-    as Str,
-    where { length $_ >= 0 },
-    message {'This string must not be empty'};
-
 subtype ErrorForSession,
     as Defined,
     where {
@@ -60,6 +40,26 @@ subtype ErrorForSession,
     return 1 if $_->can('messages') || $_->can('message');
     return 0;
 };
+
+subtype FileIsImage,
+    as class_type('R2::Schema::File'),
+    where { $_->is_image() },
+    message { 'This file (' . $_->filename() . ') is not an image' };
+
+subtype NonEmptyStr,
+    as Str,
+    where { length $_ >= 0 },
+    message {'This string must not be empty'};
+
+subtype PosInt,
+    as Int,
+    where { $_ > 0 },
+    message {'This must be a positive integer'};
+
+subtype PosOrZeroInt,
+    as Int,
+    where { $_ >= 0 },
+    message {'This must be an integer >= 0'};
 
 subtype URIStr, as NonEmptyStr;
 
