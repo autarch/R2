@@ -75,7 +75,6 @@ class_has _ObjectSelectBase => (
 
 class_has _SearchedClasses => (
     traits   => ['Hash'],
-is => 'ro',
     isa      => HashRef,
     init_arg => undef,
     lazy     => 1,
