@@ -51,7 +51,7 @@
 <h2>View all ...</h2>
 <ul>
   <li>
-    <a href="<% $account->uri( view => 'search/contact' ) %>"
+    <a href="<% $account->uri( view => 'contacts' ) %>"
        title="Add a new person">Contacts</a>
   </li>
   <li>
