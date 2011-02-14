@@ -93,6 +93,14 @@ sub _BuildSearchedClasses {
     return { 'R2::Schema::Person' => 1 };
 }
 
+sub _build_title {
+    my $self = shift;
+
+    return 'All People' unless $self->_has_restrictions();
+
+    return 'X';
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

@@ -24,6 +24,7 @@ requires qw(
     _iterator_class
     _classes_returned_by_iterator
     _bind_params
+    _build_title
 );
 
 has order_by => (
@@ -42,6 +43,13 @@ has page => (
     is      => 'ro',
     isa     => PosInt,
     default => 1,
+);
+
+has title => (
+    is      => 'ro',
+    isa     => NonEmptyStr,
+    lazy    => 1,
+    builder => '_build_title',
 );
 
 has _restrictions => (

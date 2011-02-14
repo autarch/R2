@@ -60,7 +60,7 @@ get_html 'contacts'
         page    => 1,
     );
 
-    $c->stash()->{template} = '/search/contact_list';
+    $c->stash()->{template} = '/account/contacts';
 };
 
 get q{}

@@ -1,0 +1,43 @@
+<h2>
+Found <% $count %> matching <% PL_N( 'contact', $count ) %>.
+</h2>
+
+% if ($count) {
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Modified</th>
+    </tr>
+  </thead>
+
+%   while ( my $contact = $contacts->next() ) {
+  <tbody>
+    <tr class="<% $contacts->index() % 2 ? 'odd' : 'even' %>">
+      <td>
+        <a href="<% $contact->uri() %>"><% $contact->display_name() %></a>
+      </td>
+      <td>
+%     if ( my $address = $contact->preferred_email_address() ) {
+        <% $address->email_address() %>
+%     }
+      </td>
+      <td>
+        <% $c->user()->format_datetime( $contact->last_modified_datetime() ) %>
+      </td>
+    </tr>
+  </tbody>
+%   }
+</table>
+% }
+
+<%args>
+$search
+</%args>
+
+<%init>
+my $count = $search->contact_count();
+my $contacts;
+$contacts = $search->contacts() if $count;
+</%init>

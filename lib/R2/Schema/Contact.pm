@@ -242,17 +242,30 @@ with 'R2::Role::Schema::URIMaker';
         builder => '_build_tags',
     );
 
+    has 'history' => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_history',
+    );
+
     class_has '_HistorySelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
         builder => '_BuildHistorySelect',
     );
 
-    has 'history' => (
+    has last_modified_datetime => (
         is      => 'ro',
-        isa     => 'Fey::Object::Iterator::FromSelect',
+        isa     => 'DateTime',
         lazy    => 1,
-        builder => '_build_history',
+        builder => '_build_last_modified_datetime',
+    );
+
+    class_has '_LastModifiedDateTimeSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildLastModifiedDateTimeSelect',
     );
 
     has 'custom_fields' => (
@@ -741,6 +754,41 @@ sub _BuildHistorySelect {
                     'DESC',
                     $schema->table('ContactHistoryType')->column('sort_order'),
                     'ASC' );
+    #>>>
+    return $select;
+}
+
+sub _build_last_modified_datetime {
+    my $self = shift;
+
+    my $select = $self->_LastModifiedDateTimeSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    my $row = $dbh->selectrow_arrayref(
+        $select->sql($dbh), {},
+        $self->contact_id(),
+    );
+
+    return DateTime::Format::Pg->parse_datetime( $row->[0] );
+}
+
+sub _BuildLastModifiedDateTimeSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->table('ContactHistory')->column('history_datetime') )
+        ->from  ( $schema->table('ContactHistory') )
+        ->where( $schema->table('ContactHistory')->column('contact_id'),
+                 '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('ContactHistory')->column('history_datetime'),
+                    'DESC' )
+        ->limit(1);
     #>>>
     return $select;
 }

@@ -136,6 +136,14 @@ sub _BuildSearchedClasses {
     };
 }
 
+sub _build_title {
+    my $self = shift;
+
+    return 'All Contacts' unless $self->_has_restrictions();
+
+    return 'X';
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

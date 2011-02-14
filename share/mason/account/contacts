@@ -1,0 +1,16 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+<& /lib/search-results.mas, search => $search &>
+
+<%args>
+$search
+</%args>
+
+<%method title>
+<% $search->title() %>
+<%args>
+$search
+</%args>
+</%method>
