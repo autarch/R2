@@ -12,6 +12,7 @@ use MooseX::Types -declare => [
         NonEmptyStr
         PosInt
         PosOrZeroInt
+        SearchPlugin
         URIStr
         )
 ];
@@ -60,6 +61,8 @@ subtype PosOrZeroInt,
     as Int,
     where { $_ >= 0 },
     message {'This must be an integer >= 0'};
+
+role_type SearchPlugin, { role => 'R2::Role::Search::Plugin' };
 
 subtype URIStr, as NonEmptyStr;
 

@@ -1,15 +1,14 @@
-package R2::Search::Person::ByName;
+package R2::Search::Plugin::Contact::ByName;
 
-use strict;
-use warnings;
+use Moose;
+# intentionally not StrictConstructor
+
 use namespace::autoclean;
 
 use R2::Schema;
 use R2::Types qw( NonEmptyStr );
 
-use Moose;
-
-extends 'R2::Search::Person';
+with 'R2::Role::Search::Plugin';
 
 has 'name' => (
     is  => 'ro',
@@ -18,11 +17,37 @@ has 'name' => (
 
 my $Schema = R2::Schema->Schema();
 
-sub _apply_where_clauses {
+sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
-    super();
+    $self->_person_where_clause($select)
+        if $self->search()->searches_class('Person');
+
+    $select->where('or')
+        if $self->search()->searches_class( 'Person', 'Household' );
+
+    $select->where(
+        $Schema->table('Household')->column('name'),
+        'LIKE',
+        $self->name() . '%'
+    ) if $self->search()->searches_class('Household');
+
+    $select->where('or')
+        if $self->search()->searches_class( 'Household', 'Organization' );
+
+    $select->where(
+        $Schema->table('Organization')->column('name'),
+        'LIKE',
+        $self->name() . '%'
+    ) if $self->search()->searches_class('Organization');
+
+    return;
+};
+
+sub _person_where_clause {
+    my $self = shift;
+    my $select = shift;
 
     # The theory is that if there's more than 2 parts then it's
     # probably a last name with a space in it, as opposed to someone
@@ -56,8 +81,6 @@ sub _apply_where_clauses {
                      $parts[1] . '%' );
         #>>>
     }
-
-    return;
 }
 
 __PACKAGE__->meta()->make_immutable();

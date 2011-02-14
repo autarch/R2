@@ -1,27 +1,30 @@
 package R2::Search::Contact;
 
-use strict;
-use warnings;
+use Moose;
+# Cannot use StrictConstructor with plugins
+
 use namespace::autoclean;
 
 use Fey::Literal::Function;
 use Fey::Literal::Term;
 use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
+use List::AllUtils qw( any );
 use R2::Schema;
 use R2::Search::Iterator::RealContact;
-use R2::Types;
+use R2::Types qw( NonEmptyStr );
 
-use Moose;
-use MooseX::ClassAttribute;
-
-extends 'R2::Search';
-
-has 'account' => (
+has account => (
     is       => 'ro',
     isa      => 'R2::Schema::Account',
     required => 1,
 );
+
+with 'R2::Role::Search';
+
+has '+order_by' => ( default => 'name' );
+
+__PACKAGE__->_LoadAllPlugins();
 
 {
     my $schema = R2::Schema->Schema();
@@ -45,11 +48,31 @@ has 'account' => (
         '=', Fey::Placeholder->new()
     );
 
-    class_has '_SelectBase' => (
-        is      => 'ro',
-        isa     => 'Fey::SQL::Select',
-        default => sub {$select_base},
+    my $object_select_base = $select_base->clone()
+        ->select( $schema->tables( 'Person', 'Household', 'Organization' ) );
+
+    sub _BuildObjectSelectBase {$object_select_base}
+
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('Contact')->column('contact_id')
     );
+
+    my $count_select_base = $select_base->clone()->select($count);
+
+    sub _BuildCountSelectBase {$count_select_base}
+}
+
+sub contacts {
+    my $self = shift;
+
+    return $self->_object_iterator();
+}
+
+sub _iterator_class {'R2::Search::Iterator::RealContact'}
+
+sub _classes_returned_by_iterator {
+    [qw( R2::Schema::Person R2::Schema::Household R2::Schema::Organization )];
 }
 
 {
@@ -78,68 +101,42 @@ has 'account' => (
                              ->sql_or_alias($dbh)
                        . q{ END} );
         #>>>
-
         $term->set_alias_name('_orderable_name');
 
         $term;
     };
 
-    sub contacts {
-        my $self = shift;
+    sub _order_by_name {
+        my $self   = shift;
+        my $select = shift;
 
-        my $schema = R2::Schema->Schema();
-
-        my $select = $self->_SelectBase->clone();
-
-        $select->select(
-            $schema->tables( 'Person', 'Household', 'Orgainzation' ),
-            $order_by_func
-        );
-
-        $self->_apply_where_clauses($select);
-
+        $select->select($order_by_func);
         $select->order_by($order_by_func);
 
-        $self->_apply_limit($select);
-
-        return R2::Search::Iterator::RealContact->new(
-            classes => [
-                qw( R2::Schema::Person R2::Schema::Household R2::Schema::Organization )
-            ],
-            dbh => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
-            select => $select,
-            bind_params =>
-                [ $self->account()->account_id(), $select->bind_params() ],
-        );
+        return;
     }
 }
-
-sub _apply_where_clauses { }
 
 sub contact_count {
     my $self = shift;
 
-    my $schema = R2::Schema->Schema();
+    $self->_count();
+}
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        $schema->table('Contact')->column('contact_id') );
+sub _bind_params {
+    my $self   = shift;
+    my $select = shift;
 
-    my $select = $self->_SelectBase->clone();
+    return $self->account()->account_id(), $select->bind_params();
+}
 
-    $select->select($count);
-
-    $self->_apply_where_clauses($select);
-
-    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
-
-    my $row = $dbh->selectrow_arrayref(
-        $select->sql($dbh), {},
-        $self->account()->account_id(), $select->bind_params(),
-    );
-
-    return $row ? $row->[0] : 0;
+sub _BuildSearchedClasses {
+    return { map { $_ => 1 }
+            qw( R2::Schema::Person R2::Schema::Household R2::Schema::Organization )
+    };
 }
 
 __PACKAGE__->meta()->make_immutable();
+
 
 1;

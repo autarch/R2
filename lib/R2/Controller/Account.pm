@@ -8,6 +8,7 @@ use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Schema::Account;
 use R2::Schema::CustomFieldGroup;
+use R2::Search::Contact;
 use R2::Web::Form::Report::TopDonors;
 use R2::Util qw( string_is_empty );
 
@@ -511,6 +512,12 @@ get_html q{}
 
     $self->_add_basic_sidebar($c);
 
+    $c->stash()->{search} = R2::Search::Contact->new(
+        account      => $c->stash()->{account},
+        restrictions => 'Contact::ByTag',
+        tag_id       => $c->stash()->{tag}->tag_id(),
+    );
+
     $c->stash()->{template} = '/tag/view';
 };
 
@@ -541,7 +548,13 @@ get_html confirm_deletion
     $c->stash()->{type} = 'tag';
     $c->stash()->{uri}  = $tag->uri();
 
-    my $count = $tag->contacts()->contact_count();
+    my $search = R2::Search::Contact->new(
+        account      => $c->stash()->{account},
+        restrictions => 'Contact::ByTag',
+        tag_id       => $tag->tag_id(),
+    );
+
+    my $count = $search->contact_count();
     $c->stash()->{extra} = "This tag is currently in use by $count "
         . PL_N( 'contact', $count ) . q{.};
 

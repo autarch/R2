@@ -12,7 +12,7 @@ use R2::Schema::ContactNote;
 use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
-use R2::Search::Contact::ByName;
+use R2::Search::Contact;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -60,9 +60,10 @@ get q{}
 
     my @contacts;
     if ( !string_is_empty($name) ) {
-        my $contacts = R2::Search::Contact::ByName->new(
-            account => $c->account(),
-            name    => $name,
+        my $contacts = R2::Search::Contact->new(
+            account      => $c->account(),
+            restrictions => 'Contact::ByName',
+            name         => $name,
         )->contacts();
 
         while ( my $contact = $contacts->next() ) {

@@ -1,28 +1,23 @@
-package R2::Search::Contact::ByTag;
+package R2::Search::Plugin::Contact::ByTag;
 
-use strict;
-use warnings;
+use Moose;
+# intentionally not StrictConstructor
+
 use namespace::autoclean;
 
 use R2::Schema;
 use R2::Types qw( Int );
 
-use Moose;
-
-extends 'R2::Search::Contact';
+with 'R2::Role::Search::Plugin';
 
 has 'tag_id' => (
     is  => 'ro',
     isa => Int,
 );
 
-my $Schema = R2::Schema->Schema();
-
-sub _apply_where_clauses {
+sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
-
-    super();
 
     my $schema = R2::Schema->Schema();
 

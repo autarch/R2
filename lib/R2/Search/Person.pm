@@ -1,7 +1,8 @@
 package R2::Search::Person;
 
-use strict;
-use warnings;
+use Moose;
+# Cannot use StrictConstructor with plugins
+
 use namespace::autoclean;
 
 use Fey::Literal::Function;
@@ -10,16 +11,17 @@ use Fey::Placeholder;
 use R2::Schema;
 use R2::Types qw( ArrayRef );
 
-use Moose;
-use MooseX::ClassAttribute;
-
-extends 'R2::Search';
-
 has account => (
     is       => 'ro',
     isa      => 'R2::Schema::Account',
     required => 1,
 );
+
+with 'R2::Role::Search';
+
+has '+order_by' => ( default => 'name' );
+
+__PACKAGE__->_LoadAllPlugins();
 
 {
     my $schema = R2::Schema->Schema();
@@ -35,59 +37,60 @@ has account => (
         '=', Fey::Placeholder->new()
     );
 
-    class_has '_SelectBase' => (
-        is      => 'ro',
-        isa     => 'Fey::SQL::Select',
-        default => sub {$select_base},
+    my $object_select_base
+        = $select_base->clone()->select( $schema->table('Person') );
+
+    sub _BuildObjectSelectBase {$object_select_base}
+
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('Person')->column('person_id')
     );
+
+    my $count_select_base = $select_base->clone()->select($count);
+
+    sub _BuildCountSelectBase {$count_select_base}
 }
 
 sub people {
     my $self = shift;
 
-    my $select = $self->_SelectBase->clone();
+    return $self->_object_iterator();
+}
+
+sub _iterator_class {'Fey::Object::Iterator::FromSelect'}
+
+sub _classes_returned_by_iterator {
+    [ 'R2::Schema::Person' ]
+}
+
+sub _order_by_name {
+    my $self   = shift;
+    my $select = shift;
 
     my $schema = R2::Schema->Schema();
-
-    $select->select( $schema->table('Person') );
-
-    $self->_apply_where_clauses($select);
 
     $select->order_by(
         $schema->table('Person')->columns( 'last_name', 'first_name' ) );
 
-    $self->_apply_limit($select);
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes => 'R2::Schema::Person',
-        dbh     => R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
-        select  => $select,
-        bind_params => [ $self->account()->account_id(), $select->bind_params() ],
-    );
+    return;
 }
 
 sub person_count {
     my $self = shift;
 
-    my $schema = R2::Schema->Schema();
+    $self->_count();
+}
 
-    my $count = Fey::Literal::Function->new( 'COUNT',
-        $schema->table('Person')->column('contact_id') );
+sub _bind_params {
+    my $self   = shift;
+    my $select = shift;
 
-    my $select = $self->_SelectBase->clone();
+    return $self->account()->account_id(), $select->bind_params();
+}
 
-    $select->select($count);
-
-    $self->_apply_where_clauses($select);
-
-    my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
-
-    my $row = $dbh->selectrow_arrayref(
-        $select->sql($dbh), {},
-        $self->account()->account_id(), $select->bind_params(),
-    );
-
-    return $row ? $row->[0] : 0;
+sub _BuildSearchedClasses {
+    return { 'R2::Schema::Person' => 1 };
 }
 
 __PACKAGE__->meta()->make_immutable();

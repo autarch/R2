@@ -9,7 +9,7 @@ use R2::Schema::EmailAddress;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
 use R2::Schema::Website;
-use R2::Search::Person::ByName;
+use R2::Search::Person;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -30,9 +30,10 @@ get person
 
     my @people;
     if ( !string_is_empty($name) ) {
-        my $people = R2::Search::Person::ByName->new(
-            account => $c->account(),
-            name    => $name,
+        my $people = R2::Search::Person->new(
+            account      => $c->account(),
+            restrictions => 'Contact::ByName',
+            name         => $name,
         )->people();
 
         while ( my $person = $people->next() ) {
