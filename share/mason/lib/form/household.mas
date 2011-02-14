@@ -32,5 +32,5 @@ $household => undef
 </%args>
 
 <%init>
-my $action = $household ? $household->uri() : $c->account()->uri( view => 'household' );
+my $action = $household ? $household->uri() : $c->account()->uri( view => 'households' );
 </%init>

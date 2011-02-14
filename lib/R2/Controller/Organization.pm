@@ -14,7 +14,7 @@ BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-post organization
+post organizations
     => chained '/account/_set_account'
     => args 0
     => sub {

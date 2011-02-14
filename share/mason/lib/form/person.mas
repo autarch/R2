@@ -34,5 +34,5 @@ $person => undef
 </%args>
 
 <%init>
-my $action = $person ? $person->uri() : $c->account()->uri( view => 'person' );
+my $action = $person ? $person->uri() : $c->account()->uri( view => 'people' );
 </%init>
