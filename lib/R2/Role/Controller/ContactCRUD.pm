@@ -186,9 +186,12 @@ sub _insert_contact {
     if (@errors) {
         my $e = R2::Exception::DataValidation->new( errors => \@errors );
 
+        my ($type) = $class =~ /R2::Schema::(\w+)/;
+        my $view = 'new_' . ( lc $type ) . '_form';
+
         $c->redirect_with_error(
             error     => $e,
-            uri       => '/contact/new_person_form',
+            uri       => $c->account()->uri( view => $view ),
             form_data => $c->request()->params(),
         );
     }
