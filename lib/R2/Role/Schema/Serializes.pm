@@ -32,11 +32,14 @@ role {
         next if $attr->name() =~ /_raw$/;
 
         # We only want to serialize data from the class's the associated table
-        if ( $attr->name() =~ /_date(?:time)$/ ) {
+        if (   $attr->name() =~ /_date(?:time)$/
+            && $attr->isa('Fey::Meta::Attribute::FromInflator') ) {
+
             $map{ $attr->name() } = $attr->raw_attribute()->name();
         }
         elsif ($attr->isa('Fey::Meta::Attribute::FromColumn')
             || $attr->isa('Fey::Meta::Attribute::FromInflator') ) {
+
             $map{ $attr->name() } = $attr->name();
         }
     }
