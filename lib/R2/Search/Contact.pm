@@ -138,5 +138,4 @@ sub _BuildSearchedClasses {
 
 __PACKAGE__->meta()->make_immutable();
 
-
 1;
