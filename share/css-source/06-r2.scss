@@ -322,6 +322,12 @@ div.label-and-value {
 
 /* === Tables === */
 
+table {
+    th,td {
+        vertical-align: top;
+    }
+}
+
 table.standard-table {
     width: 100%;
     border: 1px solid $medium-gray;
