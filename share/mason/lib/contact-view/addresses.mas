@@ -16,20 +16,7 @@ Does not want to receive postal mail.
     (Preferred)
 %   }
 
-    <address>
-      <% $address->street_1() %>
-
-% if ( ! string_is_empty( $address->street_2() ) ) {
-      <br />
-      <% $address->street_2() %>
-% }
-% if ( ! string_is_empty( $address->city_region_postal_code() ) ) {
-      <br />
-      <% $address->city_region_postal_code() %>
-% }
-      <br />
-      <% $address->country() %>
-    </address>
+<& .address, address => $address &>
 
 %   if ( ! string_is_empty( $address->note() ) ) {
     <p class="note">
@@ -48,3 +35,25 @@ $contact
 my @addresses = $contact->addresses()->all()
     or return;
 </%init>
+
+<%def .address>
+    <address>
+% for my $i ( 0..$#pieces ) {
+%   if ( $i != 0 ) {
+      <br />
+%   }
+      <% $pieces[$i] %>
+% }
+    </address>
+
+<%args>
+$address
+</%args>
+
+<%init>
+my @pieces
+    = grep { !string_is_empty($_) }
+    map    { $address->$_() }
+    qw( street_1 street_2 city_region_postal_code country );
+</%init>
+</%def>
