@@ -60,15 +60,15 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     is_deeply(
         [ map { $_->display_name() } $search->contacts()->all() ],
         [
+            'The Bars',
             'CAA',
             'Graham Chapman',
             'John Cleese',
+            'The Foos',
             'Terry Gilliam',
             'Eric Idle',
             'John House',
             'MFA',
-            'The Bars',
-            'The Foos',
         ],
         'contacts returned sorted by name'
     );
