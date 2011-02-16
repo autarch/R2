@@ -7,23 +7,17 @@ use Exporter qw( import );
 
 our @EXPORT_OK = qw( format_note );
 
+use Markdent::Simple::Fragment;
 use R2::Util qw( string_is_empty );
-use Text::WikiFormat;
+
+my $mds = Markdent::Simple::Fragment->new();
 
 sub format_note {
     my $note = shift;
 
     return q{} if string_is_empty($note);
 
-    return Text::WikiFormat::format(
-        $note,
-        {},
-        {
-            implicit_links => 0,
-            extended       => 1,
-            absolute_links => 1,
-        }
-    );
+    return $mds->markdown_to_html( markdown => $note );
 }
 
 1;
