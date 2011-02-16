@@ -1,0 +1,5 @@
+Buttons
+
+- use the action-button css class
+- include an icon to the left indicating what the button does, when possible
+- text should describe the action, not just "submit"
