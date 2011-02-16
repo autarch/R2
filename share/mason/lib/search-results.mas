@@ -1,33 +1,25 @@
-<h2>
-Found <% $count %> matching <% PL_N( 'contact', $count ) %>.
-</h2>
+<p>
+Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N( $search->result_type_string(), $count ) %>.
+</p>
 
 % if ($count) {
-<table class="standard-table">
+<table class="standard-table search-results">
   <thead>
     <tr>
+%   if ( $search->includes_multiple_contact_types() ) {
+      <th></th>
+%   }
       <th>Name</th>
+      <th>Location</th>
       <th>Email</th>
+      <th>Tags</th>
+      <th>Activity</th>
       <th>Modified</th>
     </tr>
   </thead>
 
 %   while ( my $contact = $contacts->next() ) {
-  <tbody>
-    <tr class="<% $contacts->index() % 2 ? 'odd' : 'even' %>">
-      <td>
-        <a href="<% $contact->uri() %>"><% $contact->display_name() %></a>
-      </td>
-      <td>
-%     if ( my $address = $contact->preferred_email_address() ) {
-        <% $address->email_address() %>
-%     }
-      </td>
-      <td>
-        <% $c->user()->format_datetime( $contact->last_modified_datetime() ) %>
-      </td>
-    </tr>
-  </tbody>
+<& .contact-row, contact => $contact, row_class => $contacts->index() % 2 ? 'odd' : 'even', search => $search &>
 %   }
 </table>
 % }
@@ -41,3 +33,68 @@ my $count = $search->contact_count();
 my $contacts;
 $contacts = $search->contacts() if $count;
 </%init>
+
+<%def .contact-row>
+  <tbody>
+    <tr class="<% $row_class %>">
+% if ( $search->includes_multiple_contact_types() ) {
+      <td class="icon">
+        <& /lib/contact-view/contact-icon.mas, contact => $contact &>
+      </td>
+% }
+      <td>
+        <a href="<% $contact->uri() %>"><% $contact->display_name() %></a>
+      </td>
+      <td>
+% if ($address) {
+        <% join ', ', grep { ! string_is_empty($_) } $address->city(), $address->region() %>
+% }
+      </td>
+      <td>
+% if ( my $address = $contact->preferred_email_address() ) {
+        <% $address->email_address() %>
+% }
+      </td>
+      <td>
+        <ul class="tags-list">
+% while ( my $tag = $tags->next() ) {
+          <li><a class="tag-link" href="<% $tag->uri() %>"><% $tag->tag() %></a></li>
+% }
+        </ul>
+      </td>
+      <td class="activity">
+% if ( $donation || $note ) {
+        <ul>
+% }
+% if ($donation) {
+          <li>Donated <% format_money( $donation->amount() ) %>
+              on <% $c->user()->format_date( $donation->donation_date() ) %></li>
+% }
+% if ($note) {
+          <li><% $note->user()->display_name() %> <% lcfirst $note->type()->description() %> on <% $c->user()->format_datetime( $note->note_datetime() ) %>:
+              <% format_note( $note->note() ) | n %></li>
+% }
+% if ( $donation || $note ) {
+        </ul>
+% }
+      </td>
+      <td>
+        <% $c->user()->format_datetime( $contact->last_modified_datetime() ) %>
+      </td>
+    </tr>
+  </tbody>
+
+<%args>
+$contact
+$row_class
+$search
+</%args>
+
+<%init>
+my $address = $contact->preferred_address();
+my $tags = $contact->tags();
+my $donation = $contact->contact()->donations()->next();
+my $note = $contact->contact()->notes()->next();
+</%init>
+
+</%def>

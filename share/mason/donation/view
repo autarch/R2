@@ -15,12 +15,12 @@
 
   <div class="yui3-g label-and-value">
     <div class="yui3-u-2-5 label"><span>Amount:</span></div>
-    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() ) %></span></div>
+    <div class="yui3-u-3-5 value"><span><% format_money( $donation->amount() ) %></span></div>
 % if ( $donation->transaction_cost() != 0 ) {
     <div class="yui3-u-2-5 label"><span>Transaction Cost:</span></div>
-    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->transaction_cost() ) %></span></div>
+    <div class="yui3-u-3-5 value"><span><% format_money( $donation->transaction_cost() ) %></span></div>
     <div class="yui3-u-2-5 label"><span>Net:</span></div>
-    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() - $donation->transaction_cost() ) %></span></div>
+    <div class="yui3-u-3-5 value"><span><% format_money( $donation->amount() - $donation->transaction_cost() ) %></span></div>
 % }
     <div class="yui3-u-2-5 label"><span>Recurring Donation?</span></div>
     <div class="yui3-u-3-5 value"><span><% $donation->is_recurring() ? 'Yes' : 'No' %></span></div>
@@ -32,9 +32,9 @@
 % }
 % if ( $donation->value_for_donor() != 0 ) {
     <div class="yui3-u-2-5 label"><span>Value for donor:</span></div>
-    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->value_for_donor() ) %></span></div>
+    <div class="yui3-u-3-5 value"><span><% format_money( $donation->value_for_donor() ) %></span></div>
     <div class="yui3-u-2-5 label"><span>Tax-deductible amount:</span></div>
-    <div class="yui3-u-3-5 value"><span><% $format->format_price( $donation->amount() - $donation->value_for_donor() ) %></span></div>
+    <div class="yui3-u-3-5 value"><span><% format_money( $donation->amount() - $donation->value_for_donor() ) %></span></div>
 % }
 % if ( $donation->dedication() ) {
     <div class="yui3-u-2-5 label"><span>Dedication:</span></div>
@@ -58,7 +58,6 @@ $contact
 </%args>
 
 <%init>
-my $format = Number::Format->new( INT_CURR_SYMBOL => '$' );
 my $dedication_contact;
 $dedication_contact = $donation->dedicated_to_contact()->real_contact()
     if $donation->dedicated_to_contact_id();

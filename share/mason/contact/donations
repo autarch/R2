@@ -27,7 +27,7 @@
   <tbody>
     <tr class="<% $donations->index() % 2 ? 'odd' : 'even' %>">
       <td><a href="<% $donation->uri() %>" title="Details for this donation"><% $c->user()->format_date( $donation->donation_date() ) %></a></td>
-      <td><% $format->format_price( $donation->amount() ) %></td>
+      <td><% format_money( $donation->amount() ) %></td>
       <td><% $donation->source()->name() %></td>
       <td><% $donation->campaign()->name() %></td>
       <td><% $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ): 'not sent' %></td>
@@ -51,11 +51,11 @@
 
 <div class="yui3-g label-and-value">
   <div class="yui3-u-2-5 label"><span>FY <% $c->account()->fiscal_year_start_date()->year() %> total (<% $c->account()->fiscal_year_start_date()->format_cldr( 'MMMM, yyyy' ) %>):</span></div>
-  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></span></div>
+  <div class="yui3-u-3-5 value"><span><% format_money( $contact->donation_total( since => $c->account()->fiscal_year_start_date() ) ) %></span></div>
   <div class="yui3-u-2-5 label"><span>12 month total:</span></div>
-  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></span></div>
+  <div class="yui3-u-3-5 value"><span><% format_money( $contact->donation_total( since => DateTime->today()->subtract( months => 12 ) ) ) %></span></div>
   <div class="yui3-u-2-5 label"><span>Total for all time:</span></div>
-  <div class="yui3-u-3-5 value"><span><% $format->format_price( $contact->donation_total() ) %></span></div>
+  <div class="yui3-u-3-5 value"><span><% format_money( $contact->donation_total() ) %></span></div>
 </div>
 % } else {
 <p>
@@ -72,7 +72,6 @@ $can_edit_donations
 
 <%init>
 my $donations = $contact->donations();
-my $format = Number::Format->new( INT_CURR_SYMBOL => '$' );
 </%init>
 
 <%method title>

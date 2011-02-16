@@ -16,11 +16,15 @@ extends 'Catalyst::View::HTML::Mason';
     use R2::Util qw( string_is_empty english_list );
     use R2::URI qw( static_uri );
     use R2::Web::Util qw( format_note );
+    use Number::Format qw( format_price );
+
+    sub format_money {
+        return format_price( shift, 2, '$' );
+    }
 }
 
 # used in templates
 use HTML::FillInForm;
-use Number::Format;
 use Path::Class;
 use R2::Config;
 use R2::Web::FormData;

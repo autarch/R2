@@ -54,6 +54,8 @@ get_html 'contacts'
     my $self = shift;
     my $c    = shift;
 
+    $c->tabs()->by_id('Contacts')->set_is_selected(1);
+
     $c->stash()->{search} = R2::Search::Contact->new(
         account => $c->account(),
         limit   => 20,

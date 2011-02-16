@@ -226,17 +226,31 @@ body {
     }
 }
 
-#tags {
-    ul {
-        display: inline;
-        margin: 0;
+ul.tags-list {
+    display: inline;
+    margin: 0;
 
-        li {
-            display: inline;
-            margin-right: 0.2em;
-        }
+    li {
+        display: inline;
+        margin-right: 0.2em;
     }
 
+    a.tag-link {
+        padding-left: 20px;
+        background-image: url(/images/icons/tag.png);
+        background-position: 1px center;
+        background-repeat: no-repeat;
+    }
+
+    a.email-tag-link {
+        padding-left: 20px;
+        background-image: url(/images/icons/email.png);
+        background-position: 1px center;
+        background-repeat: no-repeat;
+    }
+}
+
+#tags {
     h2 {
         margin: 0 0 0.5em 0;
     }
@@ -366,6 +380,27 @@ table.standard-table {
             p {
                 font-size: 90%;
                 margin: 0 0 0 0.5em;
+            }
+        }
+    }
+}
+
+table.search-results {
+    font-size: 90%;
+
+    td.icon {
+        img {
+            margin-top: 0.2em;
+        }
+    }
+
+    td.activity {
+        ul {
+            font-size: 90%;
+            margin: 0 0 0 1em;
+
+            p {
+                margin: 0;
             }
         }
     }

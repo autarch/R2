@@ -76,30 +76,62 @@ sub _classes_returned_by_iterator {
 }
 
 {
+    # This is a complex SQL bit that sorts by the name of the person,
+    # household, or organization for each row. People are sorted by last name
+    # first. For households and organizations, we ignore a leading (the|a|an)
+    # when sorting.
     my $order_by_func = do {
         my $schema = R2::Schema->Schema();
 
         my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
+        my $sortable_name_sub = sub {
+            my $col = shift;
+
+            my $sql_regex = '(a|an|the)';
+
+            #<<<
+            my $replace
+                = Fey::Literal::Term->new(
+                    'REGEXP_REPLACE('
+                    . $col->sql_or_alias($dbh)
+                    . qq{, '$sql_regex'}
+                    . q{, '' )} );
+            #>>>
+
+            #<<<
+            return
+                Fey::Literal::Term->new(
+                  'CASE '
+                  . ' WHEN '
+                  . $col->sql_or_alias($dbh)
+                  . ' ~* '
+                  . qq{'$sql_regex .+'}
+                  . ' THEN '
+                  . $replace->sql_or_alias($dbh)
+                  . ' ELSE '
+                  . $col->sql_or_alias($dbh)
+                  . ' END' )->sql_or_alias($dbh);
+            #>>>
+        };
+
         #<<<
         my $term
-            = Fey::Literal::Term
-                ->new( 'CASE '
-                       . $schema->table('Contact')->column('contact_type')
-                             ->sql_or_alias($dbh)
-                       . q{ WHEN 'Person' THEN }
-                       . $schema->table('Person')->column('last_name')
-                             ->sql_or_alias($dbh)
-                       . q{ || ' ' || }
-                       . $schema->table('Person')->column('first_name')
-                             ->sql_or_alias($dbh)
-                       . q{ WHEN 'Household' THEN }
-                       . $schema->table('Household')->column('name')
-                             ->sql_or_alias($dbh)
-                       . q{ ELSE }
-                       . $schema->table('Organization')->column('name')
-                             ->sql_or_alias($dbh)
-                       . q{ END} );
+            = Fey::Literal::Term->new(
+                'CASE '
+                . $schema->table('Contact')->column('contact_type')
+                      ->sql_or_alias($dbh)
+                . q{ WHEN 'Person' THEN }
+                . $schema->table('Person')->column('last_name')
+                      ->sql_or_alias($dbh)
+                . q{ || ' ' || }
+                . $schema->table('Person')->column('first_name')
+                      ->sql_or_alias($dbh)
+                . q{ WHEN 'Household' THEN }
+                . $sortable_name_sub->( $schema->table('Household')->column('name') )
+                . q{ ELSE }
+                . $sortable_name_sub->( $schema->table('Organization')->column('name') )
+                . q{ END} );
         #>>>
         $term->set_alias_name('_orderable_name');
 
@@ -111,7 +143,71 @@ sub _classes_returned_by_iterator {
         my $select = shift;
 
         $select->select($order_by_func);
-        $select->order_by($order_by_func);
+
+        my $sort_order = $self->reverse_order() ? 'DESC' : 'ASC';
+
+        $select->order_by( $order_by_func, $sort_order );
+
+        return;
+    }
+}
+
+{
+    my $order_by_func = do {
+        my $schema = R2::Schema->Schema();
+
+        my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        #<<<
+        my $term
+            = Fey::Literal::Term
+                ->new( $schema->table('Address')->column('country')
+                           ->sql_or_alias($dbh)
+                       . q{ || '~~' || }
+                       . $schema->table('Address')->column('postal_code')
+                           ->sql_or_alias($dbh)
+                       . q{ || '~~' || }
+                       . $schema->table('Address')->column('region')
+                           ->sql_or_alias($dbh)
+                       . q{ || '~~' || }
+                       . $schema->table('Address')->column('city')
+                           ->sql_or_alias($dbh)
+                       . q{ || '~~' || }
+                       . $schema->table('Address')->column('street_1')
+                           ->sql_or_alias($dbh)
+                     );
+        #>>>
+
+        #<<
+        $select
+            ->select($term)
+            ->from  ( $schema->table('Address') )
+            ->where ( $schema->table('Address')->column('contact_id'),
+                      '=', $schema->table('Contact')->column('contact_id') )
+            ->and   ( $schema->table('Address')->column('is_preferred'),
+                      '=', 1 )
+            ->limit(1);
+        #>>
+
+        $select->set_alias_name('_orderable_location');
+
+        $select;
+    };
+
+    sub _order_by_location {
+        my $self   = shift;
+        my $select = shift;
+
+        $select->select($order_by_func);
+
+        my $sort_order = $self->reverse_order() ? 'DESC' : 'ASC';
+
+        $select->order_by(
+            Fey::Literal::Term->new('_orderable_location'),
+            $sort_order
+        );
 
         return;
     }
@@ -139,9 +235,9 @@ sub _BuildSearchedClasses {
 sub _build_title {
     my $self = shift;
 
-    return 'All Contacts' unless $self->_has_restrictions();
+    return 'All Contacts' unless $self->has_restrictions();
 
-    return 'X';
+    return 'Contact Search';
 }
 
 __PACKAGE__->meta()->make_immutable();

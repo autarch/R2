@@ -1,10 +1,10 @@
 <div class="associated-content" id="tags">
   <h2>Tags</h2>
 
-  <ul id="tags-list">
+  <ul class="tags-list">
 % while ( my $tag = $tags->next() ) {
     <li>
-    <a href="<% $tag->uri() %>"><% $tag->tag() %></a>
+    <a class="tag-link" href="<% $tag->uri() %>"><% $tag->tag() %></a>
 %   if ($can_edit) {
     <a href="<% $contact->uri( view => 'tag/' . $tag->tag_id() ) %>"
        class="delete-tag ui-button ui-icon ui-icon-circle-close" title="Remove this tag">x</a>

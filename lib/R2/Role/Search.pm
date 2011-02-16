@@ -10,6 +10,7 @@ use List::AllUtils qw( all );
 use Module::Pluggable::Object;
 use R2::Types qw(
     ArrayRef
+    Bool
     HashRef
     NonEmptyStr
     PosInt
@@ -33,6 +34,12 @@ has order_by => (
     predicate => '_has_order_by',
 );
 
+has reverse_order => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
 has limit => (
     is      => 'ro',
     isa     => PosOrZeroInt,
@@ -52,6 +59,20 @@ has title => (
     builder => '_build_title',
 );
 
+has includes_multiple_contact_types => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    builder => '_build_includes_multiple_contact_types',
+);
+
+has result_type_string => (
+    is      => 'ro',
+    isa     => NonEmptyStr,
+    lazy    => 1,
+    builder => '_build_result_type_string',
+);
+
 has _restrictions => (
     traits   => ['Array'],
     isa      => ArrayRef [SearchPlugin],
@@ -61,7 +82,7 @@ has _restrictions => (
     handles  => {
         _restrictions     => 'elements',
         _add_restrictions => 'push',
-        _has_restrictions => 'count',
+        has_restrictions => 'count',
     },
 );
 
@@ -89,6 +110,7 @@ class_has _SearchedClasses => (
     builder  => '_BuildSearchedClasses',
     handles  => {
         _SearchIncludesClass => 'get',
+        _SearchedClassCount  => 'count',
     },
 );
 
@@ -138,7 +160,7 @@ sub _object_iterator {
     }
 
     $self->_apply_limit($select);
-
+    warn $select->sql('Fey::FakeDBI');
     return $self->_iterator_class()->new(
         classes => $self->_classes_returned_by_iterator(),
         dbh =>
@@ -170,7 +192,7 @@ sub _apply_where_clauses {
     my $self = shift;
     my $select = shift;
 
-    if ( $self->_has_restrictions() ) {
+    if ( $self->has_restrictions() ) {
         $select->where( '(' );
 
         for my $plugin ( $self->_restrictions() ) {
@@ -198,6 +220,26 @@ sub searches_class {
 
     return all { $self->_SearchIncludesClass($_) }
         map { /^R2::Schema::/ ? $_ : 'R2::Schema::' . $_ } @_;
+}
+
+sub _build_includes_multiple_contact_types {
+    my $self = shift;
+
+    return $self->_SearchedClassCount() > 1;
+}
+
+sub _build_result_type_string {
+    my $self = shift;
+
+    return 'contact' if $self->includes_multiple_contact_types();
+
+    for my $type ( qw( person household organization ) ) {
+        my $class = 'R2::Schema::' . ucfirst $type;
+
+        return $type if $self->_searches_class($class);
+    }
+
+    die 'wtf';
 }
 
 {
