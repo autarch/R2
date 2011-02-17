@@ -9,13 +9,13 @@ use MooseX::Types -declare => [
         ContactLike
         ErrorForSession
         FileIsImage
-        NonEmptyStr
         PosInt
         PosOrZeroInt
         SearchPlugin
         URIStr
         )
 ];
+use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw(  Defined Int Object Str );
 
 #<<<
