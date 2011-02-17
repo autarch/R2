@@ -16,8 +16,7 @@ requires '_base_uri_path';
 
 sub uri {
     my $self = shift;
-
-    my %p = validate(
+    my %p    = validate(
         \@_,
         view      => { isa => 'Str',     optional => 1 },
         fragment  => { isa => 'Str',     optional => 1 },
