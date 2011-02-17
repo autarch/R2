@@ -15,7 +15,7 @@ my $order_by = lc $content;
 my $reverse = 0;
 
 if ( $search->order_by() eq $order_by ) {
-    $icon = $search->reverse_order() ? 'arrow_up' : 'arrow_down';
+    $icon = $search->reverse_order() ? 'arrow_down' : 'arrow_up';
     $title = 'Reverse current sorting';
     $reverse = 1 unless $search->reverse_order();
 }
