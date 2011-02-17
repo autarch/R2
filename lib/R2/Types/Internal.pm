@@ -70,4 +70,3 @@ coerce URIStr, from class_type('URI'), via { $_->canonical() };
 #>>>
 
 1;
-
