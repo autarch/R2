@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use MooseX::Params::Validate qw( validate );
+use MooseX::Params::Validate qw( validated_hash );
 use R2::Util qw( string_is_empty );
 use R2::URI qw( dynamic_uri );
 
@@ -15,8 +15,6 @@ use Moose::Role;
 requires '_base_uri_path';
 
 sub uri {
-
-    # MX::P::V doesn't handle class methods
     my $self = shift;
 
     my %p = validate(
