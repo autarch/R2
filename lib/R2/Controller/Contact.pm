@@ -57,7 +57,8 @@ get_html 'contacts'
     $self->_contact_search( $c, undef );
 };
 
-get_html 'contacts'
+get_html 'contact_search'
+    => path_part 'contacts'
     => chained '/account/_set_account'
     => args 1
     => sub {
@@ -84,11 +85,13 @@ sub _contact_search {
         }
     }
 
-    my @plugins;
-    push @plugins, 'Contact::ByName'
+    my @restrictions;
+    push @restrictions, 'Contact::ByName'
         if $p{names};
-    push @plugins, 'Contact::ByTag'
+    push @restrictions, 'Contact::ByTag'
         if $p{tag_ids};
+
+    $p{restrictions} = \@restrictions;
 
     my $params = $c->request()->params();
     for my $key ( qw( page limit order_by reverse_order ) ) {
