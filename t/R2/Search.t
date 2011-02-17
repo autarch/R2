@@ -72,6 +72,11 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
         ],
         'contacts returned sorted by name'
     );
+
+    is(
+        $search->title(), 'All Contacts',
+        'title for all contacts search '
+    );
 }
 
 {
@@ -90,6 +95,11 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
         [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'John Cleese', 'John House', ],
         'contacts match search by name, sorted by name'
+    );
+
+    is(
+        $search->title(), 'Contact Search',
+        'title for filtered contact search '
     );
 }
 
@@ -189,6 +199,11 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
         [ 'John Cleese', ],
         'people match search by name, sorted by name'
     );
+
+    is(
+        $search->title(), 'People Search',
+        'title for filtered person search '
+    );
 }
 
 {
@@ -227,6 +242,15 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
         [ map { $_->display_name() } $search->people()->all() ],
         [ 'Eric Idle' ],
         'people match search by tag, sorted by name'
+    );
+}
+
+{
+    my $search = R2::Search::Person->new( account => $account );
+
+    is(
+        $search->title(), 'All People',
+        'title for all people search '
     );
 }
 

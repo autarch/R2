@@ -96,9 +96,9 @@ sub _BuildSearchedClasses {
 sub _build_title {
     my $self = shift;
 
-    return 'All People' unless $self->_has_restrictions();
+    return 'All People' unless $self->has_restrictions();
 
-    return 'X';
+    return 'People Search';
 }
 
 __PACKAGE__->meta()->make_immutable();
