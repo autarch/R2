@@ -18,6 +18,7 @@ use R2::Types qw(
     PosOrZeroInt
     SearchPlugin
 );
+use URI::Escape qw( uri_escape_utf8 );
 
 requires qw(
     _BuildCountSelectBase
@@ -257,6 +258,8 @@ sub uri {
         order_by      => { isa => NonEmptyStr,  optional => 1 },
         reverse_order => { isa => Bool,         optional => 1 },
     );
+
+    delete $query{page} if $query{page} && $query{page} == 1;
 
     delete $query{order_by}
         if $query{order_by} eq $self->meta()->get_attribute('order_by')->default();
