@@ -13,7 +13,7 @@ use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _valid_note_datetime )] };
-with 'R2::Role::Schema::URIMaker';
+with 'R2::Role::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();

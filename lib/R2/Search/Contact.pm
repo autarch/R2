@@ -232,6 +232,12 @@ sub _BuildSearchedClasses {
     };
 }
 
+sub _base_uri_path {
+    my $self = shift;
+
+    return $self->account()->_base_uri_path() . '/contacts';
+}
+
 sub _build_title {
     my $self = shift;
 

@@ -54,16 +54,55 @@ get_html 'contacts'
     my $self = shift;
     my $c    = shift;
 
+    $self->_contact_search( $c, undef );
+};
+
+get_html 'contacts'
+    => chained '/account/_set_account'
+    => args 1
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+    my $path = shift;
+
+    $self->_contact_search( $c, $path );
+};
+
+sub _contact_search {
+    my $self = shift;
+    my $c    = shift;
+    my $path = shift;
+
     $c->tabs()->by_id('Contacts')->set_is_selected(1);
+
+    my %p;
+    if ( defined $path ) {
+        for my $pair ( split /;/, $path ) {
+            my ( $k, $v ) = split /=/, $pair;
+
+            push @{ $p{$k} }, $v;
+        }
+    }
+
+    my @plugins;
+    push @plugins, 'Contact::ByName'
+        if $p{names};
+    push @plugins, 'Contact::ByTag'
+        if $p{tag_ids};
+
+    my $params = $c->request()->params();
+    for my $key ( qw( page limit order_by reverse_order ) ) {
+        $p{$key} = $params->{$key}
+            if exists $params->{$key};
+    }
 
     $c->stash()->{search} = R2::Search::Contact->new(
         account => $c->account(),
-        limit   => 20,
-        page    => 1,
+        %p,
     );
 
     $c->stash()->{template} = '/account/contacts';
-};
+}
 
 get q{}
     => chained '/account/_set_account'

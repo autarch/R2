@@ -100,6 +100,12 @@ sub _person_where_clause {
     }
 }
 
+sub uri_parameters {
+    my $self = shift;
+
+    return map { [ 'names', $_ ] } @{ $self->names() };
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

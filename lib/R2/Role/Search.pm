@@ -8,6 +8,7 @@ use namespace::autoclean;
 use Class::Load qw( load_class );
 use List::AllUtils qw( all );
 use Module::Pluggable::Object;
+use MooseX::Params::Validate qw( validated_hash );
 use R2::Types qw(
     ArrayRef
     Bool
@@ -27,6 +28,11 @@ requires qw(
     _bind_params
     _build_title
 );
+
+with 'R2::Role::URIMaker' => {
+    -excludes => ['uri'],
+    -alias    => { uri => '_uri' },
+};
 
 has order_by => (
     is        => 'ro',
@@ -241,6 +247,44 @@ sub _build_result_type_string {
 
     die 'wtf';
 }
+
+sub uri {
+    my $self = shift;
+    my %query = validated_hash(
+        \@_,
+        page          => { isa => PosInt,       optional => 1 },
+        limit         => { isa => PosOrZeroInt, optional => 1 },
+        order_by      => { isa => NonEmptyStr,  optional => 1 },
+        reverse_order => { isa => Bool,         optional => 1 },
+    );
+
+    delete $query{order_by}
+        if $query{order_by} eq $self->meta()->get_attribute('order_by')->default();
+
+    delete $query{reverse_order} unless $query{reverse_order};
+
+    return $self->_uri(
+        view  => $self->_restrictions_path_component(),
+        query => \%query,
+    );
+}
+
+sub _restrictions_path_component {
+    my $self = shift;
+
+    return q{} unless $self->has_restrictions();
+
+    my @params;
+    for my $restriction ( $self->_restrictions() ) {
+        for my $pair ( $restriction->uri_parameters() ) {
+            push @params, join '=', map { uri_escape_utf8($_) } @{$pair};
+        }
+    }
+
+    return join ';', sort @params;
+}
+
+sub domain { $_[0]->account()->domain() }
 
 {
     my %Plugins;

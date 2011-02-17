@@ -365,6 +365,15 @@ table.standard-table {
 
     th {
         text-align: left;
+
+        a.sort-link {
+            color: white;
+            text-decoration: none;
+
+            img {
+                margin-bottom: -3px;
+            }
+        }
     }
 
     tr.even {

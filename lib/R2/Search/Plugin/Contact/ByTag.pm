@@ -33,6 +33,12 @@ sub apply_where_clauses {
     return;
 }
 
+sub uri_parameters {
+    my $self = shift;
+
+    return map { [ 'tag_ids', $_ ] } @{ $self->tag_ids() };
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

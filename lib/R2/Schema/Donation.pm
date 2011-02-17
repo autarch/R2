@@ -18,7 +18,7 @@ use Fey::ORM::Table;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _validate_amount _valid_donation_date _valid_receipt_date )] };
-with 'R2::Role::Schema::URIMaker';
+with 'R2::Role::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();

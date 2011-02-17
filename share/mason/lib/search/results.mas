@@ -9,12 +9,12 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
 %   if ( $search->includes_multiple_contact_types() ) {
       <th></th>
 %   }
-      <th>Name</th>
-      <th>Location</th>
-      <th>Email</th>
+      <th><&| /lib/search/sortable-header.mas, search => $search &>Name</&></th>
+      <th><&| /lib/search/sortable-header.mas, search => $search &>Location</&></th>
+      <th><&| /lib/search/sortable-header.mas, search => $search &>Email</&></th>
       <th>Tags</th>
       <th>Activity</th>
-      <th>Modified</th>
+      <th><&| /lib/search/sortable-header.mas, search => $search &>Modified</&></th>
     </tr>
   </thead>
 

@@ -1,4 +1,4 @@
-package R2::Role::Schema::URIMaker;
+package R2::Role::URIMaker;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ requires '_base_uri_path';
 
 sub uri {
     my $self = shift;
-    my %p    = validate(
+    my %p    = validated_hash(
         \@_,
         view      => { isa => 'Str',     optional => 1 },
         fragment  => { isa => 'Str',     optional => 1 },

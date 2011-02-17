@@ -10,7 +10,7 @@ use URI::Escape qw( uri_escape_utf8 );
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::Schema::URIMaker';
+with 'R2::Role::URIMaker';
 
 {
     my $schema = R2::Schema->Schema();

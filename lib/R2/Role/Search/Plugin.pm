@@ -4,7 +4,7 @@ use Moose::Role;
 
 use namespace::autoclean;
 
-requires 'apply_where_clauses';
+requires qw( apply_where_clauses uri_parameters );
 
 has search => (
     is       => 'ro',

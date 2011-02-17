@@ -21,7 +21,7 @@ use MooseX::ClassAttribute;
 
 with 'R2::Role::Schema::DataValidator' =>
     { steps => [qw( _require_username_or_email )] };
-with 'R2::Role::Schema::URIMaker';
+with 'R2::Role::URIMaker';
 
 {
     my %formats = (

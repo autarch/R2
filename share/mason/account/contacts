@@ -2,7 +2,7 @@
   <h1><& SELF:title, %ARGS &></h1>
 </div>
 
-<& /lib/search-results.mas, search => $search &>
+<& /lib/search/results.mas, search => $search &>
 
 <%args>
 $search

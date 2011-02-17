@@ -1,0 +1,22 @@
+<a class="sort-link" href="<% $search->uri( page => 1, order_by => $order_by, reverse_order => $reverse ) %>"
+   title="<% $title %>"><% $content %> <img src="/images/icons/<% $icon %>.png" height="16" width="16" /></a>\
+
+<%args>
+$search
+</%args>
+
+<%init>
+my $content = $m->content();
+
+my $icon = 'sort_columns';
+my $title = 'Sort on this column';
+
+my $order_by = lc $content;
+my $reverse = 0;
+
+if ( $search->order_by() eq $order_by ) {
+    $icon = $search->reverse_order() ? 'arrow_up' : 'arrow_down';
+    $title = 'Reverse current sorting';
+    $reverse = 1 unless $search->reverse_order();
+}
+</%init>
