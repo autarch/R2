@@ -5,14 +5,17 @@ use Moose;
 
 use namespace::autoclean;
 
+use List::AllUtils qw( uniq );
 use R2::Schema;
-use R2::Types qw( NonEmptyStr );
+use R2::Types qw( NonEmptyStr SingleOrArrayRef );
 
 with 'R2::Role::Search::Plugin';
 
-has 'name' => (
-    is  => 'ro',
-    isa => NonEmptyStr,
+has names => (
+    is       => 'ro',
+    isa      => SingleOrArrayRef [NonEmptyStr],
+    coerce   => 1,
+    required => 1,
 );
 
 my $Schema = R2::Schema->Schema();
@@ -21,7 +24,22 @@ sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
-    $self->_person_where_clause($select)
+    my @names = uniq map { lc } @{ $self->names() };
+
+    for my $name (@names) {
+        $select->where('or') if $name ne $names[0];
+        $self->_apply_where_clauses( $select, $name );
+    }
+
+    return;
+}
+
+sub _apply_where_clauses {
+    my $self   = shift;
+    my $select = shift;
+    my $name = shift;
+
+    $self->_person_where_clause( $select, $name )
         if $self->search()->searches_class('Person');
 
     $select->where('or')
@@ -30,7 +48,7 @@ sub apply_where_clauses {
     $select->where(
         $Schema->table('Household')->column('name'),
         'LIKE',
-        $self->name() . '%'
+        $name . '%'
     ) if $self->search()->searches_class('Household');
 
     $select->where('or')
@@ -39,15 +57,14 @@ sub apply_where_clauses {
     $select->where(
         $Schema->table('Organization')->column('name'),
         'LIKE',
-        $self->name() . '%'
+        $name . '%'
     ) if $self->search()->searches_class('Organization');
-
-    return;
-};
+}
 
 sub _person_where_clause {
     my $self = shift;
     my $select = shift;
+    my $name = shift;
 
     # The theory is that if there's more than 2 parts then it's
     # probably a last name with a space in it, as opposed to someone
@@ -55,7 +72,7 @@ sub _person_where_clause {
     #
     # Also note that this would completely break for names written in
     # Chinese characters, which are written without spaces.
-    my @parts = split /\s+/, lc $self->name(), 2;
+    my @parts = split /\s+/, $name, 2;
     if ( @parts == 1 ) {
         #<<<
         $select

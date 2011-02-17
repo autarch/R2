@@ -83,7 +83,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByName',
-        name         => 'John',
+        names        => 'John',
     );
 
     is(
@@ -107,7 +107,26 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByName',
-        name         => 'John Cleese',
+        names        => [ 'John', 'Eric' ],
+    );
+
+    is(
+        $search->contact_count(), 3,
+        'Contact search by name finds 3 contacts for two names'
+    );
+
+    is_deeply(
+        [ map { $_->display_name() } $search->contacts()->all() ],
+        [ 'John Cleese', 'Eric Idle', 'John House', ],
+        'contacts match search by name, sorted by name'
+    );
+}
+
+{
+    my $search = R2::Search::Contact->new(
+        account      => $account,
+        restrictions => 'Contact::ByName',
+        names        => 'John Cleese',
     );
 
     is(
@@ -126,7 +145,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByName',
-        name         => 'John House',
+        names        => 'John House',
     );
 
     is(
@@ -141,8 +160,13 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 }
 
-my $tag = R2::Schema::Tag->insert(
+my $foo = R2::Schema::Tag->insert(
     tag        => 'foo',
+    account_id => $account->account_id(),
+);
+
+my $bar = R2::Schema::Tag->insert(
+    tag        => 'bar',
     account_id => $account->account_id(),
 );
 
@@ -150,7 +174,7 @@ my $tag = R2::Schema::Tag->insert(
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_id       => $tag->tag_id(),
+        tag_ids      => $foo->tag_id(),
     );
 
     is(
@@ -161,12 +185,14 @@ my $tag = R2::Schema::Tag->insert(
 
 $contacts{CAA}->contact()->add_tags( tags => ['foo'] );
 $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
+$contacts{'MFA'}->contact()->add_tags( tags => ['bar'] );
+$contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
 
 {
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_id       => $tag->tag_id(),
+        tag_ids      => $foo->tag_id(),
     );
 
     is(
@@ -183,10 +209,29 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
 }
 
 {
+    my $search = R2::Search::Contact->new(
+        account      => $account,
+        restrictions => 'Contact::ByTag',
+        tag_ids      => [ $foo->tag_id(), $bar->tag_id() ],
+    );
+
+    is(
+        $search->contact_count(), 4,
+        'Contact search by tag finds 4 contacts for two tags'
+    );
+
+    is_deeply(
+        [ map { $_->display_name() } $search->contacts()->all() ],
+        [ 'CAA', 'Graham Chapman', 'Eric Idle', 'MFA' ],
+        'contacts match search by tag, sorted by name'
+    );
+}
+
+{
     my $search = R2::Search::Person->new(
         account      => $account,
         restrictions => 'Contact::ByName',
-        name         => 'John',
+        names        => 'John',
     );
 
     is(
@@ -210,7 +255,45 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
     my $search = R2::Search::Person->new(
         account      => $account,
         restrictions => 'Contact::ByName',
-        name         => 'John Cleese',
+        names        => [ 'John', 'Nonexistent' ],
+    );
+
+    is(
+        $search->person_count(), 1,
+        'Person search by name finds 1 contact for two names (one does not exist)'
+    );
+
+    is_deeply(
+        [ map { $_->display_name() } $search->people()->all() ],
+        [ 'John Cleese', ],
+        'people match search by name, sorted by name'
+    );
+}
+
+{
+    my $search = R2::Search::Person->new(
+        account      => $account,
+        restrictions => 'Contact::ByName',
+        names        => [ 'John', 'Eric' ],
+    );
+
+    is(
+        $search->person_count(), 2,
+        'Person search by name finds 2 contacts for two names'
+    );
+
+    is_deeply(
+        [ map { $_->display_name() } $search->people()->all() ],
+        [ 'John Cleese', 'Eric Idle' ],
+        'people match search by name, sorted by name'
+    );
+}
+
+{
+    my $search = R2::Search::Person->new(
+        account      => $account,
+        restrictions => 'Contact::ByName',
+        names        => 'John Cleese',
     );
 
     is(
@@ -229,7 +312,7 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
     my $search = R2::Search::Person->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_id       => $tag->tag_id(),
+        tag_ids      => $foo->tag_id(),
     );
 
     is(
@@ -241,6 +324,25 @@ $contacts{'Eric Idle'}->contact()->add_tags( tags => ['foo'] );
     is_deeply(
         [ map { $_->display_name() } $search->people()->all() ],
         [ 'Eric Idle' ],
+        'people match search by tag, sorted by name'
+    );
+}
+
+{
+    my $search = R2::Search::Person->new(
+        account      => $account,
+        restrictions => 'Contact::ByTag',
+        tag_ids      => [ $foo->tag_id(), $bar->tag_id() ],
+    );
+
+    is(
+        $search->person_count(), 2,
+        'Person search by tag finds 2 contacts for two tags'
+    );
+
+    is_deeply(
+        [ map { $_->display_name() } $search->people()->all() ],
+        [ 'Graham Chapman', 'Eric Idle' ],
         'people match search by tag, sorted by name'
     );
 }

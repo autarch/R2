@@ -7,6 +7,7 @@ use Email::Valid;
 use MooseX::Types -declare => [
     qw(
         ContactLike
+        DatabaseId
         ErrorForSession
         FileIsImage
         PosInt
@@ -15,6 +16,7 @@ use MooseX::Types -declare => [
         URIStr
         )
 ];
+use MooseX::Types::Common::Numeric qw( PositiveInt );
 use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw(  Defined Int Object Str );
 
@@ -30,6 +32,8 @@ subtype ContactLike,
         ( ref $_[0] )
             . ' is not a R2::Schema::Contact, nor does it do R2::Role::Schema::ActsAsContact';
     };
+
+subtype DatabaseId, as PositiveInt;
 
 subtype ErrorForSession,
     as Defined,

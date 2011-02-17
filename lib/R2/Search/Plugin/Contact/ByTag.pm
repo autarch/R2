@@ -6,13 +6,15 @@ use Moose;
 use namespace::autoclean;
 
 use R2::Schema;
-use R2::Types qw( Int );
+use R2::Types qw( SingleOrArrayRef DatabaseId );
 
 with 'R2::Role::Search::Plugin';
 
-has 'tag_id' => (
+has tag_ids => (
     is  => 'ro',
-    isa => Int,
+    isa      => SingleOrArrayRef [DatabaseId],
+    coerce   => 1,
+    required => 1,
 );
 
 sub apply_where_clauses {
@@ -25,7 +27,7 @@ sub apply_where_clauses {
     $select
         ->from ( $schema->tables( 'ContactTag', 'Contact' ) )
         ->where( $schema->table('ContactTag')->column('tag_id'),
-                 '=', $self->tag_id() );
+                 'IN', @{ $self->tag_ids() } );
     #>>>
 
     return;
