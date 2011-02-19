@@ -12,7 +12,7 @@ use Fey::Placeholder;
 use List::AllUtils qw( any );
 use R2::Schema;
 use R2::Search::Iterator::RealContact;
-use R2::Types qw( NonEmptyStr );
+use R2::Types qw( NonEmptyStr PosOrZeroInt );
 
 has account => (
     is       => 'ro',
@@ -211,12 +211,6 @@ sub _classes_returned_by_iterator {
 
         return;
     }
-}
-
-sub contact_count {
-    my $self = shift;
-
-    $self->_count();
 }
 
 sub _bind_params {

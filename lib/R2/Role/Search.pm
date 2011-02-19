@@ -6,6 +6,8 @@ use MooseX::ClassAttribute;
 use namespace::autoclean;
 
 use Class::Load qw( load_class );
+use Data::Page;
+use Data::Page::FlickrLike;
 use List::AllUtils qw( all );
 use Module::Pluggable::Object;
 use MooseX::Params::Validate qw( validated_hash );
@@ -59,6 +61,14 @@ has page => (
     default => 1,
 );
 
+has pager => (
+    is       => 'ro',
+    isa      => 'Data::Page',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_pager',
+);
+
 has title => (
     is      => 'ro',
     isa     => NonEmptyStr,
@@ -78,6 +88,14 @@ has result_type_string => (
     isa     => NonEmptyStr,
     lazy    => 1,
     builder => '_build_result_type_string',
+);
+
+has count => (
+    is       => 'ro',
+    isa      => PosOrZeroInt,
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_count',
 );
 
 has _restrictions => (
@@ -177,7 +195,7 @@ sub _object_iterator {
     );
 }
 
-sub _count {
+sub _build_count {
     my $self = shift;
 
     my $select = $self->_CountSelectBase()->clone();
@@ -247,6 +265,17 @@ sub _build_result_type_string {
     }
 
     die 'wtf';
+}
+
+sub _build_pager {
+    my $self = shift;
+
+    my $pager = Data::Page->new();
+    $pager->total_entries( $self->count() );
+    $pager->entries_per_page( $self->limit() );
+    $pager->current_page( $self->page() );
+
+    return $pager;
 }
 
 sub uri {

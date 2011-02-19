@@ -397,6 +397,14 @@ table.standard-table {
 table.search-results {
     font-size: 90%;
 
+    tr.pager {
+        th {
+            background-color: white;
+            color: black;
+            font-weight: normal;
+        }
+    }
+
     td.icon {
         img {
             margin-top: 0.2em;
