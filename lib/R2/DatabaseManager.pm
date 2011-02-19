@@ -35,7 +35,15 @@ has seed => (
     isa     => Bool,
     default => 0,
     documentation =>
-        'When this is true, a newly created database will be seeded with some initial data. Defaults to false.',
+        'When this is true, a newly created database will be seeded with some basic initial data. Defaults to false.',
+);
+
+has populate => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+    documentation =>
+        'When this is true, a newly created database will be seeded with a lot of data. Defaults to false.',
 );
 
 # If this isn't done these attributes end up interleaved with attributes from
@@ -80,7 +88,7 @@ sub BUILD {
 after update_or_install_db => sub {
     my $self = shift;
 
-    $self->_seed_data() if $self->seed();
+    $self->_seed_data() if $self->seed() || $self->populate();
 };
 
 sub _seed_data {
@@ -104,7 +112,8 @@ sub _seed_data {
     my $db_name = $self->db_name();
     $self->_msg("Seeding the $db_name database");
 
-    R2::SeedData::seed_data( verbose => !$self->quiet() );
+    my $meth = $self->seed() ? 'seed_data' : 'seed_lots_of_data';
+    R2::SeedData->$meth( verbose => !$self->quiet() );
 }
 
 __PACKAGE__->meta()->make_immutable();
