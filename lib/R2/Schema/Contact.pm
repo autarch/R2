@@ -388,7 +388,9 @@ for my $pair (
                 }
             }
         }
-
+        # XXX - if any update changes display_order, all display_order updates
+        # should be collected and postponed, then done all at once in a safe
+        # way.
         my $trans_sub = subname(
             'R2::Schema::Contact::_update_or_add-' . $thing => sub {
                 for my $object ( $self->$plural()->all() ) {
