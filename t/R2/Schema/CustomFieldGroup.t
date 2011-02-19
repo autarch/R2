@@ -29,22 +29,6 @@ my $account2 = R2::Schema::Account->new( name => q{People's Front of Judea} );
         [ 1 .. 4 ],
         'groups are inserted in display order from 1-4'
     );
-
-    $groups[1]->delete();
-
-    @groups = $account1->custom_field_groups()->all();
-
-    is_deeply(
-        [ map { $_->display_order() } @groups ],
-        [ 1 .. 3 ],
-        'deleting a group reorders remaining groups'
-    );
-
-    is_deeply(
-        [ map { $_->name() } @groups ],
-        [ 'Group 1', 'Group 3', 'Group 4' ],
-        'reordered groups have the expected names'
-    );
 }
 
 done_testing();
