@@ -266,7 +266,7 @@ sub check_password {
     my $pass = Authen::Passphrase::BlowfishCrypt->from_rfc2307(
         $self->password() );
 
-    return $pass->match($pw) ? 1 : 0;
+    return $pass->match($pw);
 }
 
 sub EnsureRequiredUsersExist {
