@@ -95,8 +95,16 @@ sub CreateDefaultsForAccount {
     );
 
     $class->insert(
-        name                    => 'Office',
+        name                    => 'Work',
         applies_to_person       => 1,
+        applies_to_household    => 0,
+        applies_to_organization => 0,
+        account_id              => $account->account_id(),
+    );
+
+    $class->insert(
+        name                    => 'Office',
+        applies_to_person       => 0,
         applies_to_household    => 0,
         applies_to_organization => 1,
         account_id              => $account->account_id(),
