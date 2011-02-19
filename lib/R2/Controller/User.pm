@@ -69,7 +69,7 @@ post authentication => args 0 => sub {
         }
     }
 
-    unless ($user) {
+    if (@errors) {
         $c->redirect_with_error(
             error => R2::Exception::DataValidation->new( errors => \@errors ),
             uri =>
