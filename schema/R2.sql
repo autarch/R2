@@ -128,7 +128,7 @@ CREATE TABLE "CustomFieldGroup" (
        applies_to_household           BOOLEAN      NOT NULL DEFAULT FALSE,
        applies_to_organization        BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id                     INT8         NOT NULL,
-       CONSTRAINT CustomFieldGroup_account_id_display_order_unique
+       CONSTRAINT "CustomFieldGroup_account_id_display_order_unique"
                   UNIQUE ( account_id, display_order )
 );
 
@@ -147,7 +147,7 @@ CREATE TABLE "CustomField" (
        display_order            pos_int      NOT NULL,
        account_id               INT8         NOT NULL,
        custom_field_group_id    INT8         NOT NULL,
-       CONSTRAINT CustomField_custom_field_group_id_display_order_unique
+       CONSTRAINT "CustomField_custom_field_group_id_display_order_unique"
                   UNIQUE ( custom_field_group_id, display_order )
 );
 
@@ -228,7 +228,7 @@ CREATE TABLE "CustomFieldSelectOption" (
        custom_field_id          INT8         NOT NULL,
        display_order            pos_int      NOT NULL,
        value                    TEXT         NOT NULL,
-       CONSTRAINT CustomFieldSelectOption_custom_field_id_display_order_unique
+       CONSTRAINT "CustomFieldSelectOption_custom_field_id_display_order_unique"
                   UNIQUE ( custom_field_id, display_order )
 );
 
@@ -277,7 +277,8 @@ CREATE TABLE "ContactNoteType" (
        is_system_defined  BOOLEAN            NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_description CHECK ( description != '' ),
-       CONSTRAINT ContactNoteType_description_account_id_unique UNIQUE ( description, account_id )
+       CONSTRAINT "ContactNoteType_description_account_id_unique"
+                  UNIQUE ( description, account_id )
 );
 
 CREATE INDEX "ContactNoteType_account_id" ON "ContactNoteType" ("account_id");
@@ -330,7 +331,7 @@ CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
        tag              citext          NOT NULL,
        account_id       INT8            NOT NULL,
-       CONSTRAINT Tag_tag_account_id_unique UNIQUE ( tag, account_id )
+       CONSTRAINT "Tag_tag_account_id_unique" UNIQUE ( tag, account_id )
 );
 
 CREATE INDEX "Tag_account_id" ON "Tag" ("account_id");
@@ -494,7 +495,7 @@ CREATE TABLE "AddressType" (
        applies_to_organization  BOOLEAN      NOT NULL DEFAULT FALSE,
        account_id         INT8               NOT NULL,
        CONSTRAINT valid_name CHECK ( name != '' ),
-       CONSTRAINT AddressType_account_id_display_order_unique
+       CONSTRAINT "AddressType_account_id_display_order_unique"
                   UNIQUE ( account_id, display_order )
 );
 
