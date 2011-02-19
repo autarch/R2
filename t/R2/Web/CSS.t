@@ -10,8 +10,8 @@ use R2::Web::CSS;
 
 my $css = R2::Web::CSS->new();
 
-plan skip_all => 'Cannot run tests without lessc available'
-    unless eval { $css->lessc_path() };
+plan skip_all => 'Cannot run tests without sass available'
+    unless eval { $css->sass_path() };
 
 $css->create_single_file();
 
