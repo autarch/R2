@@ -259,10 +259,14 @@ sub check_password {
     my $self = shift;
     my $pw   = shift;
 
+    return if $self->is_disabled();
+    return if string_is_empty($pw);
+    return unless $self->password() =~ /^\Q{CRYPT}\E.+$/;
+
     my $pass = Authen::Passphrase::BlowfishCrypt->from_rfc2307(
         $self->password() );
 
-    return $pass->match($pw);
+    return $pass->match($pw) ? 1 : 0;
 }
 
 sub EnsureRequiredUsersExist {

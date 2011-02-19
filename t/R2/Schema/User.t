@@ -35,6 +35,31 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
         'password was crypted'
     );
 
+    ok(
+        !$user->check_password(undef),
+        'check_password returns false on undef'
+    );
+
+    ok(
+        !$user->check_password(q{}),
+        'check_password returns false on the empty string'
+    );
+
+    ok(
+        !$user->check_password(42),
+        'check_password returns false on wrong password'
+    );
+
+    ok(
+        !$user->check_password('password2'),
+        'check_password returns false on wrong password'
+    );
+
+    ok(
+        $user->check_password('password'),
+        'check_password returns true on correct password'
+    );
+
     is(
         $user->person()->preferred_email_address()->email_address(),
         'joe.smith@example.com',
@@ -56,6 +81,11 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
     is(
         $user->password(), '*disabled*',
         'when user is marked disabled, password is set to unusable password by default'
+    );
+
+    ok(
+        !$user->check_password('*disabled*'),
+        'check_password returns false when account is disabled'
     );
 }
 
