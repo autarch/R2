@@ -58,44 +58,6 @@ my $_insert_wrapper = sub {
     };
 };
 
-my $_delete_wrapper = sub {
-    my $table  = shift;
-    my $column = shift;
-
-    my $minus_one
-        = Fey::Literal::Term->new( $table->column('display_order'), ' - 1' );
-
-    my $reorder_update = R2::Schema->SQLFactoryClass()->new_update();
-    #<<<
-    $reorder_update
-        ->update($table)
-        ->set   ( $table->column('display_order'), $minus_one )
-        ->where ( $table->column('display_order'), '>', Fey::Placeholder->new() )
-        ->and   ( $column, '=', Fey::Placeholder->new() );
-    #>>>
-
-    my $col_name = $column->name();
-
-    return sub {
-        my $orig = shift;
-        my $self = shift;
-
-        my $dbh = $self->_dbh($reorder_update);
-        my $sql = $reorder_update->sql($dbh);
-
-        my $display_order     = $self->display_order();
-        my $related_col_value = $self->$col_name();
-
-        R2::Schema->RunInTransaction(
-            sub {
-                $self->$orig(@_);
-
-                $dbh->do( $sql, {}, $display_order, $related_col_value );
-            }
-        );
-    };
-};
-
 role {
     my $p     = shift;
     my %extra = @_;
@@ -105,8 +67,6 @@ role {
     my $column = $p->related_column();
 
     around insert => $_insert_wrapper->( $table, $column );
-
-    around delete => $_delete_wrapper->( $table, $column );
 
     my $col_name = $column->name();
 
