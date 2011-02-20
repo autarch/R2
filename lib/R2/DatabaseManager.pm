@@ -115,6 +115,8 @@ sub _truncate_data {
     $self->_msg("Truncating the $db_name database");
 
     for my $table ( R2::Schema->Schema()->tables() ) {
+        next if $table->name() eq 'Version';
+
         my $truncate = 'TRUNCATE TABLE ' . $table->sql($dbh) . ' CASCADE';
         $dbh->do($truncate);
     }
