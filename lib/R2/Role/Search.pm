@@ -290,12 +290,10 @@ sub new_uri {
         MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1,
     );
 
-    my %query
-        = map { $_ => delete $p{$_} } qw( page limit order_by reverse_order );
+    my %query = map { $_ => delete $p{$_} }
+        grep { defined $p{$_} } qw( page limit order_by reverse_order );
 
     delete $query{page} if $query{page} && $query{page} == 1;
-
-    delete $query{limit} unless defined $query{limit};
 
     delete $query{order_by}
         if $query{order_by} eq $self->meta()->get_attribute('order_by')->default();
