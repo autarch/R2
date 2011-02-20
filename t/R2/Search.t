@@ -53,7 +53,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     my $search = R2::Search::Contact->new( account => $account );
 
     is(
-        $search->contact_count(), 9,
+        $search->count(), 9,
         'search finds 8 contacts'
     );
 
@@ -87,7 +87,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 
     is(
-        $search->contact_count(), 2,
+        $search->count(), 2,
         'Contact search by name finds 2 contacts'
     );
 
@@ -111,7 +111,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 
     is(
-        $search->contact_count(), 3,
+        $search->count(), 3,
         'Contact search by name finds 3 contacts for two names'
     );
 
@@ -130,7 +130,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 
     is(
-        $search->contact_count(), 1,
+        $search->count(), 1,
         'Contact search by name finds 1 contact'
     );
 
@@ -149,7 +149,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 
     is(
-        $search->contact_count(), 1,
+        $search->count(), 1,
         'Contact search by name finds 1 contact'
     );
 
@@ -178,7 +178,7 @@ my $bar = R2::Schema::Tag->insert(
     );
 
     is(
-        $search->contact_count(), 0,
+        $search->count(), 0,
         'Contact search by tag finds 0 contacts'
     );
 }
@@ -196,7 +196,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->contact_count(), 2,
+        $search->count(), 2,
         'Contact search by tag finds 2 contacts'
     );
 
@@ -216,7 +216,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->contact_count(), 4,
+        $search->count(), 4,
         'Contact search by tag finds 4 contacts for two tags'
     );
 
@@ -235,7 +235,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 1,
+        $search->count(), 1,
         'Person search by name finds 1 contact'
     );
 
@@ -259,7 +259,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 1,
+        $search->count(), 1,
         'Person search by name finds 1 contact for two names (one does not exist)'
     );
 
@@ -278,7 +278,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 2,
+        $search->count(), 2,
         'Person search by name finds 2 contacts for two names'
     );
 
@@ -297,7 +297,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 1,
+        $search->count(), 1,
         'Person search by name finds 1 contact'
     );
 
@@ -316,7 +316,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 1,
+        $search->count(), 1,
         'Person search by tag finds 1 contact'
     );
 
@@ -336,7 +336,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->person_count(), 2,
+        $search->count(), 2,
         'Person search by tag finds 2 contacts for two tags'
     );
 
