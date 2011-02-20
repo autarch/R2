@@ -14,6 +14,7 @@ use R2::Types qw(
     ArrayRef
     Bool
     HashRef
+    Maybe
     NonEmptyStr
     PosInt
     PosOrZeroInt
@@ -59,7 +60,7 @@ has page => (
 
 has pager => (
     is       => 'ro',
-    isa      => 'Data::Pageset',
+    isa      => Maybe ['Data::Pageset'],
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_pager',
@@ -265,6 +266,8 @@ sub _build_result_type_string {
 
 sub _build_pager {
     my $self = shift;
+
+    return unless $self->limit();
 
     my $pager = Data::Pageset->new(
         {
