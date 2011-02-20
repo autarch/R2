@@ -11,7 +11,7 @@ use MIME::Base64 qw( encode_base64 );
 use R2::DatabaseManager;
 use Storable qw( nfreeze );
 
-my $db_name = $ENV{HUDSON_URL} ? "R2Hudson_$ENV{BUILD_NUMBER}" : 'R2Test';
+my $db_name = $ENV{JENKINS_URL} ? "R2Jenkins_$ENV{BUILD_NUMBER}" : 'R2Test';
 
 R2::DatabaseManager->new(
     db_name          => $db_name,
