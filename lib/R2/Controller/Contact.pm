@@ -101,10 +101,17 @@ sub _contact_search {
 
     $p{limit} //= 50;
 
-    $c->stash()->{search} = R2::Search::Contact->new(
+    my $search = R2::Search::Contact->new(
         account => $c->account(),
         %p,
     );
+
+    if ( $search->count() == 1 ) {
+        $c->redirect_and_detach(
+            $search->contacts()->next()->uri( with_host => 1 ) );
+    }
+
+    $c->stash()->{search} = $search;
 
     $c->stash()->{template} = '/account/contacts';
 }
