@@ -508,15 +508,13 @@ get_html q{}
     my $self     = shift;
     my $c        = shift;
 
-    $c->tabs()->by_id('Tags')->set_is_selected(1);
-
-    $c->stash()->{search} = R2::Search::Contact->new(
+    my $search = R2::Search::Contact->new(
         account      => $c->stash()->{account},
         restrictions => 'Contact::ByTag',
         tag_ids      => $c->stash()->{tag}->tag_id(),
     );
 
-    $c->stash()->{template} = '/account/contacts';
+    $c->redirect_and_detach( $search->new_uri( with_host => 1 ) );
 };
 
 del q{}
