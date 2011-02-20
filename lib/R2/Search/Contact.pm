@@ -13,6 +13,7 @@ use List::AllUtils qw( any );
 use R2::Schema;
 use R2::Search::Iterator::RealContact;
 use R2::Types qw( NonEmptyStr PosOrZeroInt );
+use R2::Util qw( string_is_empty );
 
 has account => (
     is       => 'ro',
@@ -207,7 +208,9 @@ sub _BuildSearchedClasses {
 sub _base_uri_path {
     my $self = shift;
 
-    return join '/', $self->account()->_base_uri_path(), 'contacts',
+    return join '/',
+        grep { !string_is_empty($_) } $self->account()->_base_uri_path(),
+        'contacts',
         $self->_restrictions_path_component();
 }
 

@@ -10,6 +10,7 @@ use Fey::Object::Iterator::FromSelect;
 use Fey::Placeholder;
 use R2::Schema;
 use R2::Types qw( ArrayRef );
+use R2::Util qw( string_is_empty );
 
 has account => (
     is       => 'ro',
@@ -96,7 +97,9 @@ sub _BuildSearchedClasses {
 sub _base_uri_path {
     my $self = shift;
 
-    return join '/', $self->account()->_base_uri_path(), 'people',
+    return join '/',
+        grep { !string_is_empty($_) } $self->account()->_base_uri_path(),
+        'people',
         $self->_restrictions_path_component();
 }
 
