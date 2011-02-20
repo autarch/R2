@@ -6,8 +6,7 @@ use MooseX::ClassAttribute;
 use namespace::autoclean;
 
 use Class::Load qw( load_class );
-use Data::Page;
-use Data::Page::FlickrLike;
+use Data::Pageset;
 use List::AllUtils qw( all );
 use Module::Pluggable::Object;
 use MooseX::Params::Validate qw( validated_hash );
@@ -63,7 +62,7 @@ has page => (
 
 has pager => (
     is       => 'ro',
-    isa      => 'Data::Page',
+    isa      => 'Data::Pageset',
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_pager',
@@ -270,10 +269,15 @@ sub _build_result_type_string {
 sub _build_pager {
     my $self = shift;
 
-    my $pager = Data::Page->new();
-    $pager->total_entries( $self->count() );
-    $pager->entries_per_page( $self->limit() );
-    $pager->current_page( $self->page() );
+    my $pager = Data::Pageset->new(
+        {
+            total_entries    => $self->count(),
+            entries_per_page => $self->limit(),
+            current_page     => $self->page(),
+            pages_per_set    => 10,
+            mode             => 'slide',
+        }
+    );
 
     return $pager;
 }

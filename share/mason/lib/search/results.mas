@@ -7,17 +7,23 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
   <thead>
     <tr class="pager">
       <th colspan="<% $search->includes_multiple_contact_types() ? 7 : 6 %>">
-%   if ( $count > $search->limit() ) {
-%     for my $page ( $search->pager()->navigations() ) {
+%   if ($pager) {
+%     if ( $pager->previous_set() ) {
+        <a href="<% $search->uri( order_by => $search->order_by(), reverse_order => $search->reverse_order() ) %>">1</a>
+        <a href="<% $search->uri( order_by => $search->order_by(), reverse_order => $search->reverse_order(), page => $pager->previous_set() ) %>">...</a>
+%     }
+%     for my $page ( @{ $pager->pages_in_set() } ) {
 %       if ($page) {
 %         if ( $page == $search->page() ) {
         <strong><% $page %></strong>
 %         } else {
         <a href="<% $search->uri( order_by => $search->order_by(), reverse_order => $search->reverse_order(), page => $page ) %>"><% $page %></a>
 %         }
-%       } else {
-        ...
 %       }
+%     }
+%     if ( $pager->next_set() ) {
+        <a href="<% $search->uri( order_by => $search->order_by(), reverse_order => $search->reverse_order(), page => $pager->next_set() ) %>">...</a>
+        <a href="<% $search->uri( order_by => $search->order_by(), reverse_order => $search->reverse_order(), page => $pager->last_page() ) %>"><% $pager->last_page() %></a>
 %     }
 %   }
       </th>
@@ -52,7 +58,7 @@ my $contacts;
 $contacts = $search->contacts() if $count;
 
 my $pager;
-$pager  = $search->pager() if $count;
+$pager = $search->pager() if $count && $count > $search->limit();
 </%init>
 
 <%def .contact-row>
