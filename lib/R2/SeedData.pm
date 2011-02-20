@@ -2,9 +2,11 @@ package R2::SeedData;
 
 use strict;
 use warnings;
+use autodie;
 
 our $VERBOSE;
 
+use DateTime;
 use File::HomeDir;
 use List::AllUtils qw( shuffle );
 use Path::Class;
@@ -158,6 +160,8 @@ sub _seed_random_contacts {
         _seed_emails_for_contact( $account, $user, $contact, $data );
         _seed_phones_for_contact( $account, $user, $contact, $data );
         _seed_addresses_for_contact( $account, $user, $contact, $data );
+        _seed_tags_for_contact( $account, $user, $contact );
+        _seed_donations_for_contact( $account, $user, $contact );
 
         $person_ids{ $person->person_id() } = 1;
     }
@@ -320,6 +324,316 @@ sub _seed_random_person {
 
         $contact->update_or_add_addresses( {}, \@addresses, $user )
             if @addresses;
+    }
+}
+
+sub _seed_tags_for_contact {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+
+    my @tags = _tags($account)
+        or return;
+
+    $contact->add_tags( tags => \@tags );
+}
+
+sub _tags {
+    my $account = shift;
+
+    my $tag_rand = _percent();
+
+    return if $tag_rand < 15;
+
+    my $num
+        = $tag_rand <= 40 ? 1
+        : $tag_rand <= 60 ? 2
+        : $tag_rand <= 70 ? 3
+        : $tag_rand <= 80 ? 4
+        : $tag_rand <= 90 ? 5
+        :                   6;
+
+    my @tags = _make_tags($account);
+
+    my @chosen;
+    for ( 1 .. $num ) {
+        push @chosen, splice @tags, int( rand(@tags) ), 1;
+    }
+
+    return @chosen;
+}
+
+{
+    open my $fh, '<', '/usr/share/dict/words';
+
+    my @words;
+    while (<$fh>) {
+        next if /\'/;
+
+        chomp;
+        push @words, $_;
+    }
+
+    my @Tags;
+
+    sub _make_tags {
+        return @Tags if @Tags;
+
+        my $account = shift;
+
+        for ( 1 .. 30 ) {
+            my $word = splice @words, int( rand(@words) ), 1;
+            push @Tags, $word;
+
+            R2::Schema::Tag->insert(
+                account_id => $account->account_id(),
+                tag        => $word,
+            );
+        }
+
+        return @Tags;
+    }
+}
+
+sub _seed_donations_for_contact {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+
+    return if _percent() <= 60;
+
+    if ( _percent() <= 15 ) {
+        _seed_recurring_donations( $account, $user, $contact );
+    }
+    else {
+        _seed_random_donations( $account, $user, $contact );
+    }
+}
+
+my $Today = DateTime->today( time_zone => 'floating' );
+
+sub _seed_recurring_donations {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+
+    my $years = _random_years();
+
+    my $start_date;
+    my %add;
+
+    my $type_rand = _percent();
+    if ( $type_rand <= 75 || $years == 1 ) {
+        $start_date = $Today->clone()->subtract( days => int( rand(28) ) );
+        $start_date->subtract( years => $years );
+        %add = ( months => 1 );
+    }
+    elsif ( $type_rand <= 95 ) {
+        $start_date = $Today->clone()->subtract( days => int( rand(89) ) );
+        $start_date->subtract( years => $years );
+        %add = ( months => 3 );
+    }
+    else {
+        $start_date = $Today->clone()->subtract( days => int( rand(365) ) );
+        $start_date->subtract( years => $years );
+        %add = ( years => 1 );
+    }
+
+    my $campaign = _random_campaign($account);
+    my $source   = _random_source($account);
+    my $type     = _random_payment_type($account);
+
+    my $amount = _random_amount();
+    while ( $start_date <= $Today ) {
+        _seed_donation(
+            $account,
+            $user,
+            $contact,
+            campaign     => $campaign,
+            source       => $source,
+            type         => $type,
+            date         => $start_date,
+            amount       => $amount,
+            is_recurring => 1,
+        );
+
+        $start_date->add(%add);
+    }
+}
+
+sub _seed_random_donations {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+
+    my $years = _random_years();
+
+    my $start_date = $Today->clone()->subtract( days => int( rand(365) ) );
+    $start_date->subtract( years => $years );
+
+    while ( $start_date <= $Today ) {
+        my %gift = _random_gift($start_date);
+
+        my %p = (
+            amount => _random_amount(),
+            date   => $start_date,
+            gift   => \%gift,
+        );
+
+        if ( $gift{gift_item} || _percent() <= 10 ) {
+            my $percent = rand(0.5);
+
+            $p{value_for_donor} = $p{amount} * $percent;
+        }
+
+        _seed_donation( $account, $user, $contact, %p );
+
+        # XXX - this isn't really right - most donors donate in a more regular
+        # pattern than "between 30 and 699 days between donations"
+        $start_date->add( days => int( rand(670) ) + 30 );
+    }
+}
+
+sub _seed_donation {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+    my %p       = @_;
+
+    $p{campaign} ||= _random_campaign($account);
+    $p{source}   ||= _random_source($account);
+    $p{type}     ||= _random_payment_type($account);
+
+    my $trans_percent = $p{type}->name() eq 'Credit card' ? 0.029 : 0;
+
+    my %receipt_date;
+    my $days_ago = $Today->delta_days( $p{date} )->in_units('days');
+
+    if ( $days_ago <= 8 ) {
+        if ( _percent() > ( 80 - ( $days_ago * 10 ) ) ) {
+            %receipt_date = ( receipt_date => $Today->clone()
+                    ->subtract( days => int( rand($days_ago) ) ) );
+        }
+    }
+    else {
+        %receipt_date
+            = (
+            receipt_date => $p{date}->clone()->add( days => int( rand(8) ) )
+            );
+    }
+
+    my %gift       = %{ $p{gift}       || {} };
+    my %dedication = %{ $p{dedication} || {} };
+
+    $contact->add_donation(
+        amount           => $p{amount},
+        donation_date    => $p{date},
+        transaction_cost => ( $p{amount} * $trans_percent ),
+        is_recurring     => $p{is_recurring} || 0,
+        %receipt_date,
+        donation_campaign_id => $p{campaign}->donation_campaign_id(),
+        donation_source_id   => $p{source}->donation_source_id(),
+        payment_type_id      => $p{type}->payment_type_id(),
+        value_for_donor      => $p{value_for_donor} || 0,
+        %gift,
+        %dedication,
+        user => $user,
+    );
+}
+
+{
+    my @Amounts;
+    push @Amounts, (10) x 20;
+    push @Amounts, (25) x 15;
+    push @Amounts, (50) x 8;
+    push @Amounts, (100) x 5;
+    push @Amounts, (250) x 3;
+    push @Amounts, (500) x 2;
+    push @Amounts, 1000;
+
+    sub _random_amount {
+        return $Amounts[ int( rand(@Amounts) ) ];
+    }
+}
+
+sub _random_years {
+    my $years_rand = _percent();
+
+    return
+          $years_rand <= 15 ? 1
+        : $years_rand <= 40 ? 2
+        : $years_rand <= 60 ? 3
+        : $years_rand <= 80 ? 4
+        : $years_rand <= 90 ? 5
+        : $years_rand <= 92 ? 6
+        : $years_rand <= 94 ? 7
+        : $years_rand <= 96 ? 8
+        : $years_rand <= 98 ? 9
+        :                     10;
+}
+
+{
+    my @Campaigns;
+
+    sub _random_campaign {
+        my $account = shift;
+
+        @Campaigns = $account->donation_campaigns()->all()
+            unless @Campaigns;
+
+        return $Campaigns[ int( rand(@Campaigns) ) ];
+    }
+}
+
+{
+    my @Sources;
+
+    sub _random_source {
+        my $account = shift;
+
+        @Sources = $account->donation_sources()->all()
+            unless @Sources;
+
+        return $Sources[ int( rand(@Sources) ) ];
+    }
+}
+
+{
+    my @Types;
+
+    sub _random_payment_type {
+        my $account = shift;
+
+        @Types = $account->payment_types()->all()
+            unless @Types;
+
+        return $Types[ int( rand(@Types) ) ];
+    }
+}
+
+{
+    my @Gifts = qw( Book Shirt Mug Calendar );
+
+    sub _random_gift {
+        my $date = shift;
+
+        return if _percent() <= 90;
+
+        my %gift = ( gift_item => $Gifts[ int( rand(@Gifts) ) ] );
+
+        my $days_ago = $Today->delta_days($date)->in_units('days');
+        if ( $days_ago <= 30 ) {
+            if ( _percent() > ( 90 - ( $days_ago * 3 ) ) ) {
+                $gift{gift_sent_date} = $Today->clone()
+                    ->subtract( days => int( rand($days_ago) ) );
+            }
+        }
+        else {
+            $gift{gift_sent_date}
+                = $date->clone()->add( days => int( rand(30) ) );
+        }
+
+        return %gift;
     }
 }
 
