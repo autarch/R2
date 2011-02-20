@@ -31,10 +31,7 @@ requires qw(
     _build_title
 );
 
-with 'R2::Role::URIMaker' => {
-    -excludes => ['uri'],
-    -alias    => { uri => '_uri' },
-};
+with 'R2::Role::URIMaker';
 
 has order_by => (
     is        => 'ro',
@@ -282,15 +279,19 @@ sub _build_pager {
     return $pager;
 }
 
-sub uri {
-    my $self = shift;
-    my %query = validated_hash(
+sub new_uri {
+    my $self  = shift;
+    my %p = validated_hash(
         \@_,
         page          => { isa => PosInt,       optional => 1 },
         limit         => { isa => PosOrZeroInt, optional => 1 },
         order_by      => { isa => NonEmptyStr,  optional => 1 },
         reverse_order => { isa => Bool,         optional => 1 },
+        MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1,
     );
+
+    my %query
+        = map { $_ => delete $p{$_} } qw( page limit order_by reverse_order );
 
     delete $query{page} if $query{page} && $query{page} == 1;
 
@@ -299,10 +300,7 @@ sub uri {
 
     delete $query{reverse_order} unless $query{reverse_order};
 
-    return $self->_uri(
-        view  => $self->_restrictions_path_component(),
-        query => \%query,
-    );
+    return $self->uri( query => \%query, %p );
 }
 
 sub _restrictions_path_component {

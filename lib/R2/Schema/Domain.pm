@@ -170,11 +170,14 @@ sub _MakeSelectAllSQL {
 sub _build_uri_params {
     my $self = shift;
 
-    my $scheme = $self->requires_ssl() ? 'https' : 'http';
-
     return {
-        scheme => $scheme,
-        host   => $self->web_hostname(),
+        scheme => $self->requires_ssl() ? 'https' : 'http',
+        host => $self->web_hostname(),
+        (
+            $ENV{SERVER_PORT}
+            ? ( port => $ENV{SERVER_PORT} )
+            : ()
+        )
     };
 }
 

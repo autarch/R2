@@ -207,7 +207,8 @@ sub _BuildSearchedClasses {
 sub _base_uri_path {
     my $self = shift;
 
-    return $self->account()->_base_uri_path() . '/contacts';
+    return join '/', $self->account()->_base_uri_path(), 'contacts',
+        $self->_restrictions_path_component();
 }
 
 sub _build_title {

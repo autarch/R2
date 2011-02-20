@@ -1,4 +1,4 @@
-<a class="sort-link" href="<% $search->uri( page => 1, order_by => $order_by, reverse_order => $reverse ) %>"
+<a class="sort-link" href="<% $search->new_uri( page => 1, order_by => $order_by, reverse_order => $reverse ) %>"
    title="<% $title %>"><% $content %> <img src="/images/icons/<% $icon %>.png" height="16" width="16" /></a>\
 
 <%args>

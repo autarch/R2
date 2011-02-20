@@ -601,6 +601,24 @@ get_html 'top_donors'
     $c->stash()->{template} = '/account/top_donors';
 };
 
+get_html 'search'
+    => chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $name = $c->request()->params()->{search};
+
+    my $search = R2::Search::Contact->new(
+        account      => $c->account(),
+        restrictions => 'Contact::ByName',
+        names        => $name,
+    );
+
+    $c->redirect_and_detach( $search->uri( with_host => 1 ) );
+};
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
