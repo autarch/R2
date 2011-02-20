@@ -510,15 +510,13 @@ get_html q{}
 
     $c->tabs()->by_id('Tags')->set_is_selected(1);
 
-    $self->_add_basic_sidebar($c);
-
     $c->stash()->{search} = R2::Search::Contact->new(
         account      => $c->stash()->{account},
         restrictions => 'Contact::ByTag',
-        tag_id       => $c->stash()->{tag}->tag_id(),
+        tag_ids      => $c->stash()->{tag}->tag_id(),
     );
 
-    $c->stash()->{template} = '/tag/view';
+    $c->stash()->{template} = '/account/contacts';
 };
 
 del q{}
