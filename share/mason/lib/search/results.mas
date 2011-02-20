@@ -27,7 +27,7 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
       <th></th>
 %   }
       <th><&| /lib/search/sortable-header.mas, search => $search &>Name</&></th>
-      <th><&| /lib/search/sortable-header.mas, search => $search &>Location</&></th>
+      <th>Location</th>
       <th><&| /lib/search/sortable-header.mas, search => $search &>Email</&></th>
       <th>Tags</th>
       <th>Activity</th>
