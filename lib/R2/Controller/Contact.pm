@@ -99,7 +99,7 @@ sub _contact_search {
             if exists $params->{$key};
     }
 
-    $p{limit} //= 20;
+    $p{limit} //= 50;
 
     $c->stash()->{search} = R2::Search::Contact->new(
         account => $c->account(),
