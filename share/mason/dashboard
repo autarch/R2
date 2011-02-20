@@ -31,15 +31,15 @@
        title="Add a new person">Contacts</a>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'search/person' ) %>"
+    <a href="<% $account->uri( view => 'people' ) %>"
        title="Add a new person">People</a>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'search/household' ) %>"
+    <a href="<% $account->uri( view => 'households' ) %>"
        title="Add a new household">Households</a>
   </li>
   <li>
-    <a href="<% $account->uri( view => 'search/organization' ) %>"
+    <a href="<% $account->uri( view => 'organizations' ) %>"
        title="Add a new organization">Organizations</a>
   </li>
 </ul>
