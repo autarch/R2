@@ -295,6 +295,8 @@ sub new_uri {
 
     delete $query{page} if $query{page} && $query{page} == 1;
 
+    delete $query{limit} unless defined $query{limit};
+
     delete $query{order_by}
         if $query{order_by} eq $self->meta()->get_attribute('order_by')->default();
 
