@@ -46,6 +46,14 @@ has populate => (
         'When this is true, a newly created database will be seeded with a lot of data. Defaults to false.',
 );
 
+has truncate => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+    documentation =>
+        'When this is true, all data in the database is wiped (use with seed or populate).',
+);
+
 # If this isn't done these attributes end up interleaved with attributes from
 # the parent class when --help is run.
 __PACKAGE__->meta()->get_attribute('seed')->_set_insertion_order(20);
@@ -88,24 +96,34 @@ sub BUILD {
 after update_or_install_db => sub {
     my $self = shift;
 
-    $self->_seed_data() if $self->seed() || $self->populate();
+    if ( $self->seed() || $self->populate() ) {
+        $self->_truncate_data() if $self->truncate();
+        $self->_seed_data();
+    }
 };
+
+sub _truncate_data {
+    my $self = shift;
+
+    $self->_setup_database_config();
+
+    require R2::Schema;
+
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+    my $db_name = $self->db_name();
+    $self->_msg("Truncating the $db_name database");
+
+    for my $table ( R2::Schema->Schema()->tables() ) {
+        my $truncate = 'TRUNCATE TABLE ' . $table->sql($dbh) . ' CASCADE';
+        $dbh->do($truncate);
+    }
+}
 
 sub _seed_data {
     my $self = shift;
 
-    require R2::Config;
-
-    my $config = R2::Config->instance();
-    $config->_set_database_name( $self->db_name() );
-
-    for my $key (qw( username password host port )) {
-        if ( my $val = $self->$key() ) {
-            my $set_meth = '_set_database_' . $key;
-
-            $config->$set_meth($val);
-        }
-    }
+    $self->_setup_database_config();
 
     require R2::SeedData;
 
@@ -114,6 +132,31 @@ sub _seed_data {
 
     my $meth = $self->seed() ? 'seed_data' : 'seed_lots_of_data';
     R2::SeedData->$meth( verbose => !$self->quiet() );
+}
+
+{
+    my $done;
+
+    sub _setup_database_config {
+        my $self = shift;
+
+        return if $done;
+
+        require R2::Config;
+
+        my $config = R2::Config->instance();
+        $config->_set_database_name( $self->db_name() );
+
+        for my $key (qw( username password host port )) {
+            if ( my $val = $self->$key() ) {
+                my $set_meth = '_set_database_' . $key;
+
+                $config->$set_meth($val);
+            }
+        }
+
+        $done = 1;
+    }
 }
 
 __PACKAGE__->meta()->make_immutable();
