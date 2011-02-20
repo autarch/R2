@@ -76,16 +76,17 @@ sub _classes_returned_by_iterator {
 }
 
 {
-    my $order_by_func = __PACKAGE__->_OrderByNameTerm();
+    my $order_by = __PACKAGE__->_OrderByNameTerm();
+
     sub _order_by_name {
         my $self   = shift;
         my $select = shift;
 
-        $select->select($order_by_func);
+        $select->select($order_by);
 
         my $sort_order = $self->reverse_order() ? 'DESC' : 'ASC';
 
-        $select->order_by( $order_by_func, $sort_order );
+        $select->order_by( $order_by, $sort_order );
 
         return;
     }
@@ -149,6 +150,45 @@ sub _OrderByNameTerm {
     $term->set_alias_name('_orderable_name');
 
     return $term;
+}
+
+{
+    my $order_by = do {
+        my $schema = R2::Schema->Schema();
+
+        my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        #<<<
+        $select
+            ->select( $schema->table('EmailAddress')->column('email_address') )
+            ->from  ( $schema->table('EmailAddress') )
+            ->where ( $schema->table('EmailAddress')->column('contact_id'),
+                      '=', $schema->table('Contact')->column('contact_id') )
+             ->and  ( $schema->table('EmailAddress')->column('is_preferred'),
+                      '=', 1 );
+        #>>>
+        $select->set_alias_name('_orderable_email_address');
+
+        $select;
+    };
+
+    sub _order_by_email_address {
+        my $self   = shift;
+        my $select = shift;
+
+        $select->select($order_by);
+
+        my $sort_order = $self->reverse_order() ? 'DESC' : 'ASC';
+
+        $select->order_by(
+            Fey::Literal::Term->new( $order_by->alias_name() ),
+            $sort_order
+        );
+
+        return;
+    }
 }
 
 sub _bind_params {

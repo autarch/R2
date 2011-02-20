@@ -3,6 +3,7 @@
 
 <%args>
 $search
+$order_by => undef
 </%args>
 
 <%init>
@@ -11,7 +12,8 @@ my $content = $m->content();
 my $icon = 'sort_columns';
 my $title = 'Sort on this column';
 
-my $order_by = lc $content;
+$order_by //= lc $content;
+
 my $reverse = 0;
 
 if ( $search->order_by() eq $order_by ) {
