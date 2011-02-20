@@ -11,7 +11,8 @@ use File::Slurp qw( read_file );
 use Path::Class qw( file );
 use Test::More;
 
-my $DB_NAME = $ENV{JENKINS_URL} ? "R2Jenkins_$ENV{BUILD_NUMBER}" : 'R2Test';
+my $DB_NAME = $ENV{JENKINS_URL}
+    || $ENV{HUDSON_URL} ? "R2Jenkins_$ENV{BUILD_NUMBER}" : 'R2Test';
 
 sub import {
     eval {
