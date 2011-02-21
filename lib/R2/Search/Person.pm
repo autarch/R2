@@ -59,6 +59,18 @@ sub people {
     return $self->_object_iterator();
 }
 
+after _apply_where_clauses => sub {
+    my $self   = shift;
+    my $select = shift;
+
+    my $schema = R2::Schema->Schema();
+
+    $select->where(
+        $schema->table('Contact')->column('account_id'),
+        '=', $self->account()->account_id(),
+    );
+};
+
 sub _iterator_class {'Fey::Object::Iterator::FromSelect'}
 
 sub _classes_returned_by_iterator {
@@ -81,13 +93,6 @@ sub person_count {
     my $self = shift;
 
     $self->_count();
-}
-
-sub _bind_params {
-    my $self   = shift;
-    my $select = shift;
-
-    return $self->account()->account_id(), $select->bind_params();
 }
 
 sub _BuildSearchedClasses {

@@ -28,7 +28,6 @@ requires qw(
     _BuildSearchedClasses
     _iterator_class
     _classes_returned_by_iterator
-    _bind_params
     _build_title
 );
 
@@ -188,7 +187,7 @@ sub _object_iterator {
         dbh =>
             R2::Schema->DBIManager()->source_for_sql($select)->dbh(),
         select      => $select,
-        bind_params => [ $self->_bind_params($select) ],
+        bind_params => [ $select->bind_params() ],
     );
 }
 
@@ -204,7 +203,7 @@ sub _build_count {
     my $row = $dbh->selectrow_arrayref(
         $select->sql($dbh),
         {},
-        $self->_bind_params($select),
+        $select->bind_params(),
     );
 
     return $row ? $row->[0] : 0;

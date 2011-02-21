@@ -44,11 +44,6 @@ __PACKAGE__->_LoadAllPlugins();
                 $schema->table('Organization') );
     #>>>
 
-    $select_base->where(
-        $schema->table('Contact')->column('account_id'),
-        '=', Fey::Placeholder->new()
-    );
-
     my $object_select_base = $select_base->clone()
         ->select( $schema->tables( 'Person', 'Household', 'Organization' ) );
 
@@ -69,6 +64,18 @@ sub contacts {
 
     return $self->_object_iterator();
 }
+
+after _apply_where_clauses => sub {
+    my $self   = shift;
+    my $select = shift;
+
+    my $schema = R2::Schema->Schema();
+
+    $select->where(
+        $schema->table('Contact')->column('account_id'),
+        '=', $self->account()->account_id(),
+    );
+};
 
 sub _iterator_class {'R2::Search::Iterator::RealContact'}
 
@@ -168,7 +175,8 @@ sub _OrderByNameTerm {
             ->where ( $schema->table('EmailAddress')->column('contact_id'),
                       '=', $schema->table('Contact')->column('contact_id') )
             ->and   ( $schema->table('EmailAddress')->column('is_preferred'),
-                      '=', 1 );
+                      '=', 1 )
+            ->limit(1);
         #>>>
         $select->set_alias_name('_orderable_email_address');
 
@@ -255,13 +263,6 @@ sub _order_by_created {
     );
 
     return;
-}
-
-sub _bind_params {
-    my $self   = shift;
-    my $select = shift;
-
-    return $self->account()->account_id(), $select->bind_params();
 }
 
 sub _BuildSearchedClasses {
