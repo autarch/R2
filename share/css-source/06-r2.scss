@@ -692,6 +692,12 @@ div.custom-field {
     text-decoration: none;
 }
 
+.action-button-small {
+    @extend .action-button;
+    font-size: 80%;
+    padding: 0.2em 0.4em;
+}
+
 .action-button:hover {
     background: $orange;
 }

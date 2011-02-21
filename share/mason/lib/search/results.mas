@@ -119,10 +119,10 @@ $colspan += 2 if $can_edit;
       </td>
 % if ($can_edit) {
       <td>
-        <a class="action-button small"  href="<% $contact->uri( view => 'edit_form' ) %>">Edit</a>
+        <a class="action-button-small"  href="<% $contact->uri( view => 'edit_form' ) %>">Edit</a>
       </td>
       <td>
-        <a class="action-button small" href="<% $contact->uri( view => 'deletion_confirmation' ) %>">Delete</a>
+        <a class="action-button-small" href="<% $contact->uri( view => 'deletion_confirmation' ) %>">Delete</a>
       </td>
 % }
     </tr>

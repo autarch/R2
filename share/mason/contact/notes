@@ -28,11 +28,11 @@
       <td><% $note->type()->description() %></td>
       <td><a href="<% $note->user()->uri() %>"><% $note->user()->display_name() %></td>
 %     if ($can_edit_notes) {
-      <td><a href="<% $note->uri( view => 'edit_form' ) %>">Edit</a></td>
       <td>
-        <form class="inline" action="<% $note->uri( view => 'confirm_deletion' ) %>" method="get">
-          <input type="submit" class="action-button small" value="Delete" />
-        </form>
+        <a class="action-button-small" href="<% $note->uri( view => 'edit_form' ) %>">Edit</a>
+      </td>
+      <td>
+        <a class="action-button-small" href="<% $note->uri( view => 'confirm_deletion' ) %>">Delete</a>
       </td>
 %     }
     </tr>
