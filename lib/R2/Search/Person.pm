@@ -7,7 +7,6 @@ use namespace::autoclean;
 
 use Fey::Literal::Function;
 use Fey::Object::Iterator::FromSelect;
-use Fey::Placeholder;
 use R2::Schema;
 use R2::Types qw( ArrayRef );
 use R2::Util qw( string_is_empty );
@@ -32,11 +31,6 @@ __PACKAGE__->_LoadAllPlugins();
     my $select_base = R2::Schema->SQLFactoryClass()->new_select();
 
     $select_base->from( $schema->table('Contact'), $schema->table('Person') );
-
-    $select_base->where(
-        $schema->table('Contact')->column('account_id'),
-        '=', Fey::Placeholder->new()
-    );
 
     my $object_select_base
         = $select_base->clone()->select( $schema->table('Person') );

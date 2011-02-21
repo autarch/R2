@@ -174,7 +174,7 @@ my $bar = R2::Schema::Tag->insert(
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_ids      => $foo->tag_id(),
+        tags         => $foo->tag(),
     );
 
     is(
@@ -192,7 +192,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_ids      => $foo->tag_id(),
+        tags         => $foo->tag(),
     );
 
     is(
@@ -212,7 +212,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     my $search = R2::Search::Contact->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_ids      => [ $foo->tag_id(), $bar->tag_id() ],
+        tags         => [ $foo->tag(), $bar->tag() ],
     );
 
     is(
@@ -312,7 +312,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     my $search = R2::Search::Person->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_ids      => $foo->tag_id(),
+        tags         => $foo->tag(),
     );
 
     is(
@@ -332,7 +332,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     my $search = R2::Search::Person->new(
         account      => $account,
         restrictions => 'Contact::ByTag',
-        tag_ids      => [ $foo->tag_id(), $bar->tag_id() ],
+        tags         => [ $foo->tag(), $bar->tag() ],
     );
 
     is(
