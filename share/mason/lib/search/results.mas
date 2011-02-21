@@ -87,12 +87,16 @@ $pager = $search->pager() if $count && $count > $search->limit();
         <ul>
 % }
 % if ($donation) {
-          <li>Donated <% format_money( $donation->amount() ) %>
+          <li><a href="<% $contact->uri( view => 'donations' ) %>"
+                 title="All donations from this contact">Donated</a> <% format_money( $donation->amount() ) %>
               on <% $c->user()->format_date( $donation->donation_date() ) %></li>
 % }
 % if ($note) {
-          <li><% $note->user()->display_name() %> <% lcfirst $note->type()->description() %> on <% $c->user()->format_datetime( $note->note_datetime() ) %>:
-              <% format_note( $note->note() ) | n %></li>
+          <li><% $note->user()->display_name() %>
+              <a href="<% $contact->uri( view => 'notes' ) %>"
+                 title="All notes about this contact"><% lcfirst $note->type()->description() %></a>
+              on <% $c->user()->format_datetime( $note->note_datetime() ) %>:
+              <% format_note( $note->truncated_note() ) | n %></li>
 % }
 % if ( $donation || $note ) {
         </ul>

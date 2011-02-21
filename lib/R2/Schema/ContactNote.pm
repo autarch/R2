@@ -7,6 +7,7 @@ use namespace::autoclean;
 use DateTime::Format::Natural;
 use R2::Schema;
 use R2::Schema::Contact;
+use R2::Types qw( NonEmptyStr );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
@@ -27,6 +28,14 @@ with 'R2::Role::URIMaker';
     has_one type => ( table => $schema->table('ContactNoteType') );
 
     has_one( $schema->table('Contact') );
+
+    has truncated_note => (
+        is       => 'ro',
+        isa      => NonEmptyStr,
+        init_arg => undef,
+        lazy     => 1,
+        builder  => '_build_truncated_note',
+    );
 }
 
 sub _valid_note_datetime {
@@ -60,6 +69,26 @@ sub _base_uri_path {
 
     return $self->contact()->_base_uri_path() . '/note/'
         . $self->contact_note_id();
+}
+
+{
+    my $MaxLength = 100;
+
+    sub _build_truncated_note {
+        my $self = shift;
+
+        my $note = $self->note();
+
+        my $para = ( split /\n{2,}/, $note )[0];
+
+        if ( length $para > $MaxLength ) {
+            my $space_idx = rindex( substr( $para, 0, $MaxLength ), q{ } );
+            $para = substr( $para, 0, $space_idx );
+            $para .= ' ...';
+        }
+
+        return $para;
+    }
 }
 
 __PACKAGE__->meta()->make_immutable();
