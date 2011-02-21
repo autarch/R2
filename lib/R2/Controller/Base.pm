@@ -117,7 +117,12 @@ sub _require_authen {
 
     return if $user;
 
-    $c->redirect_and_detach('/user/login_form');
+    my $uri = $c->domain()->application_uri(
+        path  => '/user/login_form',
+        query => { return_to => $c->request()->uri() },
+    );
+
+    $c->redirect_and_detach($uri);
 }
 
 sub _check_authz {
