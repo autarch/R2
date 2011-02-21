@@ -6,13 +6,13 @@ use Moose;
 use namespace::autoclean;
 
 use R2::Schema;
-use R2::Types qw( SingleOrArrayRef DatabaseId );
+use R2::Types qw( SingleOrArrayRef NonEmptyStr );
 
 with 'R2::Role::Search::Plugin';
 
-has tag_ids => (
+has tags => (
     is  => 'ro',
-    isa      => SingleOrArrayRef [DatabaseId],
+    isa      => SingleOrArrayRef [NonEmptyStr],
     coerce   => 1,
     required => 1,
 );
@@ -23,11 +23,15 @@ sub apply_where_clauses {
 
     my $schema = R2::Schema->Schema();
 
+    my @ph = 
     #<<<
     $select
+        ->from ( $schema->tables( 'Tag', 'ContactTag' ) )
         ->from ( $schema->tables( 'ContactTag', 'Contact' ) )
-        ->where( $schema->table('ContactTag')->column('tag_id'),
-                 'IN', @{ $self->tag_ids() } );
+        ->where( $schema->table('Tag')->column('tag'),
+                 'IN', @{ $self->tags() } )
+        ->and  ( $schema->table('Tag')->column('account_id'),
+                 '=', $self->search()->account()->account_id() );
     #>>>
 
     return;
@@ -36,7 +40,7 @@ sub apply_where_clauses {
 sub uri_parameters {
     my $self = shift;
 
-    return map { [ 'tag_ids', $_ ] } @{ $self->tag_ids() };
+    return map { [ 'tags', $_ ] } @{ $self->tags() };
 }
 
 __PACKAGE__->meta()->make_immutable();

@@ -89,7 +89,7 @@ sub _contact_search {
     push @restrictions, 'Contact::ByName'
         if $p{names};
     push @restrictions, 'Contact::ByTag'
-        if $p{tag_ids};
+        if $p{tags};
 
     $p{restrictions} = \@restrictions;
 

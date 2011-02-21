@@ -511,7 +511,7 @@ get_html q{}
     my $search = R2::Search::Contact->new(
         account      => $c->stash()->{account},
         restrictions => 'Contact::ByTag',
-        tag_ids      => $c->stash()->{tag}->tag_id(),
+        tags         => $c->stash()->{tag}->tag(),
     );
 
     $c->redirect_and_detach( $search->new_uri( with_host => 1 ) );
@@ -547,10 +547,10 @@ get_html confirm_deletion
     my $search = R2::Search::Contact->new(
         account      => $c->stash()->{account},
         restrictions => 'Contact::ByTag',
-        tag_id       => $tag->tag_id(),
+        tags         => $tag->tag(),
     );
 
-    my $count = $search->contact_count();
+    my $count = $search->count();
     $c->stash()->{extra} = "This tag is currently in use by $count "
         . PL_N( 'contact', $count ) . q{.};
 
