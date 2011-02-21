@@ -98,7 +98,7 @@ for my $name ( 'The Foos', 'The Bars', 'John House' ) {
     );
 
     is(
-        $search->title(), 'Contact Search',
+        $search->title(), 'Contact Search by Name',
         'title for filtered contact search '
     );
 }
@@ -246,7 +246,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is(
-        $search->title(), 'People Search',
+        $search->title(), 'Person Search by Name',
         'title for filtered person search '
     );
 }
