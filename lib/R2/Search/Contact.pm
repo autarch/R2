@@ -192,6 +192,22 @@ sub _OrderByNameTerm {
     }
 }
 
+sub _order_by_created {
+    my $self   = shift;
+    my $select = shift;
+
+    my $sort_order = $self->reverse_order() ? 'ASC' : 'DESC';
+
+    my $schema = R2::Schema->Schema();
+
+    $select->order_by(
+        $schema->table('Contact')->column('creation_datetime'),
+        $sort_order
+    );
+
+    return;
+}
+
 sub _bind_params {
     my $self   = shift;
     my $select = shift;
