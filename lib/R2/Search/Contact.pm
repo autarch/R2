@@ -167,7 +167,7 @@ sub _OrderByNameTerm {
             ->from  ( $schema->table('EmailAddress') )
             ->where ( $schema->table('EmailAddress')->column('contact_id'),
                       '=', $schema->table('Contact')->column('contact_id') )
-             ->and  ( $schema->table('EmailAddress')->column('is_preferred'),
+            ->and   ( $schema->table('EmailAddress')->column('is_preferred'),
                       '=', 1 );
         #>>>
         $select->set_alias_name('_orderable_email_address');
@@ -192,9 +192,56 @@ sub _OrderByNameTerm {
     }
 }
 
+{
+    my $order_by = do {
+        my $schema = R2::Schema->Schema();
+
+        my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
+
+        my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+        #<<<
+        $select
+            ->select( $schema->table('ContactHistory')->column('history_datetime') )
+            ->from  ( $schema->table('ContactHistory') )
+            ->where ( $schema->table('ContactHistory')->column('contact_id'),
+                      '=', $schema->table('Contact')->column('contact_id') )
+            ->order_by( $schema->table('ContactHistory')->column('history_datetime'), 'DESC' )
+            ->limit(1);
+        #>>>
+        $select->set_alias_name('_orderable_modified');
+
+        $select;
+    };
+
+    sub _order_by_modified {
+        my $self   = shift;
+        my $select = shift;
+
+        my $name_term = $self->_OrderByNameTerm();
+
+        $select->select( $order_by, $name_term );
+
+        my $sort_order = $self->reverse_order() ? 'ASC' : 'DESC';
+
+        $select->order_by(
+            Fey::Literal::Term->new( $order_by->alias_name() ),
+            $sort_order,
+            $name_term,
+            'ASC'
+        );
+
+        return;
+    }
+}
+
 sub _order_by_created {
     my $self   = shift;
     my $select = shift;
+
+    my $name_term = $self->_OrderByNameTerm();
+
+    $select->select($name_term);
 
     my $sort_order = $self->reverse_order() ? 'ASC' : 'DESC';
 
@@ -202,7 +249,9 @@ sub _order_by_created {
 
     $select->order_by(
         $schema->table('Contact')->column('creation_datetime'),
-        $sort_order
+        $sort_order,
+        $name_term,
+        'ASC',
     );
 
     return;
