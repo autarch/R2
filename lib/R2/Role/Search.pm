@@ -104,7 +104,7 @@ has _restrictions => (
     handles  => {
         _restrictions     => 'elements',
         _add_restrictions => 'push',
-        has_restrictions => 'count',
+        has_restrictions  => 'count',
     },
 );
 
@@ -167,7 +167,7 @@ sub _load_and_set_restrictions {
         my $plugin = $class->new($p);
         $self->_add_restrictions($plugin);
     }
-};
+}
 
 sub _object_iterator {
     my $self = shift;
@@ -241,7 +241,7 @@ sub searches_class {
     my $self = shift;
 
     return all { $self->_SearchIncludesClass($_) }
-        map { /^R2::Schema::/ ? $_ : 'R2::Schema::' . $_ } @_;
+    map { /^R2::Schema::/ ? $_ : 'R2::Schema::' . $_ } @_;
 }
 
 sub _build_includes_multiple_contact_types {
@@ -255,7 +255,7 @@ sub _build_result_type_string {
 
     return 'contact' if $self->includes_multiple_contact_types();
 
-    for my $type ( qw( person household organization ) ) {
+    for my $type (qw( person household organization )) {
         my $class = 'R2::Schema::' . ucfirst $type;
 
         return $type if $self->_searches_class($class);
@@ -283,8 +283,8 @@ sub _build_pager {
 }
 
 sub new_uri {
-    my $self  = shift;
-    my %p = validated_hash(
+    my $self = shift;
+    my %p    = validated_hash(
         \@_,
         page          => { isa => PosInt,       optional => 1 },
         limit         => { isa => PosOrZeroInt, optional => 1 },
@@ -299,7 +299,8 @@ sub new_uri {
     delete $query{page} if $query{page} && $query{page} == 1;
 
     delete $query{order_by}
-        if $query{order_by} eq $self->meta()->get_attribute('order_by')->default();
+        if $query{order_by} eq
+            $self->meta()->get_attribute('order_by')->default();
 
     delete $query{reverse_order} unless $query{reverse_order};
 
@@ -344,7 +345,7 @@ sub domain { $_[0]->account()->domain() }
     }
 
     sub _ResolvePlugin {
-        my $self = shift;
+        my $self      = shift;
         my $orig_name = shift;
 
         my $name
