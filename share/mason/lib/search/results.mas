@@ -35,9 +35,9 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
       <th><&| /lib/search/sortable-header.mas, search => $search &>Name</&></th>
       <th>Location</th>
       <th><&| /lib/search/sortable-header.mas, search => $search, order_by => 'email_address' &>Email</&></th>
-      <th>Tags</th>
       <th>Activity</th>
       <th><&| /lib/search/sortable-header.mas, search => $search &>Modified</&></th>
+      <th><&| /lib/search/sortable-header.mas, search => $search &>Created</&></th>
     </tr>
   </thead>
 
@@ -82,13 +82,6 @@ $pager = $search->pager() if $count && $count > $search->limit();
         <% $address->email_address() %>
 % }
       </td>
-      <td>
-        <ul class="tags-list">
-% while ( my $tag = $tags->next() ) {
-          <li><a class="tag-link" href="<% $tag->uri() %>"><% $tag->tag() %></a></li>
-% }
-        </ul>
-      </td>
       <td class="activity">
 % if ( $donation || $note ) {
         <ul>
@@ -104,6 +97,9 @@ $pager = $search->pager() if $count && $count > $search->limit();
 % if ( $donation || $note ) {
         </ul>
 % }
+      </td>
+      <td>
+        <% $c->user()->format_datetime( $contact->creation_datetime() ) %>
       </td>
       <td>
         <% $c->user()->format_datetime( $contact->last_modified_datetime() ) %>
