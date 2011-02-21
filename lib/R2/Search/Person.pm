@@ -102,14 +102,6 @@ sub _base_uri_path {
         $self->_restrictions_path_component();
 }
 
-sub _build_title {
-    my $self = shift;
-
-    return 'All People' unless $self->has_restrictions();
-
-    return 'People Search';
-}
-
 __PACKAGE__->meta()->make_immutable();
 
 1;

@@ -5,17 +5,23 @@ use Moose;
 
 use namespace::autoclean;
 
+use Lingua::EN::Inflect qw( WORDLIST );
 use List::AllUtils qw( uniq );
 use R2::Schema;
 use R2::Types qw( NonEmptyStr SingleOrArrayRef );
 
 with 'R2::Role::Search::Plugin';
 
-has names => (
-    is       => 'ro',
+has _names => (
+    traits   => ['Array'],
     isa      => SingleOrArrayRef [NonEmptyStr],
     coerce   => 1,
+    init_arg => 'names',
     required => 1,
+    handles  => {
+        _names      => 'elements',
+        _name_count => 'count',
+    },
 );
 
 my $Schema = R2::Schema->Schema();
@@ -24,7 +30,7 @@ sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
-    my @names = uniq map { lc } @{ $self->names() };
+    my @names = uniq map { lc } $self->_names();
 
     for my $name (@names) {
         $select->where('or') if $name ne $names[0];
@@ -103,7 +109,24 @@ sub _person_where_clause {
 sub uri_parameters {
     my $self = shift;
 
-    return map { [ 'names', $_ ] } @{ $self->names() };
+    return map { [ 'names', $_ ] } $self->_names();
+}
+
+sub _build_description {
+    my $self = shift;
+
+    my $desc = 'which have a name matching ';
+    $desc .=
+          $self->_name_count() == 2 ? 'either '
+        : $self->_name_count() == 3 ? 'any one of '
+        :                            q{};
+
+    $desc .= WORDLIST(
+        ( map {qq{"$_"}} $self->_names() ),
+        { conj => 'or' }
+    );
+
+    return $desc;
 }
 
 __PACKAGE__->meta()->make_immutable();

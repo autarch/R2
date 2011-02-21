@@ -1,5 +1,15 @@
 <p>
-Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N( $search->result_type_string(), $count ) %>.
+Found <% $count %> <% PL_N( $search->result_type_string(), $count ) %>\
+% if ( $search->description_count() == 1 ) {
+  <% $search->descriptions() %>.
+% } elsif ( $search->has_descriptions() ) {
+  <ul>
+%   for my $desc ( $search->descriptions() ) {
+    <li><% $desc %></li>
+%   }
+% } else {
+.
+% }
 </p>
 
 % if ($count) {
@@ -28,7 +38,7 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
 %   }
       </th>
     </tr>
-    <tr>
+    <tr class="headings">
 %   if ( $search->includes_multiple_contact_types() ) {
       <th></th>
 %   }

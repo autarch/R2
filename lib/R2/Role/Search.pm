@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 use Class::Load qw( load_class );
 use Data::Pageset;
+use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( all );
 use Module::Pluggable::Object;
 use MooseX::Params::Validate qw( validated_hash );
@@ -28,7 +29,6 @@ requires qw(
     _BuildSearchedClasses
     _iterator_class
     _classes_returned_by_iterator
-    _build_title
 );
 
 with 'R2::Role::URIMaker';
@@ -72,6 +72,18 @@ has title => (
     builder => '_build_title',
 );
 
+has _descriptions => (
+    traits  => ['Array'],
+    isa     => ArrayRef [NonEmptyStr],
+    lazy    => 1,
+    builder => '_build_descriptions',
+    handles => {
+        descriptions      => 'elements',
+        description_count => 'count',
+        has_descriptions  => 'count',
+    },
+);
+
 has includes_multiple_contact_types => (
     is      => 'ro',
     isa     => Bool,
@@ -104,6 +116,7 @@ has _restrictions => (
         _restrictions     => 'elements',
         _add_restrictions => 'push',
         has_restrictions  => 'count',
+        restriction_count => 'count',
     },
 );
 
@@ -322,6 +335,34 @@ sub _restrictions_path_component {
 }
 
 sub domain { $_[0]->account()->domain() }
+
+sub _build_title {
+    my $self = shift;
+
+    my ($thing) = ( ref $self ) =~ /R2::Search::(\w+)/;
+
+    if ( $self->has_restrictions() ) {
+        if ( $self->restriction_count() == 1 ) {
+            my $plugin = ($self->_restrictions())[0];
+            my ($name) = (ref $plugin) =~ /By(\w+)$/;
+
+            return "$thing Search by $name";
+        }
+        else {
+            return "$thing Search";
+        }
+    }
+    else {
+        my $pl = PL_N($thing);
+        return "All $pl\n";
+    }
+}
+
+sub _build_descriptions {
+    my $self = shift;
+
+    return [ map { $_->description() } $self->_restrictions() ];
+}
 
 {
     my %Plugins;

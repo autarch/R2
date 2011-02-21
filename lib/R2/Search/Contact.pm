@@ -280,14 +280,6 @@ sub _base_uri_path {
         $self->_restrictions_path_component();
 }
 
-sub _build_title {
-    my $self = shift;
-
-    return 'All Contacts' unless $self->has_restrictions();
-
-    return 'Contact Search';
-}
-
 __PACKAGE__->meta()->make_immutable();
 
 1;
