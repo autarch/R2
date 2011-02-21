@@ -404,6 +404,12 @@ table.search-results {
         }
     }
 
+    tr.headings {
+        th {
+            white-space: nowrap;
+        }
+    }
+
     td.icon {
         img {
             margin-top: 0.2em;
