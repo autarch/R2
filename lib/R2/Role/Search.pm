@@ -211,17 +211,17 @@ sub _build_count {
 }
 
 sub _apply_where_clauses {
-    my $self = shift;
+    my $self   = shift;
     my $select = shift;
 
     if ( $self->has_restrictions() ) {
-        $select->where( '(' );
+        $select->where('(');
 
         for my $plugin ( $self->_restrictions() ) {
             $plugin->apply_where_clauses($select);
         }
 
-        $select->where( ')' );
+        $select->where(')');
     }
 }
 
