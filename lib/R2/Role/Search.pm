@@ -354,7 +354,7 @@ sub _build_title {
     }
     else {
         my $pl = PL_N($thing);
-        return "All $pl\n";
+        return "All $pl";
     }
 }
 
