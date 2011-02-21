@@ -419,6 +419,19 @@ sub can_edit_account {
     );
 }
 
+sub can_edit_contacts {
+    my $self = shift;
+    my ($account) = validated_list(
+        \@_,
+        account => { isa => 'R2::Schema::Account' },
+    );
+
+    return $self->_require_at_least(
+        $account->account_id(),
+        'Member'
+    );
+}
+
 sub can_edit_user {
     my $self = shift;
     my ($user) = validated_list(

@@ -6,7 +6,7 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
 <table class="standard-table search-results">
   <thead>
     <tr class="pager">
-      <th colspan="<% $search->includes_multiple_contact_types() ? 7 : 6 %>">
+      <th colspan="<% $colspan %>">
 %   if ($pager) {
 %     if ( $pager->previous_set() ) {
         <a href="<% $search->new_uri( order_by => $search->order_by(), reverse_order => $search->reverse_order() ) %>">1</a>
@@ -38,11 +38,15 @@ Found <% $count %> <% $search->has_restrictions() ? 'matching' : q{} %> <% PL_N(
       <th>Activity</th>
       <th><&| /lib/search/sortable-header.mas, search => $search &>Created</&></th>
       <th><&| /lib/search/sortable-header.mas, search => $search &>Modified</&></th>
+% if ($can_edit) {
+      <th></th>
+      <th></th>
+% }
     </tr>
   </thead>
 
 %   while ( my $contact = $contacts->next() ) {
-<& .contact-row, contact => $contact, row_class => $contacts->index() % 2 ? 'odd' : 'even', search => $search &>
+<& .contact-row, contact => $contact, row_class => $contacts->index() % 2 ? 'odd' : 'even', search => $search, can_edit => $can_edit &>
 %   }
 </table>
 % }
@@ -59,6 +63,11 @@ $contacts = $search->contacts() if $count;
 
 my $pager;
 $pager = $search->pager() if $count && $count > $search->limit();
+
+my $can_edit = $c->user()->can_edit_contacts( account => $c->account() );
+
+my $colspan = $search->includes_multiple_contact_types() ? 7 : 6;
+$colspan += 2 if $can_edit;
 </%init>
 
 <%def .contact-row>
@@ -108,6 +117,14 @@ $pager = $search->pager() if $count && $count > $search->limit();
       <td>
         <% $c->user()->format_datetime( $contact->last_modified_datetime() ) %>
       </td>
+% if ($can_edit) {
+      <td>
+        <a class="action-button small"  href="<% $contact->uri( view => 'edit_form' ) %>">Edit</a>
+      </td>
+      <td>
+        <a class="action-button small" href="<% $contact->uri( view => 'deletion_confirmation' ) %>">Delete</a>
+      </td>
+% }
     </tr>
   </tbody>
 
@@ -115,6 +132,7 @@ $pager = $search->pager() if $count && $count > $search->limit();
 $contact
 $row_class
 $search
+$can_edit
 </%args>
 
 <%init>
