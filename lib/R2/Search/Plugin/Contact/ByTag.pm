@@ -59,7 +59,7 @@ sub uri_parameters {
 sub _build_description {
     my $self = shift;
 
-    my $desc = 'which are tagged with ';
+    my $desc = 'are tagged with ';
     $desc .=
           $self->_tag_count() == 2 ? 'either '
         : $self->_tag_count() >= 3 ? 'any one of '

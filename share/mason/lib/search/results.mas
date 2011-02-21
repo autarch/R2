@@ -1,16 +1,19 @@
-<p>
+<div class="search-description">
 Found <% $count %> <% PL_N( $search->result_type_string(), $count ) %>\
 % if ( $search->description_count() == 1 ) {
-  <% $search->descriptions() %>.
+  which <% $search->descriptions() %>.
 % } elsif ( $search->has_descriptions() ) {
+  which:
   <ul>
-%   for my $desc ( $search->descriptions() ) {
-    <li><% $desc %></li>
+%   my @desc = $search->descriptions();
+%   for my $i ( 0..$#desc ) {
+    <li><% $i > 0 ? 'or' : q{} %> <% $desc[$i] %><% $i == $#desc ? '.' : ';' %></li>
 %   }
+  </ul>
 % } else {
 .
 % }
-</p>
+</div>
 
 % if ($count) {
 <table class="standard-table search-results">

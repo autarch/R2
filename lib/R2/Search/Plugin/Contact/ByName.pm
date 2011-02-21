@@ -115,7 +115,7 @@ sub uri_parameters {
 sub _build_description {
     my $self = shift;
 
-    my $desc = 'which have a name matching ';
+    my $desc = 'have a name matching ';
     $desc .=
           $self->_name_count() == 2 ? 'either '
         : $self->_name_count() == 3 ? 'any one of '
