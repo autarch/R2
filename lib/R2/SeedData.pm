@@ -319,7 +319,7 @@ sub _seed_random_organization {
 
         my $days = $Today->delta_days($since)->in_units('days');
 
-        my $dt = $Today->subtract( days => int( rand($days) ) );
+        my $dt = $Today->clone()->subtract( days => int( rand($days) ) );
 
         $dt->add( hours   => int( rand(24) ) );
         $dt->add( minutes => int( rand(60) ) );
