@@ -136,8 +136,11 @@ EOF
     }
 }
 
+my $Today = DateTime->today( time_zone => 'floating' );
+
 sub _seed_random_contacts {
     require Data::Random::Contact;
+    require Text::Lorem::More;
 
     my $account
         = R2::Schema::Account->new( name => q{People's Front of Judea} );
@@ -155,16 +158,79 @@ sub _seed_random_contacts {
         my $data = $rand->person();
 
         my $person = _seed_random_person( $account, $user, $data );
-        my $contact = $person->contact();
 
-        _seed_emails_for_contact( $account, $user, $contact, $data );
-        _seed_phones_for_contact( $account, $user, $contact, $data );
-        _seed_addresses_for_contact( $account, $user, $contact, $data );
-        _seed_tags_for_contact( $account, $user, $contact );
-        _seed_donations_for_contact( $account, $user, $contact );
+        _seed_supporting_contact_data(
+            $account,
+            $user,
+            $person->contact(),
+            $data
+        );
 
-        $person_ids{ $person->person_id() } = 1;
+        $person_ids{ $person->person_id() } = $person->person_id();
     }
+
+    for ( 1 .. 50 ) {
+        if ( $VERBOSE && $_ % 50 == 0 ) {
+            print "Seeded $_ households\n";
+        }
+
+        my $data = $rand->household();
+
+        my $household = _seed_random_household( $account, $user, $data );
+
+        _seed_supporting_contact_data(
+            $account,
+            $user,
+            $household->contact(),
+            $data
+        );
+
+        _seed_members(
+            $account,
+            $user,
+            $household,
+            \%person_ids,
+        );
+    }
+
+    for ( 1 .. 50 ) {
+        if ( $VERBOSE && $_ % 50 == 0 ) {
+            print "Seeded $_ organizations\n";
+        }
+
+        my $data = $rand->organization();
+
+        my $organization
+            = _seed_random_organization( $account, $user, $data );
+
+        _seed_supporting_contact_data(
+            $account,
+            $user,
+            $organization->contact(),
+            $data
+        );
+
+        _seed_members(
+            $account,
+            $user,
+            $organization,
+            \%person_ids,
+        );
+    }
+}
+
+sub _seed_supporting_contact_data {
+    my $account = shift;
+    my $user    = shift;
+    my $contact = shift;
+    my $data    = shift;
+
+    _seed_emails_for_contact( $account, $user, $contact, $data );
+    _seed_phones_for_contact( $account, $user, $contact, $data );
+    _seed_addresses_for_contact( $account, $user, $contact, $data );
+    _seed_tags_for_contact( $account, $user, $contact );
+    _seed_donations_for_contact( $account, $user, $contact );
+    _seed_notes_for_contact( $account, $user, $contact );
 }
 
 sub _seed_random_person {
@@ -197,16 +263,17 @@ sub _seed_random_person {
     }
 
     my %p = (
-        salutation   => $data->{salutation},
-        first_name   => $data->{given},
-        middle_name  => $data->{middle},
-        last_name    => $data->{surname},
-        suffix       => $data->{suffix},
-        birth_date   => $data->{birth_date},
-        allows_email => ( _percent() <= 20 ? 0 : 1 ),
-        allows_mail  => ( _percent() <= 30 ? 0 : 1 ),
-        allows_phone => ( _percent() <= 40 ? 0 : 1 ),
-        gender       => $data->{gender},
+        salutation        => $data->{salutation},
+        first_name        => $data->{given},
+        middle_name       => $data->{middle},
+        last_name         => $data->{surname},
+        suffix            => $data->{suffix},
+        birth_date        => $data->{birth_date},
+        allows_email      => ( _percent() <= 20 ? 0 : 1 ),
+        allows_mail       => ( _percent() <= 30 ? 0 : 1 ),
+        allows_phone      => ( _percent() <= 40 ? 0 : 1 ),
+        gender            => $data->{gender},
+        creation_datetime => _random_datetime(),
     );
 
     delete $p{$_} for grep { !defined $p{$_} } keys %p;
@@ -216,6 +283,50 @@ sub _seed_random_person {
         account_id => $account->account_id(),
         user       => $user,
     );
+}
+
+sub _seed_random_household {
+    my $account = shift;
+    my $user    = shift;
+    my $data    = shift;
+
+    return R2::Schema::Household->insert(
+        name              => $data->{name},
+        account_id        => $account->account_id(),
+        user              => $user,
+        creation_datetime => _random_datetime(),
+    );
+}
+
+sub _seed_random_organization {
+    my $account = shift;
+    my $user    = shift;
+    my $data    = shift;
+
+    return R2::Schema::Organization->insert(
+        name              => $data->{name},
+        account_id        => $account->account_id(),
+        user              => $user,
+        creation_datetime => _random_datetime(),
+    );
+}
+
+{
+    my $TenYearsAgo = $Today->clone()->subtract( years => 10 );
+
+    sub _random_datetime {
+        my $since = shift || $TenYearsAgo;
+
+        my $days = $Today->delta_days($since)->in_units('days');
+
+        my $dt = $Today->subtract( days => int( rand($days) ) );
+
+        $dt->add( hours   => int( rand(24) ) );
+        $dt->add( minutes => int( rand(60) ) );
+        $dt->add( seconds => int( rand(60) ) );
+
+        return $dt;
+    }
 }
 
 {
@@ -409,8 +520,6 @@ sub _seed_donations_for_contact {
         _seed_random_donations( $account, $user, $contact );
     }
 }
-
-my $Today = DateTime->today( time_zone => 'floating' );
 
 sub _seed_recurring_donations {
     my $account = shift;
@@ -634,6 +743,81 @@ sub _random_years {
         }
 
         return %gift;
+    }
+}
+
+{
+    my @Types;
+    my $Lorem;
+
+    sub _seed_notes_for_contact {
+        my $account = shift;
+        my $user    = shift;
+        my $contact = shift;
+
+        return if _percent() <= 20;
+
+        unless (@Types) {
+            @Types = $account->contact_note_types()->all();
+            $Lorem = Text::Lorem::More->new();
+        }
+
+        my $num = ( int( rand(20) ) ) + 1;
+
+        for my $x ( 1 .. $num ) {
+            my $type = $Types[ int( rand(@Types) ) ];
+
+            my $paras = ( int( rand(4) ) ) + 1;
+
+            $contact->add_note(
+                contact_note_type_id => $type->contact_note_type_id(),
+                note_datetime =>
+                    _random_datetime( $contact->creation_datetime() ),
+                note    => $Lorem->paragraphs($paras),
+                user_id => $user->user_id(),
+            );
+        }
+    }
+}
+
+{
+    my @HouseholdPositions    = qw( Mother Father Son Daughter );
+    my @OrganizationPositions = qw( President CEO Trustee Employee );
+
+    sub _seed_members {
+        my $account    = shift;
+        my $user       = shift;
+        my $contact    = shift;
+        my $person_ids = shift;
+
+        return
+            if $contact->isa('R2::Schema::Organization') && _percent() <= 40;
+
+        my @positions;
+        if ( $contact->isa('R2::Schema::Household') ) {
+            @positions = shuffle @HouseholdPositions;
+        }
+        else {
+            @positions = shuffle @OrganizationPositions;
+        }
+
+        my $num = ( int( rand(4) ) ) + 1;
+
+        for my $i ( 1 .. $num ) {
+            my %position
+                = _percent() <= 50
+                ? ( position => $positions[ $i - 1 ] )
+                : ();
+
+            my @ids = keys %{$person_ids};
+            my $id  = delete $person_ids->{ $ids[ int( rand(@ids) ) ] };
+
+            $contact->add_member(
+                person_id => $id,
+                %position,
+                user => $user,
+            );
+        }
     }
 }
 
