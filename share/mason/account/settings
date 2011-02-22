@@ -2,11 +2,11 @@
   <h1>
    <% $account->name() %>
   </h1>
-
-  <h2>
-   Created on <% $c->user()->format_datetime( $account->creation_datetime() ) %>
-  </h2>
 </div>
+
+<p>
+  Created on <% $c->user()->format_datetime( $account->creation_datetime() ) %>.
+</p>
 
 <ul>
   <li>
