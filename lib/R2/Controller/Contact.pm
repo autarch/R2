@@ -111,6 +111,8 @@ sub _contact_search {
             $search->contacts()->next()->uri( with_host => 1 ) );
     }
 
+    $c->user()->save_most_recent_search( search => $search );
+
     $c->stash()->{search} = $search;
 
     $c->stash()->{template} = '/account/contacts';

@@ -1,8 +1,16 @@
-        <form action="<% $account->uri( view => 'search' ) %>" method="get">
-          <label for="search">Find a contact:</label>
-          <input name="search" id="search" type="text" class="text" value="" />
-        </form>
+<form action="<% $account->uri( view => 'search' ) %>" method="get">
+  <label for="search">Find a contact:</label>
+  <input name="search" id="search" type="text" class="text" value="" />
+</form>
+
+% if ($saved) {
+<a href="<% $saved->search_object()->current_uri() %>">Your most recent search</a>
+% }
 
 <%args>
 $account
 </%args>
+
+<%init>
+my $saved = $c->user()->most_recent_saved_search();
+</%init>

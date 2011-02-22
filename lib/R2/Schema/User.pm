@@ -13,7 +13,8 @@ use R2::Schema;
 use R2::Schema::Contact;
 use R2::Schema::EmailAddress;
 use R2::Schema::Person;
-use R2::Types qw( ContactLike HashRef Str );
+use R2::Schema::SavedSearch;
+use R2::Types qw( ContactLike HashRef Maybe Str );
 use R2::Util qw( string_is_empty );
 
 use Fey::ORM::Table;
@@ -133,6 +134,14 @@ class_has SystemUser => (
         ],
     );
 }
+
+has most_recent_saved_search => (
+    is       => 'ro',
+    isa      => Maybe ['R2::Schema::SavedSearch'],
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_most_recent_saved_search',
+);
 
 around 'insert' => sub {
     my $orig  = shift;
@@ -288,6 +297,44 @@ sub _FindOrCreateSystemUser {
         is_disabled    => 1,
         is_system_user => 1,
     );
+}
+
+{
+    my $MostRecentName = '___most recent search___';
+
+    sub save_most_recent_search {
+        my $self = shift;
+        my ($search) = validated_list(
+            \@_,
+            search => { does => 'R2::Role::Search' },
+        );
+
+        my $saved = $self->most_recent_saved_search();
+
+        if ($saved) {
+            $saved->update(
+                class  => ref $search,
+                params => $search->constructor_params(),
+            );
+        }
+        else {
+            R2::Schema::SavedSearch->insert(
+                name    => $MostRecentName,
+                user_id => $self->user_id(),
+                class   => ref $search,
+                params  => $search->constructor_params(),
+            );
+        }
+    }
+
+    sub _build_most_recent_saved_search {
+        my $self = shift;
+
+        return R2::Schema::SavedSearch->new(
+            name    => $MostRecentName,
+            user_id => $self->user_id(),
+        );
+    }
 }
 
 sub _build_date_format_for_jquery {

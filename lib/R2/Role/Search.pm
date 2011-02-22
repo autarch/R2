@@ -2,6 +2,7 @@ package R2::Role::Search;
 
 use Moose::Role;
 use MooseX::ClassAttribute;
+use MooseX::SemiAffordanceAccessor;
 
 use namespace::autoclean;
 
@@ -120,6 +121,13 @@ has _restrictions => (
     },
 );
 
+has constructor_params => (
+    is       => 'rw',
+    writer   => '_set_constructor_params',
+    isa      => HashRef,
+    init_arg => undef,
+);
+
 class_has _CountSelectBase => (
     is       => 'ro',
     does     => 'Fey::Role::Selectable',
@@ -157,6 +165,9 @@ after BUILD => sub {
     die "Invalid order_by parameter: " . $self->order_by()
         if $self->_has_order_by()
             && !$self->can( '_order_by_' . $self->order_by() );
+
+    # Need to take a copy since we're about to delete something from the ref.
+    $self->_set_constructor_params( { %{$p} } );
 
     $self->_load_and_set_restrictions( delete $p->{restrictions}, $p );
 };
@@ -317,6 +328,13 @@ sub new_uri {
     delete $query{reverse_order} unless $query{reverse_order};
 
     return $self->uri( query => \%query, %p );
+}
+
+sub current_uri {
+    my $self = shift;
+
+    return $self->new_uri( map { $_ => $self->$_() }
+            qw( limit page order_by reverse_order ) );
 }
 
 sub _restrictions_path_component {

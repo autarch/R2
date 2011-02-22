@@ -554,6 +554,12 @@ sub _base_uri_path {
     return '/account/' . $self->account_id();
 }
 
+sub TO_JSON {
+    my $self = shift;
+
+    return { account_id => $self->account_id() };
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

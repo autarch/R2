@@ -612,6 +612,17 @@ CREATE TABLE "PaymentType" (
 
 CREATE INDEX "PaymentType_account_id" ON "PaymentType" ("account_id");
 
+CREATE TABLE "SavedSearch" (
+       name               TEXT               NOT NULL,
+       class              TEXT               NOT NULL,
+       params             TEXT               NOT NULL,
+       user_id            INT8               NOT NULL,
+       is_shared          BOOLEAN            DEFAULT FALSE,
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT valid_class CHECK ( class != '' ),
+       PRIMARY KEY ( name, user_id )
+);
+
 CREATE TABLE "Session" (
        id                 CHAR(72)           PRIMARY KEY,
        session_data       BYTEA              NOT NULL,
@@ -921,6 +932,10 @@ ALTER TABLE "DonationCampaign" ADD CONSTRAINT "DonationCampaign_account_id"
 
 ALTER TABLE "PaymentType" ADD CONSTRAINT "PaymentType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "SavedSearch" ADD CONSTRAINT "SavedSearch_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "User" ("user_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 INSERT INTO "Version" (version) VALUES (1);
