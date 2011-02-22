@@ -28,9 +28,6 @@ around value => sub {
 
     my $val = $self->$orig(@_);
 
-    # Works around rt.cpan #65243
-    return {} unless defined;
-
     delete $val->{$_} for grep { string_is_empty( $val->{$_} ) } keys %{$val};
 
     return $val;
