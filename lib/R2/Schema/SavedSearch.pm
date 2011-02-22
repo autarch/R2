@@ -29,7 +29,15 @@ use Fey::ORM::Table;
     #>>>
 }
 
-sub search_object {
+has search_object => (
+    is       => 'ro',
+    does     => 'R2::Role::Search',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_search_object',
+);
+
+sub _build_search_object {
     my $self = shift;
 
     my %p = %{ $self->params() };
