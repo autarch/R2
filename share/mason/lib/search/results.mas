@@ -7,7 +7,7 @@ Found <% $count %> <% PL_N( $search->result_type_string(), $count ) %>\
   <ul>
 %   my @desc = $search->descriptions();
 %   for my $i ( 0..$#desc ) {
-    <li><% $i > 0 ? 'or' : q{} %> <% $desc[$i] %><% $i == $#desc ? '.' : ';' %></li>
+    <li><% $i > 0 ? 'and' : q{} %> <% $desc[$i] %><% $i == $#desc ? '.' : ';' %></li>
 %   }
   </ul>
 % } else {

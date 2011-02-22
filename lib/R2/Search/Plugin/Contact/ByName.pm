@@ -24,6 +24,16 @@ has _names => (
     },
 );
 
+override BUILDARGS => sub {
+    my $self = shift;
+    my $p    = super();
+
+    $p->{names} = delete $p->{name}
+        if $p->{name};
+
+    return $p;
+};
+
 my $Schema = R2::Schema->Schema();
 
 sub apply_where_clauses {
@@ -45,6 +55,8 @@ sub _apply_where_clauses {
     my $select = shift;
     my $name = shift;
 
+    $select->where('(');
+
     $self->_person_where_clause( $select, $name )
         if $self->search()->searches_class('Person');
 
@@ -65,6 +77,8 @@ sub _apply_where_clauses {
         'LIKE',
         $name . '%'
     ) if $self->search()->searches_class('Organization');
+
+    $select->where(')');
 }
 
 sub _person_where_clause {
@@ -109,7 +123,7 @@ sub _person_where_clause {
 sub uri_parameters {
     my $self = shift;
 
-    return map { [ 'names', $_ ] } $self->_names();
+    return map { [ 'name', $_ ] } $self->_names();
 }
 
 sub _build_description {

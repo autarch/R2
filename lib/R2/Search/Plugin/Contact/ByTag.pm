@@ -23,6 +23,16 @@ has _tags => (
     },
 );
 
+override BUILDARGS => sub {
+    my $self = shift;
+    my $p    = super();
+
+    $p->{tags} = delete $p->{tag}
+        if $p->{tag};
+
+    return $p;
+};
+
 sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
@@ -40,12 +50,13 @@ sub apply_where_clauses {
                   'IN', $self->_tags() )
         ->and   ( $schema->table('Tag')->column('account_id'),
                   '=', $self->search()->account()->account_id() );
-    #>>>
 
-    $select->where(
-        $schema->table('Contact')->column('contact_id'),
-        'IN', $subselect
-    );
+    $select
+        ->where('(')
+        ->where( $schema->table('Contact')->column('contact_id'),
+                 'IN', $subselect )
+        ->where(')');
+    #>>>
 
     return;
 }
@@ -53,7 +64,7 @@ sub apply_where_clauses {
 sub uri_parameters {
     my $self = shift;
 
-    return map { [ 'tags', $_ ] } $self->_tags();
+    return map { [ 'tag', $_ ] } $self->_tags();
 }
 
 sub _build_description {

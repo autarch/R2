@@ -205,7 +205,7 @@ sub _object_iterator {
     }
 
     $self->_apply_limit($select);
-
+    warn $select->sql('Fey::FakeDBI');
     return $self->_iterator_class()->new(
         classes => $self->_classes_returned_by_iterator(),
         dbh =>
