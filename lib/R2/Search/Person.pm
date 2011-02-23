@@ -17,7 +17,7 @@ has account => (
     required => 1,
 );
 
-with 'R2::Role::Search';
+with 'R2::Role::Search', 'R2::Role::Search::Contact';
 
 has '+order_by' => ( default => 'name' );
 
@@ -53,43 +53,31 @@ sub people {
     return $self->_object_iterator();
 }
 
-after _apply_where_clauses => sub {
-    my $self   = shift;
-    my $select = shift;
-
-    my $schema = R2::Schema->Schema();
-
-    $select->where(
-        $schema->table('Contact')->column('account_id'),
-        '=', $self->account()->account_id(),
-    );
-};
-
 sub _iterator_class {'Fey::Object::Iterator::FromSelect'}
 
 sub _classes_returned_by_iterator {
     [ 'R2::Schema::Person' ]
 }
 
-sub _order_by_name {
-    my $self   = shift;
-    my $select = shift;
-
+sub _BuildOrderByNameClause {
     my $schema = R2::Schema->Schema();
 
-    $select->order_by(
-        $schema->table('Person')->columns( 'last_name', 'first_name' ) );
+    my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    return;
-}
+    #<<<
+    my $term =
+        Fey::Literal::Term->new(
+            $schema->table('Person')->column('last_name')
+                  ->sql_or_alias($dbh)
+            . q{ || ' ' || }
+            . $schema->table('Person')->column('first_name')
+                  ->sql_or_alias($dbh)
+        );
+    #>>>
 
-sub _base_uri_path {
-    my $self = shift;
+    $term->set_alias_name('_orderable_name');
 
-    return join '/',
-        grep { !string_is_empty($_) } $self->account()->_base_uri_path(),
-        'people',
-        $self->_restrictions_path_component();
+    return $term;
 }
 
 __PACKAGE__->meta()->make_immutable();

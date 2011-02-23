@@ -342,6 +342,17 @@ sub current_uri {
             qw( limit page order_by reverse_order ) );
 }
 
+sub _base_uri_path {
+    my $self = shift;
+
+    my $path_piece = lc PL_N( ( ref $self ) =~ /R2::Search::(\w+)/ );
+
+    return join '/',
+        grep { !string_is_empty($_) } $self->account()->_base_uri_path(),
+        $path_piece,
+        $self->_restrictions_path_component();
+}
+
 sub _restrictions_path_component {
     my $self = shift;
 
