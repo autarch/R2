@@ -265,12 +265,6 @@ sub _order_by_created {
     return;
 }
 
-sub _BuildSearchedClasses {
-    return { map { $_ => 1 }
-            qw( R2::Schema::Person R2::Schema::Household R2::Schema::Organization )
-    };
-}
-
 sub _base_uri_path {
     my $self = shift;
 

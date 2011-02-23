@@ -27,7 +27,6 @@ use URI::Escape qw( uri_escape_utf8 );
 requires qw(
     _BuildCountSelectBase
     _BuildObjectSelectBase
-    _BuildSearchedClasses
     _iterator_class
     _classes_returned_by_iterator
 );
@@ -271,6 +270,12 @@ sub _build_includes_multiple_contact_types {
     my $self = shift;
 
     return $self->_SearchedClassCount() > 1;
+}
+
+sub _BuildSearchedClasses {
+    my $self = shift;
+
+    return { map { $_ => 1 } @{ $self->_classes_returned_by_iterator() } };
 }
 
 sub _build_result_type_string {

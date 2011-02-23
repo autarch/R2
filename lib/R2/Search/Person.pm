@@ -83,16 +83,6 @@ sub _order_by_name {
     return;
 }
 
-sub person_count {
-    my $self = shift;
-
-    $self->_count();
-}
-
-sub _BuildSearchedClasses {
-    return { 'R2::Schema::Person' => 1 };
-}
-
 sub _base_uri_path {
     my $self = shift;
 
