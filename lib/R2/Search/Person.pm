@@ -68,7 +68,7 @@ sub _BuildOrderByNameClause {
     my $term =
         Fey::Literal::Term->new(
             $schema->table('Person')->column('last_name')
-                  ->sql_or_alias($dbh)
+                ->sql_or_alias($dbh)
             . q{ || ' ' || }
             . $schema->table('Person')->column('first_name')
                   ->sql_or_alias($dbh)
