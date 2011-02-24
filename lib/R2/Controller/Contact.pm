@@ -13,6 +13,9 @@ use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
 use R2::Search::Contact;
+use R2::Search::Household;
+use R2::Search::Organization;
+use R2::Search::Person;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -22,57 +25,118 @@ BEGIN { extends 'R2::Controller::Base' }
 
 with 'R2::Role::Controller::ContactCRUD';
 
-for my $type (qw( person household organization )) {
-    my $form     = 'new_' . $type . '_form';
-    my $template = "$type/$form";
+for my $type (qw( contact person household organization )) {
 
-    get $form
+    if ( $type ne 'contact' ) {
+        my $form     = 'new_' . $type . '_form';
+        my $template = "$type/$form";
+
+        get_html $form
+            => chained '/account/_set_account'
+            => args 0
+            => sub {
+                my $self = shift;
+                my $c    = shift;
+
+                $self->_check_authz(
+                    $c,
+                    'can_add_contact',
+                    { account => $c->account() },
+                    'You are not allowed to add contacts.',
+                    $c->account()->uri(),
+                );
+
+                $c->tabs()->by_id('Contacts')->set_is_selected(1);
+
+                $c->stash()->{template} = $template;
+            };
+    }
+
+    my $pl_type = PL_N($type);
+
+    my $search_class = 'R2::Search::' . ucfirst $type;
+    my $schema_class = 'R2::Schema::' . ucfirst $type;
+
+    get_html $pl_type
         => chained '/account/_set_account'
         => args 0
         => sub {
-        my $self = shift;
-        my $c    = shift;
+            my $self = shift;
+            my $c    = shift;
 
-        $self->_check_authz(
-            $c,
-            'can_add_contact',
-            { account => $c->account() },
-            'You are not allowed to add contacts.',
-            $c->account()->uri(),
-        );
+            $self->_contact_search( $c, undef, $search_class );
+        };
 
-        $c->tabs()->by_id('Contacts')->set_is_selected(1);
+    get $pl_type
+        => chained '/account/_set_account'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
 
-        $c->stash()->{template} = $template;
-    };
+            my $name = $c->request()->parameters()
+                ->{ $c->request()->parameters()->{name_param} };
+
+            my @contacts;
+            if ( !string_is_empty($name) ) {
+                my $contacts = $search_class->new(
+                    account      => $c->account(),
+                    restrictions => 'Contact::ByName',
+                    name         => $name,
+                )->contacts();
+
+                while ( my $contact = $contacts->next() ) {
+                    push @contacts, $contact->serialize();
+                }
+            }
+
+            return $self->status_ok(
+                $c,
+                entity => \@contacts,
+            );
+        };
+
+    post $pl_type
+        => chained '/account/_set_account'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            $self->_check_authz(
+                $c,
+                'can_add_contact',
+                { account => $c->account() },
+                'You are not allowed to add contacts.',
+                $c->account()->uri(),
+            );
+
+            my $contact = $self->_insert_contact(
+                $c,
+                $schema_class
+            );
+
+            $c->redirect_and_detach( $contact->uri() );
+        };
+
+    get_html $type . '_search'
+        => path_part $pl_type
+        => chained '/account/_set_account'
+        => args 1
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+            my $path = shift;
+
+            $self->_contact_search( $c, $path, $search_class );
+        };
 }
 
-get_html 'contacts'
-    => chained '/account/_set_account'
-    => args 0
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-
-    $self->_contact_search( $c, undef );
-};
-
-get_html 'contact_search'
-    => path_part 'contacts'
-    => chained '/account/_set_account'
-    => args 1
-    => sub {
-    my $self = shift;
-    my $c    = shift;
-    my $path = shift;
-
-    $self->_contact_search( $c, $path );
-};
-
 sub _contact_search {
-    my $self = shift;
-    my $c    = shift;
-    my $path = shift;
+    my $self         = shift;
+    my $c            = shift;
+    my $path         = shift;
+    my $search_class = shift;
 
     $c->tabs()->by_id('Contacts')->set_is_selected(1);
 
@@ -101,7 +165,7 @@ sub _contact_search {
 
     $p{limit} //= 50;
 
-    my $search = R2::Search::Contact->new(
+    my $search = $search_class->new(
         account => $c->account(),
         %p,
     );

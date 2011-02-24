@@ -13,7 +13,6 @@ use List::AllUtils qw( any );
 use R2::Schema;
 use R2::Search::Iterator::RealContact;
 use R2::Types qw( NonEmptyStr PosOrZeroInt );
-use R2::Util qw( string_is_empty );
 
 has account => (
     is       => 'ro',
@@ -21,7 +20,7 @@ has account => (
     required => 1,
 );
 
-with 'R2::Role::Search', 'R2::Role::Search::Contact';
+with 'R2::Role::Search::Contact';
 
 has '+order_by' => ( default => 'name' );
 
@@ -57,12 +56,6 @@ __PACKAGE__->_LoadAllPlugins();
     my $count_select_base = $select_base->clone()->select($count);
 
     sub _BuildCountSelectBase {$count_select_base}
-}
-
-sub contacts {
-    my $self = shift;
-
-    return $self->_object_iterator();
 }
 
 sub _iterator_class {'R2::Search::Iterator::RealContact'}

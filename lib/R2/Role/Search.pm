@@ -22,6 +22,7 @@ use R2::Types qw(
     PosOrZeroInt
     SearchPlugin
 );
+use R2::Util qw( string_is_empty );
 use URI::Escape qw( uri_escape_utf8 );
 
 requires qw(
@@ -286,7 +287,7 @@ sub _build_result_type_string {
     for my $type (qw( person household organization )) {
         my $class = 'R2::Schema::' . ucfirst $type;
 
-        return $type if $self->_searches_class($class);
+        return $type if $self->_SearchIncludesClass($class);
     }
 
     die 'wtf';

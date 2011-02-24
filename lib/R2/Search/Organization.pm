@@ -1,4 +1,4 @@
-package R2::Search::Person;
+package R2::Search::Organization;
 
 use Moose;
 # Cannot use StrictConstructor with plugins
@@ -29,16 +29,16 @@ __PACKAGE__->_LoadAllPlugins();
 
     my $select_base = R2::Schema->SQLFactoryClass()->new_select();
 
-    $select_base->from( $schema->table('Contact'), $schema->table('Person') );
+    $select_base->from( $schema->table('Contact'), $schema->table('Organization') );
 
     my $object_select_base
-        = $select_base->clone()->select( $schema->table('Person') );
+        = $select_base->clone()->select( $schema->table('Organization') );
 
     sub _BuildObjectSelectBase {$object_select_base}
 
     my $count = Fey::Literal::Function->new(
         'COUNT',
-        $schema->table('Person')->column('person_id')
+        $schema->table('Organization')->column('organization_id')
     );
 
     my $count_select_base = $select_base->clone()->select($count);
@@ -49,7 +49,7 @@ __PACKAGE__->_LoadAllPlugins();
 sub _iterator_class {'Fey::Object::Iterator::FromSelect'}
 
 sub _classes_returned_by_iterator {
-    [ 'R2::Schema::Person' ]
+    [ 'R2::Schema::Organization' ]
 }
 
 sub _BuildOrderByNameClause {
@@ -60,11 +60,8 @@ sub _BuildOrderByNameClause {
     #<<<
     my $term =
         Fey::Literal::Term->new(
-            $schema->table('Person')->column('last_name')
+            $schema->table('Organization')->column('name')
                 ->sql_or_alias($dbh)
-            . q{ || ' ' || }
-            . $schema->table('Person')->column('first_name')
-                  ->sql_or_alias($dbh)
         );
     #>>>
 

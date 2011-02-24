@@ -7,6 +7,8 @@ use namespace::autoclean;
 
 requires '_BuildOrderByNameClause';
 
+with 'R2::Role::Search';
+
 class_has _OrderByNameClause => (
     is      => 'ro',
     does    => 'Fey::Role::Selectable',
@@ -25,6 +27,12 @@ after _apply_where_clauses => sub {
         '=', $self->account()->account_id(),
     );
 };
+
+sub contacts {
+    my $self = shift;
+
+    return $self->_object_iterator();
+}
 
 sub _order_by_name {
     my $self   = shift;

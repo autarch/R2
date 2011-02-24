@@ -3,7 +3,7 @@
       <div id="member-search">
         <input type="text" class="text" name="person_name" id="member-search-text" />
         <input type="hidden" name="member_search_uri" id="member-search-uri"
-               value="<% $c->account()->uri( view => 'person' ) %>" />
+               value="<% $c->account()->uri( view => 'people' ) %>" />
         <button id="member-search-submit" type="button">Search</button>
 
         <div class="ajax-search-results" id="member-search-results" style="display: none">
