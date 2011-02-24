@@ -240,7 +240,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'John Cleese', ],
         'people match search by name, sorted by name'
     );
@@ -264,7 +264,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'John Cleese', ],
         'people match search by name, sorted by name'
     );
@@ -283,7 +283,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'John Cleese', 'Eric Idle' ],
         'people match search by name, sorted by name'
     );
@@ -302,7 +302,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'John Cleese', ],
         'people match search by name, sorted by name'
     );
@@ -322,7 +322,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
 
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'Eric Idle' ],
         'people match search by tag, sorted by name'
     );
@@ -341,7 +341,7 @@ $contacts{'Graham Chapman'}->contact()->add_tags( tags => ['bar'] );
     );
 
     is_deeply(
-        [ map { $_->display_name() } $search->people()->all() ],
+        [ map { $_->display_name() } $search->contacts()->all() ],
         [ 'Graham Chapman', 'Eric Idle' ],
         'people match search by tag, sorted by name'
     );
