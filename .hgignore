@@ -15,3 +15,4 @@ Makefile
 Makefile.old
 pm_to_blib*
 t/lib/R2/Test/FakeSchema.pm
+nytprof*
