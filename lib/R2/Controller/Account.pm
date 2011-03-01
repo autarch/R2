@@ -7,8 +7,10 @@ use namespace::autoclean;
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any );
 use R2::Schema::Account;
+use R2::Schema::Activity;
 use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
+use R2::Web::Form::Activity;
 use R2::Web::Form::Report::TopDonors;
 use R2::Util qw( string_is_empty );
 
@@ -555,6 +557,57 @@ get_html confirm_deletion
         . PL_N( 'contact', $count ) . q{.};
 
     $c->stash()->{template} = '/shared/confirm_deletion';
+};
+
+get_html 'activities'
+    => chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->tabs()->by_id('Activities')->set_is_selected(1);
+
+    $self->_add_basic_sidebar($c);
+
+    $c->stash()->{activities} = $c->stash()->{account}->activities();
+
+    $c->stash()->{template} = '/account/activities';
+};
+
+post 'activities'
+    => chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+
+    my $form = R2::Web::Form::Activity->new( user => $c->user() );
+    $form->process(
+        action => $c->account()->uri( view => 'activities' ),
+        params => $c->request()->params(),
+    );
+
+    my $vals = $form->value();
+    $vals->{account_id} = $account->account_id();
+
+    my $activity = eval { R2::Schema::Activity->insert( %{$vals} ) };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error     => $e,
+            uri       => $account->uri( view => 'activities' ),
+            form_data => $form->value(),
+        );
+    }
+
+    $c->session_object()
+        ->add_message(
+        'The ' . $activity->name() . ' activity has been added' );
+
+    $c->redirect_and_detach( $account->uri( view => 'activities' ) );
 };
 
 get_html 'reports'

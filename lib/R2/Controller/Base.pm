@@ -74,6 +74,10 @@ sub _add_global_tabs {
             label   => 'Tags',
             tooltip => 'All tags for your contacts',
         }, {
+            uri     => $account->uri( view => 'activities' ),
+            label   => 'Activities',
+            tooltip => 'All activities for your account',
+        }, {
             uri     => $account->uri( view => 'reports' ),
             label   => 'Reports',
             tooltip => 'Reports on your contacts and donations',

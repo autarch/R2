@@ -11,6 +11,7 @@ use Fey::Object::Iterator::FromSelect;
 use Lingua::EN::Inflect qw( PL_N );
 use List::AllUtils qw( any first );
 use R2::Exceptions qw( error );
+use R2::Schema::ActivityType;
 use R2::Schema::AddressType;
 use R2::Schema::ContactNoteType;
 use R2::Schema::CustomFieldGroup;
@@ -21,6 +22,7 @@ use R2::Schema::Household;
 use R2::Schema::Organization;
 use R2::Schema::PaymentType;
 use R2::Schema::PhoneNumberType;
+use R2::Schema::ParticipationType;
 use R2::Schema::Person;
 use R2::Schema::RelationshipType;
 use R2::Schema;
@@ -71,6 +73,12 @@ with 'R2::Role::URIMaker';
         table    => $schema->table('PhoneNumberType'),
         cache    => 1,
         order_by => [ $schema->table('PhoneNumberType')->column('display_order') ],
+    );
+
+    has_many 'activity_types' => (
+        table    => $schema->table('ActivityType'),
+        cache    => 1,
+        order_by => [ $schema->table('ActivityType')->column('display_order') ],
     );
 
     has_many 'custom_field_groups' => (
@@ -127,6 +135,20 @@ with 'R2::Role::URIMaker';
         builder => '_build_tags',
     );
 
+    query activity_count => (
+        select      => __PACKAGE__->_BuildActivityCountSelect(),
+        bind_params => sub { $_[0]->account_id() },
+    );
+
+    has_many activities => (
+        table    => $schema->table('Activity'),
+        cache    => 1,
+        order_by => [
+            $schema->table('Activity')->column('creation_datetime'),
+            'DESC',
+        ],
+    );
+
     has fiscal_year_start_date => (
         is      => 'ro',
         isa     => 'DateTime',
@@ -176,6 +198,8 @@ sub insert {
 sub _initialize {
     my $self = shift;
 
+    R2::Schema::ActivityType->CreateDefaultsForAccount($self);
+
     R2::Schema::AddressType->CreateDefaultsForAccount($self);
 
     R2::Schema::ContactNoteType->CreateDefaultsForAccount($self);
@@ -187,6 +211,8 @@ sub _initialize {
     R2::Schema::PaymentType->CreateDefaultsForAccount($self);
 
     R2::Schema::PhoneNumberType->CreateDefaultsForAccount($self);
+
+    R2::Schema::ParticipationType->CreateDefaultsForAccount($self);
 
     R2::Schema::RelationshipType->CreateDefaultsForAccount($self);
 }
@@ -375,6 +401,28 @@ sub _BuildTagsSelect {
         ->order_by( $count, 'DESC',
                     $schema->table('Tag')->column('tag') )
         ->group_by( $schema->table('Tag')->columns() );
+    #>>>
+    return $select;
+}
+
+sub _BuildActivityCountSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        $schema->table('Activity')->column('activity_id')
+    );
+
+    #<<<
+    $select
+        ->select($count)
+        ->from  ( $schema->table('Activity') )
+        ->where ( $schema->table('Activity')->column('account_id'),
+                  '=', Fey::Placeholder->new() );
     #>>>
     return $select;
 }

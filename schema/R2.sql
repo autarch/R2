@@ -351,6 +351,54 @@ CREATE TABLE "ContactEmailListOptOut" (
 CREATE INDEX "ContactEmailListOptOut_contact_id"
         ON "ContactEmailListOptOut" ("contact_id");
 
+CREATE TABLE "Activity" (
+       activity_id        SERIAL8       PRIMARY KEY,
+       name               citext        NOT NULL,
+       activity_type_id   INT8          NOT NULL,
+       creation_datetime  TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       is_archived        BOOLEAN       DEFAULT FALSE,
+       account_id         INT8          NOT NULL,
+       CONSTRAINT "Activity_account_id_name"
+                  UNIQUE ( account_id, name )
+);
+
+CREATE TABLE "ActivityType" (
+       activity_type_id   SERIAL8       PRIMARY KEY,
+       name               TEXT          NOT NULL,
+       display_order      pos_int       NOT NULL,
+       account_id         INT8          NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT "ActivityType_account_id_name"
+                  UNIQUE ( account_id, name ),
+       CONSTRAINT "ActivityType_account_id_display_order"
+                  UNIQUE ( account_id, display_order )
+);
+
+CREATE TABLE "ContactActivity" (
+       contact_activity_id        SERIAL8     PRIMARY KEY,
+       contact_id                 INT8        NOT NULL,
+       activity_id                INT8        NOT NULL,
+       participation_type_id      INT8        NOT NULL,
+       participation_description  TEXT        DEFAULT '',
+       activity_start_date        DATE        NOT NULL,
+       activity_end_date          DATE        NULL,
+       CONSTRAINT start_before_end
+                  CHECK ( activity_end_date IS NULL
+                          OR activity_end_date >= activity_start_date )
+);
+
+CREATE TABLE "ParticipationType" (
+       participation_type_id  SERIAL8       PRIMARY KEY,
+       name                   TEXT          NOT NULL,
+       display_order          pos_int       NOT NULL,
+       account_id             INT8          NOT NULL,
+       CONSTRAINT valid_name CHECK ( name != '' ),
+       CONSTRAINT "ParticipationType_account_id_name"
+                  UNIQUE ( account_id, name ),
+       CONSTRAINT "ParticipationType_account_id_display_order"
+                  UNIQUE ( account_id, display_order )
+);
+
 CREATE TABLE "Person" (
        person_id          INT8               PRIMARY KEY,
        salutation         citext             NOT NULL DEFAULT '',
@@ -816,6 +864,30 @@ ALTER TABLE "ContactEmailListOptOut" ADD CONSTRAINT "Tag_tag_id"
 
 ALTER TABLE "ContactEmailListOptOut" ADD CONSTRAINT "Contact_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Activity" ADD CONSTRAINT "Activity_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Activity" ADD CONSTRAINT "Activity_activity_type_id"
+  FOREIGN KEY ("activity_type_id") REFERENCES "ActivityType" ("activity_type_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ActivityType" ADD CONSTRAINT "ActivityType_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_activity_id"
+  FOREIGN KEY ("activity_id") REFERENCES "Activity" ("activity_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_participation_type_id"
+  FOREIGN KEY ("participation_type_id") REFERENCES "ParticipationType" ("participation_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"

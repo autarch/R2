@@ -56,11 +56,6 @@ sub CreateDefaultsForAccount {
         description => 'Met with this contact',
         account_id  => $account->account_id(),
     );
-
-    $class->insert(
-        description => 'Contact attended an event',
-        account_id  => $account->account_id(),
-    );
 }
 
 sub is_updateable {

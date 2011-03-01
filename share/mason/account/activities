@@ -1,0 +1,109 @@
+% if ( $account->activity_count() ) {
+
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Activity</th>
+      <th>Type</th>
+      <th># of Participants</th>
+      <th>Created on</th>
+%   if ($can_edit) {
+      <th></th>
+      <th></th>
+%   }
+    </tr>
+  </thead>
+%   while ( my $activity = $activities->next() ) {
+  <tbody>
+    <tr class="<% $activities->index() % 2 ? 'odd' : 'even' %>">
+      <td><% $activity->name() %></td>
+      <td><% $activity->type()->name() %></td>
+      <td>X</td>
+      <td>
+        <% $c->user()->format_datetime( $activity->creation_datetime() ) %>
+      </td>
+%     if ($can_edit) {
+      <td>
+        <form class="inline" action="<% $activity->uri( view => 'edit_form' ) %>" method="get">
+          <input type="submit" class="action-button-small" value="Edit" />
+        </form>
+      </td>
+      <td>
+        <form class="inline" action="<% $activity->uri() %>" method="post">
+          <input type="hidden" name="x-tunneled-method" value="PUT" />
+%       if ( $activity->is_archived() ) {
+          <input type="hidden" name="is_archived" value="0" />
+          <input type="submit" class="action-button-small" value="Unarchive" />
+%       } else {
+          <input type="hidden" name="is_archived" value="1" />
+          <input type="submit" class="action-button-small" value="Archive" />
+%       }
+        </form>
+      </td>
+%     }
+    </tr>
+  </tbody>
+% }
+</table>
+
+% } else {
+<p>
+You have not created any activities yet.
+</p>
+% }
+
+<&| /lib/filter/form.mas &>
+<form action="<% $account->uri( view => 'activities' ) %>"
+      method="post" class="JS-standard-form">
+
+  <fieldset>
+    <legend>Add a new activity</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="name">Activity name:</label>
+      <input class="text medium" type="text" name="name" id="name" />
+      <div class="help-text">
+        <p>
+          An activity can be an event (Fundraising Banquet 2011), a campaign
+          (Stop Proposition 42), or a general volunteer effort (Informational
+          Tabling).
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="activity_type_id">Type:</label>
+      <select name="activity_type_id" id="activity_type_id">
+% while ( my $type = $types->next() ) {
+        <option value="<% $type->activity_type_id() %>"><% $type->name() %></option>
+% }
+      </select>
+    </div>
+
+  </fieldset>
+
+  <div class="form-item">
+    <input class="action-button" type="submit" value="Create a new event" />
+  </div>
+</form>
+</&>
+
+
+<%args>
+$account
+$activities
+$include_archived => 0
+</%args>
+
+<%init>
+my $types = $account->activity_types();
+
+my $can_edit = $c->user()->can_edit_contacts( account => $account );
+</%init>
+
+<%method title>
+Activities
+<%args>
+$account
+</%args>
+</%method>
