@@ -216,8 +216,8 @@ sub _form_html_from_dom {
         return $self->_dom()->getElementsByTagName('body')->[0]->innerHTML();
     }
     else {
-        return $self->_dom()->getElementsByTagName('form')->[0]
-            ->as_HTML( undef, q{}, {} );
+        return $self->_dom()->getElementsByTagName('form')->[0]->parentNode()
+            ->innerHTML();
     }
 }
 
