@@ -236,13 +236,7 @@ sub form_elt_for {
     my $dom = HTML::DOM->new();
     $dom->write( $form->filled_in_form() );
 
-    # XXX - this bit of wackness works around a bug in HTML::DOM I
-    # just cannot isolate. Without it, we get a weird error because
-    # the ownerDocument property of the form is set to itself, not the
-    # HTML::DOM object.
-    #    my $x = $dom->as_HTML;
-
-    return ( $dom->getElementsByTagName('form') )[0];
+    return $dom->getElementsByTagName('form')->[0];
 }
 
 sub generic_error_div_tests {
