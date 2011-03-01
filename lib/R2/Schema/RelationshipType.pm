@@ -58,6 +58,12 @@ sub CreateDefaultsForAccount {
     );
 
     $class->insert(
+        name         => 'cousin of',
+        inverse_name => 'cousin of',
+        account_id   => $account->account_id(),
+    );
+
+    $class->insert(
         name         => 'friend of',
         inverse_name => 'friend of',
         account_id   => $account->account_id(),
