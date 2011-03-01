@@ -66,6 +66,12 @@ EOF
         $form->as_HTML(), qr{<form.+</form>}xism,
         'still returns form if there is nothing to alter'
     );
+
+    local $TODO = 'I cannot figure out how to make HTML::DOM (or TreeBuilder?) leave my tag endings in place';
+    like(
+        $form->innerHTML(), qr{<input [^>]+/>},
+        'input tag still ends with />'
+    );
 }
 
 {
