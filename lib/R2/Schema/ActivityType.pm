@@ -4,6 +4,7 @@ use Fey::ORM::Table;
 
 use namespace::autoclean;
 
+use R2::Schema;
 use R2::Types qw( PosOrZeroInt );
 
 with 'R2::Role::Schema::DataValidator';

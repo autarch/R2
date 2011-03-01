@@ -4,6 +4,8 @@ use Fey::ORM::Table;
 
 use namespace::autoclean;
 
+use R2::Schema;
+
 with 'R2::Role::Schema::DataValidator';
 with 'R2::Role::URIMaker';
 
