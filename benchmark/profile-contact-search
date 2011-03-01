@@ -1,0 +1,22 @@
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use R2::Schema::Account;
+use R2::Search::Contact;
+
+my $account = R2::Schema::Account->new( account_id => 45 );
+
+{
+    local $@;
+    eval { DB::enable_profile() };
+}
+
+my $search = R2::Search::Contact->new( account => $account, limit => 50 );
+
+$search->count();
+
+my $contacts = $search->contacts();
+
+while ( my $c = $contacts->next() ) { $c->display_name }
