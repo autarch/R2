@@ -575,6 +575,18 @@ get_html 'activities'
     $c->stash()->{template} = '/account/activities';
 };
 
+get_html 'new_activity_form'
+    => chained '_set_account'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->tabs()->by_id('Activities')->set_is_selected(1);
+
+    $c->stash()->{template} = '/account/activity_form';
+};
+
 post 'activities'
     => chained '_set_account'
     => args 0
@@ -608,6 +620,38 @@ post 'activities'
         'The ' . $activity->name() . ' activity has been added' );
 
     $c->redirect_and_detach( $account->uri( view => 'activities' ) );
+};
+
+chain_point _set_activity
+    => chained '_set_account'
+    => path_part 'activity'
+    => capture_args 1
+    => sub {
+    my $self     = shift;
+    my $c        = shift;
+    my $activity_id = shift;
+
+    my $account = $c->stash()->{account};
+
+    my $activity = R2::Schema::Activity->new( activity_id => $activity_id );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $activity
+            && $activity->account_id()
+            == $c->stash()->{account}->account_id();
+
+    $c->stash()->{activity} = $activity;
+};
+
+get_html 'activity_edit_form'
+    => chained '_set_activity'
+    => path_part 'edit_form'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{template} = '/account/activity_form';
 };
 
 get_html 'reports'
