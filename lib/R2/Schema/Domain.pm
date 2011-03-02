@@ -174,6 +174,8 @@ sub _build_uri_params {
         scheme => $self->requires_ssl() ? 'https' : 'http',
         host => $self->web_hostname(),
         (
+            # This used to be set under Cat apps, now we set it explicitly in
+            # the controller.
             $ENV{SERVER_PORT}
             ? ( port => $ENV{SERVER_PORT} )
             : ()
