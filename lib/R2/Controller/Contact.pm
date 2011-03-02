@@ -376,6 +376,63 @@ get_html edit_form
     $c->stash()->{template} = "/$type/edit_form";
 };
 
+get_html confirm_deletion
+    => chained '_set_contact'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    $self->_check_authz(
+        $c,
+        'can_edit_contact',
+        { contact => $contact },
+        'You are not allowed to delete contacts.',
+        $contact->uri(),
+    );
+
+    $c->stash()->{type} = 'contact';
+    $c->stash()->{uri}  = $contact->uri();
+
+    $c->stash()->{template} = '/shared/confirm_deletion';
+};
+
+del q{}
+    => chained '_set_contact'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $contact = $c->stash()->{contact};
+
+    $self->_check_authz(
+        $c,
+        'can_edit_contact',
+        { contact => $contact },
+        'You are not allowed to delete contacts.',
+        $contact->uri(),
+    );
+
+    my $name = $contact->real_contact()->display_name();
+
+    eval { $contact->delete( user => $c->user() ); };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error => $e,
+            uri   => $contact->uri(),
+        );
+    }
+
+    $c->session_object()
+        ->add_message("The contact record for $name has been deleted.");
+
+    $c->redirect_and_detach( $c->stash()->{account}->uri() );
+};
+
 for my $type ( qw( donation note ) ) {
     my $plural = PL_N($type);
 
