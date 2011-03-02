@@ -20,6 +20,10 @@ sub begin : Private {
     my $self = shift;
     my $c    = shift;
 
+    # Catalyst used to set this directly, now it's only available via the PSGI
+    # env.
+    $ENV{SERVER_PORT} = $c->engine()->env()->{SERVER_PORT};
+
     R2::Schema->ClearObjectCaches();
 
     $self->_require_authen($c)
