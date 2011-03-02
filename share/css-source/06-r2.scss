@@ -8,6 +8,7 @@ $dark-green: #5b824c;
 $orange: #ff7400;
 $light-yellow: #ffffd9;
 $error-orange: #fcc841;
+$brown: #8f5139;
 
 $medium-green-border-light: $medium-green + #555;
 $medium-green-border-dark:  $medium-green - #222;
@@ -261,8 +262,9 @@ ul.tags-list {
 }
 
 #summary {
-    background-color: $light-green;
-    margin: 0 0 0.5em -5px;
+    background-color: $brown;
+    color: white;
+    margin: 0 0 0.5em 0;
     padding: 0.3em 0 0.3em 5px;
 
     h1 {
