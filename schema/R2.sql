@@ -890,6 +890,10 @@ ALTER TABLE "ContactParticipation" ADD CONSTRAINT "ContactParticipation_particip
   FOREIGN KEY ("participation_type_id") REFERENCES "ParticipationType" ("participation_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "ParticipationType" ADD CONSTRAINT "ParticipationType_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
 ALTER TABLE "Person" ADD CONSTRAINT "Person_person_id"
   FOREIGN KEY ("person_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
