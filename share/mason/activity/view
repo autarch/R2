@@ -2,6 +2,10 @@
   <h1><& SELF:title, %ARGS &></h1>
 </div>
 
+<p>
+  <a class="action-button" href="<% $activity->uri( view => 'participants_form' ) %>">Add participants</a>
+</p>
+
 % if ($contacts) {
 
 <table class="standard-table">

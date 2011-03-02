@@ -46,39 +46,52 @@ with 'R2::Role::URIMaker';
     has_one( $schema->table('Domain') );
 
     has_many 'donation_sources' => (
-        table    => $schema->table('DonationSource'),
-        cache    => 1,
-        order_by => [ $schema->table('DonationSource')->column('display_order') ],
+        table => $schema->table('DonationSource'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('DonationSource')->column('display_order') ],
     );
 
     has_many 'donation_campaigns' => (
-        table    => $schema->table('DonationCampaign'),
-        cache    => 1,
-        order_by => [ $schema->table('DonationCampaign')->column('display_order') ],
+        table => $schema->table('DonationCampaign'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('DonationCampaign')->column('display_order') ],
     );
 
     has_many 'payment_types' => (
-        table    => $schema->table('PaymentType'),
-        cache    => 1,
-        order_by => [ $schema->table('PaymentType')->column('display_order') ],
+        table => $schema->table('PaymentType'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('PaymentType')->column('display_order') ],
     );
 
     has_many 'address_types' => (
-        table    => $schema->table('AddressType'),
-        cache    => 1,
-        order_by => [ $schema->table('AddressType')->column('display_order') ],
+        table => $schema->table('AddressType'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('AddressType')->column('display_order') ],
     );
 
     has_many 'phone_number_types' => (
-        table    => $schema->table('PhoneNumberType'),
-        cache    => 1,
-        order_by => [ $schema->table('PhoneNumberType')->column('display_order') ],
+        table => $schema->table('PhoneNumberType'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('PhoneNumberType')->column('display_order') ],
     );
 
     has_many 'activity_types' => (
-        table    => $schema->table('ActivityType'),
-        cache    => 1,
-        order_by => [ $schema->table('ActivityType')->column('display_order') ],
+        table => $schema->table('ActivityType'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('ActivityType')->column('display_order') ],
+    );
+
+    has_many 'participation_types' => (
+        table => $schema->table('ParticipationType'),
+        cache => 1,
+        order_by =>
+            [ $schema->table('ParticipationType')->column('display_order') ],
     );
 
     has_many 'custom_field_groups' => (

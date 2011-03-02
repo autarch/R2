@@ -722,6 +722,17 @@ put q{}
     $c->redirect_and_detach($uri);
 };
 
+get_html participants_form
+    => chained '_set_activity'
+    => path_part 'participants_form'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $c->stash()->{template} = '/activity/participants_form';
+};
+
 get_html 'reports'
     => chained '_set_account'
     => args 0

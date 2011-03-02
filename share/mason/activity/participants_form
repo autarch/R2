@@ -1,0 +1,80 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+<&| /lib/filter/form.mas &>
+<form class="JS-standard-form"
+      action="<% $activity->uri( view => 'participants' ) %>"
+      method="post">
+
+  <fieldset>
+    <legend>Add participants</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="participation_type_id">Participation:</label>
+      <select name="participation_type_id" id="participation_type_id">
+% while ( my $type = $types->next() ) {
+        <option value="<% $type->participation_type_id() %>"><% $type->name() %></option>
+% }
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="participation_details">Details:</label>
+      <input type="text" class="text wide" name="participation_details" id="participation_details" />
+      <div class="help-text">
+        <p>
+          You can use this field to add extra details about the type of participation.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="start_date">Start date:</label>
+      <input type="text" class="text narrow date" name="start_date" id="start_date" />
+      <div class="help-text">
+        <p>
+          The start date is required, but the end date is optional.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="end_date">End date:</label>
+      <input type="text" class="text narrow date" name="end_date" id="end_date" />
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="participants">Participants:</label>
+      <textarea name="participants" class="wide"></textarea>
+      <div class="help-text">
+        <p>
+          Enter the names of participants, one per line.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <input class="action-button" type="submit" value="Submit" />
+    </div>
+
+</fieldset>
+
+</form>
+</&>
+
+<%args>
+$account
+$activity
+</%args>
+
+<%init>
+my $types = $account->participation_types();
+</%init>
+
+<%method title>
+<% $activity->name() %> Participants
+<%args>
+$activity
+</%args>
+</%method>
