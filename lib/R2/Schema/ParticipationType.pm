@@ -46,7 +46,12 @@ sub CreateDefaultsForAccount {
     my $class   = shift;
     my $account = shift;
 
-    for my $name ( 'Attended', 'Organized', 'Volunteered' ) {
+    for my $name (
+        'Attended (Free)',
+        'Attended (Paid)',
+        'Organized',
+        'Volunteered'
+        ) {
         $class->insert(
             name       => $name,
             account_id => $account->account_id(),
