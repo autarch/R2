@@ -224,7 +224,8 @@ chain_point _set_contact
     my $contact = R2::Schema::Contact->new( contact_id => $contact_id );
 
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
-        unless $contact;
+        unless $contact
+            && $contact->account_id() == $c->stash()->{account}->account_id();
 
     $self->_check_authz(
         $c,
