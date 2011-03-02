@@ -651,7 +651,7 @@ chain_point _set_activity
     $c->stash()->{activity} = $activity;
 };
 
-get_html 'activity_edit_form'
+get_html 'edit_form'
     => chained '_set_activity'
     => path_part 'edit_form'
     => args 0
@@ -660,6 +660,18 @@ get_html 'activity_edit_form'
     my $c    = shift;
 
     $c->stash()->{template} = '/account/activity_form';
+};
+
+get_html q{}
+    => chained '_set_activity'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $self->_add_basic_sidebar($c);
+
+    $c->stash()->{template} = '/activity/view';
 };
 
 put q{}
