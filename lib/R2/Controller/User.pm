@@ -13,7 +13,9 @@ use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-get_html login_form => args 0 => sub {
+get_html 'login_form'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -25,7 +27,9 @@ get_html login_form => args 0 => sub {
     $c->stash()->{template} = '/user/login_form';
 };
 
-get_html authentication => args 0 => sub {
+get 'authentication'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -41,7 +45,9 @@ get_html authentication => args 0 => sub {
     }
 };
 
-post authentication => args 0 => sub {
+post 'authentication'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
@@ -81,7 +87,9 @@ post authentication => args 0 => sub {
     $self->_login_user( $c, $user );
 };
 
-del authentication => args 0 => \&_authentication_delete;
+del authentication
+    => args 0
+    => \&_authentication_delete;
 
 sub _authentication_delete {
     my $self = shift;
@@ -118,7 +126,10 @@ sub _login_user {
     $c->redirect_and_detach($redirect_to);
 }
 
-chain_point _set_user => chained '/' => path_part 'user' => capture_args 1 => sub {
+chain_point '_set_user'
+    => chained '/'
+    => path_part 'user'
+    => capture_args 1 => sub {
     my $self    = shift;
     my $c       = shift;
     my $user_id = shift;
@@ -141,7 +152,10 @@ chain_point _set_user => chained '/' => path_part 'user' => capture_args 1 => su
     $c->stash()->{user} = $user;
 };
 
-put '' => chained '_set_user' => args 0 => sub {
+put q{}
+    => chained '_set_user'
+    => args 0
+    => sub {
     my $self = shift;
     my $c    = shift;
 
