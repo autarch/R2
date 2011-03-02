@@ -22,7 +22,7 @@
 %   while ( my $activity = $activities->next() ) {
   <tbody>
     <tr class="<% $activities->index() % 2 ? 'odd' : 'even' %>">
-      <td><% $activity->name() %></td>
+      <td><a href="<% $activity->uri() %>"><% $activity->name() %></a></td>
       <td><% $activity->type()->name() %></td>
       <td>X</td>
       <td>
