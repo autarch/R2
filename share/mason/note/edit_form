@@ -1,4 +1,6 @@
-<h1><& SELF:title, %ARGS &></h1>
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
 
 <& /lib/form/note.mas, contact => $contact, note => $note &>
 
