@@ -107,7 +107,7 @@ for my $type (qw( contact person household organization )) {
                 $c,
                 'can_add_contact',
                 { account => $c->account() },
-                'You are not allowed to add contacts.',
+                "You are not allowed to add $pl_type.",
                 $c->account()->uri(),
             );
 
@@ -115,6 +115,11 @@ for my $type (qw( contact person household organization )) {
                 $c,
                 $schema_class
             );
+
+            my $name = $contact->real_contact()->display_name();
+
+            $c->session_object()
+                ->add_message("A contact record for $name has been added.");
 
             $c->redirect_and_detach( $contact->uri() );
         };
@@ -347,6 +352,11 @@ put q{}
         $contact,
     );
 
+    my $name = $contact->real_contact()->display_name();
+
+    $c->session_object()
+        ->add_message("The contact record for $name has been updated.");
+
     $c->redirect_and_detach( $contact->uri() );
 };
 
@@ -529,6 +539,11 @@ for my $type ( qw( donation note ) ) {
                 );
             }
 
+            my $name = $contact->real_contact()->display_name();
+
+            $c->session_object()
+                ->add_message("A new $type for $name has been added.");
+
             $c->redirect_and_detach( $contact->uri( view => $plural ) );
         };
 
@@ -661,6 +676,9 @@ for my $type ( qw( donation note ) ) {
                 );
             }
 
+            $c->session_object()
+                ->add_message("The $type has been updated.");
+
             $c->redirect_and_detach( $contact->uri( view => $plural ) );
         };
 
@@ -691,6 +709,9 @@ for my $type ( qw( donation note ) ) {
                     uri   => $contact->uri( view => $plural ),
                 );
             }
+
+            $c->session_object()
+                ->add_message("The $type was deleted.");
 
             $c->redirect_and_detach( $contact->uri( view => $plural ) );
         };
