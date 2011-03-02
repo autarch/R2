@@ -491,7 +491,9 @@ sub _BuildActivitySelect {
         ->select( $schema->table('Activity') )
         ->from  ( $schema->table('Activity') )
         ->where ( $schema->table('Activity')->column('account_id'),
-                  '=', Fey::Placeholder->new() );
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('Activity')->column('creation_datetime'),
+                    'DESC' );
     #>>>
     return $select;
 }
