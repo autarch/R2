@@ -1,3 +1,7 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
 % if ($archived_count) {
 <p>
   <a href="<% $account->uri( view => 'activities', query => { include_archived => 1 } ) %>">Show archived activities too</a>.
@@ -24,7 +28,7 @@
     <tr class="<% $activities->index() % 2 ? 'odd' : 'even' %>">
       <td><a href="<% $activity->uri() %>"><% $activity->name() %></a></td>
       <td><% $activity->type()->name() %></td>
-      <td>X</td>
+      <td><% $activity->contact_count() %></td>
       <td>
         <% $c->user()->format_datetime( $activity->creation_datetime() ) %>
       </td>
