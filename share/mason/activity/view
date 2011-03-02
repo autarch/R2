@@ -1,0 +1,72 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+% if ($contacts) {
+
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Participation</th>
+      <th>Started on</th>
+      <th>Ended on</th>
+%   if ($can_edit) {
+      <th></th>
+      <th></th>
+%   }
+    </tr>
+  </thead>
+%   while ( my ( $contact, $participation ) = $contacts->next() ) {
+  <tbody>
+    <tr class="<% $contacts->index() % 2 ? 'odd' : 'even' %>">
+      <td>
+        <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+      </td>
+      <td>
+        <% $participation->type()->name() %>
+%     if ( ! string_is_empty( $participation->description() ) ) {
+        - <% $participation->description() %>
+%     }
+      </td>
+      <td>
+        <% $c->user()->format_date( $participation->start_date() ) %>
+      </td>
+      <td>
+%     if ( $participation->end_date() ) {
+        <% $c->user()->format_date( $participation->end_date() ) %>
+%     }
+      </td>
+%     if ($can_edit) {
+      <td></td>
+      <td></td>
+%     }
+    </tr>
+  </tbody>
+%   }
+</table>
+
+% } else {
+<p>
+  This activity does not have any participants.
+</p>
+% }
+
+<%args>
+$activity
+</%args>
+
+<%init>
+my $can_edit = $c->user()->can_edit_contacts( account => $c->account() );
+
+my $contacts;
+$contacts = $activity->contacts()
+    if $activity->contact_count();
+</%init>
+
+<%method title>
+<% $activity->name() %>
+<%args>
+$activity
+</%args>
+</%method>

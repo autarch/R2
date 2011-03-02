@@ -374,7 +374,7 @@ CREATE TABLE "ActivityType" (
                   UNIQUE ( account_id, display_order )
 );
 
-CREATE TABLE "ContactActivity" (
+CREATE TABLE "ContactParticipation" (
        contact_activity_id        SERIAL8     PRIMARY KEY,
        contact_id                 INT8        NOT NULL,
        activity_id                INT8        NOT NULL,
@@ -878,15 +878,15 @@ ALTER TABLE "ActivityType" ADD CONSTRAINT "ActivityType_account_id"
   FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_contact_id"
+ALTER TABLE "ContactParticipation" ADD CONSTRAINT "ContactParticipation_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_activity_id"
+ALTER TABLE "ContactParticipation" ADD CONSTRAINT "ContactParticipation_activity_id"
   FOREIGN KEY ("activity_id") REFERENCES "Activity" ("activity_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ContactActivity" ADD CONSTRAINT "ContactActivity_participation_type_id"
+ALTER TABLE "ContactParticipation" ADD CONSTRAINT "ContactParticipation_participation_type_id"
   FOREIGN KEY ("participation_type_id") REFERENCES "ParticipationType" ("participation_type_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 

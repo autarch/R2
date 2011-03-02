@@ -38,15 +38,15 @@ sub _BuildContactCountSelect {
         'COUNT',
         Fey::Literal::Function->new(
             'DISTINCT',
-            $schema->table('ContactActivity')->column('contact_id')
+            $schema->table('ContactParticipation')->column('contact_id')
         )
     );
 
     #<<<
     $select
         ->select($count)
-        ->from  ( $schema->table('ContactActivity') )
-        ->where ( $schema->table('ContactActivity')->column('activity_id'),
+        ->from  ( $schema->table('ContactParticipation') )
+        ->where ( $schema->table('ContactParticipation')->column('activity_id'),
                   '=', Fey::Placeholder->new() );
     #>>>
 }

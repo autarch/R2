@@ -19,14 +19,14 @@ with 'R2::Role::Schema::DataValidator';
 
     my $count = Fey::Literal::Function->new(
         'COUNT',
-        $schema->table('ContactActivity')->column('contact_id'),
+        $schema->table('ContactParticipation')->column('contact_id'),
     );
 
     #<<<
     $select
         ->select($count)
-        ->from  ( $schema->table('ContactActivity') )
-        ->where ( $schema->table('ContactActivity')->column('participation_type_id'),
+        ->from  ( $schema->table('ContactParticipation') )
+        ->where ( $schema->table('ContactParticipation')->column('participation_type_id'),
                   '=', Fey::Placeholder->new() );
     #>>>
     has 'contact_count' => (

@@ -1,4 +1,4 @@
-package R2::Schema::ContactActivity;
+package R2::Schema::ContactParticipation;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ with 'R2::Role::URIMaker';
 
     has_policy 'R2::Schema::Policy';
 
-    has_table( $schema->table('ContactActivity') );
+    has_table( $schema->table('ContactParticipation') );
 
     has_one( $schema->table('Activity') );
 
