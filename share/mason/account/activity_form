@@ -29,11 +29,11 @@
       </select>
     </div>
 
-  </fieldset>
+    <div class="form-item">
+      <input class="action-button" type="submit" value="Create a new activity" />
+    </div>
 
-  <div class="form-item">
-    <input class="action-button" type="submit" value="Create a new event" />
-  </div>
+  </fieldset>
 </form>
 </&>
 
