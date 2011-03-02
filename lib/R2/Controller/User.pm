@@ -13,7 +13,7 @@ use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
 
-get_html 'login_form'
+get_html login_form
     => args 0
     => sub {
     my $self = shift;
@@ -27,7 +27,7 @@ get_html 'login_form'
     $c->stash()->{template} = '/user/login_form';
 };
 
-get 'authentication'
+get authentication
     => args 0
     => sub {
     my $self = shift;
@@ -45,7 +45,7 @@ get 'authentication'
     }
 };
 
-post 'authentication'
+post authentication
     => args 0
     => sub {
     my $self = shift;
@@ -126,7 +126,7 @@ sub _login_user {
     $c->redirect_and_detach($redirect_to);
 }
 
-chain_point '_set_user'
+chain_point _set_user
     => chained '/'
     => path_part 'user'
     => capture_args 1 => sub {
