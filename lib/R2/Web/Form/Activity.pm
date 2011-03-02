@@ -18,6 +18,10 @@ has_field activity_type_id => (
     type  => 'Integer',
 );
 
+has_field is_archived => (
+    type  => 'Boolean',
+);
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

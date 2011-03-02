@@ -363,7 +363,8 @@ chain_point _set_custom_field_group
         custom_field_group_id => $custom_field_group_id );
 
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
-        unless $group;
+        unless $group
+            && $group->account_id() == $c->stash()->{account}->account_id();
 
     $c->stash()->{group} = $group;
 };
@@ -570,7 +571,12 @@ get_html 'activities'
 
     $self->_add_basic_sidebar($c);
 
-    $c->stash()->{activities} = $c->stash()->{account}->activities();
+    my $include = $c->request()->params()->{include_archived};
+
+    $c->stash()->{activities}
+        = $c->stash()->{account}->activities( include_archived => $include );
+
+    $c->stash()->{include_archived} = $include;
 
     $c->stash()->{template} = '/account/activities';
 };
@@ -627,9 +633,11 @@ chain_point _set_activity
     => path_part 'activity'
     => capture_args 1
     => sub {
-    my $self     = shift;
-    my $c        = shift;
+    my $self        = shift;
+    my $c           = shift;
     my $activity_id = shift;
+
+    $c->tabs()->by_id('Activities')->set_is_selected(1);
 
     my $account = $c->stash()->{account};
 
@@ -652,6 +660,54 @@ get_html 'activity_edit_form'
     my $c    = shift;
 
     $c->stash()->{template} = '/account/activity_form';
+};
+
+put q{}
+    => chained '_set_activity'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $form = R2::Web::Form::Activity->new( user => $c->user() );
+    $form->process(
+        action => $c->account()->uri( view => 'activities' ),
+        params => $c->request()->params(),
+    );
+
+    my $activity = $c->stash()->{activity};
+
+    my $vals = $form->value();
+
+    my $message
+        = keys %{$vals} == 1
+        ? (
+        $vals->{is_archived}
+        ? 'has been archived'
+        : 'has been unarchived'
+        )
+        : 'has been updated';
+
+    eval { $activity->update( %{$vals} ) };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error     => $e,
+            uri       => $activity->uri( view => 'edit_form' ),
+            form_data => $form->value(),
+        );
+    }
+
+    $c->session_object()
+        ->add_message(
+        'The ' . $activity->name() . ' activity ' . $message );
+
+    my $uri
+        = keys %{$vals} == 1
+        ? $c->stash()->{account}->uri( view => 'activities' )
+        : $activity->uri( view => 'edit_form' );
+
+    $c->redirect_and_detach($uri);
 };
 
 get_html 'reports'

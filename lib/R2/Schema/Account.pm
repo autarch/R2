@@ -135,18 +135,16 @@ with 'R2::Role::URIMaker';
         builder => '_build_tags',
     );
 
-    query activity_count => (
-        select      => __PACKAGE__->_BuildActivityCountSelect(),
-        bind_params => sub { $_[0]->account_id() },
+    class_has '_ActivityCountSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildActivityCountSelect',
     );
 
-    has_many activities => (
-        table    => $schema->table('Activity'),
-        cache    => 1,
-        order_by => [
-            $schema->table('Activity')->column('creation_datetime'),
-            'DESC',
-        ],
+    class_has '_ActivitySelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildActivitySelect',
     );
 
     has fiscal_year_start_date => (
@@ -405,6 +403,34 @@ sub _BuildTagsSelect {
     return $select;
 }
 
+sub activity_count {
+    my $self = shift;
+    my ($include_archived) = validated_list(
+        \@_,
+        include_archived => { isa => Bool, default => 0 },
+    );
+
+    my $select = $self->_ActivityCountSelect()->clone();
+
+    unless ($include_archived) {
+        my $schema = R2::Schema->Schema();
+
+        $select->where(
+            $schema->table('Activity')->column('is_archived'),
+            '=', 0
+        );
+    }
+
+    my $dbh = $self->_dbh($select);
+
+    my $row = $dbh->selectrow_arrayref(
+        $select->sql($dbh), {},
+        $self->account_id(), $select->bind_params()
+    );
+
+    return $row && $row->[0] ? $row->[0] : 0;
+}
+
 sub _BuildActivityCountSelect {
     my $class = shift;
 
@@ -420,6 +446,49 @@ sub _BuildActivityCountSelect {
     #<<<
     $select
         ->select($count)
+        ->from  ( $schema->table('Activity') )
+        ->where ( $schema->table('Activity')->column('account_id'),
+                  '=', Fey::Placeholder->new() );
+    #>>>
+    return $select;
+}
+
+sub activities {
+    my $self = shift;
+    my ($include_archived) = validated_list(
+        \@_,
+        include_archived => { isa => Bool, default => 0 },
+    );
+
+    my $select = $self->_ActivitySelect()->clone();
+
+    unless ($include_archived) {
+        my $schema = R2::Schema->Schema();
+
+        $select->where(
+            $schema->table('Activity')->column('is_archived'),
+            '=', 0
+        );
+    }
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Activity )],
+        dbh         => $self->_dbh($select),
+        select      => $select,
+        bind_params => [ $self->account_id(), $select->bind_params() ],
+    );
+}
+
+sub _BuildActivitySelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->table('Activity') )
         ->from  ( $schema->table('Activity') )
         ->where ( $schema->table('Activity')->column('account_id'),
                   '=', Fey::Placeholder->new() );

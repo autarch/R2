@@ -1,4 +1,10 @@
-% if ( $account->activity_count() ) {
+% if ($archived_count) {
+<p>
+  <a href="<% $account->uri( view => 'activities', query => { include_archived => 1 } ) %>">Show archived activities too</a>.
+</p>
+% }
+
+% if ($count ) {
 
 <table class="standard-table">
   <thead>
@@ -48,7 +54,11 @@
 
 % } else {
 <p>
+%  if ($archived_count) {
+You have some activities, but they have all been archived.
+%  } else {
 You have not created any activities yet.
+%  }
 </p>
 % }
 
@@ -67,6 +77,13 @@ $include_archived => 0
 
 <%init>
 my $can_edit = $c->user()->can_edit_contacts( account => $account );
+
+my $count = $account->activity_count( include_archived => $include_archived );
+my $archived_count;
+if ( ! $include_archived ) {
+    $archived_count = $account->activity_count( include_archived => 1 )
+        - $account->activity_count( include_archived => 0 );
+}
 </%init>
 
 <%method title>
