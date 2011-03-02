@@ -11,15 +11,18 @@ extends 'HTML::FormHandler';
 with 'R2::Role::Web::Form';
 
 has_field name => (
-    type  => 'Text',
+    type     => 'Text',
+    required => 1,
 );
 
 has_field activity_type_id => (
-    type  => 'Integer',
+    type     => 'Integer',
+    required => 1,
 );
 
 has_field is_archived => (
-    type  => 'Boolean',
+    type    => 'Boolean',
+    default => 0,
 );
 
 __PACKAGE__->meta()->make_immutable();
