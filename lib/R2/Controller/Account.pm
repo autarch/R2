@@ -791,6 +791,7 @@ post participants
     }
 
     $params->{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
+    delete $params->{participants};
 
     $self->_post_participants( $c, $params );
 };
