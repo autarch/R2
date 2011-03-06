@@ -5,12 +5,14 @@ use warnings;
 use namespace::autoclean;
 
 use Lingua::EN::Inflect qw( PL_N );
-use List::AllUtils qw( any );
+use List::AllUtils qw( all any );
 use R2::Schema::Account;
 use R2::Schema::Activity;
+use R2::Schema::ContactParticipation;
 use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
 use R2::Web::Form::Activity;
+use R2::Web::Form::Participants;
 use R2::Web::Form::Report::TopDonors;
 use R2::Util qw( string_is_empty );
 
@@ -731,6 +733,151 @@ get_html participants_form
     my $c    = shift;
 
     $c->stash()->{template} = '/activity/participants_form';
+};
+
+post participants
+    => chained '_set_activity'
+    => path_part 'participants'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $activity = $c->stash()->{activity};
+
+    my $form = R2::Web::Form::Participants->new( user => $c->user() );
+    $form->process(
+        action => $activity->uri( view => 'participants_form' ),
+        params => $c->request()->params(),
+    );
+
+    my $params = $form->value();
+
+    if ( $params->{contact_id} ) {
+        $self->_post_participants( $c, $params );
+        return;
+    }
+
+    my %contacts;
+    for my $name ( split /[\r\n]+/, $params->{participants} ) {
+        my $search = R2::Search::Person->new(
+            account      => $c->stash()->{account},
+            restrictions => 'Contact::ByName',
+            name         => $name,
+            limit        => 0,
+        );
+
+        my @matches = $search->contacts()->all();
+
+        if ( @matches != 1 ) {
+            my $query = $form->value();
+
+            $query->{start_date} = $c->user()
+                ->format_date_with_year( $query->{start_date} );
+
+            $query->{end_date}
+                = $c->user()->format_date_with_year( $query->{end_date} )
+                if $query->{end_date};
+
+            $c->redirect_and_detach(
+                $activity->uri(
+                    view  => 'participants_name_resolution_form',
+                    query => $form->value(),
+                )
+            );
+        }
+
+        $contacts{$name} = \@matches;
+    }
+
+    $params->{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
+
+    $self->_post_participants( $c, $params );
+};
+
+sub _post_participants {
+    my $self   = shift;
+    my $c      = shift;
+    my $params = shift;
+
+    my $ids = delete $params->{contact_id};
+
+    my $activity = $c->stash()->{activity};
+
+    my %base_vals = %{$params};
+    $base_vals{activity_id} = $activity->activity_id();
+
+    eval {
+        R2::Schema::ContactParticipation->insert_many(
+            map {
+                { %base_vals, contact_id => $_ }
+                } @{$ids}
+        );
+    };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error => $e,
+            uri =>
+                $activity->uri( view => 'participants_form' ),
+            form_data => { %{$params}, contact_id => $ids },
+        );
+    }
+
+    $c->session_object()
+        ->add_message( 'The participants have been added to the '
+            . $activity->name()
+            . ' activity' );
+
+    $c->redirect_and_detach( $activity->uri() );
+}
+
+get_html participants_name_resolution_form
+    => chained '_set_activity'
+    => path_part 'participants_name_resolution_form'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $form = R2::Web::Form::Participants->new( user => $c->user() );
+    $form->process(
+        action => $c->stash()->{activity}->uri( view => 'participants_form' ),
+        params => $c->request()->params(),
+    );
+
+    my $params = $form->value();
+
+    my $type = R2::Schema::ParticipationType->new(
+        participation_type_id => $params->{participation_type_id} );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $type
+            && $type->account_id()
+            == $c->stash()->{account}->account_id();
+
+    $c->stash()->{participation_type} = $type;
+
+    $c->stash()->{$_} = $params->{$_}
+        for qw( description start_date end_date );
+
+    my @contacts;
+    for my $name ( split /[\r\n]+/, $params->{participants} ) {
+        my $search = R2::Search::Person->new(
+            account      => $c->stash()->{account},
+            restrictions => 'Contact::ByName',
+            name         => $name,
+            limit        => 0,
+        );
+
+        my @matches = $search->contacts()->all();
+
+        push @contacts, [ $name, \@matches ];
+    }
+
+    $c->stash()->{contacts} = \@contacts;
+
+    $c->stash()->{template} = '/activity/participants_name_resolution_form';
 };
 
 get_html 'reports'

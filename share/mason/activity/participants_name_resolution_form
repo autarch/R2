@@ -1,0 +1,114 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+<&| /lib/filter/form.mas &>
+<form class="JS-standard-form"
+      action="<% $activity->uri( view => 'participants' ) %>"
+      method="post">
+
+  <fieldset>
+    <legend>Add participants</legend>
+
+    <div class="form-item">
+      <label class="for-field">Participation:</label>
+      <% $participation_type->name() %>
+      <input type="hidden" name="participation_type_id"
+             value="<% $participation_type->participation_type_id() %>" />
+    </div>
+
+% if ( ! string_is_empty( $description ) ) {
+    <div class="form-item">
+      <label class="for-field">Description:</label>
+      <p>
+        <% $description %>
+      <input type="hidden" name="description" value="<% $description %>" />
+    </div>
+% }
+
+    <div class="form-item">
+      <label class="for-field">Start date:</label>
+      <% $c->user->format_date($start_date) %>
+      <input type="hidden" name="start_date" value="<% $c->user->format_date_with_year($start_date) %>" />
+    </div>
+
+% if ($end_date) {
+    <div class="form-item">
+      <label class="for-field">End date:</label>
+      <% $c->user->format_date($end_date) %>
+      <input type="hidden" name="end_date" value="<% $c->user->format_date_with_year($end_date) %>" />
+    </div>
+% }
+
+    <div class="form-item">
+      <label class="for-field">Participants:</label>
+      <dl id="participants">
+% for my $pair (@contacts) {
+%   my ( $name, $matches ) = @{$pair};
+        <dt>
+          <% $name %>:
+        </dt>
+        <dd>
+%   if ( @{$matches} == 0 ) {
+          no matches found
+%   } else {
+          <table class="standard-table">
+%     for my $i ( 0..$#{$matches} ) {
+%       my $contact = $matches->[$i];
+            <tbody>
+              <tr class="<% $i % 2 ? 'odd' : 'even' %>">
+%       my $id = new_uuid();
+                <td>
+                    <input class="checkbox" id="<% $id %>"
+                           type="checkbox" name="contact_id" value="<% $contact->contact_id() %>" />
+                </td>
+                <td>
+                  <label class="for-checkbox" for="<% $id %>"><% $contact->display_name() %></label>
+                </td>
+                <td>
+%       if ( my $email = $contact->preferred_email_address() ) {
+                  <label class="for-checkbox" for="<% $id %>"><% $email->email_address() %></label>
+%       }
+                </td>
+                <td>
+                  <a href="<% $contact->uri() %>" target="_blank" title="view this contact in a new window">view</a>
+                </td>
+              </tr>
+            </tbody>
+%     }
+          </table>
+%   }
+        </dd>
+% }
+      </dl>
+    </div>
+
+    <div class="form-item">
+      <input class="action-button" type="submit" value="Submit" />
+    </div>
+
+</fieldset>
+
+</form>
+</&>
+
+<%args>
+$account
+$activity
+$participation_type
+$description
+$start_date
+$end_date
+@contacts
+</%args>
+
+<%init>
+my $types = $account->participation_types();
+</%init>
+
+<%method title>
+<% $activity->name() %> Participants
+<%args>
+$activity
+</%args>
+</%method>

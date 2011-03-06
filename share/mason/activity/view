@@ -6,7 +6,7 @@
   <a class="action-button" href="<% $activity->uri( view => 'participants_form' ) %>">Add participants</a>
 </p>
 
-% if ($contacts) {
+% if ($participations) {
 
 <table class="standard-table">
   <thead>
@@ -21,9 +21,9 @@
 %   }
     </tr>
   </thead>
-%   while ( my ( $contact, $participation ) = $contacts->next() ) {
+%   while ( my ( $contact, $participation ) = $participations->next() ) {
   <tbody>
-    <tr class="<% $contacts->index() % 2 ? 'odd' : 'even' %>">
+    <tr class="<% $participations->index() % 2 ? 'odd' : 'even' %>">
       <td>
         <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
       </td>
@@ -63,9 +63,9 @@ $activity
 <%init>
 my $can_edit = $c->user()->can_edit_contacts( account => $c->account() );
 
-my $contacts;
-$contacts = $activity->contacts()
-    if $activity->contact_count();
+my $participations;
+$participations = $activity->participations()
+    if $activity->participation_count();
 </%init>
 
 <%method title>

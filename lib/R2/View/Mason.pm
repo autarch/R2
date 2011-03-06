@@ -13,7 +13,7 @@ extends 'Catalyst::View::HTML::Mason';
 
     use Lingua::EN::Inflect qw( PL_N );
     use List::AllUtils qw( any );
-    use R2::Util qw( string_is_empty english_list );
+    use R2::Util qw( english_list new_uuid string_is_empty );
     use R2::URI qw( static_uri );
     use R2::Web::Util qw( format_note );
     use Number::Format qw( format_price );

@@ -25,7 +25,7 @@ with 'R2::Role::URIMaker';
 
     has_one( $schema->table('Activity') );
 
-    has_one( $schema->table('ParticipationType') );
+    has_one type => ( table => $schema->table('ParticipationType') );
 
     has_one( $schema->table('Contact') );
 }

@@ -379,12 +379,12 @@ CREATE TABLE "ContactParticipation" (
        contact_id                 INT8        NOT NULL,
        activity_id                INT8        NOT NULL,
        participation_type_id      INT8        NOT NULL,
-       participation_description  TEXT        DEFAULT '',
-       activity_start_date        DATE        NOT NULL,
-       activity_end_date          DATE        NULL,
+       description                TEXT        DEFAULT '',
+       start_date                 DATE        NOT NULL,
+       end_date                   DATE        NULL,
        CONSTRAINT start_before_end
-                  CHECK ( activity_end_date IS NULL
-                          OR activity_end_date >= activity_start_date )
+                  CHECK ( participation_end_date IS NULL
+                          OR participation_end_date >= participation_start_date )
 );
 
 CREATE TABLE "ParticipationType" (

@@ -93,6 +93,7 @@ sub _person_where_clause {
     # Also note that this would completely break for names written in
     # Chinese characters, which are written without spaces.
     my @parts = split /\s+/, $name, 2;
+
     if ( @parts == 1 ) {
         #<<<
         $select

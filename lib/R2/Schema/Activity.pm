@@ -1,6 +1,7 @@
 package R2::Schema::Activity;
 
 use Fey::ORM::Table;
+use MooseX::ClassAttribute;
 
 use namespace::autoclean;
 
@@ -21,13 +22,26 @@ with 'R2::Role::URIMaker';
 
     has_one type => ( table => $schema->table('ActivityType') );
 
-    query contact_count => (
-        select      => __PACKAGE__->_BuildContactCountSelect(),
+    query participation_count => (
+        select      => __PACKAGE__->_BuildParticipationCountSelect(),
         bind_params => sub { $_[0]->activity_id() },
+    );
+
+    has participations => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_participations',
+    );
+
+    class_has '_ParticipationsSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildParticipationsSelect',
     );
 }
 
-sub _BuildContactCountSelect {
+sub _BuildParticipationCountSelect {
     my $class = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
@@ -36,10 +50,7 @@ sub _BuildContactCountSelect {
 
     my $count = Fey::Literal::Function->new(
         'COUNT',
-        Fey::Literal::Function->new(
-            'DISTINCT',
-            $schema->table('ContactParticipation')->column('contact_id')
-        )
+        $schema->table('ContactParticipation')->column('contact_id')
     );
 
     #<<<
@@ -49,6 +60,44 @@ sub _BuildContactCountSelect {
         ->where ( $schema->table('ContactParticipation')->column('activity_id'),
                   '=', Fey::Placeholder->new() );
     #>>>
+
+    return $select;
+}
+
+sub _build_participations {
+    my $self = shift;
+
+    my $select = $self->_ParticipationsSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes =>
+            [qw( R2::Schema::Contact R2::Schema::ContactParticipation )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->activity_id() ],
+    );
+}
+
+sub _BuildParticipationsSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables( 'Contact', 'ContactParticipation' ) )
+        ->from( $schema->tables( 'Contact', 'ContactParticipation' ) )
+        ->where ( $schema->table('ContactParticipation')->column('activity_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('ContactParticipation')->column('start_date'),
+                    'DESC' );
+    #>>>
+
+    return $select;
 }
 
 sub _base_uri_path {

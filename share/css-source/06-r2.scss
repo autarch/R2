@@ -378,6 +378,10 @@ table.standard-table {
         background-color: $light-gray;
     }
 
+    tr.odd {
+        background-color: white;
+    }
+
     tr.note {
         padding-top: 0;
 
@@ -619,6 +623,11 @@ form {
     textarea.tall {
         height: 10em;
     }
+
+    dl#participants  {
+        margin: 0.5em 0 0.5em 0.5em;
+    }
+
 }
 
 div.horizontal-form {
