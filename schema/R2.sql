@@ -383,8 +383,8 @@ CREATE TABLE "ContactParticipation" (
        start_date                 DATE        NOT NULL,
        end_date                   DATE        NULL,
        CONSTRAINT start_before_end
-                  CHECK ( participation_end_date IS NULL
-                          OR participation_end_date >= participation_start_date )
+                  CHECK ( end_date IS NULL
+                          OR end_date >= start_date )
 );
 
 CREATE TABLE "ParticipationType" (
