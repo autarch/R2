@@ -22,6 +22,11 @@ with 'R2::Role::URIMaker';
 
     has_one type => ( table => $schema->table('ActivityType') );
 
+    query contact_count => (
+        select      => __PACKAGE__->_BuildContactCountSelect(),
+        bind_params => sub { $_[0]->activity_id() },
+    );
+
     query participation_count => (
         select      => __PACKAGE__->_BuildParticipationCountSelect(),
         bind_params => sub { $_[0]->activity_id() },
@@ -39,6 +44,32 @@ with 'R2::Role::URIMaker';
         isa     => 'Fey::SQL::Select',
         builder => '_BuildParticipationsSelect',
     );
+}
+
+sub _BuildContactCountSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    my $count = Fey::Literal::Function->new(
+        'COUNT',
+        Fey::Literal::Function->new(
+            'DISTINCT',
+            $schema->table('ContactParticipation')->column('contact_id')
+        )
+    );
+
+    #<<<
+    $select
+        ->select($count)
+        ->from  ( $schema->table('ContactParticipation') )
+        ->where ( $schema->table('ContactParticipation')->column('activity_id'),
+                  '=', Fey::Placeholder->new() );
+    #>>>
+
+    return $select;
 }
 
 sub _BuildParticipationCountSelect {
