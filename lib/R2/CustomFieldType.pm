@@ -67,6 +67,7 @@ has 'html_widgets' => (
 has 'is_select' => (
     is      => 'ro',
     isa     => 'Bool',
+    lazy    => 1,
     default => sub { $_[0]->type() =~ /Select/ ? 1 : 0 },
 );
 
