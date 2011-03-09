@@ -22,7 +22,6 @@ BEGIN {
     $Config = R2::Config->instance();
 
     my @imports = qw(
-        AuthenCookie
         +R2::Plugin::ErrorHandling
         Session::AsObject
         Session::State::URI
@@ -44,6 +43,7 @@ BEGIN {
 }
 
 with qw(
+    CatalystX::AuthenCookie
     R2::Role::Context::Account
     R2::Role::Context::Domain
     R2::Role::Context::NavCollections
