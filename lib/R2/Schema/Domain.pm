@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Net::Interface;
 use R2::Schema::Account;
 use R2::Schema;
-use R2::Types;
+use R2::Types qw( NonEmptyStr );
 use R2::Util qw( string_is_empty );
 use Socket qw( AF_INET );
 use Sys::Hostname qw( hostname );
@@ -55,6 +55,12 @@ with 'R2::Role::URIMaker';
         isa     => 'Fey::SQL::Select',
         lazy    => 1,
         default => \&_MakeSelectAllSQL,
+    );
+
+    class_has SystemHostname => (
+        is      => 'ro',
+        isa     => NonEmptyStr,
+        builder => '_BuildSystemHostname',
     );
 }
 
@@ -117,7 +123,7 @@ sub _FindOrCreateDefaultDomain {
     my $class = shift;
 
     my $hostname = $ENV{R2_HOSTNAME}
-        || __PACKAGE__->_SystemHostname();
+        || __PACKAGE__->SystemHostname();
 
     my $domain = $class->new( web_hostname => $hostname );
     return $domain if $domain;
@@ -125,7 +131,7 @@ sub _FindOrCreateDefaultDomain {
     return $class->insert( web_hostname => $hostname );
 }
 
-sub _SystemHostname {
+sub _BuildSystemHostname {
     for my $name (
         hostname(),
         map { scalar gethostbyaddr( $_->address(), AF_INET ) }
