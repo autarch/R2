@@ -15,7 +15,7 @@
     <tr>
       <th>Activity</th>
       <th>Type</th>
-      <th># of Participants</th>
+      <th>Participants</th>
       <th>Created on</th>
 %   if ($can_edit) {
       <th></th>
