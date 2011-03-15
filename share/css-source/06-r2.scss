@@ -1,4 +1,6 @@
-$light-gray: #f3f3f3;
+$body-text-color: #111;
+
+$light-gray: #f8f8f8;
 $medium-gray: #999;
 $dark-gray: #555;
 $super-light-green: #f6ffe4;
@@ -58,7 +60,7 @@ html {
 }
 
 body {
-    color: #111;
+    color: $body-text-color;
     font-family: Verdana, Arial, sans-serif;
     line-height: 1.6em;
     margin: auto;
@@ -376,7 +378,7 @@ table.standard-table {
     }
 
     tr.even {
-        background-color: $light-gray;
+        background-color: $light-gray - #111;
     }
 
     tr.odd {
