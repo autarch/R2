@@ -33,10 +33,14 @@
       <td><% $donation->receipt_date() ? $c->user()->format_date( $donation->receipt_date() ): 'not sent' %></td>
 %     if ($can_edit_donations) {
       <td>
-        <a class="action-button-small" href="<% $donation->uri( view => 'edit_form' ) %>">Edit</a>
+        <form class="inline" action="<% $donation->uri( view => 'edit_form' ) %>" method="get">
+          <input class="action-button-small" type="submit" value="Edit" />
+        </form>
       </td>
       <td>
-        <a class="action-button-small" href="<% $donation->uri( view => 'confirm_deletion' ) %>">Delete</a>
+        <form class="inline" action="<% $donation->uri( view => 'confirm_deletion' ) %>" method="get">
+          <input class="action-button-small" type="submit" value="Delete" />
+        </form>
       </td>
 %     }
     </tr>
