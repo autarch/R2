@@ -25,6 +25,12 @@ has 'suffix' => (
     default => q{},
 );
 
+has 'user' => (
+    is       => 'ro',
+    isa      => 'R2::Schema::User',
+    required => 1,
+);
+
 sub has_sources {
     return scalar @{ $_[0]->sources() };
 }
@@ -41,6 +47,22 @@ sub param {
     if ( my $s = $self->suffix() ) {
         $param =~ s/\Q$s\E$//;
     }
+
+    my $val = $self->_value_for_param($param);
+
+    return unless defined $val;
+
+    if ( blessed $val && $val->isa('DateTime') ) {
+        return $self->user()->format_date_with_year($val)
+    }
+    else {
+        return $val;
+    }
+}
+
+sub _value_for_param {
+    my $self  = shift;
+    my $param = shift;
 
     foreach my $s ( @{ $self->sources() } ) {
         if ( blessed $s ) {
