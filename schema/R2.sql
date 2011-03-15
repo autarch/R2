@@ -375,7 +375,7 @@ CREATE TABLE "ActivityType" (
 );
 
 CREATE TABLE "ContactParticipation" (
-       contact_activity_id        SERIAL8     PRIMARY KEY,
+       contact_participation_id   SERIAL8     PRIMARY KEY,
        contact_id                 INT8        NOT NULL,
        activity_id                INT8        NOT NULL,
        participation_type_id      INT8        NOT NULL,
