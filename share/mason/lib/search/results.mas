@@ -77,7 +77,7 @@ $contacts = $search->contacts() if $count;
 my $pager;
 $pager = $search->pager() if $count && $count > $search->limit();
 
-my $can_edit = $c->user()->can_edit_contacts( account => $c->account() );
+my $can_edit = $c->user()->can_edit_account_content( account => $c->account() );
 
 my $colspan = $search->includes_multiple_contact_types() ? 7 : 6;
 $colspan += 2 if $can_edit;
