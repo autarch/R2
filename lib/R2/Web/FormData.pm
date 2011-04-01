@@ -26,9 +26,9 @@ has 'suffix' => (
 );
 
 has 'user' => (
-    is       => 'ro',
-    isa      => 'R2::Schema::User',
-    required => 1,
+    is        => 'ro',
+    isa       => 'R2::Schema::User',
+    predicate => '_has_user',
 );
 
 sub has_sources {
@@ -53,7 +53,10 @@ sub param {
     return unless defined $val;
 
     if ( blessed $val && $val->isa('DateTime') ) {
-        return $self->user()->format_date_with_year($val)
+        die 'Cannot format a DateTime for forms without a user'
+            unless $self->_has_user();
+
+        return $self->user()->format_date_with_year($val);
     }
     else {
         return $val;

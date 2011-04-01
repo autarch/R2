@@ -19,7 +19,7 @@ my $form_data = R2::Web::FormData->new(
     sources => \@data_sources,
     prefix  => $prefix,
     suffix  => $suffix,
-    user    => $c->user(),
+    ( $c->user() ? ( user => $c->user() ) : () ),
 );
 
 my $form = R2::Web::FormMunger->new(
