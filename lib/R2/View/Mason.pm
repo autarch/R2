@@ -21,6 +21,12 @@ extends 'Catalyst::View::HTML::Mason';
     sub format_money {
         return format_price( shift, 2, '$' );
     }
+
+    sub POSS {
+        my $noun = shift;
+
+        return $noun . q{'s};
+    }
 }
 
 # used in templates
