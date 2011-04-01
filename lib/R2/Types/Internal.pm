@@ -4,10 +4,12 @@ use strict;
 use warnings;
 
 use Email::Valid;
+use List::AllUtils qw( all );
 use MooseX::Types -declare => [
     qw(
         ContactLike
         DatabaseId
+        Date
         ErrorForSession
         FileIsImage
         PosInt
@@ -34,6 +36,10 @@ subtype ContactLike,
     };
 
 subtype DatabaseId, as PositiveInt;
+
+subtype Date,
+    as class_type { class => 'DateTime' },
+    where { all { $_ == 0 } $_->hour(), $_->minute(), $_->day() };
 
 subtype ErrorForSession,
     as Defined,
