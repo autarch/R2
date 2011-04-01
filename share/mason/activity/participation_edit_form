@@ -1,0 +1,60 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &></h1>
+</div>
+
+<&| /lib/filter/form.mas, objects => [ $participation ] &>
+<form class="JS-standard-form"
+      action="<% $participation->uri() %>"
+      method="post">
+
+  <input type="hidden" name="datepicker_dateFormat" value="<% $c->user()->date_format_for_jquery() %>" />
+
+  <fieldset>
+    <legend>Participation details</legend>
+
+    <div class="form-item">
+      <label class="for-field" for="description">Description:</label>
+      <input type="text" class="text wide" name="description" id="description" />
+      <div class="help-text">
+        <p>
+          You can use this field to add extra details about the type of participation.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="start_date">Start date:</label>
+      <input type="text" class="text narrow date" name="start_date" id="start_date" />
+      <div class="help-text">
+        <p>
+          The start date is required, but the end date is optional.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-item">
+      <label class="for-field" for="end_date">End date:</label>
+      <input type="text" class="text narrow date" name="end_date" id="end_date" />
+    </div>
+
+    <div class="form-item">
+      <input class="action-button" type="submit" value="Submit" />
+    </div>
+
+  </fieldset>
+
+</form>
+</&>
+
+<%args>
+$activity
+$participation
+</%args>
+
+<%method title>
+Edit <% POSS( $contact->display_name() ) %> Participation in <% $activity->name() %>
+<%args>
+$activity
+$contact
+</%args>
+</%method>

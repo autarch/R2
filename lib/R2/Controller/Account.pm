@@ -46,7 +46,7 @@ chain_point _set_account
     unless ( uc $c->request()->method() eq 'GET' ) {
         $self->_check_authz(
             $c,
-            'can_edit_account',
+            'can_edit_account_content',
             { account => $c->account() },
             'You are not authorized to edit this account',
             $c->domain()->application_uri( path => q{} ),
@@ -138,7 +138,7 @@ put q{}
                     $c,
                     'can_edit_account',
                     { account => $c->account() },
-                    'You are not authorized to edit this account',
+                    'You are not authorized to manage this account',
                     $c->domain()->application_uri( path => q{} ),
                 );
 
@@ -544,6 +544,14 @@ get_html confirm_deletion
     my $self = shift;
     my $c    = shift;
 
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
     my $tag = $c->stash()->{tag};
 
     $c->stash()->{type} = 'tag';
@@ -589,6 +597,14 @@ get_html 'new_activity_form'
     => sub {
     my $self = shift;
     my $c    = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
 
     $c->tabs()->by_id('Activities')->set_is_selected(1);
 
@@ -661,6 +677,14 @@ get_html 'edit_form'
     my $self = shift;
     my $c    = shift;
 
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
     $c->stash()->{template} = '/account/activity_form';
 };
 
@@ -732,6 +756,14 @@ get_html participants_form
     my $self = shift;
     my $c    = shift;
 
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
     $c->stash()->{template} = '/activity/participants_form';
 };
 
@@ -746,20 +778,22 @@ post participants
     my $activity = $c->stash()->{activity};
 
     my $form = R2::Web::Form::Participants->new( user => $c->user() );
-    $form->process(
-        action => $activity->uri( view => 'participants_form' ),
-        params => $c->request()->params(),
-    );
+    my $result = $form->process( params => $c->request()->params() );
 
-    my $params = $form->value();
+    if ( ! $result->is_valid() ) {
+        
+    }
 
-    if ( $params->{contact_id} ) {
-        $self->_post_participants( $c, $params );
+    my %params = $result->results_hash();
+
+    if ( $params{contact_id} ) {
+        $self->_post_participants( $c, \%params );
+
         return;
     }
 
     my %contacts;
-    for my $name ( split /[\r\n]+/, $params->{participants} ) {
+    for my $name ( @{ $params{participants} } ) {
         my $search = R2::Search::Person->new(
             account      => $c->stash()->{account},
             restrictions => 'Contact::ByName',
@@ -770,7 +804,7 @@ post participants
         my @matches = $search->contacts()->all();
 
         if ( @matches != 1 ) {
-            my $query = $form->value();
+            my $query = \%params;
 
             $query->{start_date} = $c->user()
                 ->format_date_with_year( $query->{start_date} );
@@ -782,7 +816,7 @@ post participants
             $c->redirect_and_detach(
                 $activity->uri(
                     view  => 'participants_name_resolution_form',
-                    query => $form->value(),
+                    query => $query,
                 )
             );
         }
@@ -790,16 +824,17 @@ post participants
         $contacts{$name} = \@matches;
     }
 
-    $params->{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
-    delete $params->{participants};
+    $params{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
 
-    $self->_post_participants( $c, $params );
+    $self->_post_participants( $c, \%params );
 };
 
 sub _post_participants {
     my $self   = shift;
     my $c      = shift;
     my $params = shift;
+
+    delete $params->{participants};
 
     my $ids = delete $params->{contact_id};
 
@@ -841,29 +876,33 @@ get_html participants_name_resolution_form
     my $self = shift;
     my $c    = shift;
 
-    my $form = R2::Web::Form::Participants->new( user => $c->user() );
-    $form->process(
-        action => $c->stash()->{activity}->uri( view => 'participants_form' ),
-        params => $c->request()->params(),
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
     );
 
-    my $params = $form->value();
+    my $form = R2::Web::Form::Participants->new( user => $c->user() );
+    my $result = $form->process( params => $c->request()->params() );
+
+    my %params = $result->results_hash();
 
     my $type = R2::Schema::ParticipationType->new(
-        participation_type_id => $params->{participation_type_id} );
+        participation_type_id => $params{participation_type_id} );
 
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $type
-            && $type->account_id()
-            == $c->stash()->{account}->account_id();
+            && $type->account_id() == $c->stash()->{account}->account_id();
 
     $c->stash()->{participation_type} = $type;
 
-    $c->stash()->{$_} = $params->{$_}
+    $c->stash()->{$_} = $params{$_}
         for qw( description start_date end_date );
 
     my @contacts;
-    for my $name ( split /[\r\n]+/, $params->{participants} ) {
+    for my $name ( @{ $params{participants} } ) {
         my $search = R2::Search::Person->new(
             account      => $c->stash()->{account},
             restrictions => 'Contact::ByName',
@@ -879,6 +918,65 @@ get_html participants_name_resolution_form
     $c->stash()->{contacts} = \@contacts;
 
     $c->stash()->{template} = '/activity/participants_name_resolution_form';
+};
+
+chain_point _set_participation
+    => chained '_set_activity'
+    => path_part 'participation'
+    => capture_args 1
+    => sub {
+    my $self        = shift;
+    my $c           = shift;
+    my $participation_id = shift;
+
+    my $participation = R2::Schema::ContactParticipation->new(
+        contact_participation_id => $participation_id );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $participation
+            && $participation->activity_id()
+            == $c->stash()->{activity}->activity_id();
+
+    $c->stash()->{participation} = $participation;
+
+    $c->stash()->{contact} = $participation->contact()->real_contact();
+};
+
+get_html participation_edit_form
+    => chained '_set_participation'
+    => path_part 'edit_form'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    $c->stash()->{template} = '/activity/participation_edit_form';
+};
+
+post q{}
+    => chained '_set_participation'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+
 };
 
 get_html 'reports'

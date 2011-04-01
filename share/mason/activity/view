@@ -42,8 +42,17 @@
 %     }
       </td>
 %     if ($can_edit) {
-      <td></td>
-      <td></td>
+      <td>
+        <form class="inline" action="<% $participation->uri( view => 'edit_form' ) %>" method="get">
+          <input class="action-button-small" type="submit" value="Edit" />
+        </form>
+      </td>
+      <td>
+        <form class="inline" action="<% $participation->uri() %>" method="post">
+          <input type="hidden" name="x-tunneled-method" value="DELETE" />
+          <input class="action-button-small" type="submit" value="Remove" />
+        </form>
+      </td>
 %     }
     </tr>
   </tbody>
@@ -61,7 +70,7 @@ $activity
 </%args>
 
 <%init>
-my $can_edit = $c->user()->can_edit_contacts( account => $c->account() );
+my $can_edit = $c->user()->can_edit_account_content( account => $c->account() );
 
 my $participations;
 $participations = $activity->participations()

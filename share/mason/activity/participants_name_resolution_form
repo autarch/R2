@@ -20,8 +20,7 @@
 % if ( ! string_is_empty( $description ) ) {
     <div class="form-item">
       <label class="for-field">Description:</label>
-      <p>
-        <% $description %>
+      <% $description %>
       <input type="hidden" name="description" value="<% $description %>" />
     </div>
 % }
@@ -50,14 +49,16 @@
         </dt>
         <dd>
 %   if ( @{$matches} == 0 ) {
-          no matches found
+          <p>
+            no matches found
+          </p>
 %   } else {
           <table class="standard-table">
 %     for my $i ( 0..$#{$matches} ) {
 %       my $contact = $matches->[$i];
             <tbody>
-              <tr class="<% $i % 2 ? 'odd' : 'even' %>">
-%       my $id = new_uuid();
+              <tr class="<% ( $i + 1 ) % 2 ? 'odd' : 'even' %>">
+%       my $id = 'id-' . new_uuid();
                 <td>
                     <input class="checkbox" id="<% $id %>"
                            type="checkbox" name="contact_id" value="<% $contact->contact_id() %>" />

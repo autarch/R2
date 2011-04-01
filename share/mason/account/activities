@@ -80,7 +80,7 @@ $include_archived => 0
 </%args>
 
 <%init>
-my $can_edit = $c->user()->can_edit_contacts( account => $account );
+my $can_edit = $c->user()->can_edit_account_content( account => $account );
 
 my $count = $account->activity_count( include_archived => $include_archived );
 my $archived_count;

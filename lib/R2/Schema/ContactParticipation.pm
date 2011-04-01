@@ -83,6 +83,12 @@ sub _valid_end_date {
 }
 
 sub _base_uri_path {
+    my $self = shift;
+
+    return
+          $self->activity()->_base_uri_path()
+        . '/participation/'
+        . $self->contact_participation_id();
 
 }
 

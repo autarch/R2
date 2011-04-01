@@ -1,12 +1,11 @@
 package R2::Role::Web::Form;
 
-use strict;
-use warnings;
+use Moose::Role;
+
 use namespace::autoclean;
 
+use DateTime::Format::Natural;
 use R2::Util qw( string_is_empty );
-
-use Moose::Role;
 
 has user => (
     is       => 'ro',
@@ -14,23 +13,16 @@ has user => (
     required => 1,
 );
 
-before update_fields => sub {
+my $parser = DateTime::Format::Natural->new();
+
+sub _datetime_from_str {
     my $self = shift;
 
-    for my $field ( grep { $_->type() eq 'Date' } $self->fields() ) {
-        $field->format( $self->user()->date_format_for_jquery() );
-    }
-};
+    my $value = $self->extract_field_value(@_);
 
-around value => sub {
-    my $orig = shift;
-    my $self = shift;
+    return unless $value;
 
-    my $val = $self->$orig(@_);
-
-    delete $val->{$_} for grep { string_is_empty( $val->{$_} ) } keys %{$val};
-
-    return $val;
-};
+    return $parser->parse_datetime($value);
+}
 
 1;
