@@ -466,7 +466,7 @@ sub can_edit_account {
     );
 }
 
-sub can_edit_contacts {
+sub can_edit_account_content {
     my $self = shift;
     my ($account) = validated_list(
         \@_,
@@ -475,7 +475,7 @@ sub can_edit_contacts {
 
     return $self->_require_at_least(
         $account->account_id(),
-        'Member'
+        'Editor'
     );
 }
 
