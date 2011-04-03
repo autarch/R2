@@ -621,22 +621,22 @@ post 'activities'
 
     my $account = $c->stash()->{account};
 
-    my $form = R2::Web::Form::Activity->new( user => $c->user() );
-    $form->process(
-        action => $c->account()->uri( view => 'activities' ),
-        params => $c->request()->params(),
+    my $result = $self->_process_form(
+        $c,
+        'Activity',
+        $c->account()->uri( view => 'activities' )
     );
 
-    my $vals = $form->value();
-    $vals->{account_id} = $account->account_id();
+    my %results = $result->results_hash();
+    $results{account_id} = $account->account_id();
 
-    my $activity = eval { R2::Schema::Activity->insert( %{$vals} ) };
+    my $activity = eval { R2::Schema::Activity->insert(%results) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $account->uri( view => 'activities' ),
-            form_data => $form->value(),
+            form_data => \%results,
         );
     }
 
@@ -708,32 +708,38 @@ put q{}
     my $self = shift;
     my $c    = shift;
 
-    my $form = R2::Web::Form::Activity->new( user => $c->user() );
-    $form->process(
-        action => $c->account()->uri( view => 'activities' ),
-        params => $c->request()->params(),
-    );
-
     my $activity = $c->stash()->{activity};
 
-    my $vals = $form->value();
+    my %results;
+    if ( exists $c->request()->params()->{is_archived} ) {
+        %results = ( is_archived => $c->request()->params()->{is_archived} );
+    }
+    else {
+        my $result = $self->_process_form(
+            $c,
+            'Activity',
+            $activity->uri( view => 'edit_form' ),
+        );
+
+        %results = $result->results_hash();
+    }
 
     my $message
-        = keys %{$vals} == 1
+        = keys %results == 1
         ? (
-        $vals->{is_archived}
+        $results{is_archived}
         ? 'has been archived'
         : 'has been unarchived'
         )
         : 'has been updated';
 
-    eval { $activity->update( %{$vals} ) };
+    eval { $activity->update(%results) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $activity->uri( view => 'edit_form' ),
-            form_data => $form->value(),
+            form_data => \%results,
         );
     }
 
@@ -742,7 +748,7 @@ put q{}
         'The ' . $activity->name() . ' activity ' . $message );
 
     my $uri
-        = keys %{$vals} == 1
+        = keys %results == 1
         ? $c->stash()->{account}->uri( view => 'activities' )
         : $activity->uri( view => 'edit_form' );
 

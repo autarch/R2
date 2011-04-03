@@ -1,27 +1,26 @@
 package R2::Web::Form::Activity;
 
-use strict;
-use warnings;
+use Moose;
+use Chloro;
+
 use namespace::autoclean;
 
-use HTML::FormHandler::Moose;
-
-extends 'HTML::FormHandler';
+use R2::Types qw( Bool DatabaseId Str );
 
 with 'R2::Role::Web::Form';
 
-has_field name => (
-    type     => 'Text',
+field name => (
+    isa      => Str,
     required => 1,
 );
 
-has_field activity_type_id => (
-    type     => 'Integer',
+field activity_type_id => (
+    isa      => DatabaseId,
     required => 1,
 );
 
-has_field is_archived => (
-    type    => 'Boolean',
+field is_archived => (
+    isa     => Bool,
     default => 0,
 );
 
