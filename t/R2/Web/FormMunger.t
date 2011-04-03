@@ -255,6 +255,8 @@ sub generic_error_div_tests {
     }
     $form->childNodes();
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     ok( $error_div, 'form has an error div as a child node' );
 
     my $error_p = ( $error_div->getElementsByTagName('p') )[0];
@@ -277,6 +279,8 @@ sub text1_error_div_tests {
     }
     $form->childNodes();
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     ok( $error_div,
         'form does have a form-item div with an additional error class' );
 
@@ -295,6 +299,8 @@ sub fill_in_form_tests {
 
     my $text1 = first { $_->name() eq 'text1' }
     $form->getElementsByTagName('input');
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     is(
         $text1->value(), 't1',
