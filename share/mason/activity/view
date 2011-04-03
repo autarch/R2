@@ -2,10 +2,6 @@
   <h1><& SELF:title, %ARGS &></h1>
 </div>
 
-<p>
-  <a class="action-button" href="<% $activity->uri( view => 'participants_form' ) %>">Add participants</a>
-</p>
-
 % if ($participations) {
 
 <table class="standard-table">
@@ -64,6 +60,10 @@
   This activity does not have any participants.
 </p>
 % }
+
+<p>
+  <a class="action-button" href="<% $activity->uri( view => 'participants_form' ) %>">Add participants</a>
+</p>
 
 <%args>
 $activity
