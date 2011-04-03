@@ -44,8 +44,8 @@ R2.Tags.prototype._submitForm = function () {
             "type":     "POST",
             "data":     { "tags": tags },
             "dataType": "json",
-            "success" : function (data) { self._handleSuccess(data) },
-            "error":    function ( xhr, status, error ) { self._handleFailure(xhr) }
+            "success" : function (data) { self._handleSuccess(data); },
+            "error":    function ( xhr, status, error ) { self._handleFailure(xhr); }
         }
     );
 };
