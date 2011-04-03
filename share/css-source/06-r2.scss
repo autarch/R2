@@ -18,6 +18,9 @@ $medium-green-border-dark:  $medium-green - #222;
 $dark-green-border-light: $dark-green + #555;
 $dark-green-border-dark:  $dark-green - #222;
 
+$orange-border-light: $orange + #555;
+$orange-border-dark:  $orange - #222;
+
 @mixin rounded-corners-top ($radius) {
     border-radius-topleft: $radius;
     border-radius-topright: $radius;
@@ -725,6 +728,10 @@ div.custom-field {
 
 .action-button:hover {
     background: $orange;
+    border-top: 1px solid $orange-border-light;
+    border-right: 2px solid $orange-border-dark;
+    border-bottom: 2px solid $orange-border-dark;
+    border-left: 1px solid $orange-border-light;
 }
 
 a.action-button {
