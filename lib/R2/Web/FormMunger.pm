@@ -105,7 +105,7 @@ sub _fill_errors {
             $message = $error->{message};
         }
         else {
-            $message = ref $error ? $error->{message} : $errors;
+            $message = ref $error ? $error->{message} : $error;
         }
 
         if ( defined $field ) {
