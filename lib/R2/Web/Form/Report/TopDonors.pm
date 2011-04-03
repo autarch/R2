@@ -1,30 +1,23 @@
 package R2::Web::Form::Report::TopDonors;
 
-use strict;
-use warnings;
+use Moose;
+use Chloro;
+
 use namespace::autoclean;
 
-use HTML::FormHandler::Moose;
+use R2::Types qw( Date PosOrZeroInt );
 
-extends 'HTML::FormHandler';
-
-with 'R2::Role::Web::Form';
-
-has_field start_date => (
-    type  => 'Date',
-    label => 'Start date',
+field start_date => (
+    isa       => Date,
+    extractor => '_datetime_from_str',
 );
 
-has_field end_date => (
-    type  => 'Date',
-    label => 'End date',
-);
-
-has_field limit => (
-    type    => 'Integer',
-    label   => 'Max donors',
+field limit => (
+    isa     => PosOrZeroInt,
     default => 20,
 );
+
+with 'R2::Role::Web::Form', 'R2::Role::Web::Form::StartAndEndDates';
 
 __PACKAGE__->meta()->make_immutable();
 

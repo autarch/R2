@@ -13,6 +13,7 @@ use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
 use R2::Web::Form::Activity;
 use R2::Web::Form::Participants;
+use R2::Web::Form::Participation;
 use R2::Web::Form::Report::TopDonors;
 use R2::Util qw( string_is_empty );
 
@@ -777,12 +778,11 @@ post participants
 
     my $activity = $c->stash()->{activity};
 
-    my $form = R2::Web::Form::Participants->new( user => $c->user() );
-    my $result = $form->process( params => $c->request()->params() );
-
-    if ( ! $result->is_valid() ) {
-        
-    }
+    my $result = $self->_process_form(
+        $c,
+        'Participants',
+        $activity->uri( view => 'participants_form' )
+    );
 
     my %params = $result->results_hash();
 
@@ -884,8 +884,7 @@ get_html participants_name_resolution_form
         $c->domain()->application_uri( path => q{} ),
     );
 
-    my $form = R2::Web::Form::Participants->new( user => $c->user() );
-    my $result = $form->process( params => $c->request()->params() );
+    my $result = $self->_process_form( $c, 'Participants' );
 
     my %params = $result->results_hash();
 
@@ -976,7 +975,41 @@ post q{}
         $c->domain()->application_uri( path => q{} ),
     );
 
+    my $participation = $c->stash()->{participation};
 
+    my $result = $self->_process_form(
+        $c,
+        'Participation',
+        $participation->uri( view => 'edit_form' )
+    );
+
+    $participation->update( $result->results_hash() );
+
+    $c->redirect_and_detach( $participation->activity()->uri() );
+};
+
+del q{}
+    => chained '_set_participation'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    my $participation = $c->stash()->{participation};
+
+    my $uri = $participation->activity()->uri();
+
+    $participation->delete();
+
+    $c->redirect_and_detach($uri);
 };
 
 get_html 'reports'
@@ -1002,19 +1035,16 @@ get_html 'top_donors'
 
     $c->tabs()->by_id('Reports')->set_is_selected(1);
 
-    my $form = R2::Web::Form::Report::TopDonors->new( user => $c->user() );
-    $form->process(
-        action => $c->account()->uri( view => 'top_donors' ),
-        params => $c->request()->params(),
+    my $result = $self->_process_form(
+        $c,
+        'Report::TopDonors',
+        $c->account()->uri( view => 'top_donors' ),
     );
 
-    # XXX - form validation errors
+    $c->stash()->{donors}
+        = $c->account()->top_donors( $result->results_hash() );
 
-    my $form_val = $form->value();
-
-    $c->stash()->{donors} = $c->account()->top_donors($form_val);
-
-    $c->stash()->{form} = $form;
+    $c->stash()->{form_vals} = { $result->results_hash() };
 
     $c->stash()->{template} = '/account/top_donors';
 };

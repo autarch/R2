@@ -7,6 +7,7 @@ use Email::Valid;
 use List::AllUtils qw( all );
 use MooseX::Types -declare => [
     qw(
+        ChloroError
         ContactLike
         DatabaseId
         Date
@@ -23,6 +24,8 @@ use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw(  Defined Int Object Str );
 
 #<<<
+role_type ChloroError, { role => 'Chloro::Role::Error' };
+
 subtype ContactLike,
     as Object,
     where {
@@ -38,7 +41,7 @@ subtype ContactLike,
 subtype DatabaseId, as PositiveInt;
 
 subtype Date,
-    as class_type { class => 'DateTime' },
+    as class_type 'DateTime',
     where { all { $_ == 0 } $_->hour(), $_->minute(), $_->day() };
 
 subtype ErrorForSession,
@@ -48,6 +51,7 @@ subtype ErrorForSession,
     return 1 unless ref $_;
     return 1 if eval { @{$_} } && !grep {ref} @{$_};
     return 0 unless blessed $_;
+    return 1 if $_->can('does') && $_->does('Chloro::Role::Error');
     return 1 if $_->can('messages') || $_->can('message');
     return 0;
 };

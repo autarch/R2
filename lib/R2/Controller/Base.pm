@@ -178,6 +178,30 @@ sub status_forbidden {
     return;
 }
 
+sub _process_form {
+    my $self = shift;
+    my $c    = shift;
+    my $name = shift;
+    my $uri  = shift;
+
+    my $class = 'R2::Web::Form::' . $name;
+
+    die "Bad form name ($name)" unless $class->can('new');
+
+    my $form = $class->new( user => $c->user() );
+    my $result = $form->process( params => $c->request()->params() );
+
+    if ( !$result->is_valid() ) {
+        $c->redirect_with_error(
+            error     => [ $result->all_errors() ],
+            uri       => $uri,
+            form_data => { $result->secure_results_hash() },
+        );
+    }
+
+    return wantarray ? ( $form, $result ) : $result;
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;

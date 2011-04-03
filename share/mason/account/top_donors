@@ -3,7 +3,7 @@
 </div>
 
 <&| /lib/filter/form.mas,
-    data    => $form->fif(),
+    data => \%form_vals,
   &>
 <form class="JS-standard-form"
       action="top_donors"
@@ -79,12 +79,12 @@
 <%args>
 $account
 $donors
-$form
+%form_vals
 </%args>
 
 <%init>
-my $start_date = $form->value()->{start_date};
-my $end_date = $form->value()->{end_date};
+my $start_date = $form_vals{start_date};
+my $end_date = $form_vals{end_date};
 </%init>
 
 <%method title>
@@ -97,9 +97,9 @@ Donor
 to <% $account->name() %>
 <%args>
 $account
-$form
+%form_vals
 </%args>
 <%init>
-my $limit = $form->value()->{limit};
+my $limit = $form_vals{limit};
 </%init>
 </%method>

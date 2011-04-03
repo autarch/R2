@@ -7,7 +7,7 @@ use namespace::autoclean;
 use HTML::DOM;
 use HTML::FillInForm;
 use R2::Config;
-use R2::Types qw( ArrayRef Bool HashRef Str );
+use R2::Types qw( ArrayRef Bool ChloroError HashRef Str );
 use R2::Web::FormData;
 
 use Moose;
@@ -39,7 +39,7 @@ has '_dom' => (
 
 has 'errors' => (
     is      => 'ro',
-    isa     => ArrayRef[HashRef|Str],
+    isa     => ArrayRef [ ChloroError | HashRef | Str ],
     default => sub { [] },
 );
 
@@ -92,18 +92,33 @@ sub _fill_errors {
     $error_div->className('form-error');
 
     for my $error ( @{$errors} ) {
-        if ( ref $error && $error->{field} ) {
-            if ( my $div = $self->_get_div_for_field( $error->{field} ) ) {
+        my $field;
+        my $message;
+
+        if ( blessed $error ) {
+            $field = $error->field()->name() if $error->can('field');
+            $message = $error->error()->message();
+        }
+        # XXX - non-Chloro message
+        elsif ( ref $error && $error->{field} ) {
+            $field   = $error->{field};
+            $message = $error->{message};
+        }
+        else {
+            $message = ref $error ? $error->{message} : $errors;
+        }
+
+        if ( defined $field ) {
+            if ( my $div = $self->_get_div_for_field($field) ) {
 
                 $div->className( $div->className() . ' error' );
 
-                my $p = $self->_create_error_para( $error->{message} );
+                my $p = $self->_create_error_para($message);
                 $div->insertBefore( $p, $div->firstChild() );
             }
         }
 
-        my $p = $self->_create_error_para(
-            ref $error ? $error->{message} : $error );
+        my $p = $self->_create_error_para($message);
 
         $error_div->appendChild($p);
     }

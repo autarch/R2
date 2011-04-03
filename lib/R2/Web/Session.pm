@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use R2::Types qw( ArrayRef HashRef NonEmptyStr ErrorForSession );
+use R2::Types qw( ArrayRef ChloroError HashRef NonEmptyStr ErrorForSession );
 
 use Moose;
 use MooseX::Params::Validate qw( pos_validated_list );
@@ -21,7 +21,7 @@ has form_data => (
 has _errors => (
     traits   => ['Array'],
     is       => 'ro',
-    isa      => ArrayRef [ NonEmptyStr | HashRef ],
+    isa      => ArrayRef [ NonEmptyStr | HashRef | ChloroError ],
     default  => sub { [] },
     init_arg => undef,
     handles  => {

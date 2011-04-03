@@ -22,7 +22,11 @@ sub _datetime_from_str {
 
     return unless $value;
 
-    return $parser->parse_datetime($value);
+    my $dt = $parser->parse_datetime($value);
+
+    return $dt if $parser->success();
+
+    return;
 }
 
 1;

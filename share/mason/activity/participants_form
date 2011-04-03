@@ -48,7 +48,7 @@
 
     <div class="form-item">
       <label class="for-field" for="participants">Participants:</label>
-      <textarea name="participants" class="wide"></textarea>
+      <textarea name="participants" id="participants" class="wide"></textarea>
       <div class="help-text">
         <p>
           Enter the names of participants, one per line.
