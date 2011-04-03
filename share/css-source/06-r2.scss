@@ -268,12 +268,12 @@ ul.tags-list {
 }
 
 #summary {
-    background-color: $brown;
-    color: white;
-    margin: 0 0 0.5em 0;
-    padding: 0.3em 0 0.3em 5px;
+    border-bottom: 2px solid $brown;
+    padding-bottom: 0.1em;
+    margin-bottom: 0.5em;
 
     h1 {
+        color: $brown;
         margin: 0;
         padding: 0.3em 0;
     }
