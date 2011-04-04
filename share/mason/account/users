@@ -43,10 +43,10 @@ Only showing active users.
           <input type="hidden" name="x-tunneled-method" value="PUT" />
 %     if ( $user->is_disabled() ) {
           <input type="hidden" name="is_disabled" value="0" />
-          <input type="submit" class="action-button small" value="Enable" />
+          <input type="submit" class="action-button-small" value="Enable" />
 %     } else {
           <input type="hidden" name="is_disabled" value="1" />
-          <input type="submit" class="action-button small" value="Disable" />
+          <input type="submit" class="action-button-small" value="Disable" />
 %     }
         </form>
 %   }
