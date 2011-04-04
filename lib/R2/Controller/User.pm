@@ -7,6 +7,7 @@ use namespace::autoclean;
 use List::AllUtils qw( any );
 use R2::Schema::User;
 use R2::Util qw( string_is_empty );
+use R2::Web::Form::Login;
 
 use Moose;
 use CatalystX::Routes;
@@ -20,7 +21,7 @@ get_html login_form
     my $c    = shift;
 
     $c->stash()->{return_to} 
-        = $c->request()->parameters->{return_to}
+        = $c->request()->params()->{return_to}
         || $c->session_object()->form_data()->{return_to}
         || $c->domain()->application_uri( path => q{} );
 
@@ -51,40 +52,13 @@ post authentication
     my $self = shift;
     my $c    = shift;
 
-    my $username = $c->request()->param('username');
-    my $pw       = $c->request()->param('password');
+    my $result = $self->_process_form(
+        $c,
+        'Login',
+        $c->domain()->application_uri( path => '/user/login_form' )
+    );
 
-    my @errors;
-
-    push @errors, {
-        field   => 'password',
-        message => 'You must provide a password.'
-        }
-        if string_is_empty($pw);
-
-    my $user;
-    unless (@errors) {
-        $user = R2::Schema::User->new( username => $username );
-
-        if ( $user->is_disabled() ) {
-            push @errors, 'This account has been disabled.';
-        }
-        elsif ( !$user->check_password($pw) ) {
-            push @errors,
-                'The username or password you provided was not valid.';
-        }
-    }
-
-    if (@errors) {
-        $c->redirect_with_error(
-            error => R2::Exception::DataValidation->new( errors => \@errors ),
-            uri =>
-                $c->domain()->application_uri( path => '/user/login_form' ),
-            form_data => $c->request()->parameters(),
-        );
-    }
-
-    $self->_login_user( $c, $user );
+    $self->_login_user( $c, $result->user(), { $result->results_hash() } );
 };
 
 del authentication
@@ -105,12 +79,12 @@ sub _authentication_delete {
 };
 
 sub _login_user {
-    my $self = shift;
-    my $c    = shift;
-    my $user = shift;
+    my $self    = shift;
+    my $c       = shift;
+    my $user    = shift;
+    my $results = shift;
 
-    my %expires
-        = $c->request()->param('remember') ? ( expires => '+1y' ) : ();
+    my %expires = $results->{remember} ? ( expires => '+1y' ) : ();
 
     $c->set_authen_cookie(
         value => { user_id => $user->user_id() },
@@ -120,7 +94,7 @@ sub _login_user {
     $c->session_object()
         ->add_message( 'Welcome to the site, ' . $user->first_name() );
 
-    my $redirect_to = $c->request()->parameters()->{return_to}
+    my $redirect_to = $results->{return_to}
         || $c->domain()->application_uri( path => q{} );
 
     $c->redirect_and_detach($redirect_to);
