@@ -13,6 +13,7 @@ use MooseX::Types -declare => [
         Date
         ErrorForSession
         FileIsImage
+        MonthAsNumber
         PosInt
         PosOrZeroInt
         SearchPlugin
@@ -61,15 +62,18 @@ subtype FileIsImage,
     where { $_->is_image() },
     message { 'This file (' . $_->filename() . ') is not an image' };
 
+subtype MonthAsNumber,
+    as PositiveInt,
+    where { $_ >= 1 && $_ <= 12 },
+    message {'Must be a number from 1-12'};
+
 subtype NonEmptyStr,
     as Str,
     where { length $_ >= 0 },
     message {'This string must not be empty'};
 
-subtype PosInt,
-    as Int,
-    where { $_ > 0 },
-    message {'This must be a positive integer'};
+# XXX - compat shim - need to just use PositiveInt everywhere
+subtype PosInt, as PositiveInt;
 
 subtype PosOrZeroInt,
     as Int,

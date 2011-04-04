@@ -11,6 +11,7 @@ use R2::Schema::Activity;
 use R2::Schema::ContactParticipation;
 use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
+use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
@@ -87,19 +88,21 @@ put q{}
     my $self = shift;
     my $c    = shift;
 
-    my %p = $c->request()->account_params();
-    delete $p{domain_id}
-        unless $c->user()->is_system_admin();
-
     my $account = $c->stash()->{account};
 
-    eval { $account->update(%p) };
+    my $result = $self->_process_form(
+        $c,
+        'Account',
+        $account->uri( view => 'edit_form' ),
+    );
+
+    eval { $account->update( %{ $result->results_as_hash() } ) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $account->uri( view => 'edit_form' ),
-            form_data => $c->request()->params(),
+            form_data => $result->secure_results_as_hash(),
         );
     }
 
