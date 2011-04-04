@@ -17,7 +17,7 @@
 
     <div class="form-item">
       <label class="for-field" for="remember" class="inline">Remember me:</label>
-      <input id="remember" class="checkbox" type="checkbox" name="remember" />
+      <input id="remember" class="checkbox" type="checkbox" name="remember" value="1" />
     </div>
 
   </fieldset>
