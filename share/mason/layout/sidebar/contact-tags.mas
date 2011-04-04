@@ -1,7 +1,7 @@
 <div class="associated-content" id="tags">
   <h2>Tags</h2>
 
-  <ul class="tags-list">
+  <ul class="tags-list" id="tags-list">
 % while ( my $tag = $tags->next() ) {
     <li>
     <a class="tag-link" href="<% $tag->uri() %>"><% $tag->tag() %></a>
