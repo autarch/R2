@@ -15,6 +15,7 @@ use R2::Web::Form::Activity;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
 use R2::Web::Form::Report::TopDonors;
+use R2::Web::Form::User;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -423,43 +424,31 @@ post user
     my $self = shift;
     my $c    = shift;
 
-    my %p = $c->request()->user_params();
-    delete $p{is_system_admin}
-        unless $c->user()->is_system_admin();
-
-    delete @p{ 'password', 'password2' }
-        unless any { !string_is_empty($_) } @p{ 'password', 'password2' };
-
-    my @errors;
-
-    my $password2 = $c->request()->params()->{password2};
-
-    unless ( ( $p{password} // q{} ) eq ( $password2 // q{} ) ) {
-        push @errors, 'The two passwords you provided did not match.';
-    }
-
     my $account = $c->account();
 
-    my $user;
+    my $result = $self->_process_form(
+        $c,
+        'User',
+        $account->uri( view => 'new_user_form' ),
+    );
 
-    unless (@errors) {
-        delete $p{password2};
+    my $params = $result->results_as_hash();
 
-        $p{account_id} = $account->account_id();
+    delete $params->{is_system_admin}
+        unless $c->user()->is_system_admin();
 
-        $user = eval { R2::Schema::User->insert( %p, user => $c->user() ) };
+    delete $params->{password2};
 
-        push @errors, $@
-            if $@;
-    }
+    $params->{account_id} = $account->account_id();
 
-    if (@errors) {
-        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+    my $user
+        = eval { R2::Schema::User->insert( %{$params}, user => $c->user() ) };
 
+    if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $account->uri( view => 'new_user_form' ),
-            form_data => $c->request()->params(),
+            form_data => $result->secure_results_as_hash(),
         );
     }
 
