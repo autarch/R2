@@ -195,7 +195,7 @@ sub _process_form {
         $c->redirect_with_error(
             error     => [ $result->all_errors() ],
             uri       => $uri,
-            form_data => { $result->secure_results_hash() },
+            form_data => $result->secure_results_as_hash(),
         );
     }
 

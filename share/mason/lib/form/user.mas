@@ -76,7 +76,7 @@
       </select>
     </div>
 
-% if ( $c->user()->is_system_admin() ) {
+% if ($show_system_admin) {
     <div class="form-item">
       <label class="for-field" for="is_system_admin">System-wide admin:</label>
       <div class="radio-group">
@@ -110,6 +110,9 @@ my $action = $user ? $user->uri() : $c->account()->uri( view => 'user' );
 my $zones = R2::Schema::TimeZone->ByCountry('United States');
 my $roles = R2::Schema::Role->All();
 my $is_system_admin = $user && $user->is_system_admin ? 1 : 0;
+
+my $show_system_admin = $c->user()->is_system_admin() && !$user
+    || $user->user_id() != $c->user()->user_id();
 
 my $today = DateTime->now( time_zone => $user ? $user->time_zone() : 'UTC' );
 my %date_formats = R2::Schema::User->DateFormats();

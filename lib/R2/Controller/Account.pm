@@ -627,16 +627,16 @@ post 'activities'
         $c->account()->uri( view => 'activities' )
     );
 
-    my %results = $result->results_hash();
-    $results{account_id} = $account->account_id();
+    my $params = $result->results_as_hash();
+    $params->{account_id} = $account->account_id();
 
-    my $activity = eval { R2::Schema::Activity->insert(%results) };
+    my $activity = eval { R2::Schema::Activity->insert( %{$params} ) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $account->uri( view => 'activities' ),
-            form_data => \%results,
+            form_data => $params,
         );
     }
 
@@ -710,9 +710,9 @@ put q{}
 
     my $activity = $c->stash()->{activity};
 
-    my %results;
+    my $params;
     if ( exists $c->request()->params()->{is_archived} ) {
-        %results = ( is_archived => $c->request()->params()->{is_archived} );
+        $params = { is_archived => $c->request()->params()->{is_archived} };
     }
     else {
         my $result = $self->_process_form(
@@ -721,25 +721,25 @@ put q{}
             $activity->uri( view => 'edit_form' ),
         );
 
-        %results = $result->results_hash();
+        $params = $result->results_as_hash();
     }
 
     my $message
-        = keys %results == 1
+        = keys %{$params} == 1
         ? (
-        $results{is_archived}
+        $params->{is_archived}
         ? 'has been archived'
         : 'has been unarchived'
         )
         : 'has been updated';
 
-    eval { $activity->update(%results) };
+    eval { $activity->update( %{$params} ) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $activity->uri( view => 'edit_form' ),
-            form_data => \%results,
+            form_data => $params,
         );
     }
 
@@ -748,7 +748,7 @@ put q{}
         'The ' . $activity->name() . ' activity ' . $message );
 
     my $uri
-        = keys %results == 1
+        = keys %{$params} == 1
         ? $c->stash()->{account}->uri( view => 'activities' )
         : $activity->uri( view => 'edit_form' );
 
@@ -790,16 +790,16 @@ post participants
         $activity->uri( view => 'participants_form' )
     );
 
-    my %params = $result->results_hash();
+    my $params = $result->results_as_hash();
 
-    if ( $params{contact_id} ) {
-        $self->_post_participants( $c, \%params );
+    if ( $params->{contact_id} ) {
+        $self->_post_participants( $c, $params );
 
         return;
     }
 
     my %contacts;
-    for my $name ( @{ $params{participants} } ) {
+    for my $name ( @{ $params->{participants} } ) {
         my $search = R2::Search::Person->new(
             account      => $c->stash()->{account},
             restrictions => 'Contact::ByName',
@@ -810,7 +810,7 @@ post participants
         my @matches = $search->contacts()->all();
 
         if ( @matches != 1 ) {
-            my $query = \%params;
+            my $query = $params;
 
             $query->{start_date} = $c->user()
                 ->format_date_with_year( $query->{start_date} );
@@ -830,9 +830,9 @@ post participants
         $contacts{$name} = \@matches;
     }
 
-    $params{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
+    $params->{contact_id} = [ map { $_->[0]->contact_id() } values %contacts ];
 
-    $self->_post_participants( $c, \%params );
+    $self->_post_participants( $c, $params );
 };
 
 sub _post_participants {
@@ -989,7 +989,15 @@ post q{}
         $participation->uri( view => 'edit_form' )
     );
 
-    $participation->update( $result->results_hash() );
+    eval { $participation->update( $result->results_hash() ) };
+
+    if ( my $e = $@ ) {
+        $c->redirect_with_error(
+            error     => $e,
+            uri       => $participation->uri( view => 'edit_form' ),
+            form_data => $result->results_hash(),
+        );
+    }
 
     $c->redirect_and_detach( $participation->activity()->uri() );
 };

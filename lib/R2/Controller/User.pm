@@ -8,6 +8,7 @@ use List::AllUtils qw( any );
 use R2::Schema::User;
 use R2::Util qw( string_is_empty );
 use R2::Web::Form::Login;
+use R2::Web::Form::User;
 
 use Moose;
 use CatalystX::Routes;
@@ -58,7 +59,7 @@ post authentication
         $c->domain()->application_uri( path => '/user/login_form' )
     );
 
-    $self->_login_user( $c, $result->user(), { $result->results_hash() } );
+    $self->_login_user( $c, $result->user(), $result->results_as_hash() );
 };
 
 del authentication
@@ -133,39 +134,36 @@ put q{}
     my $self = shift;
     my $c    = shift;
 
-    my %p = $c->request()->user_params();
-    delete $p{is_system_admin}
-        unless $c->user()->is_system_admin();
-    delete $p{is_disabled}
-        unless $c->user()->role()->name() eq 'Admin';
-
-    delete @p{ 'password', 'password2' }
-        unless any { !string_is_empty($_) } @p{ 'password', 'password2' };
-
-    my @errors;
-
-    my $password2 = $c->request()->params()->{password2};
-
-    unless ( ( $p{password} // q{} ) eq ( $password2 // q{} ) ) {
-        push @errors, 'The two passwords you provided did not match.';
-    }
-
     my $user = $c->stash()->{user};
 
-    unless (@errors) {
-        eval { $user->update( %p, user => $c->user() ) };
+    my $result;
+    my $params;
+    if ( exists $c->request()->params()->{is_disabled} ) {
+        $params = { is_disabled => $c->request()->params()->{is_disabled} };
+    }
+    else {
+        $result = $self->_process_form(
+            $c,
+            'User',
+            $user->uri( view => 'edit_form' ),
+        );
 
-        push @errors, $@
-            if $@;
+        $params = $result->results_as_hash();
     }
 
-    if (@errors) {
-        my $e = R2::Exception::DataValidation->new( errors => \@errors );
+    delete $params->{is_system_admin}
+        if $c->user()->user_id() == $user->user_id();
 
+    delete $params->{is_disabled}
+        unless $c->user()->role()->name() eq 'Admin';
+
+    eval { $user->update( %{$params}, user => $c->user() ) };
+
+    if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $user->uri( view => 'edit_form' ),
-            form_data => $c->request()->params(),
+            form_data => ( $result ? $result->secure_results_as_has() : {} ),
         );
     }
 
