@@ -17,6 +17,7 @@ use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
+use R2::Web::Form::PaymentTypes;
 use R2::Web::Form::Report::TopDonors;
 use R2::Web::Form::User;
 use R2::Util qw( string_is_empty );
@@ -242,9 +243,18 @@ post payment_types
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->payment_types();
+    my $result = $self->_process_form(
+        $c,
+        'PaymentTypes',
+        $account->uri( view => 'payment_types_form' ),
+    );
 
-    eval { $account->update_or_add_payment_types( $existing, $new ); };
+    eval {
+        $account->update_or_add_payment_types(
+            $result->existing_payment_types(),
+            $result->new_payment_types(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

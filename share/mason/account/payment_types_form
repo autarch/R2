@@ -19,7 +19,10 @@
 
 % while ( my $type = $types->next() ) {
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="payment_type_name_<% $type->payment_type_id() %>"
+        <input type="hidden" name="payment_type_id" value="<% $type->payment_type_id() %>" />
+
+        <input class="text medium no-label" type="text"
+               name="payment_type.<% $type->payment_type_id() %>.name"
                value="<% $type->name() %>" />
 %   if ( ! $type->is_deletable() ) {
         <div class="help-text">
@@ -35,8 +38,11 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-payment-type">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="payment_type_name_new1"
-               id="payment_type_name_new1" />
+        <input type="hidden" name="payment_type_id" value="new1" />
+
+        <input class="text medium no-label" type="text"
+               name="payment_type.new1.name"
+               id="payment_type.new1.name" />
       </div>
     </div>
 
