@@ -18,7 +18,7 @@
     <legend>Donation Campaigns</legend>
 % while ( my $campaign = $campaigns->next() ) {
       <div class="form-item">
-      <input type="hidden" name="donation_campaign_id" value="<% $campaign->donation_campaign_id() %>" />
+        <input type="hidden" name="donation_campaign_id" value="<% $campaign->donation_campaign_id() %>" />
 
         <input class="text medium no-label" type="text"
                name="donation_campaign.<% $campaign->donation_campaign_id() %>.name"
