@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 use Moose::Meta::Class;
 use R2::Role::Web::ResultSet::NewAndExistingGroups;
-use R2::Types qw( Bool DatabaseId MonthAsNumber NonEmptyStr );
+use R2::Types qw( NonEmptyStr );
 
 with 'R2::Role::Web::Form';
 
