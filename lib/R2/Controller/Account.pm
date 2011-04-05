@@ -13,6 +13,7 @@ use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
 use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
+use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
@@ -171,10 +172,6 @@ post donation_sources
         $account->uri( view => 'donation_sources_form' ),
     );
 
-    use Devel::Dwarn;Dwarn [
-            $result->existing_donation_sources(),
-            $result->new_donation_sources(),
-];
     eval {
         $account->update_or_add_donation_sources(
             $result->existing_donation_sources(),
@@ -207,9 +204,18 @@ post donation_campaigns
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->donation_campaigns();
+    my $result = $self->_process_form(
+        $c,
+        'DonationCampaigns',
+        $account->uri( view => 'donation_campaigns_form' ),
+    );
 
-    eval { $account->update_or_add_donation_campaigns( $existing, $new ); };
+    eval {
+        $account->update_or_add_donation_campaigns(
+            $result->existing_donation_campaigns(),
+            $result->new_donation_campaigns(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

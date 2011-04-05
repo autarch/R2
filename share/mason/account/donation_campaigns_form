@@ -18,7 +18,10 @@
     <legend>Donation Campaigns</legend>
 % while ( my $campaign = $campaigns->next() ) {
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="donation_campaign_name_<% $campaign->donation_campaign_id() %>"
+      <input type="hidden" name="donation_campaign_id" value="<% $campaign->donation_campaign_id() %>" />
+
+        <input class="text medium no-label" type="text"
+               name="donation_campaign.<% $campaign->donation_campaign_id() %>.name"
                value="<% $campaign->name() %>" />
 %   if ( ! $campaign->is_deletable() ) {
         <div class="help-text">
@@ -34,8 +37,11 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-donation-campaign">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="donation_campaign_name_new1"
-               id="donation_campaign_name_new1" />
+        <input type="hidden" name="donation_campaign_id" value="new1" />
+
+        <input class="text medium no-label" type="text"
+               name="donation_campaign.new1.name"
+               id="donation_campaign.new1.name" />
       </div>
     </div>
 
