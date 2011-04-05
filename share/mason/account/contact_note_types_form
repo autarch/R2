@@ -10,7 +10,9 @@
 
 <& /lib/help-text/contact-note-type.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'contact_note_type_id' ],
+  &>
 <form action="<% $account->uri( view => 'contact_note_types' ) %>"
       method="post" class="JS-standard-form">
 
@@ -27,8 +29,10 @@
         </p>
       </div>
 %   } else {
+      <input type="hidden" name="contact_note_type_id" value="<% $type->contact_note_type_id() %>" />
+
       <input class="text medium no-label" type="text"
-             name="contact_note_type_description_<% $type->contact_note_type_id() %>"
+             name="contact_note_type.<% $type->contact_note_type_id() %>.description"
              value="<% $type->description() %>" />
 %     if ( ! $type->is_deletable() ) {
       <div class="help-text">
@@ -45,8 +49,11 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-contact-note-type">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="contact_note_type_description_new1"
-               id="contact_note_type_description_new1" />
+        <input type="hidden" name="contact_note_type_id" value="new1" />
+
+        <input class="text medium no-label" type="text"
+               name="contact_note_type.new1.description"
+               id="contact_note_type.new1.description" />
       </div>
     </div>
 

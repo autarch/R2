@@ -14,6 +14,7 @@ use R2::Search::Contact;
 use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
 use R2::Web::Form::AddressTypes;
+use R2::Web::Form::ContactNoteTypes;
 use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
@@ -357,9 +358,18 @@ post contact_note_types
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->contact_note_types();
+    my $result = $self->_process_form(
+        $c,
+        'ContactNoteTypes',
+        $account->uri( view => 'contact_note_type_form' ),
+    );
 
-    eval { $account->update_or_add_contact_note_types( $existing, $new ); };
+    eval {
+        $account->update_or_add_contact_note_types(
+            $result->existing_contact_note_types(),
+            $result->new_contact_note_types(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
