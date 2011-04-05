@@ -10,18 +10,24 @@
 
 <& /lib/help-text/address-type.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'address_type_id' ],
+  &>
 <form action="<% $account->uri( view => 'address_types' ) %>"
       method="post" class="JS-standard-form">
 
   <fieldset>
     <legend>Address Types</legend>
+
 % while ( my $type = $types->next() ) {
     <div class="form-item">
-      <input class="text medium no-label" type="text" name="address_type_name_<% $type->address_type_id() %>"
+      <input type="hidden" name="address_type_id" value="<% $type->address_type_id() %>" />
+
+      <input class="text medium no-label" type="text"
+             name="address_type.<% $type->address_type_id() %>.name"
              value="<% $type->name() %>" />
 
-      <& /lib/form/applies-to-contact-types.mas, thing => $type, id => $type->address_type_id() &>
+      <& /lib/form/applies-to-contact-types.mas, thing => $type, prefix => 'address_type.' . $type->address_type_id() &>
 
     </div>
 % }
@@ -30,10 +36,13 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-address-type">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="address_type_name_new1"
-               id="address_type_name_new1" />
+        <input type="hidden" name="address_type_id" value="new1" />
 
-        <& /lib/form/applies-to-contact-types.mas, id => 'new1' &>
+        <input class="text medium no-label" type="text"
+               name="address_type.new1.name"
+               id="address_type.new1.name" />
+
+        <& /lib/form/applies-to-contact-types.mas, prefix => 'address_type.new1' &>
 
       </div>
     </div>

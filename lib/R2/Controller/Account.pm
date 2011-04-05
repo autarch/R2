@@ -13,11 +13,13 @@ use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
 use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
+use R2::Web::Form::AddressTypes;
 use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
 use R2::Web::Form::PaymentTypes;
+use R2::Web::Form::PhoneNumberTypes;
 use R2::Web::Form::Report::TopDonors;
 use R2::Web::Form::User;
 use R2::Util qw( string_is_empty );
@@ -280,9 +282,18 @@ post address_types
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->address_types();
+    my $result = $self->_process_form(
+        $c,
+        'AddressTypes',
+        $account->uri( view => 'address_types_form' ),
+    );
 
-    eval { $account->update_or_add_address_types( $existing, $new ); };
+    eval {
+        $account->update_or_add_address_types(
+            $result->existing_address_types(),
+            $result->new_address_types(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
@@ -308,9 +319,18 @@ post phone_number_types
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->phone_number_types();
+    my $result = $self->_process_form(
+        $c,
+        'PhoneNumberTypes',
+        $account->uri( view => 'phone_number_types_form' ),
+    );
 
-    eval { $account->update_or_add_phone_number_types( $existing, $new ); };
+    eval {
+        $account->update_or_add_phone_number_types(
+            $result->existing_phone_number_types(),
+            $result->new_phone_number_types(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

@@ -1,32 +1,44 @@
       <label>Applies to ...</label>
-      <input type="checkbox" name="applies_to_person_<% $id %>"
-             id="applies_to_person_<% $id %>"
-             value="1" <% ( $thing && $thing->applies_to_person() ) || ! $thing ? q{checked="checked"} : '' %>
 % if ( $thing && $thing->applies_to_person() && ! $thing->can_unapply_from_person() ) {
+      <input type="checkbox"
              disabled="disabled"
-% }
+             checked="checked">
+      <input type="hidden" name="<% $prefix %>.applies_to_person" value="1" />
+% } else {
+      <input type="checkbox" name="<% $prefix %>.applies_to_person"
+             id="<% $prefix %>.applies_to_person"
+             value="1" <% $thing && $thing->applies_to_person() ? q{checked="checked"} : '' %>
             >
-      <label class="for-checkbox" for="applies_to_person_<% $id %>">People</label>
+% }
+      <label class="for-checkbox" for="<% $prefix %>.applies_to_person">People</label>
 
-      <input type="checkbox" name="applies_to_household_<% $id %>"
-             id="applies_to_household_<% $id %>"
-             value="1" <% $thing && $thing->applies_to_household() ? q{checked="checked"} : '' %>
 % if ( $thing && $thing->applies_to_household() && ! $thing->can_unapply_from_household() ) {
+      <input type="checkbox"
              disabled="disabled"
-% }
+             checked="checked">
+      <input type="hidden" name="<% $prefix %>.applies_to_household" value="1" />
+% } else {
+      <input type="checkbox" name="<% $prefix %>.applies_to_household"
+             id="<% $prefix %>.applies_to_household"
+             value="1" <% $thing && $thing->applies_to_household() ? q{checked="checked"} : '' %>
             >
-      <label class="for-checkbox" for="applies_to_household_<% $id %>">Household</label>
+% }
+      <label class="for-checkbox" for="<% $prefix %>.applies_to_household">Household</label>
 
-      <input type="checkbox" name="applies_to_organization_<% $id %>"
-             id="applies_to_organization_<% $id %>"
-             value="1" <% $thing && $thing->applies_to_organization() ? q{checked="checked"} : '' %>
 % if ( $thing && $thing->applies_to_organization() && ! $thing->can_unapply_from_organization() ) {
+      <input type="checkbox"
              disabled="disabled"
-% }
+             checked="checked">
+      <input type="hidden" name="<% $prefix %>.applies_to_organization" value="1" />
+% } else {
+      <input type="checkbox" name="<% $prefix %>.applies_to_organization"
+             id="<% $prefix %>.applies_to_organization"
+             value="1" <% $thing && $thing->applies_to_organization() ? q{checked="checked"} : '' %>
             >
-      <label class="for-checkbox" for="applies_to_organization_<% $id %>">Organizations</label>
+% }
+      <label class="for-checkbox" for="<% $prefix %>.applies_to_organization">Organizations</label>
 
 <%args>
 $thing => undef
-$id
+$prefix
 </%args>

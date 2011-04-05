@@ -10,7 +10,9 @@
 
 <& /lib/help-text/phone-number-type.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'phone_number_type_id' ],
+  &>
 <form action="<% $account->uri( view => 'phone_number_types' ) %>"
       method="post" class="JS-standard-form">
 
@@ -18,10 +20,13 @@
     <legend>Phone Number Types</legend>
 % while ( my $type = $types->next() ) {
     <div class="form-item">
-      <input class="text medium no-label" type="text" name="phone_number_type_name_<% $type->phone_number_type_id() %>"
+      <input type="hidden" name="phone_number_type_id" value="<% $type->phone_number_type_id() %>" />
+
+      <input class="text medium no-label" type="text"
+             name="phone_number_type.<% $type->phone_number_type_id() %>.name"
              value="<% $type->name() %>" />
 
-      <& /lib/form/applies-to-contact-types.mas, thing => $type, id => $type->phone_number_type_id() &>
+      <& /lib/form/applies-to-contact-types.mas, thing => $type, prefix => 'phone_number_type.' . $type->phone_number_type_id() &>
 
     </div>
 % }
@@ -30,10 +35,13 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-phone-number-type">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="phone_number_type_name_new1"
-               id="phone_number_type_name_new1" />
+        <input type="hidden" name="phone_number_type_id" value="new1" />
 
-        <& /lib/form/applies-to-contact-types.mas, id => 'new1' &>
+        <input class="text medium no-label" type="text"
+               name="phone_number_type.new1.name"
+               id="phone_number_type.new1.name" />
+
+        <& /lib/form/applies-to-contact-types.mas, prefix => 'phone_number_type.new1' &>
 
       </div>
     </div>
