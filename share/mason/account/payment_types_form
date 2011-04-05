@@ -10,7 +10,9 @@
 
 <& /lib/help-text/payment-type.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'payment_type_id' ],
+  &>
 <form action="<% $account->uri( view => 'payment_types' ) %>"
       method="post" class="JS-standard-form">
 

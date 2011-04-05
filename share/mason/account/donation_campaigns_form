@@ -10,7 +10,9 @@
 
 <& /lib/help-text/donation-campaign.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'donation_campaign_id' ],
+  &>
 <form action="<% $account->uri( view => 'donation_campaigns' ) %>"
       method="post" class="JS-standard-form">
 
