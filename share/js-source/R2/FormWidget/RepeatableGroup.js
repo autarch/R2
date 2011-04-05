@@ -82,12 +82,18 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 
     div.find("*").filter(
         function () {
-            return (/new1/).test( $(this).attr("name") )
+            return (/new1/).test( $(this).attr("value") )
+                || (/new1/).test( $(this).attr("name") )
                 || (/new1/).test( $(this).attr("id") )
                 || (/new1/).test( $(this).attr("for") );
         }
     ).each(
         function () {
+            if ( $(this).attr("value") ) {
+                var id = $(this).attr("value").replace( /new1/g, "new" + count );
+                $(this).attr( "value", id );
+            }
+
             if ( $(this).attr("id") ) {
                 var id = $(this).attr("id").replace( /new1/g, "new" + count );
                 $(this).attr( "id", id );

@@ -13,6 +13,7 @@ use R2::Schema::CustomFieldGroup;
 use R2::Search::Contact;
 use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
+use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
 use R2::Web::Form::Report::TopDonors;
@@ -22,7 +23,7 @@ use R2::Util qw( string_is_empty );
 use Moose;
 use CatalystX::Routes;
 
-BEGIN { extends 'R2::Controller::Base' }
+extends 'R2::Controller::Base';
 
 chain_point _set_account
     => chained '/'
@@ -164,9 +165,22 @@ post donation_sources
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->donation_sources();
+    my $result = $self->_process_form(
+        $c,
+        'DonationSources',
+        $account->uri( view => 'donation_sources_form' ),
+    );
 
-    eval { $account->update_or_add_donation_sources( $existing, $new ); };
+    use Devel::Dwarn;Dwarn [
+            $result->existing_donation_sources(),
+            $result->new_donation_sources(),
+];
+    eval {
+        $account->update_or_add_donation_sources(
+            $result->existing_donation_sources(),
+            $result->new_donation_sources(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

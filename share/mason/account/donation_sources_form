@@ -10,7 +10,9 @@
 
 <& /lib/help-text/donation-source.mas &>
 
-<&| /lib/filter/form.mas &>
+<&| /lib/filter/form.mas,
+    exclude => [ 'donation_source_id' ],
+  &>
 <form action="<% $account->uri( view => 'donation_sources' ) %>"
       method="post" class="JS-standard-form">
 
@@ -19,7 +21,10 @@
 % while ( my $source = $sources->next() ) {
 
     <div class="form-item">
-      <input class="text medium no-label" type="text" name="donation_source_name_<% $source->donation_source_id() %>"
+      <input type="hidden" name="donation_source_id" value="<% $source->donation_source_id() %>" />
+
+      <input class="text medium no-label" type="text"
+             name="donation_source.<% $source->donation_source_id() %>.name"
              value="<% $source->name() %>" />
 %   if ( ! $source->is_deletable() ) {
       <div class="help-text">
@@ -35,8 +40,11 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-donation-source">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="donation_source_name_new1"
-               id="donation_source_name_new1" />
+        <input type="hidden" name="donation_source_id" value="new1" />
+
+        <input class="text medium no-label" type="text"
+               name="donation_source.new1.name"
+               id="donation_source.new1.name" />
       </div>
     </div>
 
