@@ -18,20 +18,20 @@
     <legend>Payment Types</legend>
 
 % while ( my $type = $types->next() ) {
-      <div class="form-item">
-        <input type="hidden" name="payment_type_id" value="<% $type->payment_type_id() %>" />
+    <div class="form-item">
+      <input type="hidden" name="payment_type_id" value="<% $type->payment_type_id() %>" />
 
-        <input class="text medium no-label" type="text"
-               name="payment_type.<% $type->payment_type_id() %>.name"
-               value="<% $type->name() %>" />
+      <input class="text medium no-label" type="text"
+             name="payment_type.<% $type->payment_type_id() %>.name"
+             value="<% $type->name() %>" />
 %   if ( ! $type->is_deletable() ) {
-        <div class="help-text">
-          <p>
-            You can change this type's name, but it cannot be deleted because it is still associated with <% $type->donation_count() %> <% PL_N( 'donation', $type->donation_count() ) %>.
-          </p>
-        </div>
-%   }
+      <div class="help-text">
+        <p>
+          You can change this type's name, but it cannot be deleted because it is still associated with <% $type->donation_count() %> <% PL_N( 'donation', $type->donation_count() ) %>.
+        </p>
       </div>
+%   }
+    </div>
 % }
 
     <h3>Add New Types</h3>
