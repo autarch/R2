@@ -16,21 +16,22 @@
 
   <fieldset>
     <legend>Donation Campaigns</legend>
-% while ( my $campaign = $campaigns->next() ) {
-      <div class="form-item">
-        <input type="hidden" name="donation_campaign_id" value="<% $campaign->donation_campaign_id() %>" />
 
-        <input class="text medium no-label" type="text"
-               name="donation_campaign.<% $campaign->donation_campaign_id() %>.name"
-               value="<% $campaign->name() %>" />
+% while ( my $campaign = $campaigns->next() ) {
+    <div class="form-item">
+      <input type="hidden" name="donation_campaign_id" value="<% $campaign->donation_campaign_id() %>" />
+
+      <input class="text medium no-label" type="text"
+             name="donation_campaign.<% $campaign->donation_campaign_id() %>.name"
+             value="<% $campaign->name() %>" />
 %   if ( ! $campaign->is_deletable() ) {
-        <div class="help-text">
-          <p>
-            You can change this campaign's name, but it cannot be deleted because it is still associated with <% $campaign->donation_count() %> <% PL_N( 'donation', $campaign->donation_count() ) %>.
-          </p>
-        </div>
-%   }
+      <div class="help-text">
+        <p>
+          You can change this campaign's name, but it cannot be deleted because it is still associated with <% $campaign->donation_count() %> <% PL_N( 'donation', $campaign->donation_count() ) %>.
+        </p>
       </div>
+%   }
+    </div>
 % }
 
     <h3>Add New Campaigns</h3>
