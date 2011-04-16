@@ -944,10 +944,10 @@ get_html participants_name_resolution_form
 
     my $result = $self->_process_form( $c, 'Participants' );
 
-    my %params = $result->results_hash();
+    my $params = $result->results_as_hash();
 
     my $type = R2::Schema::ParticipationType->new(
-        participation_type_id => $params{participation_type_id} );
+        participation_type_id => $params->{participation_type_id} );
 
     $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
         unless $type
@@ -955,11 +955,11 @@ get_html participants_name_resolution_form
 
     $c->stash()->{participation_type} = $type;
 
-    $c->stash()->{$_} = $params{$_}
+    $c->stash()->{$_} = $params->{$_}
         for qw( description start_date end_date );
 
     my @contacts;
-    for my $name ( @{ $params{participants} } ) {
+    for my $name ( @{ $params->{participants} } ) {
         my $search = R2::Search::Person->new(
             account      => $c->stash()->{account},
             restrictions => 'Contact::ByName',
@@ -1041,13 +1041,13 @@ post q{}
         $participation->uri( view => 'edit_form' )
     );
 
-    eval { $participation->update( $result->results_hash() ) };
+    eval { $participation->update( %{ $result->results_as_hash() } ) };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
             error     => $e,
             uri       => $participation->uri( view => 'edit_form' ),
-            form_data => $result->results_hash(),
+            form_data => $result->results_as_hash(),
         );
     }
 
@@ -1108,9 +1108,9 @@ get_html 'top_donors'
     );
 
     $c->stash()->{donors}
-        = $c->account()->top_donors( $result->results_hash() );
+        = $c->account()->top_donors( $result->results_as_hash() );
 
-    $c->stash()->{form_vals} = { $result->results_hash() };
+    $c->stash()->{form_vals} = $result->results_as_hash();
 
     $c->stash()->{template} = '/account/top_donors';
 };
