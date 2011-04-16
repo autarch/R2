@@ -1,7 +1,7 @@
 <p>
-  Each phone has a type, which lets you distinguish between things
-  like home and cell numbers. A phone number type can apply to people,
-  organizations, and/or households. For example, a type of "Home" or
-  "Cell" does not make sense for an organization, and a type of
-  "Switchboard" doesn't make sense for people or households.
+  Each phone has a type, which lets you distinguish between things like home
+  and cell numbers. A phone number type can apply to people, organizations,
+  and/or households. For example, a type of "Home" or "Mobile" does not make
+  sense for an organization, and a type of "Office" doesn't make sense for
+  people or households.
 </p>
