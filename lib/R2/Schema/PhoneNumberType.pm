@@ -87,7 +87,7 @@ sub CreateDefaultsForAccount {
     );
 
     $class->insert(
-        name                    => 'Cell',
+        name                    => 'Mobile',
         applies_to_person       => 1,
         applies_to_household    => 0,
         applies_to_organization => 0,
