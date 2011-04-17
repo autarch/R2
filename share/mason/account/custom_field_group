@@ -73,21 +73,25 @@ $group
 </%method>
 
 <%def .custom_field>
+    <input type="hidden" name="custom_field_id" value="<% $id %>" />
+
     <div class="form-item">
-      <label class="for-field" for="custom_field_label_<% $id %>">Label:</label>
-      <input class="text medium" type="text" name="custom_field_label_<% $id %>"
+      <label class="for-field" for="custom_field.<% $id %>.label">Label:</label>
+      <input class="text medium" type="text"
+             name="custom_field.<% $id %>.label"
              value="<% $field ? $field->label() : '' %>"
-             id="custom_field_label_<% $id %>" />
+             id="custom_field.<% $id %>.label" />
 % unless ($field) {
       <a class="delete-repeated-group" style="display: none" href="#" title="delete this field">X</a>
 % }
     </div>
 
     <div class="form-item">
-      <label class="secondary" for="custom_field_description_<% $id %>">Description:</label>
-      <input class="text wide" type="text" name="custom_field_description_<% $id %>"
+      <label class="secondary" for="custom_field.<% $id %>.description">Description:</label>
+      <input class="text wide" type="text"
+             name="custom_field.<% $id %>.description"
              value="<% $field ? $field->description() : '' %>"
-             id="custom_field_description_<% $id %>" />
+             id="custom_field.<% $id %>.description" />
 
       <div class="help-text">
         <p>
@@ -97,8 +101,8 @@ $group
     </div>
 
     <div class="form-item">
-      <label class="secondary" for="custom_field_type_<% $id %>">Type:</label>
-      <select name="custom_field_type_<% $id %>" id="custom_field_type_<% $id %>">
+      <label class="secondary" for="custom_field.<% $id %>.type">Type:</label>
+      <select name="custom_field.<% $id %>.type" id="custom_field.<% $id %>.type">
 % for my $type (@types) {
         <option value="<% $type->type() %>"
                 <% $field && $field->type()->type() eq $type->type() ? 'selected="selected"' : '' %>
@@ -108,10 +112,10 @@ $group
     </div>
 
     <div class="form-item">
-      <label class="secondary" for="custom_field_is_required_<% $id %>">Required?</label>
-      <input class="checkbox" type="checkbox" name="custom_field_is_required_<% $id %>"
+      <label class="secondary" for="custom_field.<% $id %>.is_required">Required?</label>
+      <input class="checkbox" type="checkbox" name="custom_field.<% $id %>.is_required"
              <% $field && $field->is_required() ? 'checked="checked"' : '' %>
-             value="1" id="custom_field_is_required_<% $id %>" />
+             value="1" id="custom_field.<% $id %>.is_required" />
     </div>
 
 <%args>

@@ -28,6 +28,8 @@ with 'R2::Role::Schema::DataValidator' => {
 
 with 'R2::Role::Schema::AppliesToContactTypes';
 
+with 'R2::Role::URIMaker';
+
 {
     my $schema = R2::Schema->Schema();
 
@@ -205,6 +207,15 @@ sub update_or_add_custom_fields {
 
     R2::Schema->RunInTransaction($sub);
 
+}
+
+sub _base_uri_path {
+    my $self = shift;
+
+    return
+          $self->account()->_base_uri_path()
+        . '/custom_field_group/'
+        . $self->custom_field_group_id();
 }
 
 __PACKAGE__->meta()->make_immutable();

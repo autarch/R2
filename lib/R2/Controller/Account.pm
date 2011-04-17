@@ -16,6 +16,7 @@ use R2::Web::Form::Activity;
 use R2::Web::Form::AddressTypes;
 use R2::Web::Form::ContactNoteTypes;
 use R2::Web::Form::CustomFieldGroups;
+use R2::Web::Form::CustomFields;
 use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
@@ -467,21 +468,25 @@ post q{}
     my $self = shift;
     my $c    = shift;
 
-    my ( $existing, $new ) = $c->request()->custom_fields();
-
     my $group = $c->stash()->{group};
 
-    eval { $group->update_or_add_custom_fields( $existing, $new ); };
+    my $result = $self->_process_form(
+        $c,
+        'CustomFields',
+        $group->uri(),
+    );
 
-    my $account = $c->stash()->{account};
+    eval {
+        $group->update_or_add_custom_fields(
+            $result->existing_custom_fields(),
+            $result->new_custom_fields(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
-            error => $e,
-            uri   => $account->uri(
-                view => 'custom_field_group/'
-                    . $group->custom_field_group_id()
-            ),
+            error     => $e,
+            uri       => $group->uri(),
             form_data => $c->request()->params(),
         );
     }
@@ -490,8 +495,7 @@ post q{}
         ->add_message(
         'The custom fields for ' . $group->name() . ' have been updated' );
 
-    $c->redirect_and_detach(
-        $account->uri( view => 'custom_field_groups_form' ) );
+    $c->redirect_and_detach( $group->uri() );
 };
 
 post user
