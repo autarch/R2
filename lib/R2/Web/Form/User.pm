@@ -65,7 +65,7 @@ sub _extract_is_system_admin {
 
     return unless $self->user()->is_system_admin();
 
-    return $self->extract_field_value(@_);
+    return $self->_extract_field_value(@_);
 }
 
 sub _validate_form {

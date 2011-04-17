@@ -43,7 +43,7 @@ sub _validate_participants {
 sub _extract_participants {
     my $self = shift;
 
-    my $value = $self->extract_field_value(@_);
+    my $value = $self->_extract_field_value(@_);
 
     return $value if ref $value;
 

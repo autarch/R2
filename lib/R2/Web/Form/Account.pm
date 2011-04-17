@@ -33,7 +33,7 @@ sub _extract_domain_id {
 
     return unless $self->user()->is_system_admin();
 
-    return $self->extract_field_value(@_);
+    return $self->_extract_field_value(@_);
 }
 
 __PACKAGE__->meta()->make_immutable();

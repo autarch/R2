@@ -18,7 +18,7 @@ my $parser = DateTime::Format::Natural->new();
 sub _datetime_from_str {
     my $self = shift;
 
-    my $value = $self->extract_field_value(@_);
+    my $value = $self->_extract_field_value(@_);
 
     return unless $value;
 
