@@ -12,7 +12,7 @@ use R2::Types qw( NonEmptyStr );
 with 'R2::Role::Web::Form';
 
 group contact_note_type => (
-    repetition_field => 'contact_note_type_id',
+    repetition_key => 'contact_note_type_id',
     (
         field description => (
             isa      => NonEmptyStr,

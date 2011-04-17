@@ -15,6 +15,7 @@ use R2::Web::Form::Account;
 use R2::Web::Form::Activity;
 use R2::Web::Form::AddressTypes;
 use R2::Web::Form::ContactNoteTypes;
+use R2::Web::Form::CustomFieldGroups;
 use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
 use R2::Web::Form::Participants;
@@ -396,9 +397,22 @@ post custom_field_groups
 
     my $account = $c->stash()->{account};
 
-    my ( $existing, $new ) = $c->request()->custom_field_groups();
+    my $result = $self->_process_form(
+        $c,
+        'CustomFieldGroups',
+        $account->uri( view => 'custom_field_groups_form' ),
+    );
 
-    eval { $account->update_or_add_custom_field_groups( $existing, $new ); };
+    use Devel::Dwarn;
+    Dwarn [            $result->existing_custom_field_groups(),
+            $result->new_custom_field_groups(),
+];
+    eval {
+        $account->update_or_add_custom_field_groups(
+            $result->existing_custom_field_groups(),
+            $result->new_custom_field_groups(),
+        );
+    };
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(

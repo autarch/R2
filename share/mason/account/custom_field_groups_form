@@ -18,10 +18,15 @@
 % if ($count) {
 %   while ( my $group = $groups->next() ) {
     <div class="form-item">
-      <input class="text medium no-label" type="text" name="custom_field_group_name_<% $group->custom_field_group_id() %>"
+      <input type="hidden" name="custom_field_group_id" value="<% $group->custom_field_group_id() %>" />
+
+      <input class="text medium no-label" type="text"
+             name="custom_field_group.<% $group->custom_field_group_id() %>.name"
              value="<% $group->name() %>" />
 
-      <& /lib/form/applies-to-contact-types.mas, thing => $group, id => $group->custom_field_group_id() &>
+        <& /lib/form/applies-to-contact-types.mas,
+           thing  => $group,
+           prefix => 'custom_field_group.' . $group->custom_field_group_id() &>
 
       <p>
         <a href="<% $account->uri( view => 'custom_field_group/' . $group->custom_field_group_id() ) %>"
@@ -41,10 +46,13 @@
 
     <div class="JS-repeatable-group JS-repeatable-group-custom-field-group">
       <div class="form-item">
-        <input class="text medium no-label" type="text" name="custom_field_group_name_new1"
-               id="custom_field_group_name_new1" />
+        <input type="hidden" name="custom_field_group_id" value="new1" />
 
-        <& /lib/form/applies-to-contact-types.mas, id => 'new1' &>
+        <input class="text medium no-label" type="text"
+             name="custom_field_group.new1.name"
+               id="custom_field_group.new1.name" />
+
+        <& /lib/form/applies-to-contact-types.mas, prefix => 'custom_field_group.new1' &>
 
       </div>
     </div>

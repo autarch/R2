@@ -12,7 +12,7 @@ use R2::Types qw( NonEmptyStr );
 with 'R2::Role::Web::Form';
 
 group payment_type => (
-    repetition_field => 'payment_type_id',
+    repetition_key => 'payment_type_id',
     (
         field name => (
             isa      => NonEmptyStr,

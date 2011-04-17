@@ -1,4 +1,4 @@
-package R2::Web::Form::AddressTypes;
+package R2::Web::Form::CustomFieldGroups;
 
 use Moose;
 use Chloro;
@@ -11,8 +11,8 @@ use R2::Types qw( Bool NonEmptyStr );
 
 with 'R2::Role::Web::Form';
 
-group address_type => (
-    repetition_key => 'address_type_id',
+group custom_field_group => (
+    repetition_key => 'custom_field_group_id',
     (
         field name => (
             isa      => NonEmptyStr,
@@ -42,8 +42,9 @@ group address_type => (
 my $Class = Moose::Meta::Class->create_anon_class(
     superclasses => ['Chloro::ResultSet'],
     roles        => [
-        R2::Role::Web::ResultSet::NewAndExistingGroups->meta()
-            ->generate_role( parameters => { group => 'address_type' } )
+        R2::Role::Web::ResultSet::NewAndExistingGroups->meta()->generate_role(
+            parameters => { group => 'custom_field_group' }
+        )
     ],
     cache => 1,
 );
