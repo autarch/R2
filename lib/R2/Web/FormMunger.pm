@@ -97,7 +97,7 @@ sub _fill_errors {
 
         if ( blessed $error ) {
             $field = $error->field()->name() if $error->can('field');
-            $message = $error->error()->message();
+            $message = $error->message()->text();
         }
         # XXX - non-Chloro message
         elsif ( ref $error && $error->{field} ) {
