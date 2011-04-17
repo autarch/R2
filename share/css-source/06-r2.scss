@@ -638,6 +638,23 @@ form {
         }
     }
 
+    #participant-resolution {
+        td.participant-checkbox {
+            width: 7%;
+        }
+
+        td.participant-name {
+            width: 43%;
+        }
+
+        td.participant-email {
+            width: 43%;
+        }
+
+        td.participant-view {
+            width: 7%;
+        }
+    }
 }
 
 div.horizontal-form {

@@ -53,25 +53,27 @@
             no matches found
           </p>
 %   } else {
-          <table class="standard-table">
+          <table class="standard-table" id="participant-resolution">
 %     for my $i ( 0..$#{$matches} ) {
 %       my $contact = $matches->[$i];
             <tbody>
               <tr class="<% ( $i + 1 ) % 2 ? 'odd' : 'even' %>">
 %       my $id = 'id-' . new_uuid();
-                <td>
+                <td class="participant-checkbox">
                     <input class="checkbox" id="<% $id %>"
-                           type="checkbox" name="contact_id" value="<% $contact->contact_id() %>" />
+                           type="checkbox" name="contact_id" value="<% $contact->contact_id() %>"
+                           <% @{$matches} == 1 ? q{checked="checked"} : q{} %>
+                           />
                 </td>
-                <td>
+                <td class="participant-name">
                   <label class="for-checkbox" for="<% $id %>"><% $contact->display_name() %></label>
                 </td>
-                <td>
+                <td class="participant-email">
 %       if ( my $email = $contact->preferred_email_address() ) {
                   <label class="for-checkbox" for="<% $id %>"><% $email->email_address() %></label>
 %       }
                 </td>
-                <td>
+                <td class="participant-view">
                   <a href="<% $contact->uri() %>" target="_blank" title="view this contact in a new window">view</a>
                 </td>
               </tr>
