@@ -296,17 +296,18 @@ sub _BuildUsersWithRolesSelect {
 }
 
 for my $pair (
-    [ 'donation_source',    'name' ],
-    [ 'donation_campaign',  'name' ],
-    [ 'payment_type',       'name' ],
-    [ 'address_type',       'name' ],
-    [ 'phone_number_type',  'name' ],
-    [ 'contact_note_type',  'description' ],
+    [ 'donation_source',    'name',        1 ],
+    [ 'donation_campaign',  'name',        1 ],
+    [ 'payment_type',       'name',        1 ],
+    [ 'address_type',       'name',        1 ],
+    [ 'phone_number_type',  'name',        1 ],
+    [ 'contact_note_type',  'description', 1 ],
     [ 'custom_field_group', 'name' ],
     ) {
 
     my $thing         = $pair->[0];
     my $existence_col = $pair->[1];
+    my $required      = $pair->[2];
 
     my $plural = $thing . 's';
 
@@ -328,6 +329,9 @@ for my $pair (
         unless ( @{ $new || [] }
             || any { !string_is_empty( $_->{$existence_col} ) }
             values %{ $existing || {} } ) {
+
+            return unless $required;
+
             error "You must have at least one $thing_name.";
         }
 
