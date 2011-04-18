@@ -404,10 +404,6 @@ post custom_field_groups
         $account->uri( view => 'custom_field_groups_form' ),
     );
 
-    use Devel::Dwarn;
-    Dwarn [            $result->existing_custom_field_groups(),
-            $result->new_custom_field_groups(),
-];
     eval {
         $account->update_or_add_custom_field_groups(
             $result->existing_custom_field_groups(),
