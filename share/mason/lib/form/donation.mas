@@ -1,6 +1,6 @@
 <&| /lib/filter/form.mas,
     objects => [ $donation ],
-    exclude => [ 'donation_date', 'gift_sent_date', 'receipt_date', 'dedicated_to_contact_id' ]
+    exclude => [ 'donation_date', 'gift_sent_date', 'receipt_date' ]
   &>
 <form class="JS-standard-form"
       action="<% $donation ? $donation->uri() : $contact->uri( view => 'donations' ) %>"

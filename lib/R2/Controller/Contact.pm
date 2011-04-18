@@ -16,6 +16,7 @@ use R2::Search::Contact;
 use R2::Search::Household;
 use R2::Search::Organization;
 use R2::Search::Person;
+use R2::Web::Form::Donation;
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -487,7 +488,6 @@ for my $type ( qw( donation note ) ) {
             $c->stash()->{template} = "/contact/$new_form";
         };
 
-    my $params_method = "${type}_params";
     my $add_method = "add_$type";
     my $user_params_for_add
         = $type eq 'donation'
@@ -511,21 +511,23 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            my %p = $c->request()->$params_method();
+            my $result = $self->_process_form(
+                $c,
+                ucfirst $type,
+                $contact->uri( view => $new_form )
+            );
 
             eval {
                 R2::Schema->RunInTransaction(
                     sub {
-                        if ( $type eq 'donation' ) {
-                            $p{dedicated_to_contact_id}
-                                = $self->_dedication_contact($c);
+                        my $p = $result->results_as_hash();
 
-                            delete $p{dedication}
-                                unless $p{dedicated_to_contact_id};
+                        if ( $type eq 'donation' ) {
+                            $self->_dedication_contact( $c, $result, $p );
                         }
 
                         $contact->$add_method(
-                            %p,
+                            %{$p},
                             $user_params_for_add->($c),
                         );
                     }
@@ -534,8 +536,9 @@ for my $type ( qw( donation note ) ) {
 
             if ( my $e = $@ ) {
                 $c->redirect_with_error(
-                    error => $e,
-                    uri   => $contact->uri( view => $new_form ),
+                    error     => $e,
+                    uri       => $contact->uri( view => $new_form ),
+                    form_data => $result->results_as_hash()
                 );
             }
 
@@ -549,16 +552,23 @@ for my $type ( qw( donation note ) ) {
 
     sub _dedication_contact {
         my $self   = shift;
-        my $c = shift;
+        my $c      = shift;
+        my $result = shift;
+        my $p      = shift;
 
-        my $params = $c->request()->params();
+        if ( $p->{dedicated_to_contact_id} ) {
+            delete $p->{dedicated_to};
+            return;
+        }
 
-        return $params->{dedicated_to_contact_id}
-            unless string_is_empty( $params->{dedicated_to_contact_id} );
+        if (   string_is_empty( $p->{dedicated_to_contact_id} )
+            && string_is_empty( $p->{dedicated_to} ) ) {
 
-        return if string_is_empty( $params->{dedicated_to} );
+            delete $p->{dedication};
+            return;
+        }
 
-        my ( $first, $last ) = split /\s+/, $params->{dedicated_to}, 2;
+        my ( $first, $last ) = split /\s+/, delete $p->{dedicated_to}, 2;
 
         my $person = R2::Schema::Person->insert(
             first_name => $first,
@@ -567,7 +577,9 @@ for my $type ( qw( donation note ) ) {
             user       => $c->user(),
         );
 
-        return $person->contact_id();
+        $p->{dedicated_to_contact_id} = $person->contact_id();
+
+        return;
     }
 
     my $entity_chain_point = "_set_$type";
@@ -663,16 +675,36 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            my %p = $c->request()->$params_method();
+            my $result = $self->_process_form(
+                $c,
+                ucfirst $type,
+                $contact->uri( view => $new_form )
+            );
 
             my $entity = $c->stash()->{$type};
 
-            eval { $entity->update( %p, $user_params_for_update->($c) ); };
+            eval {
+                R2::Schema->RunInTransaction(
+                    sub {
+                        my $p = $result->results_as_hash();
+
+                        if ( $type eq 'donation' ) {
+                            $self->_dedication_contact( $c, $result, $p );
+                        }
+
+                        $entity->update(
+                            %{$p},
+                            $user_params_for_update->($c),
+                        );
+                    }
+                );
+            };
 
             if ( my $e = $@ ) {
                 $c->redirect_with_error(
-                    error => $e,
-                    uri   => $entity->uri( view => 'edit_form' ),
+                    error     => $e,
+                    uri       => $entity->uri( view => 'edit_form' ),
+                    form_data => $result->results_as_hash()
                 );
             }
 

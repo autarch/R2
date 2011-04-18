@@ -15,6 +15,15 @@ has user => (
 
 my $parser = DateTime::Format::Natural->new();
 
+sub _build_human_name {
+    my $self = shift;
+
+    my $name = $self->name();
+    $name =~ s/_/ /g;
+
+    return ucfirst $name;
+}
+
 sub _datetime_from_str {
     my $self = shift;
 
