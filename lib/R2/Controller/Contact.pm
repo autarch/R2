@@ -16,6 +16,7 @@ use R2::Search::Contact;
 use R2::Search::Household;
 use R2::Search::Organization;
 use R2::Search::Person;
+use R2::Web::Form::ContactNote;
 use R2::Web::Form::Donation;
 use R2::Util qw( string_is_empty );
 
@@ -488,6 +489,7 @@ for my $type ( qw( donation note ) ) {
             $c->stash()->{template} = "/contact/$new_form";
         };
 
+    my $form_class = $type eq 'donation' ? 'Donation' : 'ContactNote';
     my $add_method = "add_$type";
     my $user_params_for_add
         = $type eq 'donation'
@@ -513,7 +515,7 @@ for my $type ( qw( donation note ) ) {
 
             my $result = $self->_process_form(
                 $c,
-                ucfirst $type,
+                $form_class,
                 $contact->uri( view => $new_form )
             );
 
@@ -677,7 +679,7 @@ for my $type ( qw( donation note ) ) {
 
             my $result = $self->_process_form(
                 $c,
-                ucfirst $type,
+                $form_class,
                 $contact->uri( view => $new_form )
             );
 

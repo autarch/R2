@@ -13,8 +13,6 @@ has user => (
     required => 1,
 );
 
-my $parser = DateTime::Format::Natural->new();
-
 sub _build_human_name {
     my $self = shift;
 
@@ -31,11 +29,25 @@ sub _datetime_from_str {
 
     return unless $value;
 
-    my $dt = $parser->parse_datetime($value);
+    return $self->_parse_datetime($value);
+}
 
-    return $dt if $parser->success();
+{
+    my $parser = DateTime::Format::Natural->new();
 
-    return;
+    sub _parse_datetime {
+        my $self  = shift;
+        my $value = shift;
+
+        # DT::F::Natural cannot handle space before am/pm
+        $value =~ s/\s+(am|pm)/$1/i;
+
+        my $dt = $parser->parse_datetime($value);
+
+        return $dt if $parser->success();
+
+        return;
+    }
 }
 
 1;
