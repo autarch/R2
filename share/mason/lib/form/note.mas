@@ -9,7 +9,7 @@
   <input type="hidden" name="datepicker_yearRange" value="-20:+2" />
 
   <fieldset>
-    <legend>Add a new note</legend>
+    <legend><% $note ? 'Edit a note' : 'Add a new note' %></legend>
 
     <div class="form-item">
       <label class="for-field" for="source">About what?</label>
