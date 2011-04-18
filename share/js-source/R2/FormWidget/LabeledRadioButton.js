@@ -15,7 +15,7 @@ R2.FormWidget.LabeledRadioButton = function ( radio, label ) {
     }
 
     /* This works around a bug (?) in the browser which
-       when a repeatble group is deleted, then the page
+       when a repeatable group is deleted, then the page
        is reloaded. The label is still marked as selected
        but the radio button is no longed checked. */
     if ( /selected/.test( this.label.attr("class") ) ) {
