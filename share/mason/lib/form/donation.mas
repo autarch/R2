@@ -12,7 +12,7 @@
   <input type="hidden" name="datepicker_yearRange" value="-20:+2" />
 
   <fieldset>
-    <legend>Add a new donation</legend>
+    <legend><% $donation ? 'Edit a donation' : 'Add a new donation' %></legend>
 
     <div class="form-item">
       <label class="for-field" for="amount">Amount:</label>
