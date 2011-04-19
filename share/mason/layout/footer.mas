@@ -1,3 +1,3 @@
   <div id="footer">
-    Rapport is copyright 2008 - <% DateTime->today()->year() %> by Dave Rolsky. All Rights Reserved.
+    <% R2::Config->instance()->software_name() %> is copyright 2008 - <% DateTime->today()->year() %> by Dave Rolsky. All Rights Reserved.
   </div>

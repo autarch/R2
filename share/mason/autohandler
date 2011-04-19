@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-  <title>Rapport | <& SELF:title, %ARGS &></title>
+  <title><% R2::Config->instance()->software_name() %> | <& SELF:title, %ARGS &></title>
 
   <link rel="stylesheet"
         href="<% static_uri('/css/r2-combined.css') %>"

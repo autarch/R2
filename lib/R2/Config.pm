@@ -9,7 +9,7 @@ use File::HomeDir;
 use File::Spec;
 use File::Temp qw( tempdir );
 use Path::Class;
-use R2::Types qw( Bool Str Int HashRef Dir File );
+use R2::Types qw( Bool  Dir File HashRef Int NonEmptyStr Str );
 use R2::Util qw( string_is_empty );
 
 use Moose;
@@ -25,6 +25,16 @@ has is_production => (
     documentation =>
         'A flag indicating whether or not this is a production install. This should probably be true unless you are actively developing R2.',
     writer => '_set_is_production',
+);
+
+has software_name => (
+    is      => 'ro',
+    isa     => NonEmptyStr,
+    default => 'R2',
+    section => 'R2',
+    key     => 'software_name',
+    documentation =>
+        'The name of the software to be displayed in the application.',
 );
 
 has max_upload_size => (

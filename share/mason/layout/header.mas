@@ -6,14 +6,14 @@
     <li><a href="<% $c->user()->uri( view => 'edit_form') %>" title="Your application preferences">Prefs</a></li>
     <li><a href="<% $c->domain()->application_uri
                  ( path => '/user/authentication', query => { 'x-tunneled-method' => 'DELETE' } ) %>"
-           title="Log out of Rapport">Log Out</a></li>
+           title="Log out of <% R2::Config->instance()->software_name() %>">Log Out</a></li>
 % }
     <li><a href="<% $c->domain()->application_uri( path => '/application/help' ) %>"
-           title="Help using Rapport">Help</a></li>
+           title="Help using <% R2::Config->instance()->software_name() %>">Help</a></li>
   </ul>
 
   <div id="header">
-    <h1>Rapport</h1>
+    <h1><% R2::Config->instance()->software_name() %></h1>
 
     <div id="tabs">
       <ul>

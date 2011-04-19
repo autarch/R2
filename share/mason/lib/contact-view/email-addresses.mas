@@ -5,9 +5,9 @@
 % } else {
 <p>
 %   if ( $contact->allows_email() ) {
-Allows email from Rapport.
+Allows email from <% R2::Config->instance()->software_name() %>.
 %   } else {
-Does not want to be emailed via Rapport.
+Does not want to be emailed via <% R2::Config->instance()->software_name() %>.
 %   }
 </p>
 % }

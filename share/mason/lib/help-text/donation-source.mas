@@ -9,5 +9,5 @@ workflow simple.
 Some organizations may prefer to track things in much greater detail
 in order to evaluate the success of specific campaigns. This will
 require a greater level of organization on your part, and a higher
-level of training for those people entering donations into Rapport.
+level of training for those people entering donations into <% R2::Config->instance()->software_name() %>.
 </p>
