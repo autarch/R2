@@ -92,7 +92,7 @@ sub _build_value_count_select {
 
     my $schema = R2::Schema->Schema();
 
-    my $value_table = $schema->table( $self->type_table() );
+    my $value_table = $self->type_table();
 
     my $count = Fey::Literal::Function->new( 'COUNT',
         $value_table->column('custom_field_id') );
