@@ -33,7 +33,9 @@ sub _datetime_from_str {
 }
 
 {
-    my $parser = DateTime::Format::Natural->new();
+    my $parser = DateTime::Format::Natural->new(
+        time_zone => 'floating',
+    );
 
     sub _parse_datetime {
         my $self  = shift;
