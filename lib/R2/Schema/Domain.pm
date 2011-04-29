@@ -88,7 +88,7 @@ sub _web_hostname_is_unique {
 
     return {
         field => 'web_hostname',
-        message =>
+        text =>
             'The web hostname you provided is already in use by another domain.'
     };
 }
@@ -107,9 +107,8 @@ sub _email_hostname_is_unique {
 
     return {
         field => 'email_hostname',
-        message =>
+        text =>
             'The email hostname you provided is already in use by another domain.'
-
     };
 }
 

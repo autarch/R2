@@ -14,3 +14,7 @@ R2.Utils.makeUniqueId = function () {
 
     return id;
 };
+
+R2.Utils.escapeId = function (id) {
+    return id.replace( /\./g, "\\." );
+};

@@ -36,8 +36,8 @@ sub _ValidateValue {
     return;
 
     return {
-        field   => 'custom_field_' . $p->{custom_field_id},
-        message => '',                                        # XXX
+        field => 'custom_field_' . $p->{custom_field_id},
+        text  => '',                                        # XXX
     };
 }
 

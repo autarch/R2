@@ -123,7 +123,7 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
 
     div.find("label").filter(
         function () {
-            return (/is_preferred-/).test( $(this).attr("id") );
+            return (/is_preferred\./).test( $(this).attr("id") );
         }
     ).each(
         function () {

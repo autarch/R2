@@ -41,8 +41,9 @@ sub _valid_email_address {
         && is_domain($domain) );
 
     return {
-        message => qq{"$p->{email_address}" is not a valid email address.},
-        field   => 'email_address',
+        field    => 'email_address',
+        text     => qq{"$p->{email_address}" is not a valid email address.},
+        category => 'invalid',
     };
 }
 

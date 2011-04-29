@@ -19,12 +19,6 @@ has 'prefix' => (
     default => q{},
 );
 
-has 'suffix' => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => q{},
-);
-
 has 'user' => (
     is        => 'ro',
     isa       => 'R2::Schema::User',
@@ -40,12 +34,9 @@ sub param {
     my $param = shift;
 
     if ( my $p = $self->prefix() ) {
-        # Don't want to turn phone_number_type_id into type_id
-        $param =~ s/^\Q$p\E_(?!type)//;
-    }
 
-    if ( my $s = $self->suffix() ) {
-        $param =~ s/\Q$s\E$//;
+        # Don't want to turn phone_number_type_id into type_id
+        $param =~ s/^\Q$p\E//;
     }
 
     my $val = $self->_value_for_param($param);

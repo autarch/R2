@@ -115,8 +115,8 @@ sub validate_value {
         my $message = 'You must provide a value for ' . $self->label() . q{.};
 
         return {
-            message => $message,
-            field   => 'custom_field_' . $self->custom_field_id(),
+            text  => $message,
+            field => 'custom_field_' . $self->custom_field_id(),
         };
     }
 
@@ -129,8 +129,8 @@ sub validate_value {
         . $self->type()->name() . q{.};
 
     return {
-        message => $message,
-        field   => 'custom_field_' . $self->custom_field_id(),
+        text  => $message,
+        field => 'custom_field_' . $self->custom_field_id(),
     };
 }
 

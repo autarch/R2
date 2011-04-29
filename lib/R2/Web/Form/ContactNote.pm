@@ -10,9 +10,9 @@ use R2::Util qw( string_is_empty );
 
 with 'R2::Role::Web::Form';
 
-with 'R2::Role::Web::Form::FromFey' => {
-    table => R2::Schema->Schema->table('ContactNote'),
-    skip  => [qw( contact_id reversal_blob user_id note_datetime )],
+with 'R2::Role::Web::Form::FromSchema' => {
+    classes => ['R2::Schema::ContactNote'],
+    skip    => [qw( contact_id reversal_blob user_id note_datetime )],
 };
 
 field note_datetime => (

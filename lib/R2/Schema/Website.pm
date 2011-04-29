@@ -41,8 +41,8 @@ sub _validate_and_canonicalize_uri {
     my $canonical = $self->_canonicalize_uri( $p->{uri} );
 
     return {
-        message => qq{"$p->{uri}" is not a valid web address.},
-        field   => 'uri',
+        text  => qq{"$p->{uri}" is not a valid web address.},
+        field => 'uri',
         }
         unless is_web_uri($canonical);
 

@@ -45,7 +45,7 @@ R2.FormWidget.LabeledRadioButton.prototype._onClick = function () {
                 return;
             }
 
-            $( "label#for-" + $(this).attr("id") ).removeClass("selected");
+            $( "label#for-" + R2.Utils.escapeId( $(this).attr("id") ) ).removeClass("selected");
         }
     );
 };

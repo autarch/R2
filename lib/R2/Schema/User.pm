@@ -240,8 +240,8 @@ sub _require_username_or_email {
     return unless $is_insert;
 
     return {
-        message => 'A user must have a username or email address.',
-        field   => 'username',
+        field => 'username',
+        text  => 'A user must have a username or email address.',
         }
         if string_is_empty( $p->{username} )
             && string_is_empty( $p->{email_address} );

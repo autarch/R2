@@ -100,7 +100,10 @@ sub _require_some_name {
 
     }
 
-    return { message => 'A person requires either a first or last name.' };
+    return {
+        text     => 'A person requires either a first or last name.',
+        category => 'invalid',
+    };
 }
 
 sub _valid_birth_date {
@@ -122,8 +125,9 @@ sub _valid_birth_date {
         $dt = $parser->parse_datetime( $p->{birth_date} );
 
         return {
-            field   => 'birth_date',
-            message => 'Birth date does not seem to be a valid date.',
+            field    => 'birth_date',
+            text     => 'Birth date does not seem to be a valid date.',
+            category => 'invalid',
             }
             unless $dt && !$parser->error();
     }
@@ -131,8 +135,9 @@ sub _valid_birth_date {
     return if DateTime->today( time_zone => 'floating' ) >= $dt;
 
     return {
-        field   => 'birth_date',
-        message => 'Birth date cannot be in the future.',
+        field    => 'birth_date',
+        text     => 'Birth date cannot be in the future.',
+        category => 'invalid',
     };
 }
 

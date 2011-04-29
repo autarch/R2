@@ -98,8 +98,9 @@ sub _validate_amount {
     return unless $msg;
 
     return {
-        message => $msg,
-        field   => 'amount',
+        field    => 'amount',
+        text     => $msg,
+        category => 'invalid',
     };
 }
 
@@ -138,8 +139,9 @@ sub _valid_date {
     my $dt = $parser->parse_datetime( $p->{$field} );
 
     return {
-        field   => '$field',
-        message => 'This does not seem to be a valid date.',
+        field    => $field,
+        text     => 'This does not seem to be a valid date.',
+        category => 'invalid',
         }
         unless $dt && !$parser->error();
 

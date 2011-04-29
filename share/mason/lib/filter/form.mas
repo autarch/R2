@@ -4,7 +4,6 @@ $data        => undef
 @exclude     => ()
 $is_fragment => 0
 $prefix      => q{}
-$suffix      => q{}
 </%args>
 
 <%init>
@@ -18,7 +17,6 @@ push @data_sources, grep {defined} @objects;
 my $form_data = R2::Web::FormData->new(
     sources => \@data_sources,
     prefix  => $prefix,
-    suffix  => $suffix,
     ( $c->user() ? ( user => $c->user() ) : () ),
 );
 

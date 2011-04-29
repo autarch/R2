@@ -30,7 +30,7 @@ BEGIN {
     sub full_message {
         if ( my @m = $_[0]->messages ) {
             return join "\n", 'Data validation errors: ',
-                map { ref $_ ? $_->{message} : $_ } @m;
+                map { ref $_ ? ( $_->{text} || $_->{message} ) : $_ } @m;
         }
         else {
             return $_[0]->SUPER::full_message();

@@ -1,0 +1,42 @@
+package R2::Role::Web::Form::WebsiteGroup;
+
+use Moose::Role;
+use Chloro;
+
+use R2::Types qw( NonEmptyStr );
+use R2::Util qw( string_is_empty );
+
+group website => (
+    repetition_key   => 'website_id',
+    is_empty_checker => '_website_is_empty',
+    (
+        field label => (
+            isa      => NonEmptyStr,
+            required => 1,
+        ),
+    ),
+    (
+        field uri => (
+            isa      => NonEmptyStr,
+            required => 1,
+        ),
+    ),
+    (
+        field note => (
+            isa => NonEmptyStr,
+        ),
+    )
+);
+
+sub _website_is_empty {
+    my $self   = shift;
+    my $params = shift;
+    my $prefix = shift;
+    my $group  = shift;
+
+    my @keys = map { join q{.}, $prefix, $_->name() } $group->fields();
+
+    return 1 unless ( grep { !string_is_empty( $params->{$_} ) } @keys ) > 1;
+}
+
+1;

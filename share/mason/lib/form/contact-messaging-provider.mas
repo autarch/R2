@@ -31,19 +31,18 @@ my @messaging_provider_types;
 </%shared>
 
 <%def .messaging_provider>
-% if ($messaging_provider) {
       <input type="hidden" name="messaging_provider_id" value="<% $id %>" />
-% }
 
       <&| /lib/filter/form.mas,
           is_fragment => 1,
-          prefix      => 'messaging_provider',
-          suffix      => q{-} . $id,
+          prefix      => "messaging_provider.$id.",
           exclude     => ['messaging_provider_is_preferred'],
           objects     => $messaging_provider ? [ $messaging_provider ] : [] &>
       <div class="form-item">
-        <label class="for-field" for="messaging_provider-<% $id %>" id="for-messaging_provider-<% $id %>">Account:</label>
-        <select name="messaging_provider_type_id-<% $id %>">
+        <label class="for-field"
+               for="messaging_provider.<% $id %>.messaging_provider_type_id">Account:</label>
+        <select name="messaging_provider.<% $id %>.messaging_provider_type_id"
+                id="messaging_provider.<% $id %>.messaging_provider_type_id">
 % for my $type (@messaging_provider_types) {
           <option value="<% $type->messaging_provider_type_id() %>"><% $type->name() %></option>
 % }
@@ -60,8 +59,9 @@ my @messaging_provider_types;
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="messaging_provider_note-<% $id %>">Note:</label>
-        <input type="text" class="text wide" name="messaging_provider_note-<% $id %>" id="messaging_provider_note-<% $id %>" />
+        <label class="secondary" for="messaging_provider.<% $id %>.note">Note:</label>
+        <input type="text" class="text wide"
+               name="messaging_provider.<% $id %>.note" id="messaging_provider.<% $id %>.note" />
       </div>
 
       <div class="form-item no-label">

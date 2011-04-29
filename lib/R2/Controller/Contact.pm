@@ -19,6 +19,7 @@ use R2::Search::Organization;
 use R2::Search::Person;
 use R2::Web::Form::ContactNote;
 use R2::Web::Form::Donation;
+use R2::Web::Form::Person;
 use R2::Util qw( string_is_empty studly_to_calm );
 use Scalar::Util qw( blessed );
 
@@ -29,11 +30,13 @@ BEGIN { extends 'R2::Controller::Base' }
 
 for my $type (qw( contact person household organization )) {
 
-    if ( $type ne 'contact' ) {
-        my $form     = 'new_' . $type . '_form';
-        my $template = "$type/$form";
+    my $new_entity_form;
 
-        get_html $form
+    if ( $type ne 'contact' ) {
+        $new_entity_form = 'new_' . $type . '_form';
+        my $template = "$type/$new_entity_form";
+
+        get_html $new_entity_form
             => chained '/account/_set_account'
             => args 0
             => sub {
@@ -57,6 +60,7 @@ for my $type (qw( contact person household organization )) {
     my $pl_type = PL_N($type);
 
     my $search_class = 'R2::Search::' . ucfirst $type;
+    my $form_class   = ucfirst $type;
     my $schema_class = 'R2::Schema::' . ucfirst $type;
 
     get_html $pl_type
@@ -113,9 +117,16 @@ for my $type (qw( contact person household organization )) {
                 $c->account()->uri(),
             );
 
+            my $result = $self->_process_form(
+                $c,
+                $form_class,
+                $c->account()->uri( view => $new_entity_form ),
+            );
+
             my $contact = $self->_insert_contact(
                 $c,
-                $schema_class
+                $result,
+                $schema_class,
             );
 
             my $name = $contact->real_contact()->display_name();
@@ -873,25 +884,6 @@ sub _tags_as_entity_response {
     $self->$meth( $c, %p );
 }
 
-sub _contact_params_for_class {
-    my $self  = shift;
-    my $c     = shift;
-    my $class = shift;
-
-    my ($type) = $class =~ /^R2::Schema::(\w+)/;
-
-    my $params_method = lc $type . '_params';
-
-    my %p = $c->request()->$params_method();
-    $p{account_id} = $c->account()->account_id();
-
-    unless ( $c->user()->is_system_admin() ) {
-        delete $p{email_opt_out};
-    }
-
-    return \%p;
-}
-
 sub _contact_image {
     my $self   = shift;
     my $c      = shift;
@@ -907,67 +899,6 @@ sub _contact_image {
     }
 
     return $image;
-}
-
-for my $class_suffix (qw( EmailAddress Website MessagingProvider Address PhoneNumber )) {
-    my $type  = studly_to_calm($class_suffix);
-    my $class = 'R2::Schema::' . $class_suffix;
-
-    my $new_param_set_meth = 'new_' . $type . '_param_sets';
-
-    my $new_sub = sub {
-        my $self   = shift;
-        my $c      = shift;
-        my $errors = shift;
-
-        my $sets = $c->request()->$new_param_set_meth();
-
-        for my $suffix ( keys %{$sets} ) {
-            my @e = $class->ValidateForInsert(
-                %{ $sets->{$suffix} },
-                contact_id => 1,
-            );
-
-            $self->_apply_suffix_to_fields_in_errors( $suffix, \@e );
-
-            push @{$errors}, @e;
-        }
-
-        return [ values %{$sets} ];
-    };
-
-    my $plural = $type . ( $type =~ /s$/ ? 'es' : 's' );
-    my $new_meth = '_new_' . $plural;
-
-    __PACKAGE__->meta()->add_method( $new_meth => $new_sub );
-
-    my $updated_param_set_meth = 'updated_' . $type . '_param_sets';
-
-    my $pk_col = $class->Table()->primary_key()->[0]->name();
-
-    my $updated_sub = sub {
-        my $self   = shift;
-        my $c      = shift;
-        my $errors = shift;
-
-        my $sets = $c->request()->$updated_param_set_meth();
-
-        for my $id ( keys %{$sets} ) {
-            my $object = $class->new( $pk_col => $id ) or next;
-
-            my @e = $object->validate_for_update( %{ $sets->{$id} } );
-
-            $self->_apply_suffix_to_fields_in_errors( $id, \@e );
-
-            push @{$errors}, @e;
-        }
-
-        return $sets;
-    };
-
-    my $updated_meth = '_updated_' . $plural;
-
-    __PACKAGE__->meta()->add_method( $updated_meth => $updated_sub );
 }
 
 sub _custom_fields {
@@ -1005,22 +936,11 @@ sub _custom_fields {
     return \@fields;
 }
 
-sub _apply_suffix_to_fields_in_errors {
-    my $self   = shift;
-    my $suffix = shift;
-    my $errors = shift;
-
-    for my $e ( @{$errors} ) {
-        if ( ref $e && $e->{field} ) {
-            $e->{field} .= q{-} . $suffix;
-        }
-    }
-}
-
 sub _insert_contact {
-    my $self  = shift;
-    my $c     = shift;
-    my $class = shift;
+    my $self   = shift;
+    my $c      = shift;
+    my $result = shift;
+    my $class  = shift;
 
     my $contact_p = $self->_contact_params_for_class( $c, $class );
 

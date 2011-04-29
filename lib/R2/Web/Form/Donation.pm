@@ -8,9 +8,9 @@ use R2::Types qw( Str );
 
 with 'R2::Role::Web::Form';
 
-with 'R2::Role::Web::Form::FromFey' => {
-    table => R2::Schema->Schema->table('Donation'),
-    skip  => [qw( contact_id dedicated_to_contact_id )],
+with 'R2::Role::Web::Form::FromSchema' => {
+    classes => ['R2::Schema::Donation'],
+    skip    => [qw( contact_id dedicated_to_contact_id )],
 };
 
 field dedicated_to => (

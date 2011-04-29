@@ -27,7 +27,7 @@ sub _ValidateValue {
 
     return {
         field => 'custom_field_' . $p->{custom_field_id},
-        message =>
+        text =>
             "The value you provided ($orig), does not look like a date.",
     };
 }

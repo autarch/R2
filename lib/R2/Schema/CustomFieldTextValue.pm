@@ -23,8 +23,8 @@ sub _ValidateValue {
     return if defined $p->{value} && length $p->{value};
 
     return {
-        field   => 'custom_field_' . $p->{custom_field_id},
-        message => 'The text field was empty.',
+        field => 'custom_field_' . $p->{custom_field_id},
+        text  => 'The text field was empty.',
     };
 }
 

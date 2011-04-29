@@ -71,8 +71,9 @@ sub _needs_value_error {
     my $articled = A($friendly_name);
 
     return {
-        field   => $name,
-        message => "You must provide $articled."
+        field    => $name,
+        text     => "You must provide $articled.",
+        category => 'missing',
     };
 }
 

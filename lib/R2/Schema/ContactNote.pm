@@ -54,8 +54,8 @@ sub _valid_note_datetime {
     my $dt = $parser->parse_datetime( $p->{note_datetime} );
 
     return {
-        field   => 'note_datetime',
-        message => 'This does not seem to be a valid date/time.',
+        field => 'note_datetime',
+        text  => 'This does not seem to be a valid date/time.',
         }
         unless $dt && !$parser->error();
 

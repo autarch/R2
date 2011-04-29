@@ -101,11 +101,14 @@ sub _fill_errors {
         }
         # XXX - non-Chloro message
         elsif ( ref $error && $error->{field} ) {
-            $field   = $error->{field};
-            $message = $error->{message};
+            $field = $error->{field};
+            $message = $error->{message} || $error->{text};
         }
         else {
-            $message = ref $error ? $error->{message} : $error;
+            $message
+                = ref $error
+                ? ( $error->{message} || $error->{text} )
+                : $error;
         }
 
         if ( defined $field ) {

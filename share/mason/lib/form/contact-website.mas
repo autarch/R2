@@ -27,18 +27,17 @@ $websites = $contact->websites()
 </%init>
 
 <%def .website>
-% if ($website) {
       <input type="hidden" name="website_id" value="<% $id %>" />
-% }
 
       <&| /lib/filter/form.mas,
           is_fragment => 1,
-          prefix      => 'website',
-          suffix      => q{-} . $id,
+          prefix      => "website.$id.",
           objects     => $website ? [ $website ] : [] &>
       <div class="form-item">
-        <label class="for-field" for="label-<% $id %>">Label:</label>
-        <input type="text" class="text" name="label-<% $id %>" id="label-<% $id %>" value="Website" />
+        <label class="for-field" for="website.<% $id %>.label">Label:</label>
+        <input type="text" class="text"
+               name="website.<% $id %>.label" id="website.<% $id %>.label"
+               value="Website" />
         <a class="JS-delete-div"
            style="<% $website ? q{} : 'display: none' %>"
            href="#"
@@ -46,13 +45,13 @@ $websites = $contact->websites()
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="uri-<% $id %>">URI:</label>
-        <input type="text" class="text medium" name="uri-<% $id %>" id="uri-<% $id %>" />
+        <label class="secondary" for="website.<% $id %>.uri">URI:</label>
+        <input type="text" class="text medium" name="website.<% $id %>.uri" id="website.<% $id %>.uri" />
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="website_note-<% $id %>">Note:</label>
-        <input type="text" class="text wide" name="website_note-<% $id %>" id="website_note-<% $id %>" />
+        <label class="secondary" for="website.<% $id %>.note">Note:</label>
+        <input type="text" class="text wide" name="website.<% $id %>.note" id="website.<% $id %>.note" />
       </div>
       </&>
 <%args>

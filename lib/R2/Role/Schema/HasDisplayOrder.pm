@@ -101,7 +101,7 @@ role {
 
         return {
             field => 'display_order',
-            message =>
+            text =>
                 "There is already a field at this position - $p->{display_order}",
         };
     };
