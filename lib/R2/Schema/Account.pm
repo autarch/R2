@@ -25,6 +25,8 @@ use R2::Schema::PhoneNumberType;
 use R2::Schema::ParticipationType;
 use R2::Schema::Person;
 use R2::Schema::RelationshipType;
+use R2::Schema::Role;
+use R2::Schema::User;
 use R2::Schema;
 use R2::Types qw( ArrayRef Bool HashRef Int PosOrZeroInt );
 use R2::Util qw( calm_to_studly string_is_empty );
