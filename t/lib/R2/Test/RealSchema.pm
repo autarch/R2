@@ -10,6 +10,7 @@ use DBI;
 use File::Slurp qw( read_file );
 use Path::Class qw( file );
 use Test::More;
+use Timer::Simple;
 
 my $DB_NAME = $ENV{JENKINS_URL}
     || $ENV{HUDSON_URL} ? "R2Jenkins_$ENV{BUILD_NUMBER}" : 'R2Test';
@@ -32,11 +33,14 @@ sub import {
         exit 0;
     }
 
+    my $timer = Timer::Simple->new( start => 1 );
     if ( _database_exists() ) {
         _clean_tables();
+        diag( 'Cleaning took ' . $timer->elapsed() . 's' );
     }
     else {
         _recreate_database();
+        diag( 'Recreating took ' . $timer->elapsed() . 's' );
     }
 
     require R2::Config;
@@ -47,7 +51,9 @@ sub import {
     R2::Config->instance()->_set_database_username(q{});
     R2::Config->instance()->_set_database_password(q{});
 
+    $timer->restart();
     _seed_data();
+    diag( 'Seeding took ' . $timer->elapsed() . 's' );
 }
 
 sub _database_exists {
