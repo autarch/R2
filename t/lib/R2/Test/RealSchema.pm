@@ -16,6 +16,10 @@ my $DB_NAME = $ENV{JENKINS_URL}
     || $ENV{HUDSON_URL} ? "R2Jenkins_$ENV{BUILD_NUMBER}" : 'R2Test';
 
 sub import {
+    ensure_real_schema();
+}
+
+sub ensure_real_schema {
     eval {
         DBI->connect(
             'dbi:Pg:dbname=template1',
