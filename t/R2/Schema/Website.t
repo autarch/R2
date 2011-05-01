@@ -47,7 +47,7 @@ my $contact = R2::Schema::Person->insert(
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{"urth" is not a valid web address.},
+        $e[0]->{text}, q{"urth" is not a valid web address.},
         'got expected error message'
     );
 }
@@ -66,7 +66,7 @@ my $contact = R2::Schema::Person->insert(
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{"urth.foo" is not a valid web address.},
+        $e[0]->{text}, q{"urth.foo" is not a valid web address.},
         'got expected error message'
     );
 }

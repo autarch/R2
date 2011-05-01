@@ -69,7 +69,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     is( scalar @errors, 1, 'got one validation error' );
     is(
-        $errors[0]->{message},
+        $errors[0]->{text},
         'A person requires either a first or last name.',
         'got expected error message'
     );
@@ -93,7 +93,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     is( scalar @errors, 1, 'got one validation error' );
     is(
-        $errors[0]->{message},
+        $errors[0]->{text},
         'A person requires either a first or last name.',
         'got expected error message'
     );
@@ -116,7 +116,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{Birth date cannot be in the future.},
+        $e[0]->{text}, q{Birth date cannot be in the future.},
         'got expected error message'
     );
 }
@@ -138,7 +138,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{Birth date does not seem to be a valid date.},
+        $e[0]->{text}, q{Birth date does not seem to be a valid date.},
         'got expected error message'
     );
 }

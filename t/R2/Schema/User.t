@@ -106,7 +106,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{A user must have a username or email address.},
+        $e[0]->{text}, q{A user must have a username or email address.},
         'got expected error message'
     );
 }
@@ -131,7 +131,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message}, q{You must provide a password.},
+        $e[0]->{text}, q{You must provide a password.},
         'got expected error message'
     );
 }

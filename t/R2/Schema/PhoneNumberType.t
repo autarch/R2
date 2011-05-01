@@ -20,7 +20,7 @@ my $dbh = mock_dbh();
 
     my @e = @{ $@->errors() };
     is(
-        $e[0]->{message},
+        $e[0]->{text},
         q{A phone number type must apply to a person, household, or organization.},
         'got expected error message'
     );

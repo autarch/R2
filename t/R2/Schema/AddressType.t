@@ -33,7 +33,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $e->errors() };
     is(
-        $e[0]->{message},
+        $e[0]->{text},
         q{An address type must apply to a person, household, or organization.},
         '... got an appropriate error message in the exception'
     );
@@ -59,7 +59,7 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
     my @e = @{ $e->errors() };
     is(
-        $e[0]->{message},
+        $e[0]->{text},
         q{An address type must apply to a person, household, or organization.},
         '... got an appropriate error message in the exception'
     );
