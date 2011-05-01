@@ -5,6 +5,8 @@ blib*
 cover_db*
 Build
 _build
+.build
+.cache
 MANIFEST
 META.yml
 Makefile.PL
