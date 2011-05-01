@@ -151,7 +151,7 @@ sub _clean_tables {
 sub _seed_data {
     require R2::SeedData;
 
-    R2::SeedData::seed_data();
+    R2::SeedData->seed_data( testing => 1, db_name => $DB_NAME );
 }
 
 1;

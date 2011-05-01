@@ -7,10 +7,9 @@ use autodie;
 our $VERBOSE;
 
 use DateTime;
-use File::HomeDir;
+use File::Slurp qw( read_file write_file );
 use List::AllUtils qw( shuffle );
-use Path::Class;
-use Sys::Hostname qw( hostname );
+use Path::Class qw( dir file );
 
 sub seed_data {
     shift;
@@ -18,10 +17,18 @@ sub seed_data {
 
     local $VERBOSE = $p{verbose};
 
+    if ( $p{testing} ) {
+        return if _maybe_seed_from_cache( $p{db_name} );
+    }
+
     _seed_required_data();
 
     my $domain = make_domain();
     make_accounts($domain);
+
+    if ( $p{testing} ) {
+        _cache_seed_data( $p{db_name} );
+    }
 }
 
 sub seed_lots_of_data {
@@ -823,6 +830,74 @@ sub _random_years {
 
 sub _percent {
     return ( int( rand(100) ) ) + 1;
+}
+
+sub _maybe_seed_from_cache {
+    my $db_name = shift;
+
+    my $file = _cache_file();
+
+    return
+        unless -f $file
+            && $file->stat()->mtime()
+            >= file( $INC{'R2/SeedData.pm'} )->stat()->mtime();
+
+    require R2::Config;
+    require R2::DatabaseManager;
+
+    # Suppresses a "variable used only once" warning from inside Test::Builder
+    $R2::SeedData::TODO = $R2::SeedData::TODO;
+    Test::More::diag("Seeding from cached data in $file");
+
+    my $psql = R2::DatabaseManager->new( db_name => $db_name )->_psql();
+
+    $psql->run(
+        database => R2::Config->instance()->database_name(),
+        options  => [ '-q', '-o', '/dev/null', '-f', $file->stringify() ],
+    );
+
+    return 1;
+}
+
+sub _cache_seed_data {
+    my $db_name = shift;
+
+    require R2::Config;
+    require R2::DatabaseManager;
+
+    my $file = _cache_file();
+
+    $R2::SeedData::TODO = $R2::SeedData::TODO;
+    Test::More::diag("Caching seed data to $file");
+
+    my $pg_dump = R2::DatabaseManager->new( db_name => $db_name )->_pg_dump();
+
+    $pg_dump->run(
+        database => $db_name,
+        options  => [ '-a', '-T', q{"Version"}, '-f', $file->stringify() ],
+    );
+}
+
+{
+    my $Cache;
+
+    sub _cache_file {
+        require R2::Config;
+
+        return $Cache if $Cache;
+
+        my $dir = dir(
+            file( $INC{'R2/SeedData.pm'} )->dir(),
+            '..',
+            '..',
+            '.cache'
+        )->resolve();
+
+        $dir->mkpath( 0, 0755 )
+            unless -d $dir;
+
+        return $Cache = $dir->file('seed-data.pg');
+    }
 }
 
 1;
