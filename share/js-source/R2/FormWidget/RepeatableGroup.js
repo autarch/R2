@@ -117,6 +117,12 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
         }
     );
 
+    div.find("textarea").each(
+        function () {
+            $(this).children().detach();
+        }
+    );
+
     div.find(":radio").filter(
         function () {
             return (/is_preferred$/).test( $(this).attr("name") );
