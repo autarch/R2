@@ -111,6 +111,12 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
         }
     );
 
+    div.find( ':input[type="text"]', ':input[type="password"]' ).each(
+        function () {
+            $(this).val("");
+        }
+    );
+
     div.find(":radio").filter(
         function () {
             return (/is_preferred$/).test( $(this).attr("name") );
@@ -130,6 +136,14 @@ R2.FormWidget.RepeatableGroup.prototype._cleanClonedHTML = function (div) {
             $(this).removeClass("selected");
         }
     );
+
+    div.find(".error").each(
+        function() {
+            $(this).removeClass("error");
+        }
+    );
+
+    div.find("p.error-message").detach();
 
     div.find("a.JS-delete-div").show();
 
