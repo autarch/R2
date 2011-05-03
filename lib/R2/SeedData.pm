@@ -366,7 +366,7 @@ sub _seed_random_organization {
 }
 
 {
-    my @TypeNames = qw( cell home work office );
+    my @TypeNames;
     my %TypeIds;
 
     sub _seed_phones_for_contact {
@@ -376,8 +376,10 @@ sub _seed_random_organization {
         my $data    = shift;
 
         unless (%TypeIds) {
-            $TypeIds{ lc $_->name() } = $_->phone_number_type_id()
-                for $account->phone_number_types()->all();
+            for my $type ( $account->phone_number_types()->all() ) {
+                $TypeIds{ lc $type->name() } = $type->phone_number_type_id();
+                push @TypeNames, lc $type->name();
+            }
         }
 
         my @phones;
@@ -394,7 +396,7 @@ sub _seed_random_organization {
                 phone_number_type_id => $TypeIds{$type},
                 phone_number         => $data->{phone}{$type},
                 allows_sms =>
-                    ( $type eq 'cell' ? ( _percent() <= 20 ? 0 : 1 ) : 0 ),
+                    ( $type eq 'mobile' ? ( _percent() <= 20 ? 0 : 1 ) : 0 ),
                 };
         }
 
@@ -404,7 +406,7 @@ sub _seed_random_organization {
 }
 
 {
-    my @TypeNames = qw( home work headquarters branch );
+    my @TypeNames;
     my %TypeIds;
 
     sub _seed_addresses_for_contact {
@@ -414,8 +416,10 @@ sub _seed_random_organization {
         my $data    = shift;
 
         unless (%TypeIds) {
-            $TypeIds{ lc $_->name() } = $_->address_type_id()
-                for $account->address_types()->all();
+            for my $type ( $account->phone_number_types()->all() ) {
+                $TypeIds{ lc $type->name() } = $type->phone_number_type_id();
+                push @TypeNames, lc $type->name();
+            }
         }
 
         my @addresses;
