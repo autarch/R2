@@ -67,7 +67,6 @@ sub _process {
     }
 
     return scalar read_file($filename);
-
 }
 
 sub _build_sass_path {
