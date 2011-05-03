@@ -76,6 +76,9 @@ sub _build_sass_path {
     my $bin = which('sass');
     return $bin if $bin;
 
+    $bin = '/var/lib/gems/1.8/bin/sass';
+    return $bin if -x $bin;
+
     die "Cannot find sass in your path";
 }
 
