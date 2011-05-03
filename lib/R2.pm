@@ -98,3 +98,6 @@ __PACKAGE__->setup();
 __PACKAGE__->meta()->make_immutable( replace_constructor => 1 );
 
 1;
+
+# ABSTRACT: R2
+
