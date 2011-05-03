@@ -60,6 +60,8 @@ sub create_single_file {
 
     print {$fh} $self->create_content();
 
+    close $fh;
+
     move( $tempfile => $target )
         or die "Cannot move $tempfile => $target: $!";
 }
