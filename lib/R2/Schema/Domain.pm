@@ -136,7 +136,7 @@ sub _BuildSystemHostname {
         map { scalar gethostbyaddr( $_->address(), AF_INET ) }
         grep { $_->address() } Net::Interface->interfaces()
         ) {
-        return $name if $name =~ /\.[^.]+$/;
+        return $name if defined $name && $name =~ /\.[^.]+$/;
     }
 
     die 'Cannot determine system hostname.';
