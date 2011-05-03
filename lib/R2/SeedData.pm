@@ -376,7 +376,9 @@ sub _seed_random_organization {
         my $data    = shift;
 
         unless (%TypeIds) {
-            for my $type ( $account->phone_number_types()->all() ) {
+            for my $type ( grep { $_->applies_to_person() }
+                $account->phone_number_types()->all() ) {
+
                 $TypeIds{ lc $type->name() } = $type->phone_number_type_id();
                 push @TypeNames, lc $type->name();
             }
@@ -416,8 +418,10 @@ sub _seed_random_organization {
         my $data    = shift;
 
         unless (%TypeIds) {
-            for my $type ( $account->phone_number_types()->all() ) {
-                $TypeIds{ lc $type->name() } = $type->phone_number_type_id();
+            for my $type ( grep { $_->applies_to_person() }
+                $account->address_types()->all() ) {
+
+                $TypeIds{ lc $type->name() } = $type->address_type_id();
                 push @TypeNames, lc $type->name();
             }
         }
