@@ -322,6 +322,30 @@ my $email2 = R2::Schema::EmailAddress->insert(
     );
 }
 
+{
+    my $resultset = $form->process(
+        params => {
+            email_address_id                   => ['new1'],
+            "email_address.new1.email_address" => q{},
+            "email_address.new1.note"          => q{},
+            email_address_is_preferred         => 'new1',
+        }
+    );
+
+    ok(
+        $resultset->is_valid(),
+        'resultset with no email addresses is valid'
+    );
+
+    is_deeply(
+        $resultset->results_as_hash(), {
+            email_address_is_preferred => 'new1',
+            allows_email               => 1,
+        },
+        'got expected results back (no email address data'
+    );
+}
+
 done_testing();
 
 sub _error_breakdown {
