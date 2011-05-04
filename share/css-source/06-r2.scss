@@ -268,10 +268,6 @@ ul.tags-list {
 }
 
 #summary {
-    border-bottom: 2px solid $brown;
-    padding-bottom: 0.1em;
-    margin-bottom: 0.5em;
-
     h1 {
         color: $brown;
         margin: 0;
@@ -286,8 +282,8 @@ ul.tags-list {
 
 #detail-view {
     h2 {
-        border-bottom: 1px solid $dark-gray;
         color: $dark-gray;
+        margin-bottom: 0.2em;
     }
 
     h3 {
