@@ -292,6 +292,14 @@ ul.tags-list {
         color: $medium-gray;
     }
 
+    p {
+       margin-bottom: 0.5em;
+    }
+
+    ul {
+        margin: 0 1em 0 2em;
+    }
+
     li.preferred {
         font-weight: bold;
 
