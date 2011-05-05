@@ -2,8 +2,6 @@
 
 <& /lib/contact-view/summary.mas, contact => $household, show_image => 1, show_edit_link => 1 &>
 
-<& /lib/contact-view/edit-link.mas, contact => $household &>
-
 <& /lib/contact-view/members.mas, contact => $household &>
 
 <& /lib/contact-view/email-addresses.mas, contact => $household &>
