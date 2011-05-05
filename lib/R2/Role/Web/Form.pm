@@ -25,11 +25,11 @@ sub _build_human_name {
 sub _datetime_from_str {
     my $self = shift;
 
-    my $value = $self->_extract_field_value(@_);
+    my ( $value, @names ) = $self->_extract_field_value(@_);
 
     return unless $value;
 
-    return $self->_parse_datetime($value);
+    return ( $self->_parse_datetime($value), @names );
 }
 
 {

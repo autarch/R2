@@ -12,13 +12,13 @@
 
 <& /lib/form/contact-email.mas, contact => $person &>
 
-<& /lib/form/contact-website.mas, contact => $person &>
-
-<& /lib/form/contact-messaging-provider.mas, contact => $person &>
-
 <& /lib/form/contact-phone-numbers.mas, contact => $person, contact_type => 'person' &>
 
 <& /lib/form/contact-addresses.mas, contact => $person, contact_type => 'person' &>
+
+<& /lib/form/contact-messaging-provider.mas, contact => $person &>
+
+<& /lib/form/contact-website.mas, contact => $person &>
 
 <& /lib/form/contact-custom-fields.mas, contact => $person, contact_type => 'person' &>
 

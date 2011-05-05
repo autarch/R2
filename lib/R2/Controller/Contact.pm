@@ -117,7 +117,7 @@ for my $type (qw( contact person household organization )) {
                 $c->account()->uri(),
             );
 
-            my $result = $self->_process_form(
+            my $resultset = $self->_process_form(
                 $c,
                 $form_class,
                 $c->account()->uri( view => $new_entity_form ),
@@ -125,7 +125,7 @@ for my $type (qw( contact person household organization )) {
 
             my $contact = $self->_insert_contact(
                 $c,
-                $result,
+                $resultset,
                 $schema_class,
             );
 
@@ -360,12 +360,24 @@ put q{}
         $c->domain()->application_uri( path => q{} ),
     );
 
+    my $real_contact = $contact->real_contact();
+
+    my ($form_class) = ( ref $real_contact ) =~ /::(\w+)$/;
+
+    my $resultset = $self->_process_form(
+        $c,
+        $form_class,
+        $contact->uri( view => 'edit_form' ),
+        { entity => $real_contact },
+    );
+
     $self->_update_contact(
         $c,
+        $resultset,
         $contact,
     );
 
-    my $name = $contact->real_contact()->display_name();
+    my $name = $real_contact->display_name();
 
     $c->session_object()
         ->add_message("The contact record for $name has been updated.");
@@ -524,7 +536,7 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            my $result = $self->_process_form(
+            my $resultset = $self->_process_form(
                 $c,
                 $form_class,
                 $contact->uri( view => $new_form )
@@ -533,10 +545,10 @@ for my $type ( qw( donation note ) ) {
             eval {
                 R2::Schema->RunInTransaction(
                     sub {
-                        my $p = $result->results_as_hash();
+                        my $p = $resultset->results_as_hash();
 
                         if ( $type eq 'donation' ) {
-                            $self->_dedication_contact( $c, $result, $p );
+                            $self->_dedication_contact( $c, $resultset, $p );
                         }
 
                         $contact->$add_method(
@@ -551,7 +563,7 @@ for my $type ( qw( donation note ) ) {
                 $c->redirect_with_error(
                     error     => $e,
                     uri       => $contact->uri( view => $new_form ),
-                    form_data => $result->results_as_hash()
+                    form_data => $resultset->results_as_hash()
                 );
             }
 
@@ -564,10 +576,10 @@ for my $type ( qw( donation note ) ) {
         };
 
     sub _dedication_contact {
-        my $self   = shift;
-        my $c      = shift;
-        my $result = shift;
-        my $p      = shift;
+        my $self      = shift;
+        my $c         = shift;
+        my $resultset = shift;
+        my $p         = shift;
 
         if ( $p->{dedicated_to_contact_id} ) {
             delete $p->{dedicated_to};
@@ -688,7 +700,7 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $plural ),
             );
 
-            my $result = $self->_process_form(
+            my $resultset = $self->_process_form(
                 $c,
                 $form_class,
                 $contact->uri( view => $new_form )
@@ -699,10 +711,10 @@ for my $type ( qw( donation note ) ) {
             eval {
                 R2::Schema->RunInTransaction(
                     sub {
-                        my $p = $result->results_as_hash();
+                        my $p = $resultset->results_as_hash();
 
                         if ( $type eq 'donation' ) {
-                            $self->_dedication_contact( $c, $result, $p );
+                            $self->_dedication_contact( $c, $resultset, $p );
                         }
 
                         $entity->update(
@@ -717,7 +729,7 @@ for my $type ( qw( donation note ) ) {
                 $c->redirect_with_error(
                     error     => $e,
                     uri       => $entity->uri( view => 'edit_form' ),
-                    form_data => $result->results_as_hash()
+                    form_data => $resultset->results_as_hash()
                 );
             }
 
@@ -884,23 +896,6 @@ sub _tags_as_entity_response {
     $self->$meth( $c, %p );
 }
 
-sub _contact_image {
-    my $self   = shift;
-    my $c      = shift;
-    my $errors = shift;
-
-    my $image = $c->request()->upload('image');
-
-    if ( $image && !R2::Schema::File->TypeIsImage( $image->type() ) ) {
-        push @{$errors}, {
-            field   => 'image',
-            message => 'The image you provided is not a GIF, JPG, or PNG.',
-            };
-    }
-
-    return $image;
-}
-
 sub _custom_fields {
     my $self   = shift;
     my $c      = shift;
@@ -937,87 +932,47 @@ sub _custom_fields {
 }
 
 sub _insert_contact {
-    my $self   = shift;
-    my $c      = shift;
-    my $result = shift;
-    my $class  = shift;
-
-    my $contact_p = $self->_contact_params_for_class( $c, $class );
-
-    my @errors = $class->ValidateForInsert( %{$contact_p} );
-
-    my $image = $self->_contact_image( $c, \@errors );
-
-    my $emails = $self->_new_email_addresses( $c, \@errors );
-
-    my $websites = $self->_new_websites( $c, \@errors );
-
-    my $messaging = $self->_new_messaging_providers( $c, \@errors );
-
-    my $addresses = $self->_new_addresses( $c, \@errors );
-
-    my $phone_numbers = $self->_new_phone_numbers( $c, \@errors );
-
-    my $custom_fields = $self->_custom_fields( $c, \@errors );
-
-    my $members;
-    if ( $class->can('members') ) {
-        $members = $c->request()->members();
-    }
-
-    if (@errors) {
-        my $e = R2::Exception::DataValidation->new( errors => \@errors );
-
-        my ($type) = $class =~ /R2::Schema::(\w+)/;
-        my $view = 'new_' . ( lc $type ) . '_form';
-
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $c->account()->uri( view => $view ),
-            form_data => $c->request()->params(),
-        );
-    }
+    my $self      = shift;
+    my $c         = shift;
+    my $resultset = shift;
+    my $class     = shift;
 
     my $user    = $c->user();
     my $account = $c->account();
 
     my $insert_sub = sub {
-        if ($image) {
+        my %contact_p = (
+            $resultset->contact_params(),
+            $resultset->person_params(),
+            account_id => $account->account_id(),
+        );
+
+        my $result = $resultset->result_for('image');
+        if ( my $image = $result->value() ) {
             my $file = R2::Schema::File->insert(
                 filename   => $image->basename(),
                 contents   => scalar $image->slurp(),
                 mime_type  => $image->type(),
-                account_id => $contact_p->{account_id},
+                account_id => $contact_p{account_id},
             );
 
-            $contact_p->{image_file_id} = $file->file_id();
+            $contact_p{image_file_id} = $file->file_id();
         }
 
-        my $thing = $class->insert( %{$contact_p}, user => $user );
+        my $thing = $class->insert( %contact_p, user => $user );
         my $contact = $thing->contact();
 
         $self->_update_or_add_contact_data(
             $contact,
             $contact->real_contact(),
             $user,
-            $emails,
-            undef,
-            $websites,
-            undef,
-            $messaging,
-            undef,
-            $addresses,
-            undef,
-            $phone_numbers,
-            undef,
-            $members,
-            $custom_fields,
+            $resultset,
         );
 
-        my $note = $c->request()->params()->{note};
-        if ( !string_is_empty($note) ) {
+        my $note = $resultset->result_for('note');
+        if ( !string_is_empty( $note->value() ) ) {
             $contact->add_note(
-                note => $note,
+                note => $note->value(),
                 contact_note_type_id =>
                     $account->made_a_note_contact_note_type()
                     ->contact_note_type_id(),
@@ -1032,55 +987,22 @@ sub _insert_contact {
 }
 
 sub _update_contact {
-    my $self    = shift;
-    my $c       = shift;
-    my $contact = shift;
+    my $self      = shift;
+    my $c         = shift;
+    my $resultset = shift;
+    my $contact   = shift;
 
     my $real_contact = $contact->real_contact();
-    my $class = blessed $real_contact;
-
-    my $contact_p = $self->_contact_params_for_class( $c, $class );
-
-    my @errors = $real_contact->validate_for_update( %{$contact_p} );
-
-    my $image = $self->_contact_image( $c, \@errors );
-
-    my $new_emails = $self->_new_email_addresses( $c, \@errors );
-    my $updated_emails = $self->_updated_email_addresses( $c, \@errors );
-
-    my $new_websites = $self->_new_websites( $c, \@errors );
-    my $updated_websites = $self->_updated_websites( $c, \@errors );
-
-    my $new_messaging = $self->_new_messaging_providers( $c, \@errors );
-    my $updated_messaging = $self->_updated_messaging_providers( $c, \@errors );
-
-    my $new_addresses = $self->_new_addresses( $c, \@errors );
-    my $updated_addresses = $self->_updated_addresses( $c, \@errors );
-
-    my $new_phone_numbers = $self->_new_phone_numbers( $c, \@errors );
-    my $updated_phone_numbers = $self->_updated_phone_numbers( $c, \@errors );
-
-    my $custom_fields = $self->_custom_fields( $c, \@errors );
-
-    my $members;
-    if ( $real_contact->can('members') ) {
-        $members = $c->request()->members();
-    }
-
-    if (@errors) {
-        my $e = R2::Exception::DataValidation->new( errors => \@errors );
-
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => '/contact/new_person_form',
-            form_data => $c->request()->params(),
-        );
-    }
-
-    my $user = $c->user();
+    my $user         = $c->user();
 
     my $update_sub = sub {
-        if ($image) {
+        my %contact_p = (
+            $resultset->contact_params(),
+            $resultset->person_params(),
+        );
+
+        my $result = $resultset->result_for('image');
+        if ( my $image = $result->value() ) {
             if ( my $old_image = $contact->image() ) {
                 $old_image->file()->delete();
             }
@@ -1092,102 +1014,66 @@ sub _update_contact {
                 account_id => $contact->account_id(),
             );
 
-            $contact_p->{image_file_id} = $file->file_id();
+            $contact_p{image_file_id} = $file->file_id();
         }
 
-        $real_contact->update( %{$contact_p}, user => $user );
+        $real_contact->update( %contact_p, user => $user );
 
-        $self->_update_or_add_contact_data(
-            $contact,
-            $real_contact,
-            $user,
-            $new_emails,
-            $updated_emails,
-            $new_websites,
-            $updated_websites,
-            $new_messaging,
-            $updated_messaging,
-            $new_addresses,
-            $updated_addresses,
-            $new_phone_numbers,
-            $updated_phone_numbers,
-            $members,
-            $custom_fields,
-        );
+        $self->_update_or_add_contact_data( $contact, $real_contact, $user,
+            $resultset );
     };
 
     return R2::Schema->RunInTransaction($update_sub);
 }
 
+# XXX - custom fields
 sub _update_or_add_contact_data {
-    my $self              = shift;
-    my $contact           = shift;
-    my $real_contact      = shift;
-    my $user              = shift;
-    my $new_emails        = shift;
-    my $updated_emails    = shift;
-    my $new_websites      = shift;
-    my $updated_websites  = shift;
-    my $new_messaging     = shift;
-    my $updated_messaging = shift;
-    my $new_addresses     = shift;
-    my $updated_addresses = shift;
-    my $new_numbers       = shift;
-    my $updated_numbers   = shift;
-    my $members           = shift;
-    my $custom_fields     = shift;
+    my $self         = shift;
+    my $contact      = shift;
+    my $real_contact = shift;
+    my $user         = shift;
+    my $resultset    = shift;
 
     $contact->update_or_add_email_addresses(
-        $updated_emails || {},
-        $new_emails,
-        $user,
-    );
-
-    $contact->update_or_add_websites(
-        $updated_websites || {},
-        $new_websites,
-        $user,
-    );
-
-    $contact->update_or_add_messaging_providers(
-        $updated_messaging || {},
-        $new_messaging,
-        $user,
-    );
-
-    $contact->update_or_add_addresses(
-        $updated_addresses || {},
-        $new_addresses,
+        $resultset->existing_email_addresses() || {},
+        $resultset->new_email_addresses() || [],
         $user,
     );
 
     $contact->update_or_add_phone_numbers(
-        $updated_numbers || {},
-        $new_numbers,
+        $resultset->existing_phone_numbers() || {},
+        $resultset->new_phone_numbers() || [],
+        $user,
+    );
+
+    $contact->update_or_add_addresses(
+        $resultset->existing_addresses() || {},
+        $resultset->new_addresses() || [],
+        $user,
+    );
+
+    $contact->update_or_add_messaging_providers(
+        $resultset->existing_messaging_providers() || {},
+        $resultset->new_messaging_providers() || [],
+        $user,
+    );
+
+    $contact->update_or_add_websites(
+        $resultset->existing_websites() || {},
+        $resultset->new_websites() || [],
         $user,
     );
 
     if ( $real_contact->can('members') ) {
         $real_contact->update_members(
-            members => $members || [],
+            members => $resultset->members() || [],
             user => $user,
         );
     }
 
-    my %values = map { $_->[0]->custom_field_id() => $_->[1] } @{$custom_fields};
+    # XXX - custom fields
 
-    for my $field ( $contact->custom_fields()->all() ) {
-        if ( string_is_empty( $values{ $field->custom_field_id() } ) ) {
-            $field->delete_value_for_contact( contact => $contact );
-        }
-    }
-
-    for my $pair ( @{$custom_fields} ) {
-        $pair->[0]->set_value_for_contact(
-            contact => $contact,
-            value   => $pair->[1]
-        );
-    }
+    return;
 }
 
 __PACKAGE__->meta()->make_immutable();

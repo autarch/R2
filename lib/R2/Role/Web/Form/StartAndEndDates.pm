@@ -21,7 +21,7 @@ field end_date => (
 
 sub _validate_end_date {
     my $self = shift;
-    my $end = shift;
+    my $end  = shift;
 
     return unless defined $end;
 

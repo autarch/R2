@@ -28,8 +28,10 @@ sub _extract_note_datetime {
     return
         if any { string_is_empty($_) } @{$params}{ 'note_date', 'note_time' };
 
-    return $self->_parse_datetime(
-        "$params->{note_date} $params->{note_time}");
+    return (
+        $self->_parse_datetime("$params->{note_date} $params->{note_time}"),
+        'note_date', 'note_time',
+    );
 }
 
 1;

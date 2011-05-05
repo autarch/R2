@@ -58,6 +58,7 @@ sub _column_to_chloro_field {
         text          => Str,
         blob          => Str,
         EMAIL_ADDRESS => Str,
+        URI           => Str,
         integer       => Int,
         float         => Num,
         boolean       => Bool,

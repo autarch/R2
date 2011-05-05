@@ -49,6 +49,7 @@ sub _squish {
     my $self = shift;
     my $css  = shift;
 
+    return $css;
     return minify( input => $css );
 }
 

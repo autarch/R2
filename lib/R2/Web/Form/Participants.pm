@@ -43,11 +43,14 @@ sub _validate_participants {
 sub _extract_participants {
     my $self = shift;
 
-    my $value = $self->_extract_field_value(@_);
+    my ( $value, $name ) = $self->_extract_field_value(@_);
 
     return $value if ref $value;
 
-    return [ map { s/^\s+|\s+$//g; $_ } grep {/\S/} split /[\r\n]+/, $value ];
+    return (
+        [ map { s/^\s+|\s+$//g; $_ } grep {/\S/} split /[\r\n]+/, $value ],
+        $name,
+    );
 }
 
 __PACKAGE__->meta()->make_immutable();

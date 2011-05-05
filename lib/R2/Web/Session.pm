@@ -18,6 +18,11 @@ has form_data => (
     default => sub { {} },
 );
 
+has resultset => (
+    is  => 'rw',
+    isa => 'Chloro::ResultSet',
+);
+
 has _errors => (
     traits   => ['Array'],
     is       => 'ro',

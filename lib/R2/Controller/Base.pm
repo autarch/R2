@@ -183,23 +183,32 @@ sub _process_form {
     my $c    = shift;
     my $name = shift;
     my $uri  = shift;
+    my $form_p = shift;
 
     my $class = 'R2::Web::Form::' . $name;
 
     die "Bad form name ($name)" unless $class->can('new');
 
-    my $form = $class->new( user => $c->user() );
-    my $result = $form->process( params => $c->request()->params() );
+    my $form = $class->new(
+        user => $c->user(),
+        %{ $form_p || {} },
+    );
 
-    if ( !$result->is_valid() ) {
-        $c->redirect_with_error(
-            error     => [ $result->all_errors() ],
+    my $resultset = $form->process(
+        params => {
+            %{ $c->request()->params() },
+            %{ $c->request()->uploads() },
+        },
+    );
+
+    if ( !$resultset->is_valid() ) {
+        $c->redirect_with_resultset(
             uri       => $uri,
-            form_data => $result->secure_results_as_hash(),
+            resultset => $resultset,
         );
     }
 
-    return wantarray ? ( $form, $result ) : $result;
+    return wantarray ? ( $form, $resultset ) : $resultset;
 }
 
 __PACKAGE__->meta()->make_immutable();

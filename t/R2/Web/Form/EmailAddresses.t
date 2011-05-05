@@ -124,6 +124,45 @@ my $email2 = R2::Schema::EmailAddress->insert(
     my $prefix1 = 'email_address.' . $id1;
     my $prefix2 = 'email_address.' . $id2;
 
+    my $new_address1 = 'bobY@example.com';
+    my $new_address2 = 'bobZ@example.com';
+    my $note2        = 'blah blah';
+
+    my $resultset = $form->process(
+        params => {
+            email_address_id           => [ $id1, $id2 ],
+            "$prefix1.email_address"   => $new_address1,
+            "$prefix2.email_address"   => q{},
+            email_address_is_preferred => $id1,
+        }
+    );
+
+    ok( $resultset->is_valid(), 'results are valid' );
+
+    my $params = $resultset->results_as_hash();
+
+    is_deeply(
+        $params, {
+            email_address_id => [ $id1 ],
+            email_address    => {
+                $id1 => {
+                    email_address => $new_address1,
+                },
+            },
+            email_address_is_preferred => $id1,
+            allows_email               => 1,
+        },
+        'got expected results back (empty address id is not included)'
+    );
+}
+
+{
+    my $id1 = $email1->email_address_id();
+    my $id2 = $email2->email_address_id();
+
+    my $prefix1 = 'email_address.' . $id1;
+    my $prefix2 = 'email_address.' . $id2;
+
     my $address1 = $email1->email_address();
     my $address2 = $email2->email_address();
     my $note1    = $email1->note();

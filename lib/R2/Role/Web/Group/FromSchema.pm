@@ -70,6 +70,8 @@ role {
 
     return unless $validate_against->can('ValidateForInsert');
 
+    my $validate_method = '_validate_' . $group_name . '_group';
+
     around _make_resultset => sub {
         my $orig = shift;
         my $self = shift;
@@ -79,13 +81,13 @@ role {
         my $params = $resultset->results_as_hash();
 
         for my $key ( @{ $params->{$repetition_key} } ) {
-            $self->_validate_group( $key, $params, $resultset );
+            $self->$validate_method( $key, $params, $resultset );
         }
 
         return $resultset;
     };
 
-    method _validate_group => sub {
+    method $validate_method => sub {
         my $self      = shift;
         my $key       = shift;
         my $params    = shift;
@@ -109,8 +111,9 @@ role {
         my @errors = $invocant->$meth( %{ $params->{$group_name}{$key} } );
         return unless @errors;
 
-        my $group_result
-            = $resultset->result_for( $group_name . q{.} . $key );
+        my $group_key = $group_name . q{.} . $key;
+        my $group_result = $resultset->result_for($group_key)
+            or die "No group result for $group_key";
 
         for my $error (@errors) {
             if ( my $field = delete $error->{field} ) {

@@ -60,7 +60,7 @@ role {
 
         my $params = $resultset->results_as_hash();
 
-        my @errors = $invocant->$meth($params);
+        my @errors = $invocant->$meth( %{$params} );
 
         for my $error (@errors) {
             if ( my $field = delete $error->{field} ) {

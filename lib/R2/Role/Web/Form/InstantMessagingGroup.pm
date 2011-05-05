@@ -6,32 +6,12 @@ use Chloro;
 use R2::Types qw( DatabaseId NonEmptyStr );
 use R2::Util qw( string_is_empty );
 
-group messaging_provider => (
-    repetition_key   => 'messaging_provider_id',
+with 'R2::Role::Web::Group::FromSchema' => {
+    group            => 'messaging_provider',
     is_empty_checker => '_messaging_provider_is_empty',
-    (
-        field messaging_provider_type_id => (
-            isa      => DatabaseId,
-            required => 1,
-        ),
-    ),
-    (
-        field screen_name => (
-            isa      => NonEmptyStr,
-            required => 1,
-        ),
-    ),
-    (
-        field note => (
-            isa => NonEmptyStr,
-        ),
-    )
-);
-
-field messaging_provider_is_preferred => (
-    isa      => NonEmptyStr,
-    required => 1,
-);
+    classes          => ['R2::Schema::MessagingProvider'],
+    skip             => [ 'contact_id', 'is_preferred' ],
+};
 
 sub _messaging_provider_is_empty {
     my $self   = shift;
@@ -42,6 +22,7 @@ sub _messaging_provider_is_empty {
     my @keys = map { join q{.}, $prefix, $_->name() } $group->fields();
 
     return 1 unless ( grep { !string_is_empty( $params->{$_} ) } @keys ) > 1;
+    return 0;
 }
 
 1;

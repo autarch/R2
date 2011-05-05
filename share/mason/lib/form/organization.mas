@@ -12,11 +12,11 @@
 
 <& /lib/form/contact-email.mas, contact => $organization &>
 
-<& /lib/form/contact-website.mas, contact => $organization &>
-
 <& /lib/form/contact-phone-numbers.mas, contact => $organization, contact_type => 'organization' &>
 
 <& /lib/form/contact-addresses.mas, contact => $organization, contact_type => 'organization' &>
+
+<& /lib/form/contact-website.mas, contact => $organization &>
 
 <& /lib/form/contact-custom-fields.mas, contact => $organization, contact_type => 'organization' &>
 

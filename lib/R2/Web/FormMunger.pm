@@ -37,6 +37,12 @@ has '_dom' => (
     },
 );
 
+has resultset => (
+    is        => 'ro',
+    isa       => 'Chloro::ResultSet',
+    predicate => '_has_resultset',
+);
+
 has 'errors' => (
     is      => 'ro',
     isa     => ArrayRef [ ChloroError | HashRef | Str ],
@@ -85,8 +91,51 @@ sub _fill_in_form {
 sub _fill_errors {
     my $self = shift;
 
-    my $errors = $self->errors();
-    return unless @{$errors};
+    if ( $self->_has_resultset() ) {
+        $self->_handle_resultset();
+    }
+    else {
+        $self->_handle_old_style_errors();
+    }
+}
+
+sub  _handle_resultset {
+    my $self = shift;
+
+    my $form = $self->_dom()->getElementsByTagName('form')->[0];
+    return unless $form;
+
+    return if $self->resultset()->is_valid();
+
+    my @errors = map { $self->_errors_for_result($_) }
+        $self->resultset()->all_errors();
+
+    $self->_apply_errors_to_form( $form, \@errors );
+}
+
+sub _errors_for_result {
+    my $self  = shift;
+    my $error = shift;
+
+    if ( $error->can('field')
+        && defined $error->result()->param_names()->[0] ) {
+
+        return {
+            field => $error->result()->param_names()->[0],
+            text  => $error->message()->text(),
+        };
+    }
+    else {
+        return {
+            text => $error->message()->text(),
+        };
+    }
+}
+
+sub _apply_errors_to_form {
+    my $self   = shift;
+    my $form   = shift;
+    my $errors = shift;
 
     my $error_div = $self->_dom()->createElement('div');
     $error_div->className('form-error');
@@ -95,12 +144,43 @@ sub _fill_errors {
         my $field;
         my $message;
 
-        if ( blessed $error ) {
-            $field = $error->field()->name() if $error->can('field');
-            $message = $error->message()->text();
+        if ( defined $error->{field} ) {
+            if ( my $div = $self->_get_div_for_field( $error->{field} ) ) {
+
+                $div->className( $div->className() . ' error' );
+
+                my $p = $self->_create_error_para( $error->{text} );
+                $div->insertBefore( $p, $div->firstChild() );
+            }
         }
-        # XXX - non-Chloro message
-        elsif ( ref $error && $error->{field} ) {
+
+        my $p = $self->_create_error_para( $error->{text} );
+
+        $error_div->appendChild($p);
+    }
+
+    $form->insertBefore( $error_div, $form->firstChild() );
+
+    return;
+}
+
+sub  _handle_old_style_errors {
+    my $self = shift;
+
+    my $errors = $self->errors();
+    return unless @{$errors};
+
+    my $form = $self->_dom()->getElementsByTagName('form')->[0];
+    return unless $form;
+
+    my $error_div = $self->_dom()->createElement('div');
+    $error_div->className('form-error');
+
+    for my $error ( @{$errors} ) {
+        my $field;
+        my $message;
+
+        if ( ref $error && $error->{field} ) {
             $field = $error->{field};
             $message = $error->{message} || $error->{text};
         }
@@ -125,9 +205,6 @@ sub _fill_errors {
 
         $error_div->appendChild($p);
     }
-
-    my $form = $self->_dom()->getElementsByTagName('form')->[0];
-    return unless $form;
 
     $form->insertBefore( $error_div, $form->firstChild() );
 
