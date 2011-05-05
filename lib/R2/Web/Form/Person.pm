@@ -68,7 +68,7 @@ sub _extract_email_opt_out {
                     ->generate_role( parameters => { group => $_ } )
                 } qw( phone_number email_address address messaging_provider website )
         ],
-        cache => 1,
+        weaken => 0,
     );
 
     $Class->make_immutable();

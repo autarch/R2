@@ -21,7 +21,7 @@ with qw(
                     ->generate_role( parameters => { group => $_ } )
                 } qw( email_address )
         ],
-        cache => 1,
+        weaken => 0,
     );
 
     $Class->make_immutable();

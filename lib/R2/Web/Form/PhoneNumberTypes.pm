@@ -39,18 +39,22 @@ group phone_number_type => (
     ),
 );
 
-my $Class = Moose::Meta::Class->create_anon_class(
-    superclasses => ['Chloro::ResultSet'],
-    roles        => [
-        R2::Role::Web::ResultSet::NewAndExistingGroups->meta()
-            ->generate_role( parameters => { group => 'phone_number_type' } )
-    ],
-    cache => 1,
-);
+{
+    my $Class = Moose::Meta::Class->create_anon_class(
+        superclasses => ['Chloro::ResultSet'],
+        roles        => [
+            R2::Role::Web::ResultSet::NewAndExistingGroups->meta()
+                ->generate_role(
+                parameters => { group => 'phone_number_type' }
+                )
+        ],
+        weaken => 0,
+    );
 
-$Class->make_immutable();
+    $Class->make_immutable();
 
-sub _resultset_class { $Class->name() }
+    sub _resultset_class { $Class->name() }
+}
 
 __PACKAGE__->meta()->make_immutable();
 

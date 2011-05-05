@@ -21,18 +21,22 @@ group donation_campaign => (
     )
 );
 
-my $Class = Moose::Meta::Class->create_anon_class(
-    superclasses => ['Chloro::ResultSet'],
-    roles        => [
-        R2::Role::Web::ResultSet::NewAndExistingGroups->meta()
-            ->generate_role( parameters => { group => 'donation_campaign' } )
-    ],
-    cache => 1,
-);
+{
+    my $Class = Moose::Meta::Class->create_anon_class(
+        superclasses => ['Chloro::ResultSet'],
+        roles        => [
+            R2::Role::Web::ResultSet::NewAndExistingGroups->meta()
+                ->generate_role(
+                parameters => { group => 'donation_campaign' }
+                )
+        ],
+        weaken => 0,
+    );
 
-$Class->make_immutable();
+    $Class->make_immutable();
 
-sub _resultset_class { $Class->name() }
+    sub _resultset_class { $Class->name() }
+}
 
 __PACKAGE__->meta()->make_immutable();
 
