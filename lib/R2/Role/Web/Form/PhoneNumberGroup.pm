@@ -21,7 +21,7 @@ sub _phone_number_is_empty {
 
     my @keys = map { join q{.}, $prefix, $_->name() } $group->fields();
 
-    return 1 unless ( grep { !string_is_empty( $params->{$_} ) } @keys ) > 1;
+    return 1 unless ( grep { !string_is_empty( $params->{$_} ) } @keys ) > 2;
     return 0;
 }
 
