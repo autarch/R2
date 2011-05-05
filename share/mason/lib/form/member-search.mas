@@ -28,13 +28,14 @@
                 <td class="name"><% $person->full_name() %></td>
                 <td class="position">
                   <input type="text"
-                         name="position-existing-<% $person->person_id() %>"
+                         name="member.<% $person->person_id() %>.position"
                          value="<% $membership->position() %>" />
                 </td>
                 <td class="button">
                   <button type="button" name="remove-<% $person->person_id %>">remove</button>
                   <input type="hidden"
-                         name="person_id-existing-<% $person->person_id() %>"
+                         name="person_id"
+                         id="member.<% $person->person_id() %>"
                          value="<% $person->person_id() %>" />
                 </td>
               </tr>

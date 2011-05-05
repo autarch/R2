@@ -100,7 +100,7 @@ sub update_members {
         }
         else {
             $membership->update(
-                position => $new_members{$id}->{position},
+                position => $new_members{$id}->{position} // q{},
             );
 
             delete $new_members{$id};

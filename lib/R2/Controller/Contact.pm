@@ -19,6 +19,8 @@ use R2::Search::Organization;
 use R2::Search::Person;
 use R2::Web::Form::ContactNote;
 use R2::Web::Form::Donation;
+use R2::Web::Form::Household;
+use R2::Web::Form::Organization;
 use R2::Web::Form::Person;
 use R2::Util qw( string_is_empty studly_to_calm );
 use Scalar::Util qw( blessed );
@@ -943,7 +945,6 @@ sub _insert_contact {
     my $insert_sub = sub {
         my %contact_p = (
             $resultset->contact_params(),
-            $resultset->person_params(),
             account_id => $account->account_id(),
         );
 
@@ -996,10 +997,7 @@ sub _update_contact {
     my $user         = $c->user();
 
     my $update_sub = sub {
-        my %contact_p = (
-            $resultset->contact_params(),
-            $resultset->person_params(),
-        );
+        my %contact_p = $resultset->contact_params();
 
         my $result = $resultset->result_for('image');
         if ( my $image = $result->value() ) {
@@ -1052,11 +1050,13 @@ sub _update_or_add_contact_data {
         $user,
     );
 
-    $contact->update_or_add_messaging_providers(
-        $resultset->existing_messaging_providers() || {},
-        $resultset->new_messaging_providers() || [],
-        $user,
-    );
+    if ( $resultset->can('existing_messaging_providers') ) {
+        $contact->update_or_add_messaging_providers(
+            $resultset->existing_messaging_providers() || {},
+            $resultset->new_messaging_providers()      || [],
+            $user,
+        );
+    }
 
     $contact->update_or_add_websites(
         $resultset->existing_websites() || {},

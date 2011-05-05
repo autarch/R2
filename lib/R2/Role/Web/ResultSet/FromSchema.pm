@@ -15,27 +15,27 @@ parameter skip => (
     default => sub { [] },
 );
 
+parameter method => (
+    isa      => NonEmptyStr,
+    required => 1,
+);
+
 role {
     my $p = shift;
 
     my %skip = map { $_ => 1 } @{ $p->skip() };
 
-    for my $class ( @{ $p->classes() } ) {
+    my @cols = grep { !$skip{$_} }
+        map { $_->name() } map { $_->Table()->columns() } @{ $p->classes() };
 
-        $class =~ /::(\w+)$/;
-        my $method = lc $1 . '_params';
+    method $p->method() => sub {
+        my $self = shift;
 
-        my @cols = grep { !$skip{$_} }
-            map { $_->name() } $class->Table()->columns();
+        my $result = $self->results_as_hash();
 
-        method $method => sub {
-            my $self = shift;
-
-            my $result = $self->results_as_hash();
-
-            return map { $_ => $result->{$_} } grep { exists $result->{$_} } @cols;
-        };
-    }
+        return
+            map { $_ => $result->{$_} } grep { exists $result->{$_} } @cols;
+    };
 };
 
 1;

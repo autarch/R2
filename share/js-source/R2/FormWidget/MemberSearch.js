@@ -52,9 +52,9 @@ R2.FormWidget.MemberSearch.prototype._instrumentExistingTable = function () {
             tr.attr( "id", R2.Utils.makeUniqueId() );
 
             var result = { "person_id": person_id };
-            var hidden_name = "person_id-existing-" + person_id;
+            var hidden_id = "member." + person_id;
 
-            self._instrumentRemoveButton( $(this), tr, result, hidden_name );
+            self._instrumentRemoveButton( $(this), tr, result, hidden_id );
         }
     );
 };
@@ -288,18 +288,17 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
     var tbody;
 
     if ( table.length ) {
-        var tbody = $( "tbody", table ).first();
+        table.append("<tbody/>");
     }
     else {
         table = this._createResultsTable();
         table.addClass("ajax-search-selected-table");
         table.attr( "id", "member-search-selected-table" );
 
-        var tbody = $("<tbody/>");
-        table.append(tbody);
-
         elt_to_fade = table;
     }
+
+    tbody = $( "tbody", table ).last();
 
     var tr = $("<tr/>");
     tr.attr( "id", R2.Utils.makeUniqueId() );
@@ -318,7 +317,7 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
 
     var position_input = $("<input/>");
     position_input.attr( "type",  "text" );
-    position_input.attr( "name",  "position-" + result.id );
+    position_input.attr( "name",  "member." + result.person_id + ".position" );
     position_input.attr( "value", typeof position_name != "undefined" ? position_name : "" );
 
     position_td.append(position_input);
@@ -340,12 +339,13 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
 
     var person_id = $("<input/>");
     person_id.attr( "type",  "hidden" );
-    person_id.attr( "name",  "person_id-" + result.id );
+    person_id.attr( "id",  "member." + result.id );
+    person_id.attr( "name",  "person_id" );
     person_id.attr( "value", result.person_id );
 
     this.form.append(person_id);
 
-    this._instrumentRemoveButton( remover, tr, result, person_id.attr("name") );
+    this._instrumentRemoveButton( remover, tr, result, person_id.attr("id") );
 
     if ( ! table.parent().length ) {
         this.selected.append(table);
@@ -356,17 +356,17 @@ R2.FormWidget.MemberSearch.prototype._appendResultToSelected = function ( result
     elt_to_fade.fadeIn(500);
 };
 
-R2.FormWidget.MemberSearch.prototype._instrumentRemoveButton = function ( remover, tr, result, hidden_name ) {
+R2.FormWidget.MemberSearch.prototype._instrumentRemoveButton = function ( remover, tr, result, hidden_id ) {
     remover.click(
-        this.removeMemberFunction( remover, tr, result, hidden_name )
+        this.removeMemberFunction( remover, tr, result, hidden_id )
     );
 };
 
-R2.FormWidget.MemberSearch.prototype.removeMemberFunction = function ( button, tr, result, hidden_name ) {
+R2.FormWidget.MemberSearch.prototype.removeMemberFunction = function ( button, tr, result, hidden_id ) {
     var remover = button;
     var selected_tr = tr;
     var res = result;
-    var input_name = hidden_name;
+    var input_id = hidden_id.replace( /\./g, "\\." );
 
     var self = this;
     var func = function (e) {
@@ -382,7 +382,7 @@ R2.FormWidget.MemberSearch.prototype.removeMemberFunction = function ( button, t
             }
         );
 
-        $( 'input:hidden[name="' + input_name + '"]', self.form ).detach();
+        $( "#" + input_id, self.form ).detach();
 
         delete self.person_ids[ res.person_id ];
     };
