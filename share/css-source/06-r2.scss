@@ -283,6 +283,11 @@ ul.tags-list {
 }
 
 #detail-view {
+    #contact-image {
+        float: left;
+        margin-right: 1em;
+    }
+
     h2 {
         color: $dark-gray;
         margin-bottom: 0.2em;
