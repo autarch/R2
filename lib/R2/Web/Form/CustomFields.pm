@@ -14,7 +14,7 @@ with 'R2::Role::Web::Form';
 
 group custom_field => (
     repetition_key   => 'custom_field_id',
-    is_empty_checker => '_group_is_empty',
+    is_empty_checker => '_custom_field_is_empty',
     (
         field label => (
             isa      => NonEmptyStr,
@@ -40,7 +40,7 @@ group custom_field => (
     ),
 );
 
-sub _group_is_empty {
+sub _custom_field_is_empty {
     my $self   = shift;
     my $params = shift;
     my $prefix = shift;
