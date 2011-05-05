@@ -34,9 +34,9 @@ group contact_note_type => (
     );
 
     $Class->make_immutable();
-}
 
-sub _resultset_class { $Class->name() }
+    sub _resultset_class { $Class->name() }
+}
 
 __PACKAGE__->meta()->make_immutable();
 
