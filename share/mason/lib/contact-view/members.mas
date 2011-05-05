@@ -1,21 +1,28 @@
 <h2>Members</h2>
 
+% if ($count) {
 <ul>
-% while ( my ( $person, $membership ) = $members->next() ) {
+%   while ( my ( $person, $membership ) = $members->next() ) {
   <li><a href="<% $person->contact()->uri() %>"
          title="View <% $person->full_name() %>"
          ><% $person->full_name() %></a>
-%   if ( my $pos = $membership->position() ) {
+%     if ( my $pos = $membership->position() ) {
       - <% $pos %>
-%   }
+%     }
   </li>
-% }
+%   }
 </ul> 
-
+% } else {
+<p>
+  This <% lc $contact->contact_type() %> has no members yet.
+</p>
+% }
 <%args>
 $contact
 </%args>
 
 <%init>
-my $members = $contact->members();
+my $count = $contact->member_count();
+my $members;
+$members = $contact->members() if $count;
 </%init>
