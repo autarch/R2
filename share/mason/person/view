@@ -6,13 +6,13 @@
 
 <& /lib/contact-view/email-addresses.mas, contact => $person &>
 
-<& /lib/contact-view/websites.mas, contact => $person &>
-
-<& /lib/contact-view/messaging-providers.mas, contact => $person &>
-
 <& /lib/contact-view/phone-numbers.mas, contact => $person &>
 
 <& /lib/contact-view/addresses.mas, contact => $person &>
+
+<& /lib/contact-view/messaging-providers.mas, contact => $person &>
+
+<& /lib/contact-view/websites.mas, contact => $person &>
 
 <& /lib/contact-view/custom-fields.mas, contact => $person &>
 

@@ -8,11 +8,11 @@
 
 <& /lib/contact-view/email-addresses.mas, contact => $household &>
 
-<& /lib/contact-view/websites.mas, contact => $household &>
-
 <& /lib/contact-view/phone-numbers.mas, contact => $household &>
 
 <& /lib/contact-view/addresses.mas, contact => $household &>
+
+<& /lib/contact-view/websites.mas, contact => $household &>
 
 </div>
 

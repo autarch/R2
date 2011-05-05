@@ -6,11 +6,11 @@
 
 <& /lib/contact-view/email-addresses.mas, contact => $organization &>
 
-<& /lib/contact-view/websites.mas, contact => $organization &>
-
 <& /lib/contact-view/phone-numbers.mas, contact => $organization &>
 
 <& /lib/contact-view/addresses.mas, contact => $organization &>
+
+<& /lib/contact-view/websites.mas, contact => $organization &>
 
 </div>
 
