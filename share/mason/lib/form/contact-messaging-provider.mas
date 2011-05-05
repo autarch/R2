@@ -54,8 +54,8 @@ my @messaging_provider_types;
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="screen_name-<% $id %>">Screen name:</label>
-        <input type="text" class="text medium" name="screen_name-<% $id %>" id="screen_name-<% $id %>" />
+        <label class="secondary" for="messaging_provider.<% $id %>.screen_name">Screen name:</label>
+        <input type="text" class="text medium" name="messaging_provider.<% $id %>.screen_name" id="messaging_provider.<% $id %>.screen_name" />
       </div>
 
       <div class="form-item">
