@@ -105,15 +105,7 @@ put q{}
         $account->uri( view => 'edit_form' ),
     );
 
-    eval { $account->update( %{ $result->results_as_hash() } ) };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'edit_form' ),
-            form_data => $result->secure_results_as_hash(),
-        );
-    }
+    $account->update( %{ $result->results_as_hash() } );
 
     $c->session_object()
         ->add_message(

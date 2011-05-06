@@ -5,29 +5,18 @@ use namespace::autoclean;
 use Moose;
 use Chloro;
 
-use namespace::autoclean;
-
 use R2::Types qw( Bool DatabaseId MonthAsNumber NonEmptyStr );
 
 with 'R2::Role::Web::Form';
 
-field name => (
-    isa        => NonEmptyStr,
-    required   => 1,
-);
-
-field fiscal_year_start_month => (
-    isa      => MonthAsNumber,
-    required => 1,
-);
-
-field default_time_zone => (
-    isa      => NonEmptyStr,
-    required => 1,
-);
+with 'R2::Role::Web::Form::FromSchema' => {
+    classes => ['R2::Schema::Account'],
+    skip    => [ 'creation_datetime', 'domain_id' ],
+};
 
 field domain_id => (
-    isa => DatabaseId,
+    isa       => DatabaseId,
+    extractor => '_extract_domain_id',
 );
 
 sub _extract_domain_id {
