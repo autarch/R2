@@ -19,6 +19,11 @@ with 'R2::Role::URIMaker';
     has_table( $schema->table('Tag') );
 
     has_one( $schema->table('Account') );
+
+    has_one email_list => (
+        table => $schema->table('EmailList'),
+        undef => 1,
+    );
 }
 
 with 'R2::Role::Schema::Serializes';

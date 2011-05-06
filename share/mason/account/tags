@@ -24,8 +24,9 @@
       </td>
       <td><% $count ? $count : 'unused' %></td>
       <td>
-%   if ( $tag->email_list() ) {
-
+%   if ( my $list = $tag->email_list() ) {
+        List description: <% $list->description() %><br />
+        <a href="<% $list->uri( view => 'edit_form' ) %>">Edit its description</a>.
 %   } else {
         <a href="<% $tag->uri( view => 'email_list_form' ) %>">Make this tag an email list</a>
 %   }

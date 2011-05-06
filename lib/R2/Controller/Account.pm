@@ -19,6 +19,7 @@ use R2::Web::Form::CustomFieldGroups;
 use R2::Web::Form::CustomFields;
 use R2::Web::Form::DonationCampaigns;
 use R2::Web::Form::DonationSources;
+use R2::Web::Form::EmailList;
 use R2::Web::Form::Participants;
 use R2::Web::Form::Participation;
 use R2::Web::Form::PaymentTypes;
@@ -635,6 +636,58 @@ get_html confirm_deletion
         . PL_N( 'contact', $count ) . q{.};
 
     $c->stash()->{template} = '/shared/confirm_deletion';
+};
+
+get_html email_list_form
+    => chained '_set_tag'
+    => path_part 'email_list_form'
+    => args 0
+    => sub {
+    my $self     = shift;
+    my $c        = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    $c->stash()->{template} = '/account/email_list_form';
+};
+
+post email_list
+    => chained '_set_tag'
+    => path_part 'email_list'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+    my $tag     = $c->stash()->{tag};
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    my $resultset = $self->_process_form(
+        $c,
+        'EmailList',
+        $tag->uri( view => 'email_list_form' ),
+    );
+
+    R2::Schema::EmailList->insert(
+        %{ $resultset->results_as_hash() },
+        tag_id => $tag->tag_id(),
+    );
+
+    $c->redirect_and_detach( $account->uri( view => 'tags' ) );
 };
 
 get_html 'activities'
