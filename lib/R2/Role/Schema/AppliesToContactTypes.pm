@@ -66,8 +66,10 @@ sub _applies_to_something {
 
     my $articled_thing = ucfirst A($thing);
 
-    return { text =>
-            "$articled_thing must apply to a person, household, or organization."
+    return {
+        text =>
+            "$articled_thing must apply to a person, household, or organization.",
+        category => 'invalid',
     };
 }
 
