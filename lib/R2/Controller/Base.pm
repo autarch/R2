@@ -101,7 +101,9 @@ sub end : Private {
     if (   ( !$c->response()->status() || $c->response()->status() == 200 )
         && !$c->response()->body()
         && !@{ $c->error() || [] } ) {
+
         $c->forward( $c->view() );
+        $c->response()->content_type('text/html; charset=utf-8');
     }
 
     return;
