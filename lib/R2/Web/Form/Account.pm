@@ -1,5 +1,7 @@
 package R2::Web::Form::Account;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 

@@ -1,5 +1,7 @@
 package R2::Web::Form::ContactNote;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 

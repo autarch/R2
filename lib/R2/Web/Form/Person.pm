@@ -1,5 +1,7 @@
 package R2::Web::Form::Person;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 
