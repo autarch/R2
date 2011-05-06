@@ -15,6 +15,7 @@ Emails
 - CAN-SPAM compliance
 - limit size of created lists somehow? add a confirm-via-email step for any list larger than X?
 - DKIM and SPF for bigger email senders?
+- mailing lists
 
 SMS
 
@@ -22,7 +23,6 @@ SMS
 
 Reports
 
-- Top donors
 - "Expiring" donors
 
 - parameterize reports by donation fields, tags, etc
@@ -37,15 +37,11 @@ Import tool
 - contacts
 - donations
 
-Events?
-
-- separate events from notes and turn them into first class things?
-
-Tags
-
-- as email lists
-
 Visual Polish
 
 - use action button for all actions
 -- icon for every action
+
+Random
+
+- use microformat tags where possible - hcard, etc
