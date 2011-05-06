@@ -41,8 +41,8 @@ my @address_types;
           exclude     => ['address_is_preferred'],
           objects     => $address ? [ $address ] : [] &>
       <div class="form-item">
-        <label class="for-field" for="address.<% $id %>.address_type_id"">Address:</label>
-        <select name="address.<% $id %>.address_type_id">
+        <label class="for-field" for="address.<% $id %>.address_type_id">Address:</label>
+        <select name="address.<% $id %>.address_type_id" id="address.<% $id %>.address_type_id">
 % for my $type (@address_types) {
           <option value="<% $type->address_type_id() %>"><% $type->name() %></option>
 % }
@@ -91,7 +91,7 @@ my @address_types;
       <div class="form-item no-label">
         <input type="radio" name="address_is_preferred" value="<% $id %>"
                <% $is_preferred ? q{checked="checked"} : q{} | n %>
-               id="address_is_preferred-<% $id %>" />
+               id="address_is_preferred.<% $id %>" />
         <label class="for-radio <% $is_preferred ? 'selected' : q{} %>"
                for="address_is_preferred.<% $id %>"
                id="for-address_is_preferred.<% $id %>">This is the preferred address</label>

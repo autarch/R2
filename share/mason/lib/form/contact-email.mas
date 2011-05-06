@@ -2,7 +2,7 @@
     <legend>Email Addresses</legend>
 
     <div class="form-item">
-      <label class="for-field" for="allows_email">Email is ok?</label>
+      <label class="for-field">Email is ok?</label>
 
 % if ( $contact && $contact->email_opt_out() ) {
       <& /lib/contact-view/email-opt-out.mas, contact => $contact &>
@@ -67,7 +67,7 @@ $emails = $contact->email_addresses()
       </div>
 
       <div class="form-item">
-        <label class="secondary" for="email_address_note-<% $id %>">Note:</label>
+        <label class="secondary" for="email_address.<% $id %>.note">Note:</label>
         <input type="text" class="text wide" name="email_address.<% $id %>.note" id="email_address.<% $id %>.note" />
       </div>
 
