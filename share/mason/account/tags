@@ -8,6 +8,7 @@
       <th>Tag</th>
       <th># of Contacts</th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
 % while ( my $tag = $tags->next() ) {
@@ -22,6 +23,12 @@
 %   }
       </td>
       <td><% $count ? $count : 'unused' %></td>
+      <td>
+%   if ( $tag->email_list() ) {
+
+%   } else {
+        <a href="<% $tag->uri( view => 'email_list_form' ) %>">Make this tag an email list</a>
+%   }
       <td>
 %   if ($count) {
         <form class="inline" action="<% $tag->uri( view => 'confirm_deletion' ) %>" method="get">

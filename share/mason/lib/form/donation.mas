@@ -41,8 +41,8 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="source">Source:</label>
-      <select name="donation_source_id">
+      <label class="for-field" for="donation_source_id">Source:</label>
+      <select name="donation_source_id" id="donation_source_id">
 % while ( my $source = $sources->next() ) {
         <option value="<% $source->donation_source_id() %>"><% $source->name() %></option>
 % }
@@ -50,8 +50,8 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="campaign">Campaign:</label>
-      <select name="donation_campaign_id">
+      <label class="for-field" for="donation_campaign_id">Campaign:</label>
+      <select name="donation_campaign_id" id="donation_campaign_id">
 % while ( my $campaign = $campaigns->next() ) {
         <option value="<% $campaign->donation_campaign_id() %>"><% $campaign->name() %></option>
 % }
@@ -59,8 +59,8 @@
     </div>
 
     <div class="form-item">
-      <label class="for-field" for="payment_type">Payment type:</label>
-      <select name="payment_type_id">
+      <label class="for-field" for="payment_type_id">Payment type:</label>
+      <select name="payment_type_id" id="payment_type_id">
 % while ( my $type = $payment_types->next() ) {
         <option value="<% $type->payment_type_id() %>"><% $type->name() %></option>
 % }
@@ -108,7 +108,7 @@
 
     <div class="form-item">
       <label class="for-field" for="dedication">Dedication:</label>
-      <select name="dedication">
+      <select name="dedication" id="dedication">
         <option value="In honor of">In honor of</option>
         <option value="In memory of">In memory of</option>
       </select>

@@ -12,8 +12,8 @@
     <legend><% $note ? 'Edit a note' : 'Add a new note' %></legend>
 
     <div class="form-item">
-      <label class="for-field" for="source">About what?</label>
-      <select name="contact_note_type_id">
+      <label class="for-field" for="contact_note_type_id">About what?</label>
+      <select name="contact_note_type_id" id="contact_note_type_id">
 % while ( my $type = $types->next() ) {
         <option value="<% $type->contact_note_type_id() %>"><% $type->description() %></option>
 % }
@@ -30,7 +30,7 @@
 
     <div class="form-item">
       <label class="for-field" for="note">Note:</label>
-      <textarea name="note" class="tall wide"></textarea>
+      <textarea name="note" id="note" class="tall wide"></textarea>
     </div>
 
     <div class="form-item">
