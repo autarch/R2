@@ -36,7 +36,8 @@ Add a new activity
     </div>
 
     <div class="form-item">
-      <input class="action-button" type="submit" value="Create a new activity" />
+      <input class="action-button" type="submit"
+             value="<% $activity ? 'Update this activity' : 'Create a new activity' %>" />
     </div>
 
   </fieldset>
