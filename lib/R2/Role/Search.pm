@@ -328,7 +328,8 @@ sub new_uri {
     delete $query{page} if $query{page} && $query{page} == 1;
 
     delete $query{order_by}
-        if $query{order_by} eq
+        if defined $query{order_by}
+            && $query{order_by} eq
             $self->meta()->get_attribute('order_by')->default();
 
     delete $query{reverse_order} unless $query{reverse_order};
