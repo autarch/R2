@@ -41,7 +41,11 @@ my @address_types;
           exclude     => ['address_is_preferred'],
           objects     => $address ? [ $address ] : [] &>
       <div class="form-item">
-        <label class="for-field" for="address.<% $id %>.address_type_id">Address:</label>
+        <label class="for-field"
+% if ( @address_types > 1 ) {
+               for="address.<% $id %>.address_type_id"
+% }
+               >Address:</label>
         <select name="address.<% $id %>.address_type_id" id="address.<% $id %>.address_type_id">
 % for my $type (@address_types) {
           <option value="<% $type->address_type_id() %>"><% $type->name() %></option>

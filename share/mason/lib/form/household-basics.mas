@@ -2,7 +2,7 @@
     <legend>The Basics</legend>
 
     <div class="form-item">
-      <label class="for-field" for="first_name">Name:</label>
+      <label class="for-field" for="name">Name:</label>
       <input type="text" class="text" name="name" id="name" />
     </div>
 
