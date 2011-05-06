@@ -6,7 +6,13 @@
 % }
 
   <fieldset>
-    <legend>Add a new activity</legend>
+    <legend>
+% if ($activity) {
+<% $activity->name() %>
+% } else {
+Add a new activity
+% }
+    </legend>
 
     <div class="form-item">
       <label class="for-field" for="name">Activity name:</label>
