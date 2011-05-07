@@ -9,6 +9,8 @@ use Chloro::Error::Form;
 use R2::Types qw( ArrayRef ClassName NonEmptyStr );
 use R2::Web::Util qw( table_to_chloro_fields );
 
+with 'R2::Role::Web::ErrorsFromSchema';
+
 parameter classes => (
     isa => ArrayRef [ClassName],
     required => 1,
@@ -38,7 +40,8 @@ role {
     $skip{$_} = 1 for @{ $p->skip() };
 
     $consumer->add_field($_)
-        for map { table_to_chloro_fields( $_, \%skip ) } @tables;
+        for grep { !$consumer->has_field( $_->name() ) }
+        map { table_to_chloro_fields( $_, \%skip ) } @tables;
 
     my $validate_against = $p->classes()->[0];
 
@@ -62,29 +65,7 @@ role {
 
         my @errors = $invocant->$meth( %{$params} );
 
-        for my $error (@errors) {
-            if ( my $field = delete $error->{field} ) {
-                next if $skip{$field};
-
-                my $result = $resultset->result_for($field);
-                my $field_obj = $self->meta()->get_field($field)
-                    or die "No field for $field in " . ref $self;
-
-                $result->add_error(
-                    Chloro::Error::Field->new(
-                        field   => $field_obj,
-                        message => Chloro::ErrorMessage->new($error),
-                    )
-                );
-            }
-            else {
-                $resultset->add_form_error(
-                    Chloro::Error::Form->new(
-                        message => Chloro::ErrorMessage->new($error)
-                    )
-                );
-            }
-        }
+        $self->_process_errors( \@errors, $resultset, $resultset, \%skip );
 
         return $resultset;
     };

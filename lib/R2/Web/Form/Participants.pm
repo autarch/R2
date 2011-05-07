@@ -9,14 +9,10 @@ use R2::Types qw( ArrayRef NonEmptySimpleStr NonEmptyStr PositiveInt );
 
 with 'R2::Role::Web::Form', 'R2::Role::Web::Form::StartAndEndDates';
 
-field participation_type_id => (
-    isa      => PositiveInt,
-    required => 1,
-);
-
-field description => (
-    isa => NonEmptyStr,
-);
+with 'R2::Role::Web::Form::FromSchema' => {
+    classes => ['R2::Schema::ContactParticipation'],
+    skip    => [ 'activity_id', 'contact_id' ],
+};
 
 field participants => (
     isa => ArrayRef [NonEmptySimpleStr],

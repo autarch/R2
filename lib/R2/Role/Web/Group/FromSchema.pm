@@ -8,6 +8,8 @@ use R2::Types qw( ArrayRef ClassName HashRef NonEmptyStr );
 use R2::Web::Util qw( table_to_chloro_fields );
 use Scalar::Util qw( blessed );
 
+with 'R2::Role::Web::ErrorsFromSchema';
+
 parameter group => (
     isa      => NonEmptyStr,
     required => 1,
@@ -109,35 +111,12 @@ role {
         }
 
         my @errors = $invocant->$meth( %{ $params->{$group_name}{$key} } );
-        return unless @errors;
 
         my $group_key = $group_name . q{.} . $key;
         my $group_result = $resultset->result_for($group_key)
             or die "No group result for $group_key";
 
-        for my $error (@errors) {
-            if ( my $field = delete $error->{field} ) {
-                # If we try to validate an insert when we've left a field out
-                # of the form (like EmailAddress.contact_id), we'll get an
-                # error, but it should be ignored.
-                next if $skip{$field};
-
-                my $result = $group_result->result_for($field);
-                $result->add_error(
-                    Chloro::Error::Field->new(
-                        field   => $group->get_field($field),
-                        message => Chloro::ErrorMessage->new($error),
-                    )
-                );
-            }
-            else {
-                $resultset->add_form_error(
-                    Chloro::Error::Form->new(
-                        message => Chloro::ErrorMessage->new($error)
-                    )
-                );
-            }
-        }
+        $self->_process_errors( \@errors, $group_result, $resultset, \%skip );
     };
 };
 

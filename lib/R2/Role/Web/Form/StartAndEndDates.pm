@@ -25,7 +25,7 @@ sub _validate_end_date {
 
     return unless defined $end;
 
-    my $start = $self->_datetime_from_str(@_);
+    my ($start) = $self->_datetime_from_str(@_);
 
     return if $start && $start <= $end;
 

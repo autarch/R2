@@ -848,22 +848,11 @@ sub _post_participants {
     my %base_vals = %{$params};
     $base_vals{activity_id} = $activity->activity_id();
 
-    eval {
-        R2::Schema::ContactParticipation->insert_many(
-            map {
-                { %base_vals, contact_id => $_ }
-                } @{$ids}
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri =>
-                $activity->uri( view => 'participants_form' ),
-            form_data => { %{$params}, contact_id => $ids },
-        );
-    }
+    R2::Schema::ContactParticipation->insert_many(
+        map {
+            { %base_vals, contact_id => $_ }
+            } @{$ids}
+    );
 
     $c->session_object()
         ->add_message( 'The participants have been added to the '
@@ -988,7 +977,7 @@ post q{}
         $participation->uri( view => 'edit_form' )
     );
 
-    eval { $participation->update( %{ $result->results_as_hash() } ) };
+    $participation->update( %{ $result->results_as_hash() } );
 
     if ( my $e = $@ ) {
         $c->redirect_with_error(
