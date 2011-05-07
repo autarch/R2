@@ -7,10 +7,8 @@ $prefix      => q{}
 </%args>
 
 <%init>
-my $params
-    = $c->session_object()->resultset()
-    ? $c->session_object()->resultset()->secure_raw_params()
-    : $c->session_object()->form_data();
+my $params = $c->session_object()->resultset()->secure_raw_params()
+    if $c->session_object()->resultset();
 
 my @data_sources;
 push @data_sources, $params if keys %{$params};
@@ -30,7 +28,6 @@ my $form = R2::Web::FormMunger->new(
         ? ( resultset => $c->session_object()->resultset() )
         : ()
     ),
-    errors      => [ $c->session_object()->errors ],
     form_data   => $form_data,
     exclude     => \@exclude,
     is_fragment => $is_fragment,

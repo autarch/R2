@@ -65,7 +65,13 @@ role {
 
         my @errors = $invocant->$meth( %{$params} );
 
-        $self->_process_errors( \@errors, $resultset, $resultset, \%skip );
+        $self->_process_errors(
+            \@errors,
+            $resultset,
+            $resultset,
+            $self->meta(),
+            \%skip,
+        );
 
         return $resultset;
     };

@@ -11,13 +11,6 @@ use MooseX::Params::Validate qw( pos_validated_list );
 use MooseX::SemiAffordanceAccessor;
 use MooseX::StrictConstructor;
 
-has form_data => (
-    is      => 'rw',
-    isa     => HashRef,
-    lazy    => 1,
-    default => sub { {} },
-);
-
 has resultset => (
     is  => 'rw',
     isa => 'Chloro::ResultSet',

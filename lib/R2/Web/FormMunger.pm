@@ -43,12 +43,6 @@ has resultset => (
     predicate => '_has_resultset',
 );
 
-has 'errors' => (
-    is      => 'ro',
-    isa     => ArrayRef [ ChloroError | HashRef | Str ],
-    default => sub { [] },
-);
-
 has 'form_data' => (
     is        => 'ro',
     isa       => 'R2::Web::FormData',
@@ -91,21 +85,11 @@ sub _fill_in_form {
 sub _fill_errors {
     my $self = shift;
 
-    if ( $self->_has_resultset() ) {
-        $self->_handle_resultset();
-    }
-    else {
-        $self->_handle_old_style_errors();
-    }
-}
-
-sub  _handle_resultset {
-    my $self = shift;
+    return unless $self->_has_resultset();
+    return if $self->resultset()->is_valid();
 
     my $form = $self->_dom()->getElementsByTagName('form')->[0];
     return unless $form;
-
-    return if $self->resultset()->is_valid();
 
     my @errors = map { $self->_errors_for_result($_) }
         $self->resultset()->all_errors();
@@ -155,53 +139,6 @@ sub _apply_errors_to_form {
         }
 
         my $p = $self->_create_error_para( $error->{text} );
-
-        $error_div->appendChild($p);
-    }
-
-    $form->insertBefore( $error_div, $form->firstChild() );
-
-    return;
-}
-
-sub  _handle_old_style_errors {
-    my $self = shift;
-
-    my $errors = $self->errors();
-    return unless @{$errors};
-
-    my $form = $self->_dom()->getElementsByTagName('form')->[0];
-    return unless $form;
-
-    my $error_div = $self->_dom()->createElement('div');
-    $error_div->className('form-error');
-
-    for my $error ( @{$errors} ) {
-        my $field;
-        my $message;
-
-        if ( ref $error && $error->{field} ) {
-            $field = $error->{field};
-            $message = $error->{message} || $error->{text};
-        }
-        else {
-            $message
-                = ref $error
-                ? ( $error->{message} || $error->{text} )
-                : $error;
-        }
-
-        if ( defined $field ) {
-            if ( my $div = $self->_get_div_for_field($field) ) {
-
-                $div->className( $div->className() . ' error' );
-
-                my $p = $self->_create_error_para($message);
-                $div->insertBefore( $p, $div->firstChild() );
-            }
-        }
-
-        my $p = $self->_create_error_para($message);
 
         $error_div->appendChild($p);
     }

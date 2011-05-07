@@ -21,9 +21,7 @@ get_html login_form
     my $self = shift;
     my $c    = shift;
 
-    $c->stash()->{return_to} 
-        = $c->request()->params()->{return_to}
-        || $c->session_object()->form_data()->{return_to}
+    $c->stash()->{return_to} = $c->request()->params()->{return_to}
         || $c->domain()->application_uri( path => q{} );
 
     $c->stash()->{template} = '/user/login_form';

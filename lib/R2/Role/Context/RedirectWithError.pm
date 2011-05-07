@@ -9,16 +9,15 @@ use JSON::XS;
 
 use Moose::Role;
 use MooseX::Params::Validate qw( validated_hash validated_list );
-use R2::Types qw( ErrorForSession URIStr HashRef );
+use R2::Types qw( ErrorForSession URIStr );
 
 # These are not available yet?
 #requires qw( redirect_and_detach session_object );
 
 {
     my %spec = (
-        uri       => { isa => URIStr,          coerce   => 1 },
-        error     => { isa => ErrorForSession, optional => 1 },
-        form_data => { isa => HashRef,         optional => 1 },
+        uri   => { isa => URIStr,          coerce   => 1 },
+        error => { isa => ErrorForSession, optional => 1 },
     );
 
     sub redirect_with_error {
@@ -29,8 +28,6 @@ use R2::Types qw( ErrorForSession URIStr HashRef );
 
         $self->session_object()->add_error( $p{error} )
             if $p{error};
-        $self->session_object()->set_form_data( $p{form_data} )
-            if $p{form_data};
 
         $self->_redirect( $p{uri} );
     }

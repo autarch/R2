@@ -116,7 +116,13 @@ role {
         my $group_result = $resultset->result_for($group_key)
             or die "No group result for $group_key";
 
-        $self->_process_errors( \@errors, $group_result, $resultset, \%skip );
+        $self->_process_errors(
+            \@errors,
+            $group_result,
+            $resultset,
+            $group,
+            \%skip,
+        );
     };
 };
 

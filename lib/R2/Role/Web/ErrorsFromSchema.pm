@@ -14,6 +14,7 @@ sub _process_errors {
     my $errors          = shift;
     my $field_resultset = shift;
     my $form_resultset  = shift;
+    my $fields_from     = shift;
     my $skip            = shift;
 
     return unless @{$errors};
@@ -26,9 +27,10 @@ sub _process_errors {
             # it should be ignored.
             next if $skip->{$field};
 
-            my $result    = $field_resultset->result_for($field);
-            my $field_obj = $self->meta()->get_field($field)
-                or die "No field for $field in " . ref $self;
+            my $field_obj = $fields_from->get_field($field)
+                or next;
+
+            my $result = $field_resultset->result_for($field);
 
             if ( $error->{category} eq 'missing' ) {
                 next

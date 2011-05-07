@@ -8,7 +8,6 @@ use CatalystX::RoleApplicator;
 use Catalyst::Plugin::Session;
 use Catalyst::Request::REST::ForBrowsers;
 use R2::Config;
-use R2::Request;
 use R2::Schema;
 use R2::Web::Session;
 
@@ -88,8 +87,6 @@ with qw(
 
     __PACKAGE__->config(\%config);
 }
-
-__PACKAGE__->apply_request_class_roles('R2::Request');
 
 R2::Schema->EnableObjectCaches();
 
