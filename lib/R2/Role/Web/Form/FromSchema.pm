@@ -64,10 +64,15 @@ role {
 
         for my $error (@errors) {
             if ( my $field = delete $error->{field} ) {
+                next if $skip{$field};
+
                 my $result = $resultset->result_for($field);
+                my $field_obj = $self->meta()->get_field($field)
+                    or die "No field for $field in " . ref $self;
+
                 $result->add_error(
                     Chloro::Error::Field->new(
-                        field   => $self->meta()->get_field($field),
+                        field   => $field_obj,
                         message => Chloro::ErrorMessage->new($error),
                     )
                 );

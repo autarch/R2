@@ -644,15 +644,7 @@ post 'activities'
     my $params = $result->results_as_hash();
     $params->{account_id} = $account->account_id();
 
-    my $activity = eval { R2::Schema::Activity->insert( %{$params} ) };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'activities' ),
-            form_data => $params,
-        );
-    }
+    my $activity = R2::Schema::Activity->insert( %{$params} );
 
     $c->session_object()
         ->add_message(
@@ -733,6 +725,7 @@ put q{}
             $c,
             'Activity',
             $activity->uri( view => 'edit_form' ),
+            { entity => $activity },
         );
 
         $params = $result->results_as_hash();
@@ -747,15 +740,7 @@ put q{}
         )
         : 'has been updated';
 
-    eval { $activity->update( %{$params} ) };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $activity->uri( view => 'edit_form' ),
-            form_data => $params,
-        );
-    }
+    $activity->update( %{$params} );
 
     $c->session_object()
         ->add_message(
