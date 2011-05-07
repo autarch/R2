@@ -979,14 +979,6 @@ post q{}
 
     $participation->update( %{ $result->results_as_hash() } );
 
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $participation->uri( view => 'edit_form' ),
-            form_data => $result->results_as_hash(),
-        );
-    }
-
     $c->redirect_and_detach( $participation->activity()->uri() );
 };
 
