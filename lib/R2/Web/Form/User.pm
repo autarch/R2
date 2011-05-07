@@ -11,11 +11,16 @@ use R2::Util qw( string_is_empty );
 
 with 'R2::Role::Web::Form';
 
-field username => (
-    human_name => 'email address',
-    isa        => NonEmptyStr,
-    required   => 1,
-);
+with 'R2::Role::Web::Form::FromSchema' => {
+    classes => ['R2::Schema::User'],
+    skip    => [
+        'account_id',
+        'creation_datetime',
+        'is_system_admin',
+        'last_modified_datetime',
+        'password',
+    ],
+};
 
 field password => (
     isa    => NonEmptyStr,
@@ -28,30 +33,12 @@ field password2 => (
 );
 
 field first_name => (
-    isa => NonEmptyStr,
+    isa      => NonEmptyStr,
+    required => 1,
 );
 
 field last_name => (
-    isa => NonEmptyStr,
-);
-
-field date_style => (
     isa      => NonEmptyStr,
-    required => 1,
-);
-
-field use_24_hour_time => (
-    isa      => Bool,
-    required => 1,
-);
-
-field time_zone => (
-    isa      => NonEmptyStr,
-    required => 1,
-);
-
-field role_id => (
-    isa      => DatabaseId,
     required => 1,
 );
 
@@ -69,12 +56,12 @@ sub _extract_is_system_admin {
 }
 
 sub _validate_form {
-    my $self = shift;
-    my $params = shift;
+    my $self    = shift;
+    my $params  = shift;
     my $results = shift;
 
-    my $pw1 = $results->{password}->value();
-    my $pw2 = $results->{password2}->value();
+    my $pw1 = $results->{password}  ? $results->{password}->value()  : q{};
+    my $pw2 = $results->{password2} ? $results->{password2}->value() : q{};
 
     return if all { string_is_empty($_) } $pw1, $pw2;
 

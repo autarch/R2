@@ -455,14 +455,7 @@ del q{}
 
     my $name = $contact->real_contact()->display_name();
 
-    eval { $contact->delete( user => $c->user() ); };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error => $e,
-            uri   => $contact->uri(),
-        );
-    }
+    $contact->delete( user => $c->user() );
 
     $c->session_object()
         ->add_message("The contact record for $name has been deleted.");
@@ -544,30 +537,20 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $new_form )
             );
 
-            eval {
-                R2::Schema->RunInTransaction(
-                    sub {
-                        my $p = $resultset->results_as_hash();
+            R2::Schema->RunInTransaction(
+                sub {
+                    my $p = $resultset->results_as_hash();
 
-                        if ( $type eq 'donation' ) {
-                            $self->_dedication_contact( $c, $resultset, $p );
-                        }
-
-                        $contact->$add_method(
-                            %{$p},
-                            $user_params_for_add->($c),
-                        );
+                    if ( $type eq 'donation' ) {
+                        $self->_dedication_contact( $c, $resultset, $p );
                     }
-                );
-            };
 
-            if ( my $e = $@ ) {
-                $c->redirect_with_error(
-                    error     => $e,
-                    uri       => $contact->uri( view => $new_form ),
-                    form_data => $resultset->results_as_hash()
-                );
-            }
+                    $contact->$add_method(
+                        %{$p},
+                        $user_params_for_add->($c),
+                    );
+                }
+            );
 
             my $name = $contact->real_contact()->display_name();
 
@@ -694,12 +677,15 @@ for my $type ( qw( donation note ) ) {
 
             my $contact = $c->stash()->{contact};
 
+            my $entity = $c->stash()->{$type};
+
             $self->_check_authz(
                 $c,
                 'can_edit_contact',
                 { contact => $contact },
                 "You are not allowed to add $plural.",
                 $contact->uri( view => $plural ),
+                { entity => $entity },
             );
 
             my $resultset = $self->_process_form(
@@ -708,32 +694,20 @@ for my $type ( qw( donation note ) ) {
                 $contact->uri( view => $new_form )
             );
 
-            my $entity = $c->stash()->{$type};
+            R2::Schema->RunInTransaction(
+                sub {
+                    my $p = $resultset->results_as_hash();
 
-            eval {
-                R2::Schema->RunInTransaction(
-                    sub {
-                        my $p = $resultset->results_as_hash();
-
-                        if ( $type eq 'donation' ) {
-                            $self->_dedication_contact( $c, $resultset, $p );
-                        }
-
-                        $entity->update(
-                            %{$p},
-                            $user_params_for_update->($c),
-                        );
+                    if ( $type eq 'donation' ) {
+                        $self->_dedication_contact( $c, $resultset, $p );
                     }
-                );
-            };
 
-            if ( my $e = $@ ) {
-                $c->redirect_with_error(
-                    error     => $e,
-                    uri       => $entity->uri( view => 'edit_form' ),
-                    form_data => $resultset->results_as_hash()
-                );
-            }
+                    $entity->update(
+                        %{$p},
+                        $user_params_for_update->($c),
+                    );
+                }
+            );
 
             $c->session_object()
                 ->add_message("The $type has been updated.");
@@ -760,14 +734,7 @@ for my $type ( qw( donation note ) ) {
 
             my $entity = $c->stash()->{$type};
 
-            eval { $entity->delete( user => $c->user() ); };
-
-            if ( my $e = $@ ) {
-                $c->redirect_with_error(
-                    error => $e,
-                    uri   => $contact->uri( view => $plural ),
-                );
-            }
+            $entity->delete( user => $c->user() );
 
             $c->session_object()
                 ->add_message("The $type was deleted.");

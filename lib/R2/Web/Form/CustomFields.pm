@@ -1,44 +1,22 @@
 package R2::Web::Form::CustomFields;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 
-use namespace::autoclean;
-
 use Moose::Meta::Class;
 use R2::Role::Web::ResultSet::NewAndExistingGroups;
-use R2::Types qw( Bool NonEmptyStr );
 use R2::Util qw( string_is_empty );
 
 with 'R2::Role::Web::Form';
 
-group custom_field => (
-    repetition_key   => 'custom_field_id',
+with 'R2::Role::Web::Group::FromSchema' => {
+    group            => 'custom_field',
     is_empty_checker => '_custom_field_is_empty',
-    (
-        field label => (
-            isa      => NonEmptyStr,
-            required => 1,
-        )
-    ),
-    (
-        field description => (
-            isa => NonEmptyStr,
-        )
-    ),
-    (
-        field type => (
-            isa      => NonEmptyStr,
-            required => 1,
-        )
-    ),
-    (
-        field is_required => (
-            isa     => Bool,
-            default => 0,
-        )
-    ),
-);
+    classes          => ['R2::Schema::CustomField'],
+    skip => [ 'account_id', 'custom_field_group_id', 'display_order', 'html_widget_id' ],
+};
 
 sub _custom_field_is_empty {
     my $self   = shift;

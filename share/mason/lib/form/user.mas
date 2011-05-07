@@ -43,7 +43,7 @@
       <label class="for-field" for="date_style">Date style:</label>
       <select name="date_style" id="date_style">
 % for my $style ( qw( American European YMD ) ) {
-        <option value="<% $style %>"><% $today->format_cldr( $date_formats{$style} ) %></option>
+        <option value="<% $style %>"><% $sample_date->format_cldr( $date_formats{$style} ) %></option>
 % }
       </select>
     </div>
@@ -52,7 +52,7 @@
       <label class="for-field" for="use_24_hour_time">Time style:</label>
       <select name="use_24_hour_time" id="use_24_hour_time">
 % for my $style ( 12, 24 ) {
-        <option value="<% $style == 12 ? 0 : 1 %>"><% $today->format_cldr( $time_formats{$style} ) %></option>
+        <option value="<% $style == 12 ? 0 : 1 %>"><% $sample_date->format_cldr( $time_formats{$style} ) %></option>
 % }
       </select>
     </div>
@@ -116,7 +116,15 @@ my $is_system_admin = $user && $user->is_system_admin ? 1 : 0;
 my $show_system_admin = $c->user()->is_system_admin() && !$user
     || $user->user_id() != $c->user()->user_id();
 
-my $today = DateTime->now( time_zone => $user ? $user->time_zone() : 'UTC' );
+my $sample_date = DateTime->new(
+    year   => 2011,
+    month  => 5,
+    day    => 7,
+    hour   => 14,
+    minute => 32,
+    ( time_zone => $user ? $user->time_zone() : 'UTC' )
+);
+
 my %date_formats = R2::Schema::User->DateFormats();
 my %time_formats = R2::Schema::User->TimeFormats();
 </%init>

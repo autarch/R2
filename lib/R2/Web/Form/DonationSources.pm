@@ -1,25 +1,20 @@
 package R2::Web::Form::DonationSources;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 
-use namespace::autoclean;
-
 use Moose::Meta::Class;
 use R2::Role::Web::ResultSet::NewAndExistingGroups;
-use R2::Types qw( NonEmptyStr );
 
 with 'R2::Role::Web::Form';
 
-group donation_source => (
-    repetition_key => 'donation_source_id',
-    (
-        field name => (
-            isa      => NonEmptyStr,
-            required => 1,
-        )
-    )
-);
+with 'R2::Role::Web::Group::FromSchema' => {
+    group   => 'donation_source',
+    classes => ['R2::Schema::DonationSource'],
+    skip    => [ 'account_id', 'display_order' ],
+};
 
 {
     my $Class = Moose::Meta::Class->create_anon_class(

@@ -181,10 +181,10 @@ sub status_forbidden {
 }
 
 sub _process_form {
-    my $self = shift;
-    my $c    = shift;
-    my $name = shift;
-    my $uri  = shift;
+    my $self   = shift;
+    my $c      = shift;
+    my $name   = shift;
+    my $uri    = shift;
     my $form_p = shift;
 
     my $class = 'R2::Web::Form::' . $name;

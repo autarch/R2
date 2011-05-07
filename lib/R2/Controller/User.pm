@@ -146,6 +146,7 @@ put q{}
             $c,
             'User',
             $user->uri( view => 'edit_form' ),
+            { entity => $user },
         );
 
         $params = $result->results_as_hash();
@@ -157,15 +158,10 @@ put q{}
     delete $params->{is_disabled}
         unless $c->user()->role()->name() eq 'Admin';
 
-    eval { $user->update( %{$params}, user => $c->user() ) };
+    delete $params->{role_id}
+        unless $c->user()->can_edit_account( account => $c->account() );
 
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $user->uri( view => 'edit_form' ),
-            form_data => ( $result ? $result->secure_results_as_has() : {} ),
-        );
-    }
+    $user->update( %{$params}, user => $c->user() );
 
     my $whos
         = $c->user()->user_id() == $user->user_id()

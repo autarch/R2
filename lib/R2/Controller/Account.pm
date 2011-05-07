@@ -171,20 +171,10 @@ post donation_sources
         $account->uri( view => 'donation_sources_form' ),
     );
 
-    eval {
-        $account->update_or_add_donation_sources(
-            $result->existing_donation_sources(),
-            $result->new_donation_sources(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'donation_sources_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_donation_sources(
+        $result->existing_donation_sources(),
+        $result->new_donation_sources(),
+    );
 
     $c->session_object()
         ->add_message( 'The donation sources for '
@@ -209,20 +199,10 @@ post donation_campaigns
         $account->uri( view => 'donation_campaigns_form' ),
     );
 
-    eval {
-        $account->update_or_add_donation_campaigns(
-            $result->existing_donation_campaigns(),
-            $result->new_donation_campaigns(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'donation_campaigns_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_donation_campaigns(
+        $result->existing_donation_campaigns(),
+        $result->new_donation_campaigns(),
+    );
 
     $c->session_object()
         ->add_message( 'The donation campaigns for '
@@ -247,20 +227,10 @@ post payment_types
         $account->uri( view => 'payment_types_form' ),
     );
 
-    eval {
-        $account->update_or_add_payment_types(
-            $result->existing_payment_types(),
-            $result->new_payment_types(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'payment_types_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_payment_types(
+        $result->existing_payment_types(),
+        $result->new_payment_types(),
+    );
 
     $c->session_object()
         ->add_message(
@@ -284,20 +254,10 @@ post address_types
         $account->uri( view => 'address_types_form' ),
     );
 
-    eval {
-        $account->update_or_add_address_types(
-            $result->existing_address_types(),
-            $result->new_address_types(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'address_types_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_address_types(
+        $result->existing_address_types(),
+        $result->new_address_types(),
+    );
 
     $c->session_object()
         ->add_message(
@@ -321,20 +281,10 @@ post phone_number_types
         $account->uri( view => 'phone_number_types_form' ),
     );
 
-    eval {
-        $account->update_or_add_phone_number_types(
-            $result->existing_phone_number_types(),
-            $result->new_phone_number_types(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'phone_number_types_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_phone_number_types(
+        $result->existing_phone_number_types(),
+        $result->new_phone_number_types(),
+    );
 
     $c->session_object()
         ->add_message( 'The phone number types for '
@@ -359,20 +309,10 @@ post contact_note_types
         $account->uri( view => 'contact_note_type_form' ),
     );
 
-    eval {
-        $account->update_or_add_contact_note_types(
-            $result->existing_contact_note_types(),
-            $result->new_contact_note_types(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'contact_note_types_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_contact_note_types(
+        $result->existing_contact_note_types(),
+        $result->new_contact_note_types(),
+    );
 
     $c->session_object()
         ->add_message( 'The contact history types for '
@@ -397,20 +337,10 @@ post custom_field_groups
         $account->uri( view => 'custom_field_groups_form' ),
     );
 
-    eval {
-        $account->update_or_add_custom_field_groups(
-            $result->existing_custom_field_groups(),
-            $result->new_custom_field_groups(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'custom_field_groups_form' ),
-            form_data => $c->request()->params(),
-        );
-    }
+    $account->update_or_add_custom_field_groups(
+        $result->existing_custom_field_groups(),
+        $result->new_custom_field_groups(),
+    );
 
     $c->session_object()
         ->add_message( 'The custom field groups for '
@@ -465,20 +395,10 @@ post q{}
         $group->uri(),
     );
 
-    eval {
-        $group->update_or_add_custom_fields(
-            $result->existing_custom_fields(),
-            $result->new_custom_fields(),
-        );
-    };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $group->uri(),
-            form_data => $c->request()->params(),
-        );
-    }
+    $group->update_or_add_custom_fields(
+        $result->existing_custom_fields(),
+        $result->new_custom_fields(),
+    );
 
     $c->session_object()
         ->add_message(
@@ -511,16 +431,7 @@ post user
 
     $params->{account_id} = $account->account_id();
 
-    my $user
-        = eval { R2::Schema::User->insert( %{$params}, user => $c->user() ) };
-
-    if ( my $e = $@ ) {
-        $c->redirect_with_error(
-            error     => $e,
-            uri       => $account->uri( view => 'new_user_form' ),
-            form_data => $result->secure_results_as_hash(),
-        );
-    }
+    my $user = R2::Schema::User->insert( %{$params}, user => $c->user() );
 
     $c->session_object()
         ->add_message(
@@ -659,14 +570,6 @@ post email_list
 
     my $account = $c->stash()->{account};
     my $tag     = $c->stash()->{tag};
-
-    $self->_check_authz(
-        $c,
-        'can_edit_account_content',
-        { account => $c->account() },
-        'You are not authorized to edit this account',
-        $c->domain()->application_uri( path => q{} ),
-    );
 
     my $resultset = $self->_process_form(
         $c,

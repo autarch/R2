@@ -1,25 +1,20 @@
 package R2::Web::Form::PaymentTypes;
 
+use namespace::autoclean;
+
 use Moose;
 use Chloro;
 
-use namespace::autoclean;
-
 use Moose::Meta::Class;
 use R2::Role::Web::ResultSet::NewAndExistingGroups;
-use R2::Types qw( NonEmptyStr );
 
 with 'R2::Role::Web::Form';
 
-group payment_type => (
-    repetition_key => 'payment_type_id',
-    (
-        field name => (
-            isa      => NonEmptyStr,
-            required => 1,
-        )
-    )
-);
+with 'R2::Role::Web::Group::FromSchema' => {
+    group   => 'payment_type',
+    classes => ['R2::Schema::PaymentType'],
+    skip    => [ 'account_id', 'display_order' ],
+};
 
 {
     my $Class = Moose::Meta::Class->create_anon_class(

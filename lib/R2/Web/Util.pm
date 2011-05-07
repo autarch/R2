@@ -55,15 +55,17 @@ sub _column_to_chloro_field {
 
 {
     my %map = (
-        text          => Str,
-        blob          => Str,
-        EMAIL_ADDRESS => Str,
-        URI           => Str,
-        integer       => Int,
-        float         => Num,
-        boolean       => Bool,
-        date          => 'DateTime',
-        datetime      => 'DateTime',
+        text              => Str,
+        blob              => Str,
+        CUSTOM_FIELD_TYPE => Str,
+        DATE_STYLE        => Str,
+        EMAIL_ADDRESS     => Str,
+        URI               => Str,
+        integer           => Int,
+        float             => Num,
+        boolean           => Bool,
+        date              => 'DateTime',
+        datetime          => 'DateTime',
     );
 
     sub _type_for_column {
