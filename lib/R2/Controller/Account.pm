@@ -541,9 +541,9 @@ get_html confirm_deletion
     $c->stash()->{template} = '/shared/confirm_deletion';
 };
 
-get_html email_list_form
+get_html new_email_list_form
     => chained '_set_tag'
-    => path_part 'email_list_form'
+    => path_part 'new_email_list_form'
     => args 0
     => sub {
     my $self     = shift;
@@ -562,7 +562,6 @@ get_html email_list_form
 
 post email_list
     => chained '_set_tag'
-    => path_part 'email_list'
     => args 0
     => sub {
     my $self = shift;
@@ -574,13 +573,72 @@ post email_list
     my $resultset = $self->_process_form(
         $c,
         'EmailList',
-        $tag->uri( view => 'email_list_form' ),
+        $tag->uri( view => 'new_email_list_form' ),
     );
 
     R2::Schema::EmailList->insert(
         %{ $resultset->results_as_hash() },
         tag_id => $tag->tag_id(),
     );
+
+    $c->redirect_and_detach( $account->uri( view => 'tags' ) );
+};
+
+chain_point _set_email_list
+    => chained '_set_account'
+    => path_part 'email_list'
+    => capture_args 1
+    => sub {
+    my $self   = shift;
+    my $c      = shift;
+    my $tag_id = shift;
+
+    my $account = $c->stash()->{account};
+    my $tag = R2::Schema::Tag->new( tag_id => $tag_id );
+
+    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
+        unless $tag && $tag->email_list();
+
+    $c->stash()->{tag} = $tag;
+    $c->stash()->{email_list} = $tag->email_list();
+};
+
+get_html edit_form
+    => chained '_set_email_list'
+    => args 0
+    => sub {
+    my $self     = shift;
+    my $c        = shift;
+
+    $self->_check_authz(
+        $c,
+        'can_edit_account_content',
+        { account => $c->account() },
+        'You are not authorized to edit this account',
+        $c->domain()->application_uri( path => q{} ),
+    );
+
+    $c->stash()->{template} = '/account/email_list_form';
+};
+
+put q{}
+    => chained '_set_email_list'
+    => args 0
+    => sub {
+    my $self = shift;
+    my $c    = shift;
+
+    my $account = $c->stash()->{account};
+    my $list    = $c->stash()->{email_list};
+
+    my $resultset = $self->_process_form(
+        $c,
+        'EmailList',
+        $list->uri( view => 'edit_form' ),
+        { entity => $list },
+    );
+
+    $list->update( %{ $resultset->results_as_hash() } );
 
     $c->redirect_and_detach( $account->uri( view => 'tags' ) );
 };

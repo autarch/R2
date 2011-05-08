@@ -11,6 +11,7 @@ with 'R2::Role::Web::Form';
 
 with 'R2::Role::Web::Form::FromSchema' => {
     classes => ['R2::Schema::EmailList'],
+    skip    => ['tag_id'],
 };
 
 1;

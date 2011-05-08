@@ -26,9 +26,9 @@
       <td>
 %   if ( my $list = $tag->email_list() ) {
         List description: <% $list->description() %><br />
-        <a href="<% $list->uri( view => 'edit_form' ) %>">Edit its description</a>.
+        <a href="<% $tag->email_list()->uri( view => 'edit_form' ) %>">Edit its description</a>.
 %   } else {
-        <a href="<% $tag->uri( view => 'email_list_form' ) %>">Make this tag an email list</a>
+        <a href="<% $tag->uri( view => 'new_email_list_form' ) %>">Make this tag an email list</a>
 %   }
       <td>
 %   if ($count) {
