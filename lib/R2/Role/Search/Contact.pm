@@ -122,7 +122,7 @@ sub _order_by_name {
         my $sort_order = $self->reverse_order() ? 'ASC' : 'DESC';
 
         $select->order_by(
-            Fey::Literal::Clause->new( $order_by->alias_name() ),
+            Fey::Literal::Term->new( $order_by->alias_name() ),
             $sort_order,
             $name_clause,
             'ASC'
