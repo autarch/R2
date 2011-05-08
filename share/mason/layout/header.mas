@@ -12,8 +12,17 @@
            title="Help using <% R2::Config->instance()->software_name() %>">Help</a></li>
   </ul>
 
-  <div id="header">
-    <h1><% R2::Config->instance()->software_name() %></h1>
+  <div class id="header">
+    <div class="yui3-g">
+      <div class="yui3-u-3-5">
+        <h1><% R2::Config->instance()->software_name() %></h1>
+      </div>
+      <div class="yui3-u-2-5">
+        <div id="global-search">
+          <& contact-search.mas, %ARGS &>
+        </div>
+      </div>
+    </div>
 
     <div id="tabs">
       <ul>

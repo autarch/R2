@@ -1,23 +1,28 @@
 <div id="detail-view">
 
-<& /lib/contact-view/summary.mas, contact => $person, show_image => 1, show_edit_link => 1 &>
+  <& /lib/contact-view/summary.mas, contact => $person, show_image => 1, show_edit_link => 1 &>
+  <& /lib/contact-view/person-basics.mas, contact => $person &>
 
-<& /lib/contact-view/person-basics.mas, contact => $person &>
+  <div class="yui3-g">
+    <div class="yui3-u-3-4">
+      <& /lib/contact-view/email-addresses.mas, contact => $person &>
 
-<& /lib/contact-view/email-addresses.mas, contact => $person &>
+      <& /lib/contact-view/phone-numbers.mas, contact => $person &>
 
-<& /lib/contact-view/phone-numbers.mas, contact => $person &>
+      <& /lib/contact-view/addresses.mas, contact => $person &>
 
-<& /lib/contact-view/addresses.mas, contact => $person &>
+      <& /lib/contact-view/messaging-providers.mas, contact => $person &>
 
-<& /lib/contact-view/messaging-providers.mas, contact => $person &>
+      <& /lib/contact-view/websites.mas, contact => $person &>
 
-<& /lib/contact-view/websites.mas, contact => $person &>
-
-<& /lib/contact-view/custom-fields.mas, contact => $person &>
-
+      <& /lib/contact-view/custom-fields.mas, contact => $person &>
+    </div>
+    <div class="yui3-u-1-4">
+      <& /lib/contact-view/tags.mas, contact => $person &>
+    </div>
+  </div>
 </div>
-
+    
 <%args>
 $person
 </%args>

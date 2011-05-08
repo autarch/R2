@@ -18,37 +18,27 @@
 <div id="page">
 <& /layout/header.mas, %ARGS &>
 
-<div class="yui3-g">
-  <div class="<% $show_sidebar ? 'yui3-u-17-24' : 'yui3-u-1' %>">
-
-    <div id="content" class="<% $show_sidebar ? q{} : 'no-side-nav' %>">
-      <div id="local-nav">
-        <ul>
+  <div id="content" class="<% $show_sidebar ? q{} : 'no-side-nav' %>">
+    <div id="local-nav">
+      <ul>
 % for my $nav ( $c->local_nav()->items() ) {
-          <li class="<% $nav->is_selected() ? 'selected' : '' %>"
-              ><a href="<% $nav->uri() %>"
-                  title="<% $nav->tooltip %>"><% $nav->label() %></a></li>
+        <li class="<% $nav->is_selected() ? 'selected' : '' %>"
+            ><a href="<% $nav->uri() %>"
+                title="<% $nav->tooltip %>"><% $nav->label() %></a></li>
 % }
 % unless ( $c->local_nav()->has_items() ) {
-          <!-- we need an element here or else the height of the header
-              is different for a page with tabs vs one without -->
-          <li class="invisible">&nbsp;</li>
+        <!-- we need an element here or else the height of the header
+            is different for a page with tabs vs one without -->
+        <li class="invisible">&nbsp;</li>
 % }
-        </ul>
-      </div>
-      <& .messages &>
+      </ul>
+    </div>
+    <& .messages &>
 
 % $m->call_next();
-    </div>
   </div>
 
-% if ($show_sidebar) {
-<& /layout/sidebar.mas, %ARGS &>
-% }
-	
-</div>
-
-<& /layout/footer.mas, %ARGS &>
+  <& /layout/footer.mas, %ARGS &>
 </div>
 
 </body>
