@@ -6,7 +6,9 @@ use namespace::autoclean;
 
 use Fey::DBIManager::Source;
 use Fey::Loader;
+use Path::Class qw( file );
 use R2::Config;
+use Storable qw( store retrieve );
 
 use Fey::ORM::Schema;
 
@@ -29,11 +31,39 @@ else {
         post_connect => \&_set_dbh_attributes,
     );
 
-    my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
+    my $schema = _load_schema($source);
 
     has_schema $schema;
 
     __PACKAGE__->DBIManager()->add_source($source);
+}
+
+# The caching will not be used in production, but it makes reloading the
+# Catalyst dev server a bit quicker during development.
+sub _load_schema {
+    my $source = shift;
+
+    my $storable_file
+        = R2::Config->instance()->cache_dir()->file('R2.schema.storable');
+    my $sql_file = file(
+        file( $INC{'R2/Schema.pm'} )->dir(),
+        '..', '..',
+        'schema',
+        'R2.sql'
+    );
+
+    if (   !R2::Config->instance()->is_production()
+        && -f $storable_file
+        && -f $sql_file
+        && $storable_file->stat()->mtime() >= $sql_file->stat()->mtime() ) {
+
+        return retrieve( $storable_file->stringify() );
+    }
+    else {
+        my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
+        store( $schema, $storable_file->stringify() );
+        return $schema;
+    }
 }
 
 sub _set_dbh_attributes {
