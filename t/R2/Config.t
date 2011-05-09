@@ -9,7 +9,7 @@ use File::Basename qw( dirname );
 use File::HomeDir;
 use File::Slurp qw( read_file );
 use File::Temp qw( tempdir );
-use Path::Class qw( dir );
+use Path::Class qw( dir file );
 use R2::Config;
 
 my $dir = tempdir( CLEANUP => 1 );
@@ -173,12 +173,12 @@ EOF
 {
     my $config = R2::Config->new();
 
-    my $home_dir = dir( File::HomeDir->my_home() );
+    my $checkout = file($0)->absolute()->dir()->parent()->parent();
 
     is(
         $config->var_lib_dir(),
-        $home_dir->subdir( '.r2', 'var', 'lib' ),
-        'var lib dir defaults to $HOME/.r2/var/lib'
+        $checkout->subdir( '.r2', 'var', 'lib' ),
+        'var lib dir defaults to $CHECKOUT/.r2/var/lib'
     );
 
     is(
@@ -189,20 +189,20 @@ EOF
 
     is(
         $config->etc_dir(),
-        $home_dir->subdir( '.r2', 'etc' ),
-        'etc dir defaults to $HOME/.r2/etc'
+        $checkout->subdir( '.r2', 'etc' ),
+        'etc dir defaults to $CHECKOUT/.r2/etc'
     );
 
     is(
         $config->cache_dir(),
-        $home_dir->subdir( '.r2', 'cache' ),
-        'cache dir defaults to $HOME/.r2/cache'
+        $checkout->subdir( '.r2', 'cache' ),
+        'cache dir defaults to $CHECKOUT/.r2/cache'
     );
 
     is(
         $config->files_dir(),
-        $home_dir->subdir( '.r2', 'cache', 'files' ),
-        'files dir defaults to $HOME/.r2/cache/files'
+        $checkout->subdir( '.r2', 'cache', 'files' ),
+        'files dir defaults to $CHECKOUT/.r2/cache/files'
     );
 }
 

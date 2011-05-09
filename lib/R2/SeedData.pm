@@ -894,17 +894,8 @@ sub _cache_seed_data {
 
         return $Cache if $Cache;
 
-        my $dir = dir(
-            file( $INC{'R2/SeedData.pm'} )->dir(),
-            '..',
-            '..',
-            '.cache'
-        )->resolve();
-
-        $dir->mkpath( 0, 0755 )
-            unless -d $dir;
-
-        return $Cache = $dir->file('seed-data.pg');
+        return $Cache
+            = R2::Config->instance()->cache_dir()->file('seed-data.pg');
     }
 }
 

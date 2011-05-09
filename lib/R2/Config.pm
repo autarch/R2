@@ -5,7 +5,6 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-use File::HomeDir;
 use File::Spec;
 use File::Temp qw( tempdir );
 use Path::Class;
@@ -202,12 +201,14 @@ has var_lib_dir => (
         'This directory stores files generated at install time (CSS and Javascript). Defaults to /var/lib/r2.',
 );
 
-has _home_dir => (
+has _root_dir => (
     is      => 'rw',
     isa     => Dir,
     lazy    => 1,
-    default => sub { dir( File::HomeDir->my_home() ) },
-    writer  => '_set_home_dir',
+    default => sub {
+        dir( file( $INC{'R2/Config.pm'} )->dir()->parent()->parent(), '.r2' )->absolute()->cleanup();
+    },
+    writer => '_set_root_dir',
 );
 
 has etc_dir => (
@@ -279,8 +280,7 @@ sub _build_config_file {
     return if $ENV{R2_CONFIG_TESTING};
 
     my @dirs = dir('/etc/r2');
-    push @dirs, $self->_home_dir()->subdir( '.r2', 'etc' )
-        if $> && $self->_home_dir();
+    push @dirs, $self->_root_dir()->subdir('etc') if $>;
 
     for my $dir (@dirs) {
         my $file = $dir->file('r2.conf');
@@ -330,9 +330,10 @@ sub _build_share_dir {
     # I'd like to use File::ShareDir, but it blows up if the directory doesn't
     # exist, which isn't very fucking helpful. This is equivalent to
     # dist_dir('R2')
-    my $share_dir = dir(
-        dir( $INC{'R2/Config.pm'} )->parent(),
-        'auto', 'share', 'dist',
+    my $share_dir = file( $INC{'R2/Config.pm'} )->dir()->subdir(
+        'auto',
+        'share',
+        'dist',
         'R2'
     )->absolute()->cleanup();
 
@@ -412,13 +413,7 @@ sub _pick_dir {
     return $dev_default
         if defined $dev_default;
 
-    if ( $ENV{HARNESS_ACTIVE} ) {
-        $TestingRootDir ||= tempdir( CLEANUP => 1 );
-
-        return dir( $TestingRootDir, @{$pieces} );
-    }
-
-    return dir( $self->_home_dir(), '.r2', @{$pieces} );
+    return dir( $self->_root_dir(), @{$pieces} );
 }
 
 sub _ensure_dir {

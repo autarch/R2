@@ -12,30 +12,31 @@ use Storable qw( store retrieve );
 
 use Fey::ORM::Schema;
 
-if ($R2::Schema::TestSchema) {
-    has_schema($R2::Schema::TestSchema);
-
-    require DBD::Mock;
-
-    my $source = Fey::DBIManager::Source->new( dsn => 'dbi:Mock:' );
-
-    $source->dbh()->{HandleError} = sub { Carp::confess(shift); };
-
-    __PACKAGE__->DBIManager()->add_source($source);
-}
-else {
-    my $config = R2::Config->instance()->database_connection();
-
-    my $source = Fey::DBIManager::Source->new(
-        %{$config},
-        post_connect => \&_set_dbh_attributes,
-    );
+{
+    my $source = _source();
 
     my $schema = _load_schema($source);
 
     has_schema $schema;
 
     __PACKAGE__->DBIManager()->add_source($source);
+}
+
+sub _source {
+    if ( $ENV{R2_MOCK_SCHEMA} ) {
+        my $source = Fey::DBIManager::Source->new( dsn => 'dbi:Mock:' );
+
+        $source->dbh()->{HandleError} = sub { Carp::confess(shift); };
+
+        return $source;
+    }
+    else {
+        my $config = R2::Config->instance()->database_connection();
+        return Fey::DBIManager::Source->new(
+            %{$config},
+            post_connect => \&_set_dbh_attributes,
+        );
+    }
 }
 
 # The caching will not be used in production, but it makes reloading the
@@ -60,6 +61,9 @@ sub _load_schema {
         return retrieve( $storable_file->stringify() );
     }
     else {
+        die 'Cannot use Fey::Loader with a mock connection'
+            if $source->dbh()->{Driver}{Name} eq 'Mock';
+
         my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
         store( $schema, $storable_file->stringify() );
         return $schema;

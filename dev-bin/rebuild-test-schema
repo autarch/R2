@@ -26,21 +26,5 @@ require R2::Config;
 
 R2::Config->instance()->_set_database_name($db_name);
 
+# Simply loading R2::Schema should cause a storable file to be written if needed
 require R2::Schema;
-
-open my $fh, '>', 't/lib/R2/Test/FakeSchema.pm';
-
-print {$fh}
-    sprintf( <<'EOF', encode_base64( nfreeze( R2::Schema->Schema() ) ) );
-package R2::Test::FakeSchema;
-
-use strict;
-use warnings;
-
-use MIME::Base64 qw( decode_base64 );
-use Storable qw( thaw );
-
-$R2::Schema::TestSchema = thaw( decode_base64( '%s' ) );
-
-1;
-EOF
