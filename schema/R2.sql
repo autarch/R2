@@ -271,8 +271,20 @@ CREATE TABLE "Email" (
 );
 
 CREATE TABLE "ContactEmail" (
-       email_id           SERIAL8            PRIMARY KEY,
-       contact_id         INT8               NOT NULL
+       contact_id         INT8               NOT NULL,
+       email_id           INT8               PRIMARY KEY
+);
+
+CREATE INDEX "ContactEmail_contact_id" ON "ContactEmail" ("contact_id");
+CREATE INDEX "ContactEmail_contact_note_type_id" ON "ContactEmail" ("email_id");
+
+CREATE TABLE "ContactNote" (
+       contact_note_id    SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL,
+       contact_note_type_id  INT             NOT NULL,
+       user_id            INT8               NOT NULL,
+       note               TEXT               NOT NULL,
+       note_datetime      TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX "ContactNote_contact_id" ON "ContactNote" ("contact_id");
