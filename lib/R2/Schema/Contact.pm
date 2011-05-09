@@ -14,6 +14,7 @@ use R2::CustomFieldType;
 use R2::Schema;
 use R2::Schema::Address;
 use R2::Schema::ContactTag;
+use R2::Schema::Email;
 use R2::Schema::EmailAddress;
 use R2::Schema::File;
 use R2::Schema::MessagingProvider;
@@ -240,6 +241,19 @@ with 'R2::Role::URIMaker';
         isa     => 'Fey::Object::Iterator::FromSelect',
         lazy    => 1,
         builder => '_build_tags',
+    );
+
+    class_has '_EmailsSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildEmailsSelect',
+    );
+
+    has emails => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_emails',
     );
 
     has 'history' => (
@@ -722,6 +736,39 @@ sub add_tags {
         if @tag_ids;
 
     return;
+}
+
+sub _build_emails {
+    my $self = shift;
+
+    my $select = $self->_EmailsSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Email )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->contact_id() ],
+    );
+}
+
+sub _BuildEmailsSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables('Email') )
+        ->from  ( $schema->tables( 'Email', 'ContactEmail' ) )
+        ->where ( $schema->table('ContactEmail')->column('contact_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('Email')->column('email_datetime'), 'DESC' );
+    #>>>
+    return $select;
 }
 
 sub _build_history {

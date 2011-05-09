@@ -259,13 +259,20 @@ CREATE INDEX "CustomFieldMultiSelectValue_custom_field_id"
 CREATE INDEX "CustomFieldMultiSelectValue_custom_field_select_option_id"
        ON "CustomFieldMultiSelectValue" ("custom_field_select_option_id");
 
-CREATE TABLE "ContactNote" (
-       contact_note_id    SERIAL8            PRIMARY KEY,
-       contact_id         INT8               NOT NULL,
-       contact_note_type_id  INT             NOT NULL,
-       user_id            INT8               NOT NULL,
-       note               TEXT               NOT NULL,
-       note_datetime      TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "Email" (
+       email_id           SERIAL8            PRIMARY KEY,
+       from_contact_id    INT8               NULL,
+       from_user_id       INT8               NULL,
+       subject            TEXT               NOT NULL,
+       raw_content        TEXT               NOT NULL,
+       email_datetime     TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       CONSTRAINT valid_subject CHECK ( subject != '' ),
+       CONSTRAINT valid_raw_content CHECK ( raw_content != '' )
+);
+
+CREATE TABLE "ContactEmail" (
+       email_id           SERIAL8            PRIMARY KEY,
+       contact_id         INT8               NOT NULL
 );
 
 CREATE INDEX "ContactNote_contact_id" ON "ContactNote" ("contact_id");
@@ -825,6 +832,22 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_phone_number_id"
 ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_other_contact_id"
   FOREIGN KEY ("other_contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "Email" ADD CONSTRAINT "Email_from_contact_id"
+  FOREIGN KEY ("from_contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Email" ADD CONSTRAINT "Email_from_user_id"
+  FOREIGN KEY ("from_user_id") REFERENCES "User" ("user_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactEmail" ADD CONSTRAINT "ContactEmail_email_id"
+  FOREIGN KEY ("email_id") REFERENCES "Email" ("email_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ContactEmail" ADD CONSTRAINT "ContactEmail_contact_id"
+  FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
+  ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "ContactNote" ADD CONSTRAINT "ContactNote_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
