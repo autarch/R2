@@ -6,7 +6,7 @@ cover_db*
 Build
 _build
 .build
-.cache
+.r2
 MANIFEST
 META.yml
 Makefile.PL
