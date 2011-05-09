@@ -23,18 +23,6 @@ sub new {
         'db-ssl'      => {},
     };
 
-    $args{auto_features} = {
-        PSGI => {
-            description => 'PSGI app (r2.psgi)',
-            requires    => {
-                'Catalyst::Engine::PSGI'          => '0',
-                'Plack'                           => '0',
-                'Plack::Builder'                  => '0',
-                'Plack::Middleware::ReverseProxy' => '0',
-            },
-        },
-    };
-
     my $self = $class->SUPER::new(%args);
 
     $self->_update_from_existing_config();
