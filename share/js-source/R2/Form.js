@@ -1,4 +1,3 @@
-JSAN.use('R2.FormWidget.ContactSearch');
 JSAN.use('R2.FormWidget.DateRange');
 JSAN.use('R2.FormWidget.LabeledRadioButton');
 JSAN.use('R2.FormWidget.MemberSearch');
@@ -17,7 +16,6 @@ R2.Form = function (form) {
     this._instrumentDivDeleters();
     this._instrumentDateFields();
     new R2.FormWidget.MemberSearch ();
-    new R2.FormWidget.ContactSearch ();
 };
 
 R2.Form.instrumentAllForms = function () {

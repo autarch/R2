@@ -538,10 +538,6 @@ for my $type ( qw( donation note ) ) {
                 sub {
                     my $p = $resultset->results_as_hash();
 
-                    if ( $type eq 'donation' ) {
-                        $self->_dedication_contact( $c, $resultset, $p );
-                    }
-
                     $contact->$add_method(
                         %{$p},
                         $user_params_for_add->($c),
@@ -556,38 +552,6 @@ for my $type ( qw( donation note ) ) {
 
             $c->redirect_and_detach( $contact->uri( view => $plural ) );
         };
-
-    sub _dedication_contact {
-        my $self      = shift;
-        my $c         = shift;
-        my $resultset = shift;
-        my $p         = shift;
-
-        if ( $p->{dedicated_to_contact_id} ) {
-            delete $p->{dedicated_to};
-            return;
-        }
-
-        if (   string_is_empty( $p->{dedicated_to_contact_id} )
-            && string_is_empty( $p->{dedicated_to} ) ) {
-
-            delete $p->{dedication};
-            return;
-        }
-
-        my ( $first, $last ) = split /\s+/, delete $p->{dedicated_to}, 2;
-
-        my $person = R2::Schema::Person->insert(
-            first_name => $first,
-            last_name  => $last,
-            account_id => $c->account()->account_id(),
-            user       => $c->user(),
-        );
-
-        $p->{dedicated_to_contact_id} = $person->contact_id();
-
-        return;
-    }
 
     my $entity_chain_point = "_set_$type";
     my $class = 'R2::Schema::'

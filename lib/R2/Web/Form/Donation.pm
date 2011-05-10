@@ -10,12 +10,8 @@ with 'R2::Role::Web::Form';
 
 with 'R2::Role::Web::Form::FromSchema' => {
     classes => ['R2::Schema::Donation'],
-    skip    => [qw( contact_id dedicated_to_contact_id )],
+    skip    => [qw( contact_id )],
 };
-
-field dedicated_to => (
-    isa => Str,
-);
 
 1;
 

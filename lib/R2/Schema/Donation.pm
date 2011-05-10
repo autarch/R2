@@ -47,18 +47,6 @@ with 'R2::Role::URIMaker';
         ),
     );
 
-    has_one dedicated_to_contact => (
-        table => $schema->table('Contact'),
-        fk    => (
-            first {
-                $_->has_column( $schema->table('Donation')
-                        ->column('dedicated_to_contact_id') );
-            }
-            @fks
-        ),
-        undef => 1,
-    );
-
     has formatted_amount => (
         is       => 'ro',
         isa      => Str,
