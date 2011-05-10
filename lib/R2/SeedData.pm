@@ -613,7 +613,7 @@ sub _seed_random_donations {
         _seed_donation( $account, $user, $contact, %p );
 
         # XXX - this isn't really right - most donors donate in a more regular
-        # pattern than "between 30 and 699 days between donations"
+        # pattern than "from 30 and 699 days between donations"
         $start_date->add( days => int( rand(670) ) + 30 );
     }
 }
