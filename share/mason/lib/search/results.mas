@@ -155,8 +155,8 @@ $can_edit
 <%init>
 my $address = $contact->preferred_address();
 my $tags = $contact->tags();
-my $donation = $contact->contact()->donations()->next();
-my $note = $contact->contact()->notes()->next();
+my $donation = $contact->donations()->next();
+my $note = $contact->notes()->next();
 </%init>
 
 </%def>

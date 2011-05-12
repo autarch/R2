@@ -3,7 +3,7 @@
 % if ($count) {
 <ul>
 %   while ( my ( $person, $membership ) = $members->next() ) {
-  <li><a href="<% $person->contact()->uri() %>"
+  <li><a href="<% $person->uri() %>"
          title="View <% $person->full_name() %>"
          ><% $person->full_name() %></a>
 %     if ( my $pos = $membership->position() ) {

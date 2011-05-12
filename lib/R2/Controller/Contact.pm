@@ -889,7 +889,6 @@ sub _insert_contact {
         }
 
         my $thing = $class->insert( %contact_p, user => $user );
-        my $contact = $thing->contact();
 
         $self->_update_or_add_contact_data(
             $contact,
@@ -900,7 +899,7 @@ sub _insert_contact {
 
         my $note = $resultset->result_for('note');
         if ( !string_is_empty( $note->value() ) ) {
-            $contact->add_note(
+            $thing->add_note(
                 note => $note->value(),
                 contact_note_type_id =>
                     $account->made_a_note_contact_note_type()
