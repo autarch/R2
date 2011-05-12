@@ -25,5 +25,7 @@ require R2::Config;
 
 R2::Config->instance()->_set_database_name($db_name);
 
-# Simply loading R2::Schema should cause a storable file to be written if needed
+unlink R2::Config->instance()->cache_dir()->file('R2.schema.storable');
+
+# Simply loading R2::Schema should cause a storable file to be written
 require R2::Schema;
