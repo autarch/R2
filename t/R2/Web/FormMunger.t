@@ -9,6 +9,40 @@ use List::AllUtils qw( first );
 use R2::Web::FormMunger;
 use R2::Web::FormData;
 
+{
+
+    package Test::Form;
+
+    use Moose;
+    use Chloro;
+    use Moose::Util::TypeConstraints;
+
+    subtype 'NoFoo', as 'Str', where { $_ !~ /FOO/ };
+
+    field text1 => ( isa => 'NoFoo' );
+
+    field text2 => ( isa => 'Str' );
+
+    field select1 => ( isa => 'Str' );
+
+    field select2 => ( isa => 'ArrayRef[Str]' );
+
+    field textarea => ( isa => 'ArrayRef[Str]' );
+
+    field nested => ( isa => 'NoFoo' );
+
+    sub _validate_form {
+        my $self   = shift;
+        my $params = shift;
+
+        return unless exists $params->{bad_form};
+
+        return 'This form has an error.';
+    }
+
+    __PACKAGE__->meta()->make_immutable();
+}
+
 my $html = <<'EOF';
 <form action="/" method="POST">
  <input type="hidden" name="hidden" value="1" />
@@ -59,64 +93,60 @@ my $html = <<'EOF';
 </form>
 EOF
 
+my $form = Test::Form->new();
+
 {
-    my $form = form_elt_for();
+    my $form_dom = form_elt_for();
 
     like(
-        $form->as_HTML(), qr{<form.+</form>}xism,
+        $form_dom->as_HTML(), qr{<form.+</form>}xism,
         'still returns form if there is nothing to alter'
     );
 
-    local $TODO = 'I cannot figure out how to make HTML::DOM (or TreeBuilder?) leave my tag endings in place';
+    local $TODO
+        = 'I cannot figure out how to make HTML::DOM (or TreeBuilder?) leave my tag endings in place';
     like(
-        $form->innerHTML(), qr{<input [^>]+/>},
+        $form_dom->innerHTML(), qr{<input [^>]+/>},
         'input tag still ends with />'
     );
 }
 
 {
-    my $form = form_elt_for(
-        errors => [ { message => 'A generic error' } ],
+    my $form_dom = form_elt_for(
+        resultset => $form->process( params => { bad_form => 1 } ),
     );
 
-    generic_error_div_tests($form);
+    generic_error_div_tests($form_dom);
 }
 
 {
-    my $form = form_elt_for(
-        errors => ['A generic error'],
+    my $form_dom = form_elt_for(
+        resultset => $form->process( params => { bad_form => 1 } ),
     );
 
-    generic_error_div_tests($form);
+    generic_error_div_tests($form_dom);
 }
 
 {
-    my $form = form_elt_for(
-        errors => [
-            {
-                field   => 'text1',
-                message => 'Error in text1'
+    my $form_dom = form_elt_for(
+        resultset => $form->process( params => { text1 => 'FOO' } ),
+    );
+
+    text1_error_div_tests($form_dom);
+}
+
+{
+    my $form_dom = form_elt_for(
+        resultset => $form->process(
+            params => {
+                bad_form => 1,
+                text1    => 'FOO',
             }
-        ],
+        ),
     );
 
-    text1_error_div_tests($form);
-}
-
-{
-    my $form = form_elt_for(
-        errors => [
-            {
-                message => 'A generic error',
-            }, {
-                field   => 'text1',
-                message => 'Error in text1'
-            },
-        ],
-    );
-
-    generic_error_div_tests($form);
-    text1_error_div_tests($form);
+    generic_error_div_tests($form_dom);
+    text1_error_div_tests($form_dom);
 }
 
 {
@@ -132,9 +162,9 @@ EOF
         ],
     );
 
-    my $form = form_elt_for( form_data => $data );
+    my $form_dom = form_elt_for( form_data => $data );
 
-    fill_in_form_tests($form);
+    fill_in_form_tests($form_dom);
 }
 
 {
@@ -150,35 +180,38 @@ EOF
         ],
     );
 
-    my $form = form_elt_for(
-        errors => [
-            {
-                message => 'A generic error',
-            }, {
-                field   => 'text1',
-                message => 'Error in text1'
-            },
-        ],
+    my $resultset = $form->process(
+        params => {
+            text1    => 'FOO',
+            text2    => 't2',
+            select1  => 1,
+            select2  => [ 2, 3 ],
+            textarea => 'tarea',
+            bad_form => 1,
+        },
+    );
+
+    my $form_dom = form_elt_for(
+        resultset => $resultset,
         form_data => $data,
     );
 
-    generic_error_div_tests($form);
-    text1_error_div_tests($form);
-    fill_in_form_tests($form);
+    generic_error_div_tests($form_dom);
+    text1_error_div_tests($form_dom);
+    fill_in_form_tests($form_dom);
 }
 
 {
-    my $form = form_elt_for(
-        errors => [
-            {
-                field   => 'nested',
-                message => 'Error in nested',
-            },
-        ],
+    my $form_dom = form_elt_for(
+        resultset => $form->process(
+            params => {
+                nested => 'FOO',
+            }
+        ),
     );
 
     my $nested = first { $_->getAttribute('name') eq 'nested' }
-    $form->getElementsByTagName('input');
+    $form_dom->getElementsByTagName('input');
 
     my $grandparent = $nested->parentNode()->parentNode();
 
@@ -206,10 +239,10 @@ EOF
 
     $html =~ s/\Q<!--__SELECT__-->/$select/;
 
-    my $form = form_elt_for();
+    my $form_dom = form_elt_for();
 
     my $select3 = first { $_->getAttribute('name') eq 'select3' }
-    $form->getElementsByTagName('input');
+    $form_dom->getElementsByTagName('input');
 
     is(
         lc $select3->tagName(), 'input',
@@ -225,7 +258,7 @@ EOF
     );
 
     my $span = first { $_->className() eq 'text-for-hidden' }
-    $form->getElementsByTagName('div');
+    $form_dom->getElementsByTagName('div');
 
     is(
         $span->firstChild()->data(), 'ninety-nine',
@@ -234,26 +267,26 @@ EOF
 }
 
 sub form_elt_for {
-    my $form = R2::Web::FormMunger->new(
+    my $form_dom = R2::Web::FormMunger->new(
         html => $html,
         @_,
     );
 
     my $dom = HTML::DOM->new();
-    $dom->write( $form->filled_in_form() );
+    $dom->write( $form_dom->filled_in_form() );
 
     return $dom->getElementsByTagName('form')->[0];
 }
 
 sub generic_error_div_tests {
-    my $form = shift;
+    my $form_dom = shift;
 
     my $error_div = first {
         $_->can('tagName')
             && lc $_->tagName() eq 'div'
             && $_->className eq 'form-error';
     }
-    $form->childNodes();
+    $form_dom->childNodes();
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
@@ -264,41 +297,43 @@ sub generic_error_div_tests {
     ok( $error_p, 'error div has a P element as a child' );
     is(
         $error_p->firstChild()->firstChild()->data(),
-        'A generic error',
+        'This form has an error.',
         'text of p is expected error message'
     );
 }
 
 sub text1_error_div_tests {
-    my $form = shift;
+    my $form_dom = shift;
 
     my $error_div = first {
         $_->can('tagName')
             && lc $_->tagName() eq 'div'
             && $_->className eq 'form-item error';
     }
-    $form->childNodes();
+    $form_dom->childNodes();
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok( $error_div,
-        'form does have a form-item div with an additional error class' );
+    ok(
+        $error_div,
+        'form does have a form-item div with an additional error class'
+    );
 
     my $error_p = ( $error_div->getElementsByTagName('p') )[0];
 
     ok( $error_p, 'error div has a P element as a child' );
     is(
         $error_p->firstChild()->firstChild()->data(),
-        'Error in text1',
+        'The text1 field did not contain a valid value.',
         'text of p is expected error message'
     );
 }
 
 sub fill_in_form_tests {
-    my $form = shift;
+    my $form_dom = shift;
 
     my $text1 = first { $_->name() eq 'text1' }
-    $form->getElementsByTagName('input');
+    $form_dom->getElementsByTagName('input');
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
@@ -308,7 +343,7 @@ sub fill_in_form_tests {
     );
 
     my $text2 = first { $_->name() eq 'text2' }
-    $form->getElementsByTagName('input');
+    $form_dom->getElementsByTagName('input');
 
     is(
         $text2->value(), 't2',
@@ -316,7 +351,7 @@ sub fill_in_form_tests {
     );
 
     my $select1 = first { $_->name() eq 'select1' }
-    $form->getElementsByTagName('select');
+    $form_dom->getElementsByTagName('select');
 
     is_deeply(
         [
@@ -328,7 +363,7 @@ sub fill_in_form_tests {
     );
 
     my $select2 = first { $_->name() eq 'select2' }
-    $form->getElementsByTagName('select');
+    $form_dom->getElementsByTagName('select');
 
     is_deeply(
         [
@@ -340,7 +375,7 @@ sub fill_in_form_tests {
     );
 
     my $textarea = first { $_->name() eq 'textarea' }
-    $form->getElementsByTagName('textarea');
+    $form_dom->getElementsByTagName('textarea');
 
     my $textarea_text = $textarea->firstChild()->data();
     $textarea_text =~ s/^\s+|\s+$//g;
