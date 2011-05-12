@@ -34,32 +34,7 @@ use MooseX::ClassAttribute;
         },
     );
 
-    require R2::Schema::Contact;
-
-    has_one 'contact' => (
-        table   => $schema->table('Contact'),
-        handles => [
-            qw(
-                email_addresses
-                primary_email_address
-                websites
-                messaging_providers
-                addresses
-                primary_address
-                phone_numbers
-                primary_phone_number
-                uri
-                has_custom_field_values_for_group
-                custom_field_value
-                ),
-            (
-                grep     { !__PACKAGE__->meta()->has_attribute($_) }
-                    grep { $_ !~ /^(?:person|household|organization)$/ }
-                    grep { !/^_/ }
-                    R2::Schema::Contact->meta()->get_attribute_list(),
-            )
-        ],
-    );
+    has_one $schema->table('Contact');
 
     has_one 'user' => (
         table => $schema->table('User'),

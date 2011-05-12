@@ -150,6 +150,25 @@ role {
 
         return @errors;
     };
+
+    my %exclude = map { $_ => 1 } qw(
+        person
+        household
+        organization
+        is_person
+        is_household
+        is_organization
+        real_contact
+    );
+
+    $extra{consumer}->add_has_one(
+        table   => R2::Schema->Schema()->table('Contact'),
+        handles => [
+            grep { !$extra{consumer}->find_method_by_name($_) }
+            grep { !$exclude{$_} }
+            grep { !/^_/ } R2::Schema::Contact->meta()->get_method_list(),
+        ],
+    );
 };
 
 1;

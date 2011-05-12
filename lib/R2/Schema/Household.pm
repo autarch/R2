@@ -24,26 +24,7 @@ use MooseX::ClassAttribute;
             sub { [ $schema->table('Household')->column('name') ] },
     );
 
-    require R2::Schema::Contact;
     require R2::Schema::HouseholdMember;
-
-    has_one 'contact' => (
-        table   => $schema->table('Contact'),
-        handles => [
-            qw( email_addresses primary_email_address
-                websites
-                addresses primary_address
-                phone_numbers primary_phone_number
-                uri
-                ),
-            (
-                grep     { !__PACKAGE__->meta()->has_attribute($_) }
-                    grep { $_ !~ /^(?:person|household|organization)$/ }
-                    grep { !/^_/ }
-                    R2::Schema::Contact->meta()->get_attribute_list(),
-            )
-        ],
-    );
 
     with 'R2::Role::Schema::HasMembers' =>
         { membership_table => $schema->table('HouseholdMember') };
