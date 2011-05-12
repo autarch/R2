@@ -155,9 +155,6 @@ role {
         person
         household
         organization
-        is_person
-        is_household
-        is_organization
         real_contact
     );
 
