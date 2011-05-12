@@ -307,7 +307,7 @@ with 'R2::Role::URIMaker';
 with 'R2::Role::Schema::Serializes';
 
 sub _CountContactsInTableSelect {
-    my $class = shift;
+    my $class      = shift;
     my $table_name = shift;
 
     my $select = R2::Schema->SQLFactoryClass()->new_select();
