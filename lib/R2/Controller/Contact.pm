@@ -891,8 +891,7 @@ sub _insert_contact {
         my $thing = $class->insert( %contact_p, user => $user );
 
         $self->_update_or_add_contact_data(
-            $contact,
-            $contact->real_contact(),
+            $thing,
             $user,
             $resultset,
         );
@@ -955,7 +954,6 @@ sub _update_contact {
 sub _update_or_add_contact_data {
     my $self         = shift;
     my $contact      = shift;
-    my $real_contact = shift;
     my $user         = shift;
     my $resultset    = shift;
 
@@ -991,8 +989,8 @@ sub _update_or_add_contact_data {
         $user,
     );
 
-    if ( $real_contact->can('members') ) {
-        $real_contact->update_members(
+    if ( $contact->can('members') ) {
+        $contact->update_members(
             members => $resultset->members() || [],
             user => $user,
         );
