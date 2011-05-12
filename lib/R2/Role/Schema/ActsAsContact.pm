@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use R2::Schema::Contact;
-
 use MooseX::Role::Parameterized;
 
 # Can't use Fey::ORM::Table in a role yet
@@ -151,11 +149,16 @@ role {
         return @errors;
     };
 
+    # This needs to be delayed to prevent circular require madness
+    require R2::Schema::Contact;
+
     my %exclude = map { $_ => 1 } qw(
         person
         household
         organization
         real_contact
+        ValidateForInsert
+        validate_for_update
     );
 
     $extra{consumer}->add_has_one(
