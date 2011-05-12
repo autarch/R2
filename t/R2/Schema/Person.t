@@ -15,11 +15,11 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
 
 {
     my $person = R2::Schema::Person->insert(
-        salutation  => '',
+        salutation  => q{},
         first_name  => 'Joe',
-        middle_name => '',
+        middle_name => q{},
         last_name   => 'Smith',
-        suffix      => '',
+        suffix      => q{},
         account_id  => $account->account_id(),
         user        => R2::Schema::User->SystemUser(),
     );
@@ -87,8 +87,8 @@ my $account = R2::Schema::Account->new( name => q{Judean People's Front} );
     );
 
     my @errors = $person->validate_for_update(
-        first_name => '',
-        last_name  => '',
+        first_name => q{},
+        last_name  => q{},
     );
 
     is( scalar @errors, 1, 'got one validation error' );
