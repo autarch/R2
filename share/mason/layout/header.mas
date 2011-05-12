@@ -19,7 +19,9 @@
       </div>
       <div class="yui3-u-2-5">
         <div id="global-search">
-          <& contact-search.mas, %ARGS &>
+% if ( $c->account() ) {
+          <& contact-search.mas, account => $c->account() &>
+% }
         </div>
       </div>
     </div>
