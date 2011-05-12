@@ -25,6 +25,16 @@ use R2::Types qw( ArrayRef Bool HashRef PosOrZeroInt Str );
 use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
+# This needs to happen after the BEGIN phase to prevent all sorts of circular madness
+INIT {
+    require R2::Schema::Account;
+    require R2::Schema::ContactNote;
+    require R2::Schema::Donation;
+    require R2::Schema::Household;
+    require R2::Schema::Organization;
+    require R2::Schema::Person;
+}
+
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
 use MooseX::Params::Validate qw( pos_validated_list validated_list );
@@ -243,6 +253,11 @@ with 'R2::Role::URIMaker';
         builder => '_build_tags',
     );
 
+    query email_count => (
+        select      => __PACKAGE__->_CountContactsInTableSelect('ContactEmail'),
+        bind_params => sub { $_[0]->contact_id() },
+    );
+
     class_has '_EmailsSelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
@@ -254,6 +269,19 @@ with 'R2::Role::URIMaker';
         isa     => 'Fey::Object::Iterator::FromSelect',
         lazy    => 1,
         builder => '_build_emails',
+    );
+
+    class_has '_ActivitiesWithParticipationsSelect' => (
+        is      => 'ro',
+        isa     => 'Fey::SQL::Select',
+        builder => '_BuildActivitiesWithParticipationsSelect',
+    );
+
+    has activities_with_participations => (
+        is      => 'ro',
+        isa     => 'Fey::Object::Iterator::FromSelect',
+        lazy    => 1,
+        builder => '_build_activities_with_participations',
     );
 
     has 'history' => (
@@ -318,7 +346,7 @@ sub _CountContactsInTableSelect {
 
     my $count = Fey::Literal::Function->new(
         'COUNT',
-        @{ $table->primary_key() },
+        grep { $_->name() ne 'contact_id' } @{ $table->primary_key() },
     );
 
     #<<<
@@ -771,6 +799,45 @@ sub _BuildEmailsSelect {
     return $select;
 }
 
+sub _build_activities_with_participations {
+    my $self = shift;
+
+    my $select = $self->_ActivitiesWithParticipationsSelect();
+
+    my $dbh = $self->_dbh($select);
+
+    return Fey::Object::Iterator::FromSelect->new(
+        classes     => [qw( R2::Schema::Activity R2::Schema::ContactParticipation )],
+        dbh         => $dbh,
+        select      => $select,
+        bind_params => [ $self->contact_id() ],
+    );
+}
+
+sub _BuildActivitiesWithParticipationsSelect {
+    my $class = shift;
+
+    my $select = R2::Schema->SQLFactoryClass()->new_select();
+
+    my $schema = R2::Schema->Schema();
+
+    #<<<
+    $select
+        ->select( $schema->tables('Activity', 'ContactParticipation') )
+        ->from  ( $schema->tables('Activity', 'ContactParticipation') )
+        ->where ( $schema->table('ContactParticipation')->column('contact_id'),
+                  '=', Fey::Placeholder->new() )
+        ->order_by( $schema->table('ContactParticipation')->column('start_date'),
+                    'DESC',
+                    $schema->table('ContactParticipation')->column('end_date'),
+                    'DESC',
+                    $schema->table('Activity')->column('name'),
+                    'ASC',
+                  );
+    #>>>
+    return $select;
+}
+
 sub _build_history {
     my $self = shift;
 
@@ -852,14 +919,6 @@ sub _base_uri_path {
 }
 
 __PACKAGE__->meta()->make_immutable();
-
-# Need to load these here because of circular dependency problems
-require R2::Schema::Account;
-require R2::Schema::ContactNote;
-require R2::Schema::Donation;
-require R2::Schema::Household;
-require R2::Schema::Organization;
-require R2::Schema::Person;
 
 1;
 

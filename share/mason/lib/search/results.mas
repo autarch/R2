@@ -46,7 +46,6 @@ Found <% $count %> <% PL_N( $search->result_type_string(), $count ) %>\
       <th></th>
 %   }
       <th><&| /lib/search/sortable-header.mas, search => $search &>Name</&></th>
-      <th>Location</th>
       <th><&| /lib/search/sortable-header.mas, search => $search, order_by => 'email_address' &>Email</&></th>
       <th>Activity</th>
       <th><&| /lib/search/sortable-header.mas, search => $search &>Created</&></th>
@@ -93,9 +92,8 @@ $colspan += 2 if $can_edit;
 % }
       <td>
         <a href="<% $contact->uri() %>"><% $contact->display_name() %></a>
-      </td>
-      <td>
 % if ($address) {
+        <br />
         <% join ', ', grep { ! string_is_empty($_) } $address->city(), $address->region() %>
 % }
       </td>
@@ -112,6 +110,16 @@ $colspan += 2 if $can_edit;
           <li><a href="<% $contact->uri( view => 'donations' ) %>"
                  title="All donations from this contact">Donated</a> <% format_money( $donation->amount() ) %>
               on <% $c->user()->format_date( $donation->donation_date() ) %></li>
+% }
+% if ($activity) {
+          <li><a href="<% $contact->uri( view => 'activities' ) %>"><% $activity->name() %></a>
+%   if ( $participation->has_end_date() && $participation->start_date() != $participation->end_date() ) {
+              from <% $c->user()->format_date( $participation->start_date() ) %>
+              to <% $c->user()->format_date( $participation->end_date() ) %>
+%   } else {
+              on <% $c->user()->format_date( $participation->start_date() ) %>
+%   }
+              - <% $participation->type()->name %> 
 % }
 % if ($note) {
           <li><% $note->user()->display_name() %>
@@ -157,6 +165,7 @@ my $address = $contact->preferred_address();
 my $tags = $contact->tags();
 my $donation = $contact->donations()->next();
 my $note = $contact->notes()->next();
+my ( $activity, $participation ) = $contact->activities_with_participations()->next();
 </%init>
 
 </%def>
