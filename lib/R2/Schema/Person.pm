@@ -34,8 +34,6 @@ use MooseX::ClassAttribute;
         },
     );
 
-    has_one $schema->table('Contact');
-
     has_one 'user' => (
         table => $schema->table('User'),
         undef => 1,
