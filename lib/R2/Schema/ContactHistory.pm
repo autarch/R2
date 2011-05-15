@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use DateTime::Format::Strptime;
 use List::AllUtils qw( first );
 use R2::Schema;
 # Can't load this here because of load order issues with
