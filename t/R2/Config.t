@@ -6,7 +6,6 @@ use Test::Most;
 use autodie;
 use Cwd qw( abs_path );
 use File::Basename qw( dirname );
-use File::HomeDir;
 use File::Slurp qw( read_file );
 use File::Temp qw( tempdir );
 use Path::Class qw( dir file );
