@@ -263,6 +263,7 @@ CREATE TABLE "Email" (
        email_id           SERIAL8            PRIMARY KEY,
        from_contact_id    INT8               NULL,
        from_user_id       INT8               NULL,
+       donation_id        INT8               NULL,
        subject            TEXT               NOT NULL,
        raw_content        TEXT               NOT NULL,
        email_datetime     TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -272,11 +273,11 @@ CREATE TABLE "Email" (
 
 CREATE TABLE "ContactEmail" (
        contact_id         INT8               NOT NULL,
-       email_id           INT8               PRIMARY KEY
+       email_id           INT8               NOT NULL,
+       PRIMARY KEY ( contact_id, email_id )
 );
 
-CREATE INDEX "ContactEmail_contact_id" ON "ContactEmail" ("contact_id");
-CREATE INDEX "ContactEmail_contact_note_type_id" ON "ContactEmail" ("email_id");
+CREATE INDEX "ContactEmail_email_id" ON "ContactEmail" ("email_id");
 
 CREATE TABLE "ContactNote" (
        contact_note_id    SERIAL8            PRIMARY KEY,
@@ -634,7 +635,6 @@ CREATE TABLE "Donation" (
 );
 
 CREATE INDEX "Donation_contact_id" ON "Donation" ("contact_id");
-CREATE INDEX "Donation_dedicated_to_contact_id" ON "Donation" ("dedicated_to_contact_id");
 CREATE INDEX "Donation_donation_source_id" ON "Donation" ("donation_source_id");
 CREATE INDEX "Donation_donation_campaign_id" ON "Donation" ("donation_campaign_id");
 CREATE INDEX "Donation_payment_type_id" ON "Donation" ("payment_type_id");
@@ -846,11 +846,15 @@ ALTER TABLE "ContactHistory" ADD CONSTRAINT "ContactHistory_other_contact_id"
 
 ALTER TABLE "Email" ADD CONSTRAINT "Email_from_contact_id"
   FOREIGN KEY ("from_contact_id") REFERENCES "Contact" ("contact_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
+  ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "Email" ADD CONSTRAINT "Email_from_user_id"
   FOREIGN KEY ("from_user_id") REFERENCES "User" ("user_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Email" ADD CONSTRAINT "Email_donation_id"
+  FOREIGN KEY ("donation_id") REFERENCES "Donation" ("donation_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "ContactEmail" ADD CONSTRAINT "ContactEmail_email_id"
   FOREIGN KEY ("email_id") REFERENCES "Email" ("email_id")
@@ -1014,10 +1018,6 @@ ALTER TABLE "Website" ADD CONSTRAINT "Website_contact_id"
 
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_contact_id"
   FOREIGN KEY ("contact_id") REFERENCES "Contact" ("contact_id")
-  ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "Donation" ADD CONSTRAINT "Donation_dedicated_to_contact_id"
-  FOREIGN KEY ("dedicated_to_contact_id") REFERENCES "Contact" ("contact_id")
   ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donation_source_id"
