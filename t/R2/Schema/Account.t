@@ -6,7 +6,7 @@ use Test::More;
 
 use lib 't/lib';
 
-use List::MoreUtils qw( all );
+use List::AllUtils qw( all );
 use R2::Test::RealSchema;
 
 use R2::Schema::Account;
