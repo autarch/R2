@@ -26,7 +26,7 @@ use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
 # This needs to happen after the BEGIN phase to prevent all sorts of circular madness
-UNITCHECK {
+INIT {
     require R2::Schema::Account;
     require R2::Schema::ContactNote;
     require R2::Schema::Donation;
