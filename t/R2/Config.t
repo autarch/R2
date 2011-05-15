@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test::Most;
+use Test::Fatal;
+use Test::More;
 
 use autodie;
 use Cwd qw( abs_path );
@@ -38,8 +39,8 @@ $ENV{R2_CONFIG_TESTING} = 1;
 {
     local $ENV{R2_CONFIG} = '/path/to/nonexistent/file.conf';
 
-    throws_ok(
-        sub { R2::Config->new() },
+    like(
+        exception { R2::Config->new() },
         qr/\QNonexistent config file in R2_CONFIG env var/,
         'R2_CONFIG pointing to bad file throws an error'
     );
@@ -78,8 +79,8 @@ EOF
     {
         local $ENV{R2_CONFIG} = $file;
 
-        throws_ok(
-            sub { R2::Config->new() },
+        like(
+            exception { R2::Config->new() },
             qr/\QYou must supply a value for [R2] - secret when running R2 in production/,
             'If is_production is true in config, there must be a secret defined'
         );
