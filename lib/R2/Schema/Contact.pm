@@ -25,14 +25,18 @@ use R2::Types qw( ArrayRef Bool HashRef PosOrZeroInt Str );
 use R2::Util qw( calm_to_studly string_is_empty );
 use Sub::Name qw( subname );
 
-# This needs to happen after the BEGIN phase to prevent all sorts of circular madness
-INIT {
-    require R2::Schema::Account;
-    require R2::Schema::ContactNote;
-    require R2::Schema::Donation;
-    require R2::Schema::Household;
-    require R2::Schema::Organization;
-    require R2::Schema::Person;
+{
+    # This avoids a "Too late to run INIT block" warning which can happen in some cases.
+    no warnings 'void';
+    # This needs to happen after the BEGIN phase to prevent all sorts of circular madness
+    INIT {
+        require R2::Schema::Account;
+        require R2::Schema::ContactNote;
+        require R2::Schema::Donation;
+        require R2::Schema::Household;
+        require R2::Schema::Organization;
+        require R2::Schema::Person;
+    }
 }
 
 use Fey::ORM::Table;
