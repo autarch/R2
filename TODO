@@ -42,6 +42,17 @@ Visual Polish
 - use action button for all actions
 -- icon for every action
 
+System Admin Panel
+
+- all accounts
+-- # of users
+-- # of contacts
+-- # of emails sent
+-- track spam reports for email?
+-- rough estimate of space usage
+-- drill down into user info, but not contact info
+- all users?
+
 Random
 
 - use microformat tags where possible - hcard, etc
