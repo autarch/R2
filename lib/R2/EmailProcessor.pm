@@ -169,7 +169,7 @@ sub _strip_largest_attachment {
 
 sub _append_message_to_body {
     my $self = shift;
-    my $msg = shift;
+    my $msg  = shift;
 
     # This could probably end up fetching something that isn't the user
     # body. I'm not sure how to distinguish from HTML as the message body
