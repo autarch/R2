@@ -8,7 +8,8 @@ use Chloro;
 use R2::Role::Web::ResultSet::FromSchema;
 use R2::Role::Web::ResultSet::NewAndExistingGroups;
 use R2::Schema;
-use R2::Types qw( Bool );
+use R2::Types qw( Bool NonEmptyStr );
+use R2::Util qw( string_is_empty );
 
 with 'R2::Role::Web::Form';
 
@@ -17,6 +18,7 @@ with 'R2::Role::Web::Form::FromSchema' => {
     skip    => [
         qw( contact_id
             contact_type
+            gender
             email_opt_out
             allows_mail
             allows_phone
@@ -27,6 +29,11 @@ with 'R2::Role::Web::Form::FromSchema' => {
          )
     ],
 };
+
+field gender => (
+    isa       => NonEmptyStr,
+    extractor => '_extract_gender',
+);
 
 with qw(
     R2::Role::Web::Form::ContactEmailOptOut
@@ -65,6 +72,17 @@ with qw(
     $Class->make_immutable();
 
     sub _resultset_class { $Class->name() }
+}
+
+sub _extract_gender {
+    my $self   = shift;
+    my $params = shift;
+
+    for my $key (qw( gender gender_text )) {
+        if ( !string_is_empty( $params->{$key} ) ) {
+            return ( $params->{$key}, $key );
+        }
+    }
 }
 
 1;

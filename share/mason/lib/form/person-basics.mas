@@ -53,7 +53,9 @@
 % }
       </select>
       <label class="secondary" for="gender_text">or enter a gender here</label>
-      <input type="text" class="text narrow" name="gender_text" id="gender_text" />
+      <input type="text" class="text narrow" name="gender_text" id="gender_text"
+             value="<% $person && $person->has_gender() && $person->gender() !~ /^(?:fe)?male$/ ? $person->gender() : q{} %>"
+             />
     </div>
 
 <& /lib/form/contact-ok-fields.mas, contact => $person &>
