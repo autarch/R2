@@ -943,8 +943,11 @@ sub _update_contact {
 
         $real_contact->update( %contact_p, user => $user );
 
-        $self->_update_or_add_contact_data( $contact, $real_contact, $user,
-            $resultset );
+        $self->_update_or_add_contact_data(
+            $real_contact,
+            $user,
+            $resultset
+        );
     };
 
     return R2::Schema->RunInTransaction($update_sub);
