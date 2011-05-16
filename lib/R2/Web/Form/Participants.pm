@@ -25,9 +25,9 @@ field contact_id => (
 );
 
 sub _validate_participants {
-    my $self = shift;
+    my $self         = shift;
     my $participants = shift;
-    my $params = shift;
+    my $params       = shift;
 
     return if $params->{contact_id};
 
