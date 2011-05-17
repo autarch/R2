@@ -11,6 +11,7 @@ use DateTime::TimeZone;
 use Email::Address;
 use Email::Date;
 use Email::MIME;
+use Email::MIME::Attachment::Stripper;
 use Fey::Placeholder;
 use List::AllUtils qw( first sum uniq );
 use MooseX::Params::Validate qw( validated_list );
@@ -60,7 +61,7 @@ has _html_body_part => (
     is      => 'ro',
     isa     => Maybe ['Email::MIME'],
     lazy    => 1,
-    builder => '_build_text_body_part',
+    builder => '_build_html_body_part',
 );
 
 has _sender_params => (
@@ -92,112 +93,10 @@ class_has _ParticipantSelect => (
 sub process {
     my $self = shift;
 
-    $self->_strip_large_attachments();
+    my $email
+        = Email::MIME::Attachment::Stripper->new( $self->email() )->message();
 
     $self->_insert_email();
-}
-
-sub _strip_large_attachments {
-    my $self = shift;
-
-    my $max_size = R2::Config->instance()->max_upload_size();
-
-    return unless $self->_total_email_size() > $max_size;
-
-    while ( $self->_total_email_size() > $max_size ) {
-        $self->_strip_largest_attachment();
-    }
-}
-
-sub _total_email_size {
-    my $self = shift;
-
-    my $sum = 0;
-    $self->email()->walk_parts(
-        sub {
-            my $part = shift;
-            $sum += length $part->body();
-        }
-    );
-
-    return $sum;
-}
-
-sub _strip_largest_attachment {
-    my $self = shift;
-
-    my %container;
-    my $max = 0;
-    my $biggest;
-
-    $self->email()->walk_parts(
-        sub {
-            my $part = shift;
-
-            if ( $part->subparts() ) {
-                $container{$_} = $part for $part->subparts();
-            }
-            else {
-                my $size = length $part->body();
-                if ( $size > $max ) {
-                    $max     = $size;
-                    $biggest = $part;
-                }
-            }
-        }
-    );
-
-    my $parent = $container{$biggest};
-
-    $parent->parts_set( [ grep { $_ ne $biggest } $parent->subparts() ] );
-
-    my $msg;
-    if ( defined $biggest->filename() ) {
-        $msg
-            = 'The attachment named '
-            . $biggest->filename()
-            . ' was removed because it was too large.';
-    }
-    else {
-        $msg = 'An attachment was removed because it was too large.';
-    }
-
-    $msg .= ' Attachment was ' . format_bytes($max) . q{.};
-
-    $self->_append_message_to_body("[$msg]");
-}
-
-sub _append_message_to_body {
-    my $self = shift;
-    my $msg  = shift;
-
-    # This could probably end up fetching something that isn't the user
-    # body. I'm not sure how to distinguish from HTML as the message body
-    # versus HTML as a random attachment.
-    my $part = first {defined} $self->_text_body_part(),
-        $self->_html_body_part();
-
-    return unless $part;
-
-    my $body = $part->body();
-
-    if ( $part->content_type() eq 'text/plain' ) {
-        $body .= "\n$msg\n";
-    }
-    else {
-        my $new_p = "\n<p>\n$msg\n</p>\n";
-
-        if ( $body =~ m{</body>} ) {
-            $body =~ s{</body>}{$new_p</body>};
-        }
-        else {
-            $body .= $new_p;
-        }
-    }
-
-    $part->body_str_set($body);
-
-    return;
 }
 
 sub _insert_email {
@@ -477,15 +376,36 @@ sub _find_date_received {
 sub _build_text_body_part {
     my $self = shift;
 
-    return first { $_->content_type() eq 'text/plain' }
-        $self->email()->parts();
+    return $self->_first_part_with_type('text/plain');
 }
 
 sub _build_html_body_part {
     my $self = shift;
 
-    return first { $_->content_type() eq 'text/html' }
-        $self->email()->parts();
+    return $self->_first_part_with_type('text/html');
+}
+
+sub _first_part_with_type {
+    my $self = shift;
+    my $type = shift;
+
+    my $first;
+
+    local $@;
+    eval {
+        $self->email()->walk_parts(
+            sub {
+                my $part = shift;
+
+                if ( $part->content_type() =~ /^\Q$type\E(?:;|$)/ ) {
+                    $first = $part;
+                    die;
+                }
+            }
+        );
+    };
+
+    return $first;
 }
 
 sub _build_participant_email_addresses {

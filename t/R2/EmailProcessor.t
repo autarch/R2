@@ -238,7 +238,7 @@ _delete_all_email();
         },
         attachments => [
             'a' x 500,
-            'a' x 50_000_000,
+            'a' x 50_000,
         ],
     );
 
@@ -257,8 +257,8 @@ _delete_all_email();
 
     is(
         scalar $mime->parts(),
-        2,
-        '50MB part was stripped from message before storing it'
+        1,
+        'attachments were stripped before storing email'
     );
 }
 
