@@ -104,26 +104,8 @@ sub _insert_email {
 
     my $contact_ids = $self->_contacts_in_email();
 
-    my ( $donation, $contact ) = $self->_donation_data();
-
-    my $create_contact = $contact && !$contact->{contact_id};
-
     R2::Schema->RunInTransaction(
         sub {
-            if ($create_contact) {
-                my $class = delete $contact->{class};
-
-                my $new_contact = $class->new();
-
-                push @{$contact_ids}, $new_contact->contact_id();
-            }
-
-            if ($donation) {
-                my $new_donation
-                    = R2::Schema::Donation->insert( %{$donation} );
-                $p{donation_id} = $new_donation->donation_id();
-            }
-
             my $email = R2::Schema::Email->insert(%p);
 
             # If there are no contacts _or_ the only contact for the email is
@@ -140,11 +122,6 @@ sub _insert_email {
                     contact_id => $contact_id,
                 );
             }
-
-            if ($needs_review) {
-
-                # insert into review queue?
-            }
         }
     );
 }
@@ -152,12 +129,15 @@ sub _insert_email {
 sub _donation_data {
     my $self = shift;
 
+    # XXX - need to do more work on this feature and review queues
+    return;
+
     for my $type (qw( _nfg_custom )) {
         my $method = $type . '_data';
 
-        my ( $donation, $contact ) = $self->$method;
+        my ( $donation, $contact, $needs_review ) = $self->$method;
 
-        return ( $donation, $contact ) if keys %{$donation};
+        return ( $donation, $contact, $needs_review ) if keys %{$donation};
     }
 }
 
@@ -174,13 +154,15 @@ sub _nfg_custom_data {
 
     $content =~ s/\r//g;
 
+    my $needs_review = 0;
+
     my %donation;
 
     $donation{donation_date} = $self->_email_datetime();
 
     ( $donation{amount} ) = $content =~ m{Donation Amount: \$([\d\.]+)};
-    $donation{is_recurring} = $content =~ m{Frequency: } ? 1 : 0;
-    ( $donation{gift_item} ) = $content =~ m{Name: (.+)};
+    ( $donation{recurrence_frequency} ) = $content =~ m{Frequency: (.+)};
+    ( $donation{gift_item} )            = $content =~ m{Name: (.+)};
 
     my ($gift_value) = $content =~ m{Market Value: (.+)};
     if ($gift_value) {
@@ -192,6 +174,7 @@ sub _nfg_custom_data {
     ( $donation{dedication} ) = $content =~ m{(In (?:memory|honor) .+|On behalf of .+)};
 
     $donation{note} = 'Created from an email forwarded to the system.';
+
     $donation{payment_type_id}      = 'Credit Card';    # XXX
     $donation{donation_source_id}   = 'Online';         # XXX
     $donation{donation_campaign_id} = 'Online';         # XXX
@@ -211,7 +194,9 @@ sub _nfg_custom_data {
     $contact{contact_id}
         = $self->_contact_id_for_email_address( $contact{email_address} );
 
-    return \%donation, \%contact;
+    $needs_review = 1 unless $contact{contact_id};
+
+    return \%donation, \%contact, $needs_review;
 }
 
 sub _build_sender_params {
