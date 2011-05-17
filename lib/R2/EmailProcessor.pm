@@ -408,13 +408,12 @@ sub _build_participant_email_addresses {
 }
 
 {
-
     package Email::MIME;
 
     no warnings 'redefine';
 
     # The version in Email::MIME resets the subparts after every walk, which
-    # breaks the attachment stripping code _and_ is hugely inefficient.
+    # is hugely inefficient.
     sub walk_parts {
         my ( $self, $callback ) = @_;
 
