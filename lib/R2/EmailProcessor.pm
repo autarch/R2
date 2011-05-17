@@ -57,13 +57,6 @@ has _text_body_part => (
     builder => '_build_text_body_part',
 );
 
-has _html_body_part => (
-    is      => 'ro',
-    isa     => Maybe ['Email::MIME'],
-    lazy    => 1,
-    builder => '_build_html_body_part',
-);
-
 has _sender_params => (
     is      => 'ro',
     isa     => HashRef [DatabaseId],
@@ -377,12 +370,6 @@ sub _build_text_body_part {
     my $self = shift;
 
     return $self->_first_part_with_type('text/plain');
-}
-
-sub _build_html_body_part {
-    my $self = shift;
-
-    return $self->_first_part_with_type('text/html');
 }
 
 sub _first_part_with_type {
