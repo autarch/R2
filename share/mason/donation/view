@@ -22,8 +22,10 @@
     <div class="yui3-u-2-5 label"><span>Net:</span></div>
     <div class="yui3-u-3-5 value"><span><% format_money( $donation->amount() - $donation->transaction_cost() ) %></span></div>
 % }
-    <div class="yui3-u-2-5 label"><span>Recurring Donation?</span></div>
-    <div class="yui3-u-3-5 value"><span><% $donation->is_recurring() ? 'Yes' : 'No' %></span></div>
+% if ( $donation->has_recurrence_frequency() ) {
+    <div class="yui3-u-2-5 label"><span>Frequency</span></div>
+    <div class="yui3-u-3-5 value"><span><% $donation->recurrence_frequency() %></span></div>
+% }
 % if ( $donation->gift_item() ) {
     <div class="yui3-u-2-5 label"><span>Thank-you gift:</span></div>
     <div class="yui3-u-3-5 value"><span><% $donation->gift_item() %></span></div>

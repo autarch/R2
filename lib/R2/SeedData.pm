@@ -547,20 +547,25 @@ sub _seed_recurring_donations {
     my %add;
 
     my $type_rand = _percent();
+    my $frequency;
+
     if ( $type_rand <= 75 || $years == 1 ) {
         $start_date = $Today->clone()->subtract( days => int( rand(28) ) );
         $start_date->subtract( years => $years );
         %add = ( months => 1 );
+        $frequency = 'Monthly';
     }
     elsif ( $type_rand <= 95 ) {
         $start_date = $Today->clone()->subtract( days => int( rand(89) ) );
         $start_date->subtract( years => $years );
         %add = ( months => 3 );
+        $frequency = 'Quarterly';
     }
     else {
         $start_date = $Today->clone()->subtract( days => int( rand(365) ) );
         $start_date->subtract( years => $years );
         %add = ( years => 1 );
+        $frequency = 'Tearly';
     }
 
     my $campaign = _random_campaign($account);
@@ -573,12 +578,12 @@ sub _seed_recurring_donations {
             $account,
             $user,
             $contact,
-            campaign     => $campaign,
-            source       => $source,
-            type         => $type,
-            date         => $start_date,
-            amount       => $amount,
-            is_recurring => 1,
+            campaign             => $campaign,
+            source               => $source,
+            type                 => $type,
+            date                 => $start_date,
+            amount               => $amount,
+            recurrence_frequency => $frequency,
         );
 
         $start_date->add(%add);
@@ -653,7 +658,11 @@ sub _seed_donation {
         amount           => $p{amount},
         donation_date    => $p{date},
         transaction_cost => ( $p{amount} * $trans_percent ),
-        is_recurring     => $p{is_recurring} || 0,
+        (
+            $p{recurrence_frequency}
+            ? recurrence_frequency => $p{recurrence_frequency}
+            : ()
+        ),
         %receipt_date,
         donation_campaign_id => $p{campaign}->donation_campaign_id(),
         donation_source_id   => $p{source}->donation_source_id(),

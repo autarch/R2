@@ -622,7 +622,7 @@ CREATE TABLE "Donation" (
        value_for_donor    NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        transaction_cost   NUMERIC(13,2)      NOT NULL DEFAULT 0.00,
        dedication         TEXT               NOT NULL DEFAULT '',
-       is_recurring       BOOL               NOT NULL DEFAULT FALSE,
+       recurrence_frequency  TEXT            NULL,
        receipt_date       DATE               NULL,
        donation_source_id INT8               NOT NULL,
        donation_campaign_id  INT8            NOT NULL,
