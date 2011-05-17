@@ -263,7 +263,7 @@ CREATE TABLE "Email" (
        email_id           SERIAL8            PRIMARY KEY,
        from_contact_id    INT8               NULL,
        from_user_id       INT8               NULL,
-       donation_id        INT8               NULL,
+       donation_id        INT8               UNIQUE  NULL,
        subject            TEXT               NOT NULL,
        raw_content        TEXT               NOT NULL,
        email_datetime     TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
