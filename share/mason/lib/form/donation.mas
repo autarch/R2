@@ -32,12 +32,12 @@
 
     <div class="form-item">
       <label class="for-field" for="recurrence_frequency">Recurring donation?</label>
-      <input type="text" class="text medium" name="recurrence_frequency" id="recurrence_frequency" />
-      <div class="help-text">
-        <p>
-          Is this a recurring donation? How often? Monthly, Quarterly, Yearly, etc.?
-        </p>
-      </div>
+      <select name="recurrence_frequency">
+        <option value="">-- pick a value --</option>
+% for my $value ( qw( Monthly Quarterly Yearly ) ) {
+        <option value="<% $value %>"><% $value %></option>
+% }
+      </select>
     </div>
 
     <div class="form-item">
@@ -145,7 +145,4 @@ $donation => undef
 my $sources = $c->account()->donation_sources();
 my $campaigns = $c->account()->donation_campaigns();
 my $payment_types = $c->account()->payment_types();
-
-my $dedication_contact;
-$dedication_contact = $donation->dedicated_to_contact() if $donation;
 </%init>

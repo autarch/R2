@@ -659,10 +659,6 @@ for my $type ( qw( donation note ) ) {
                 sub {
                     my $p = $resultset->results_as_hash();
 
-                    if ( $type eq 'donation' ) {
-                        $self->_dedication_contact( $c, $resultset, $p );
-                    }
-
                     $entity->update(
                         %{$p},
                         $user_params_for_update->($c),
