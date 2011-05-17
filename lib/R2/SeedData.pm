@@ -660,7 +660,7 @@ sub _seed_donation {
         transaction_cost => ( $p{amount} * $trans_percent ),
         (
             $p{recurrence_frequency}
-            ? recurrence_frequency => $p{recurrence_frequency}
+            ? ( recurrence_frequency => $p{recurrence_frequency} )
             : ()
         ),
         %receipt_date,
