@@ -104,6 +104,9 @@ sub _insert_email {
 
     my $contact_ids = $self->_contacts_in_email();
 
+    # XXX - eventually this needs to go into a review queue.
+    return unless @{$contact_ids} || $p{from_user_id};
+
     R2::Schema->RunInTransaction(
         sub {
             my $email = R2::Schema::Email->insert(%p);
