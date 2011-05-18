@@ -7,7 +7,7 @@ use lib 't/lib';
 
 use R2::Test::RealSchema;
 
-use R2::Schema::Contact; # Load this module prevents a load order problem
+use R2::Schema::Contact; # Loading this module prevents a load order problem
 use R2::Schema::ContactNoteType;
 use R2::Schema::Person;
 use R2::Schema::User;
