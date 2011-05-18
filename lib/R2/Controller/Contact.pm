@@ -131,7 +131,7 @@ for my $type (qw( contact person household organization )) {
                 $schema_class,
             );
 
-            my $name = $contact->real_contact()->display_name();
+            my $name = $contact->display_name();
 
             $c->session_object()
                 ->add_message("A contact record for $name has been added.");
@@ -359,7 +359,7 @@ put q{}
         $c->domain()->application_uri( path => q{} ),
     );
 
-    my $real_contact = $contact->real_contact();
+    my $real_contact = $c->stash()->{real_contact};
 
     my ($form_class) = ( ref $real_contact ) =~ /::(\w+)$/;
 
