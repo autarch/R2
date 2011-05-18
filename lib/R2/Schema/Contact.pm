@@ -910,6 +910,7 @@ sub _base_uri_path {
 
 __PACKAGE__->meta()->make_immutable();
 
+# These need to be loaded here to avoid circular requirements.
 require R2::Schema::Account;
 require R2::Schema::ContactNote;
 require R2::Schema::Donation;
