@@ -232,7 +232,7 @@ sub _seed_supporting_contact_data {
     my $contact = shift;
     my $data    = shift;
 
-    _seed_emails_for_contact( $account, $user, $contact, $data );
+    _seed_email_addresses_for_contact( $account, $user, $contact, $data );
     _seed_phones_for_contact( $account, $user, $contact, $data );
     _seed_addresses_for_contact( $account, $user, $contact, $data );
     _seed_tags_for_contact( $account, $user, $contact );
@@ -339,7 +339,7 @@ sub _seed_random_organization {
 {
     my @TypeNames = qw( home work );
 
-    sub _seed_emails_for_contact {
+    sub _seed_email_addresses_for_contact {
         my $account = shift;
         my $user    = shift;
         my $contact = shift;
