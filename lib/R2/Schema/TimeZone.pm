@@ -58,6 +58,8 @@ sub EnsureRequiredTimeZonesExist {
 
     for my $country ( keys %zones ) {
         for my $zone ( @{ $zones{$country} } ) {
+            next if $class->new( olson_name => $zone->[0] );
+
             $class->insert(
                 olson_name  => $zone->[0],
                 description => $zone->[1],

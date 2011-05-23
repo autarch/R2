@@ -21,6 +21,8 @@ sub EnsureRequiredHTMLWidgetsExist {
     my $class = shift;
 
     for my $name ( map { $_->type() } R2::CustomFieldType->All() ) {
+        next if $class->new( name => $name );
+
         $class->insert(
             name        => $name,
             description => 'default input for ' . $name,

@@ -78,7 +78,7 @@ sub make_domain {
     if ($VERBOSE) {
         print <<"EOF";
 
-  Made a new domain: $hostname
+  Domain for this R2 instance: $hostname
 
 EOF
     }
@@ -104,6 +104,8 @@ sub make_account {
     my $domain       = shift;
     my $account_name = shift;
     my $user_name    = shift;
+
+    return if R2::Schema::Account->new( name => $account_name );
 
     my $account = R2::Schema::Account->insert(
         name      => $account_name,
