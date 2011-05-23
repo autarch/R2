@@ -65,7 +65,10 @@ sub _load_schema {
             if $source->dbh()->{Driver}{Name} eq 'Mock';
 
         my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
-        store( $schema, $storable_file->stringify() );
+
+        store( $schema, $storable_file->stringify() )
+            unless R2::Config->instance()->is_production();
+
         return $schema;
     }
 }
