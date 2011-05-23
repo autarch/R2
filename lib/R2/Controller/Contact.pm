@@ -460,7 +460,7 @@ del q{}
     $c->redirect_and_detach( $c->stash()->{account}->uri() );
 };
 
-for my $type ( qw( donation note ) ) {
+for my $type ( qw( donation email note ) ) {
     my $plural = PL_N($type);
 
     my $edit_perm = "can_edit_$plural";
@@ -504,12 +504,12 @@ for my $type ( qw( donation note ) ) {
             $c->stash()->{template} = "/contact/$new_form";
         };
 
-    my $form_class = $type eq 'donation' ? 'Donation' : 'ContactNote';
+    my $form_class = $type eq 'note' ? 'ContactNote' : ucfirst $type;
     my $add_method = "add_$type";
     my $user_params_for_add
-        = $type eq 'donation'
-        ? sub { ( user    => $_[0]->user() ) }
-        : sub { ( user_id => $_[0]->user()->user_id() ) };
+        = $type eq 'note'
+        ? sub { ( user_id => $_[0]->user()->user_id() ) }
+        : sub { ( user    => $_[0]->user() ) };
 
     post $plural
         => chained '_set_contact'
@@ -554,8 +554,8 @@ for my $type ( qw( donation note ) ) {
         };
 
     my $entity_chain_point = "_set_$type";
-    my $class = 'R2::Schema::'
-        . ( $type eq 'donation' ? 'Donation' : 'ContactNote' );
+    my $class              = 'R2::Schema::'
+        . ( $type eq 'note' ? 'ContactNote' : ucfirst $type );
     my $id_col = $type eq 'donation' ? 'donation_id' : 'contact_note_id';
 
     chain_point $entity_chain_point
@@ -602,7 +602,7 @@ for my $type ( qw( donation note ) ) {
             $c->stash()->{template} = $edit_template;
         };
 
-    if ( $type eq 'donation' ) {
+    if ( $type ne 'note' ) {
         my $view_template = "/$type/view";
         get_html q{}
             => chained $entity_chain_point
@@ -625,9 +625,9 @@ for my $type ( qw( donation note ) ) {
     }
 
     my $user_params_for_update
-        = $type eq 'donation'
-        ? sub { ( user    => $_[0]->user() ) }
-        : sub { () };
+        = $type eq 'note'
+        ? sub { () }
+        : sub { ( user    => $_[0]->user() ) };
 
     put q{}
         => chained $entity_chain_point
