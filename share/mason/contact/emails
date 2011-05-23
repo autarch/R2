@@ -1,0 +1,48 @@
+<div id="summary">
+  <h1><& SELF:title, %ARGS &> <& /lib/contact-view/contact-icon.mas, contact => $contact &></h1>
+</div>
+
+% if ( $contact->email_count() ) {
+<table class="standard-table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Subject</th>
+      <th>From</th>
+      <th>Recipients</th>
+      <th>Body</th>
+%   if ($can_edit_emails) {
+      <th></th>
+      <th></th>
+%   }
+    </tr>
+  </thead>
+%   while ( my $email = $emails->next() ) {
+  <tbody>
+    <tr class="<% $emails->index() % 2 ? 'odd' : 'even' %>">
+    </tr>
+  </tbody>
+%   }
+</table>
+% } else {
+<p>
+No emails to or from <% $real_contact->display_name() %>.
+</p>
+% }
+
+<%args>
+$contact
+$real_contact
+$can_edit_emails
+</%args>
+
+<%init>
+my $emails = $contact->emails();
+</%init>
+
+<%method title>
+Emails to or from <% $real_contact->display_name() %>
+<%args>
+$real_contact
+</%args>
+</%method>
