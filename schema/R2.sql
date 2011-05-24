@@ -266,10 +266,16 @@ CREATE TABLE "Email" (
        donation_id        INT8               UNIQUE  NULL,
        subject            TEXT               NOT NULL,
        raw_content        TEXT               NOT NULL,
+       account_id         INT8               NULL,
        email_datetime     TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_subject CHECK ( subject != '' ),
        CONSTRAINT valid_raw_content CHECK ( raw_content != '' )
 );
+
+CREATE INDEX "Email_from_contact_id" ON "Email" ("from_contact_id");
+CREATE INDEX "Email_from_user_id" ON "Email" ("from_user_id");
+CREATE INDEX "Email_donation_id" ON "Email" ("donation_id");
+CREATE INDEX "Email_account_id" ON "Email" ("account_id");
 
 CREATE TABLE "ContactEmail" (
        contact_id         INT8               NOT NULL,
@@ -854,6 +860,10 @@ ALTER TABLE "Email" ADD CONSTRAINT "Email_from_user_id"
 
 ALTER TABLE "Email" ADD CONSTRAINT "Email_donation_id"
   FOREIGN KEY ("donation_id") REFERENCES "Donation" ("donation_id")
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE "Email" ADD CONSTRAINT "Email_account_id"
+  FOREIGN KEY ("account_id") REFERENCES "Account" ("account_id")
   ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE "ContactEmail" ADD CONSTRAINT "ContactEmail_email_id"
