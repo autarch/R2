@@ -100,6 +100,7 @@ sub _insert_email {
         subject        => $self->_subject(),
         raw_content    => $self->email()->as_string(),
         email_datetime => $self->_email_datetime,
+        account_id     => $self->account()->account_id(),
     );
 
     my $contact_ids = $self->_contacts_in_email();
