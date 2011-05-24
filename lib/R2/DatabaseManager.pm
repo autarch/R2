@@ -43,7 +43,15 @@ has populate => (
     isa     => Bool,
     default => 0,
     documentation =>
-        'When this is true, a newly created database will be seeded with a lot of data. Defaults to false.',
+        'When this is true, the database will be seeded with a lot of contact data. Defaults to false.',
+);
+
+has email => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+    documentation =>
+        'When this is true, the database will be seeded with a lot of emails. Defaults to false.',
 );
 
 has truncate => (
@@ -96,7 +104,7 @@ sub BUILD {
 after update_or_install_db => sub {
     my $self = shift;
 
-    if ( $self->seed() || $self->populate() ) {
+    if ( $self->seed() || $self->populate() || $self->email() ) {
         $self->_truncate_data() if $self->truncate();
         $self->_seed_data();
     }
@@ -132,8 +140,13 @@ sub _seed_data {
     my $db_name = $self->db_name();
     $self->_msg("Seeding the $db_name database");
 
-    my $meth = $self->seed() ? 'seed_data' : 'seed_lots_of_data';
-    R2::SeedData->$meth( verbose => !$self->quiet() );
+    my %args = (
+        populate => $self->populate(),
+        email    => $self->email(),
+        verbose  => !$self->quiet(),
+    );
+
+    R2::SeedData->seed_data(%args);
 }
 
 {

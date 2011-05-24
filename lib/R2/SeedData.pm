@@ -11,6 +11,8 @@ use File::Slurp qw( read_file write_file );
 use List::AllUtils qw( shuffle );
 use Path::Class qw( dir file );
 
+my $Today = DateTime->today( time_zone => 'floating' );
+
 sub seed_data {
     shift;
     my %p = @_;
@@ -29,20 +31,14 @@ sub seed_data {
     if ( $p{testing} ) {
         _cache_seed_data( $p{db_name} );
     }
-}
 
-sub seed_lots_of_data {
-    shift;
-    my %p = @_;
+    if ( $p{populate} ) {
+        _seed_random_contacts();
+    }
 
-    local $VERBOSE = $p{verbose};
-
-    _seed_required_data();
-
-    my $domain = make_domain();
-    make_accounts($domain);
-
-    _seed_random_contacts();
+    if ( $p{email} ) {
+        _seed_random_emails();
+    }
 }
 
 sub _seed_required_data {
@@ -144,8 +140,6 @@ sub make_account {
 EOF
     }
 }
-
-my $Today = DateTime->today( time_zone => 'floating' );
 
 sub _seed_random_contacts {
     require Data::Random::Contact;
@@ -502,12 +496,24 @@ sub _tags {
         push @words, $_;
     }
 
+    sub _words { @words }
+
+    sub _random_words {
+        my $count = shift or return;
+
+        return map { $words[ int( rand @words ) ] } 1..$count;
+    }
+}
+
+{
     my @Tags;
 
     sub _make_tags {
         return @Tags if @Tags;
 
         my $account = shift;
+
+        my @words = _words();
 
         for ( 1 .. 30 ) {
             my $word = splice @words, int( rand(@words) ), 1;
@@ -774,7 +780,6 @@ sub _random_years {
 
 {
     my @Types;
-    my $Lorem;
 
     sub _seed_notes_for_contact {
         my $account = shift;
@@ -785,7 +790,6 @@ sub _random_years {
 
         unless (@Types) {
             @Types = $account->contact_note_types()->all();
-            $Lorem = Text::Lorem::More->new();
         }
 
         my $num = ( int( rand(20) ) ) + 1;
@@ -793,16 +797,29 @@ sub _random_years {
         for my $x ( 1 .. $num ) {
             my $type = $Types[ int( rand(@Types) ) ];
 
-            my $paras = ( int( rand(4) ) ) + 1;
-
             $contact->add_note(
                 contact_note_type_id => $type->contact_note_type_id(),
                 note_datetime =>
                     _random_datetime( $contact->creation_datetime() ),
-                note    => $Lorem->paragraphs($paras),
+                note    => _random_paragraphs(),
                 user_id => $user->user_id(),
             );
         }
+    }
+}
+
+{
+    my $Lorem;
+    sub _random_paragraphs {
+        my $max_paras = shift // 4;
+
+        require Text::Lorem::More;
+
+        $Lorem ||= Text::Lorem::More->new();
+
+        my $paras = ( int( rand($max_paras) ) ) + 1;
+
+        return $Lorem->paragraphs($paras);
     }
 }
 
@@ -847,8 +864,168 @@ sub _random_years {
     }
 }
 
-sub _percent {
-    return ( int( rand(100) ) ) + 1;
+sub _seed_random_emails {
+    require R2::EmailProcessor;
+    require DateTime::Format::Mail;
+    require Email::MIME;
+    require Email::MessageID;
+
+    my $account
+        = R2::Schema::Account->new( name => q{People's Front of Judea} );
+
+    my $sql = <<'EOF';
+SELECT distinct email_address
+  FROM "EmailAddress" JOIN "Contact" USING (contact_id)
+ WHERE account_id = ?
+EOF
+
+    my $addresses = R2::Schema->DBIManager()->default_source()->dbh()
+        ->selectcol_arrayref( $sql, undef, $account->account_id() );
+
+    # $count times 0.8 to 1.2
+    my $count = int( scalar @{$addresses} * ( rand(0.4) + 0.8 ) );
+
+    my $x = 1;
+
+    while ( $count > 0 ) {
+        my $to_count = _seed_one_email( $account, $addresses );
+
+        $count -= scalar $to_count;
+
+        if ( $VERBOSE && $x % 50 == 0 ) {
+            print "Seeded $x emails\n";
+        }
+
+        $x++;
+    }
+}
+
+sub _seed_one_email {
+    my $account   = shift;
+    my $addresses = shift;
+
+    my @to = _email_recipients($addresses);
+
+    my $from
+        = _percent() <= 70
+        ? $addresses->[ rand @{$addresses} ]
+        : 'not.in.the.database@example.com';
+
+    my $email = _email_mime( \@to, $from );
+
+    R2::EmailProcessor->new(
+        account => $account,
+        email   => $email,
+    )->process();
+
+    return scalar @to;
+}
+
+sub _email_recipients {
+    my $addresses = shift;
+
+    my $percent = _percent();
+
+    my $recipients
+        = $percent <= 50 ? 1
+        : $percent <= 70 ? 2
+        : $percent <= 80 ? 3
+        : $percent <= 85 ? 4
+        : $percent <= 90 ? 5
+        : $percent <= 95 ? 6
+        :                  $percent - 89;
+
+    return map { $addresses->[ rand @{$addresses} ] } 1 .. $recipients;
+}
+
+sub _email_mime {
+    my $to   = shift;
+    my $from = shift;
+
+    my $percent = _percent();
+
+    my $text_body;
+    my $html_body;
+
+    my $paras = _random_paragraphs( int( rand 8 ) + 1 );
+
+    if ( $percent <= 80 ) {
+        $text_body = $paras;
+        $html_body = _html_email_body($paras);
+    }
+    elsif ( $percent <= 90 ) {
+        $text_body = $paras
+    }
+    else {
+        $html_body = _html_email_body($paras);
+    }
+
+    my @bodies;
+
+    # XXX - it would be good to vary the body charset
+    if ($text_body) {
+        push @bodies,
+            Email::MIME->create(
+            attributes => {
+                content_type => 'text/plain',
+                charset      => 'utf-8',
+                encoding     => 'quoted-printable',
+            },
+            body => $text_body,
+            );
+    }
+
+    if ($html_body) {
+        push @bodies,
+            Email::MIME->create(
+            attributes => {
+                content_type => 'text/html',
+                charset      => 'utf-8',
+                encoding     => 'quoted-printable',
+            },
+            body => $html_body,
+            );
+    }
+
+    my %headers = (
+        From    => $from,
+        To      => ( join q{,}, @{$to} ),
+        Subject => ( join q{ }, _random_words( int( rand(15) ) + 1 ) ),
+        (
+            _percent() <= 98
+            ? ( 'Message-ID' => Email::MessageID->new()->in_brackets() )
+            : ()
+        ),
+        (
+            _percent() <= 98
+            ? (
+                'Date' => DateTime::Format::Mail->format_datetime(
+                    _random_datetime()
+                )
+                )
+            : ()
+        ),
+    );
+
+    if ( @bodies == 2 ) {
+        return Email::MIME->create(
+            header     => [%headers],
+            attributes => { content_type => 'multipart/alternative' },
+            parts      => \@bodies,
+        );
+    }
+    else {
+        $bodies[0]->header_set( $_ => $headers{$_} ) for keys %headers;
+        return $bodies[0];
+    }
+}
+
+# XXX - need to add other markup, especially tables, images, inline styles,
+# inline JS, etc.
+sub _html_email_body {
+    my $paras = shift;
+
+    return join "\n\n", map {"<p>\n$_\n</p>"} split /\n+/, $paras;
 }
 
 sub _maybe_seed_from_cache {
@@ -876,6 +1053,10 @@ sub _maybe_seed_from_cache {
     );
 
     return 1;
+}
+
+sub _percent {
+    return ( int( rand(100) ) ) + 1;
 }
 
 sub _cache_seed_data {

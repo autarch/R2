@@ -119,7 +119,7 @@ sub _insert_email {
                 && $p{from_user_id}
                 && $p{from_contact_id} == $contact_ids->[0] );
 
-            for my $contact_id ( @{$contact_ids} ) {
+            for my $contact_id ( uniq @{$contact_ids} ) {
                 R2::Schema::ContactEmail->insert(
                     email_id   => $email->email_id(),
                     contact_id => $contact_id,
