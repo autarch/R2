@@ -10,23 +10,18 @@
       <th>Subject</th>
       <th>From</th>
       <th>Recipients</th>
-      <th>Body</th>
 %   if ($can_edit_emails) {
-      <th></th>
       <th></th>
 %   }
     </tr>
   </thead>
 %   while ( my $email = $emails->next() ) {
-  <tbody>
-    <tr class="<% $emails->index() % 2 ? 'odd' : 'even' %>">
-    </tr>
-  </tbody>
+  <& .email, email => $email, index => $emails->index(), can_edit_emails => $can_edit_emails &>
 %   }
 </table>
 % } else {
 <p>
-No emails to or from <% $real_contact->display_name() %>.
+  No emails to or from <% $real_contact->display_name() %>.
 </p>
 % }
 
@@ -39,6 +34,54 @@ $can_edit_emails
 <%init>
 my $emails = $contact->emails();
 </%init>
+
+
+<%def .email>
+  <tbody>
+    <tr class="<% $index % 2 ? 'odd' : 'even' %>">
+      <td>
+        <% $c->user()->format_datetime( $email->email_datetime() ) %>
+      </td>
+      <td>
+        <% $email->subject() %>
+      </td>
+      <td>
+% if ( my $user = $email->from_user() ) {
+        <a href="<% $user->uri() %>"><% $user->display_name() %></a>
+% } elsif ( my $contact = $email->from_contact() ) {
+        <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+% } else {
+        <% $mime->header('From') %>
+% }
+      </td>
+      <td>
+% while ( my $contact = $contacts->next() ) {
+        <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+% }
+      </td>
+      <td>
+        <form class="inline" action="<% $email->uri( view => 'confirm_deletion' ) %>" method="get">
+          <input class="action-button-small" type="submit" value="Delete" />
+        </form>
+      </td>
+    </tr>
+    <tr class="<% $index % 2 ? 'odd' : 'even' %>">
+      <td colspan="<% $can_edit_emails ? 5 : 4 %>">
+        body
+      </td>
+    </tr>
+  </tbody>
+<%args>
+$email
+$index
+$can_edit_emails
+</%args>
+
+<%init>
+my $mime = $email->email();
+my $contacts = $email->contacts();
+</%init>
+</%def>
 
 <%method title>
 Emails to or from <% $real_contact->display_name() %>
