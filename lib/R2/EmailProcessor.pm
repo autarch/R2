@@ -50,11 +50,11 @@ has _email_datetime => (
     builder => '_build_email_datetime',
 );
 
-has _text_body_part => (
+has _plain_body_part => (
     is      => 'ro',
     isa     => Maybe ['Email::MIME'],
     lazy    => 1,
-    builder => '_build_text_body_part',
+    builder => '_build_plain_body_part',
 );
 
 has _sender_params => (
@@ -151,7 +151,7 @@ sub _nfg_custom_data {
 
     return unless $self->_subject() =~ /Online donation via Network for Good/;
 
-    my $text = $self->_text_body_part()
+    my $text = $self->_plain_body_part()
         or return;
 
     my $content = $text->body();
@@ -355,7 +355,7 @@ sub _find_date_received {
     $date;
 }
 
-sub _build_text_body_part {
+sub _build_plain_body_part {
     my $self = shift;
 
     return $self->_first_part_with_type('text/plain');
