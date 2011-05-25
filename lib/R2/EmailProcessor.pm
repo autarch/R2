@@ -5,6 +5,8 @@ use namespace::autoclean;
 use Moose;
 use MooseX::ClassAttribute;
 
+with 'R2::Role::HasEmailMIME';
+
 use DateTime;
 use DateTime::Format::Mail;
 use DateTime::TimeZone;
@@ -20,7 +22,7 @@ use R2::Config;
 use R2::Schema;
 use R2::Schema::ContactEmail;
 use R2::Schema::Email;
-use R2::Types qw( ArrayRef DatabaseId HashRef Maybe NonEmptyStr );
+use R2::Types qw( ArrayRef DatabaseId HashRef NonEmptyStr );
 use R2::Util qw( string_is_empty );
 
 has account => (
@@ -29,10 +31,7 @@ has account => (
     required => 1,
 );
 
-has email => (
-    is       => 'rw',
-    writer   => '_set_email',
-    isa      => 'Email::MIME',
+has '+mime_object' => (
     required => 1,
 );
 
@@ -50,13 +49,6 @@ has _email_datetime => (
     builder => '_build_email_datetime',
 );
 
-has _plain_body_part => (
-    is      => 'ro',
-    isa     => Maybe ['Email::MIME'],
-    lazy    => 1,
-    builder => '_build_plain_body_part',
-);
-
 has _sender_params => (
     is      => 'ro',
     isa     => HashRef [DatabaseId],
@@ -66,7 +58,7 @@ has _sender_params => (
 
 has _participant_email_addresses => (
     is      => 'ro',
-    isa     => ArrayRef[NonEmptyStr],
+    isa     => ArrayRef [NonEmptyStr],
     lazy    => 1,
     builder => '_build_participant_email_addresses',
 );
@@ -86,8 +78,8 @@ class_has _ParticipantSelect => (
 sub process {
     my $self = shift;
 
-    my $email
-        = Email::MIME::Attachment::Stripper->new( $self->email() )->message();
+    my $email = Email::MIME::Attachment::Stripper->new( $self->mime_object() )
+        ->message();
 
     $self->_insert_email();
 }
@@ -98,7 +90,7 @@ sub _insert_email {
     my %p = (
         %{ $self->_sender_params() },
         subject        => $self->_subject(),
-        raw_content    => $self->email()->as_string(),
+        raw_content    => $self->mime_object()->as_string(),
         email_datetime => $self->_email_datetime,
         account_id     => $self->account()->account_id(),
     );
@@ -175,7 +167,8 @@ sub _nfg_custom_data {
     }
 
     $donation{external_id} = $content =~ m{External Id: (.+)};
-    ( $donation{dedication} ) = $content =~ m{(In (?:memory|honor) .+|On behalf of .+)};
+    ( $donation{dedication} )
+        = $content =~ m{(In (?:memory|honor) .+|On behalf of .+)};
 
     $donation{note} = 'Created from an email forwarded to the system.';
 
@@ -206,7 +199,7 @@ sub _nfg_custom_data {
 sub _build_sender_params {
     my $self = shift;
 
-    my $from = $self->email()->header('From');
+    my $from = $self->mime_object()->header('From');
 
     return if string_is_empty($from);
 
@@ -267,7 +260,6 @@ sub _BuildSenderSelect {
         ->and   ( $schema->table('Contact')->column('account_id'), '=',
                   Fey::Placeholder->new() );
     #>>>
-
     return $select;
 }
 
@@ -309,14 +301,13 @@ sub _BuildParticipantSelect {
         ->where ( $schema->table('Contact')->column('account_id'), '=',
                   Fey::Placeholder->new() );
     #>>>
-
     return $select;
 }
 
 sub _build_subject {
     my $self = shift;
 
-    my $subject = $self->email()->header('Subject');
+    my $subject = $self->mime_object()->header('Subject');
     $subject = '(No Subject)' if string_is_empty($subject);
 
     return $subject;
@@ -330,9 +321,9 @@ sub _build_subject {
 
         # Stolen from Email::Date
         my $raw_date 
-            = $self->email()->header('Date')
-            || _find_date_received( $self->email()->header('Received') )
-            || $self->email()->header('Resent-Date');
+            = $self->mime_object()->header('Date')
+            || _find_date_received( $self->mime_object()->header('Received') )
+            || $self->mime_object()->header('Resent-Date');
 
         if ( !string_is_empty($raw_date) ) {
             my $dt = eval { $parser->parse_datetime($raw_date) };
@@ -355,35 +346,6 @@ sub _find_date_received {
     $date;
 }
 
-sub _build_plain_body_part {
-    my $self = shift;
-
-    return $self->_first_part_with_type('text/plain');
-}
-
-sub _first_part_with_type {
-    my $self = shift;
-    my $type = shift;
-
-    my $first;
-
-    local $@;
-    eval {
-        $self->email()->walk_parts(
-            sub {
-                my $part = shift;
-
-                if ( $part->content_type() =~ /^\Q$type\E(?:;|$)/ ) {
-                    $first = $part;
-                    die;
-                }
-            }
-        );
-    };
-
-    return $first;
-}
-
 sub _build_participant_email_addresses {
     my $self = shift;
 
@@ -391,35 +353,9 @@ sub _build_participant_email_addresses {
         uniq(
             map { $_->address() }
             map { Email::Address->parse($_) }
-            map { $self->email()->header($_) } qw( From To CC )
+            map { $self->mime_object()->header($_) } qw( From To CC )
         )
     ];
-}
-
-{
-    package Email::MIME;
-
-    no warnings 'redefine';
-
-    # The version in Email::MIME resets the subparts after every walk, which
-    # is hugely inefficient.
-    sub walk_parts {
-        my ( $self, $callback ) = @_;
-
-        my $walk;
-        $walk = sub {
-            my ($part) = @_;
-            $callback->($part);
-
-            $walk->($_) for $part->subparts;
-        };
-
-        my $rv = $walk->($self);
-
-        undef $walk;
-
-        return $rv;
-    }
 }
 
 __PACKAGE__->meta()->make_immutable();

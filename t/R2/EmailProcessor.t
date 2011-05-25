@@ -71,8 +71,8 @@ $jane->contact()->update_or_add_email_addresses(
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $plain,
+        account     => $account,
+        mime_object => $plain,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -98,7 +98,7 @@ $jane->contact()->update_or_add_email_addresses(
         'email has the correct datetime'
     );
 
-    my $mime = $emails[0]->email();
+    my $mime = $emails[0]->mime_object();
     ok(
         !string_is_empty( scalar $mime->header('Message-ID') ),
         'stored message still has a Message-ID header'
@@ -122,8 +122,8 @@ _delete_all_email();
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $plain,
+        account     => $account,
+        mime_object => $plain,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -152,8 +152,8 @@ _delete_all_email();
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $plain,
+        account     => $account,
+        mime_object => $plain,
     )->process();
 
     is(
@@ -181,8 +181,8 @@ _delete_all_email();
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $plain,
+        account     => $account,
+        mime_object => $plain,
     )->process();
 
     is(
@@ -210,8 +210,8 @@ _delete_all_email();
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $plain,
+        account     => $account,
+        mime_object => $plain,
     )->process();
 
     is(
@@ -243,8 +243,8 @@ _delete_all_email();
     );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $attachments,
+        account     => $account,
+        mime_object => $attachments,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -253,7 +253,7 @@ _delete_all_email();
         'joe contact has one associated email'
     );
 
-    my $mime = $emails[0]->email();
+    my $mime = $emails[0]->mime_object();
 
     is(
         scalar $mime->parts(),
@@ -373,5 +373,5 @@ sub _email_attachment {
 sub _delete_all_email {
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();
 
-    $dbh->do( q{DELETE FROM "Email"} );
+    $dbh->do(q{DELETE FROM "Email"});
 }

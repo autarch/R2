@@ -67,7 +67,7 @@ my $emails = $contact->emails();
     </tr>
     <tr class="<% $index % 2 ? 'odd' : 'even' %>">
       <td colspan="<% $can_edit_emails ? 5 : 4 %>">
-        body
+        <% format_note( $email->body_summary() ) | n %>
       </td>
     </tr>
   </tbody>
@@ -78,7 +78,7 @@ $can_edit_emails
 </%args>
 
 <%init>
-my $mime = $email->email();
+my $mime = $email->mime_object();
 my $contacts = $email->contacts();
 </%init>
 </%def>
