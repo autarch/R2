@@ -9,6 +9,7 @@ use Courriel;
 use DateTime;
 use DateTime::Format::Mail;
 use DateTime::TimeZone;
+use Email::Address;
 use Fey::Placeholder;
 use List::AllUtils qw( first sum uniq );
 use MooseX::Params::Validate qw( validated_list );
