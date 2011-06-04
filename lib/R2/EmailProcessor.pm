@@ -302,14 +302,6 @@ sub _build_subject {
     return $subject;
 }
 
-# Stolen from Email::Date
-sub _find_date_received {
-    return unless defined $_[0] and length $_[0];
-    my $date = pop;
-    $date =~ s/.+;//;
-    $date;
-}
-
 __PACKAGE__->meta()->make_immutable();
 
 1;
