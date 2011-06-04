@@ -6,10 +6,8 @@ use Test::More;
 use lib 't/lib';
 use R2::Test::RealSchema;
 
+use Courriel::Builder;
 use DateTime;
-use Email::Date qw( format_date );
-use Email::MessageID;
-use Email::MIME;
 use File::Slurp qw( read_file );
 use R2::EmailProcessor;
 use R2::Schema::Account;
@@ -62,17 +60,20 @@ $jane->contact()->update_or_add_email_addresses(
 );
 
 {
-    my $plain = _make_email(
-        headers => {
-            From    => 'joe@example.com',
-            Subject => 'Test 1',
-        },
-        datetime => DateTime->new( year => 2010, month => 2, day => 24 ),
+    my $plain = build_email(
+        from('joe@example.com'),
+        subject('Test 1'),
+        header(
+            Date => DateTime::Format::Mail->format_datetime(
+                DateTime->new( year => 2010, month => 2, day => 24 )
+            ),
+        ),
+        plain_body('body'),
     );
 
     R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $plain,
+        account  => $account,
+        courriel => $plain,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -98,9 +99,17 @@ $jane->contact()->update_or_add_email_addresses(
         'email has the correct datetime'
     );
 
-    my $mime = $emails[0]->mime_object();
+    my $email = $emails[0]->courriel();
+    my @id = $email->headers->get('Message-ID');
+
+    is(
+        scalar @id,
+        1,
+        'email has a Message-ID'
+    );
+
     ok(
-        !string_is_empty( scalar $mime->header('Message-ID') ),
+        !string_is_empty( $id[0] ),
         'stored message still has a Message-ID header'
     );
 }
@@ -113,17 +122,16 @@ _delete_all_email();
         [ 'Joe Schmoe', 'joe@example.com' ],
     );
 
-    my $plain = _make_email(
-        headers => {
-            From    => 'doesnotmatter@example.com',
-            CC      => ( join q{ }, @addresses ),
-            Subject => 'Test 2',
-        },
+    my $plain = build_email(
+        from('doesnotmatter@example.com'),
+        cc(@addresses),
+        subject('Test 2'),
+        plain_body('body'),
     );
 
     R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $plain,
+        account  => $account,
+        courriel => $plain,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -142,18 +150,17 @@ _delete_all_email();
 _delete_all_email();
 
 {
-    my $plain = _make_email(
-        headers => {
-            From    => 'doesnotmatter@example.com',
-            To      => 'jane@example.com',
-            CC      => 'joe@example.com',
-            Subject => 'Test 3',
-        },
+    my $plain = build_email(
+        from('doesnotmatter@example.com'),
+        to('jane@example.com'),
+        cc('joe@example.com'),
+        subject('Test 3'),
+        plain_body('body'),
     );
 
     R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $plain,
+        account  => $account,
+        courriel => $plain,
     )->process();
 
     is(
@@ -172,17 +179,16 @@ _delete_all_email();
 _delete_all_email();
 
 {
-    my $plain = _make_email(
-        headers => {
-            From    => 'doesnotmatter@example.com',
-            To      => 'shared@example.com',
-            Subject => 'Test 4',
-        },
+    my $plain = build_email(
+        from('doesnotmatter@example.com'),
+        to('shared@example.com'),
+        subject('Test 4'),
+        plain_body('body'),
     );
 
     R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $plain,
+        account  => $account,
+        courriel => $plain,
     )->process();
 
     is(
@@ -201,50 +207,18 @@ _delete_all_email();
 _delete_all_email();
 
 {
-    my $plain = _make_email(
-        headers => {
-            From    => 'doesnotmatter@example.com',
-            To      => 'shared@example.com',
-            Subject => 'Test 4',
-        },
+    my $attachments = build_email(
+        from('doesnotmatter@example.com'),
+        to('joe@example.com'),
+        subject('Test 5'),
+        plain_body('body'),
+        attach( content => 'a' x 500 ),
+        attach( content => 'a' x50_000 ),
     );
 
     R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $plain,
-    )->process();
-
-    is(
-        $joe->email_count(),
-        1,
-        'joe contact has one associated email - shared email address'
-    );
-
-    is(
-        $jane->email_count(),
-        1,
-        'jane contact has one associated email - shared email address'
-    );
-}
-
-_delete_all_email();
-
-{
-    my $attachments = _make_email(
-        headers => {
-            From    => 'doesnotmatter@example.com',
-            To      => 'joe@example.com',
-            Subject => 'Test 5',
-        },
-        attachments => [
-            'a' x 500,
-            'a' x 50_000,
-        ],
-    );
-
-    R2::EmailProcessor->new(
-        account     => $account,
-        mime_object => $attachments,
+        account  => $account,
+        courriel => $attachments,
     )->process();
 
     my @emails = $joe->emails()->all();
@@ -253,122 +227,16 @@ _delete_all_email();
         'joe contact has one associated email'
     );
 
-    my $mime = $emails[0]->mime_object();
+    my $email = $emails[0]->courriel();
 
     is(
-        scalar $mime->parts(),
+        $email->part_count(),
         1,
         'attachments were stripped before storing email'
     );
 }
 
 done_testing();
-
-sub _make_email {
-    my %p = @_;
-
-    my %bodies = _email_bodies(%p);
-
-    my @bodies;
-
-    if ( $bodies{text_body} ) {
-        push @bodies,
-            Email::MIME->create(
-            attributes => {
-                content_type => 'text/plain',
-                charset      => 'utf-8',
-                encoding     => 'quoted-printable',
-            },
-            body => $bodies{text_body},
-            );
-    }
-
-    if ( $bodies{html_body} ) {
-        push @bodies,
-            Email::MIME->create(
-            attributes => {
-                content_type => 'text/html',
-                charset      => 'utf-8',
-                encoding     => 'quoted-printable',
-            },
-            body => $bodies{html_body},
-            );
-    }
-
-    my $body;
-    if ( @bodies == 2 ) {
-        $body = Email::MIME->create(
-            attributes => { content_type => 'multipart/alternative' },
-            parts      => \@bodies,
-        );
-    }
-    else {
-        $body = $bodies[0];
-    }
-
-    my @parts = $body;
-    push @parts, map { _email_attachment($_) } @{ $p{attachments} };
-
-    return Email::MIME->create(
-        header => _email_headers(%p),
-        parts  => \@parts,
-    );
-}
-
-sub _email_headers {
-    my %p = @_;
-
-    my $headers = $p{headers};
-
-    if ( my $dt = $p{datetime} ) {
-        $headers->{Date} = format_date( $dt->epoch() );
-    }
-    else {
-        $headers->{Date} = format_date();
-    }
-
-    $headers->{'Message-ID'} = Email::MessageID->new()->in_brackets();
-
-    return [ %{$headers} ];
-}
-
-sub _email_bodies {
-    my %p = @_;
-
-    my %bodies = map { $_ => $p{$_} }
-        grep { !string_is_empty( $p{$_} ) } qw( html_body text_body );
-
-    return %bodies if keys %bodies;
-
-    return text_body => <<'EOF';
-This is a test body
-
-Nothing here
-EOF
-}
-
-sub _email_attachment {
-    my $attachment = shift;
-
-    if ( ref $attachment ) {
-        return Email::MIME->create(
-            attributes => {
-                content_type => $attachment->{content_type},
-                encoding     => $attachment->{encoding} // 'base64',
-            },
-            body => $attachment->{body},
-        );
-    }
-    else {
-        return Email::MIME->create(
-            attributes => {
-                content_type => 'application/unknown',
-                encoding     => 'base64',
-            },
-            body => $attachment,
-        );
-    }
-}
 
 sub _delete_all_email {
     my $dbh = R2::Schema->DBIManager()->default_source()->dbh();

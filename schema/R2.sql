@@ -265,11 +265,11 @@ CREATE TABLE "Email" (
        from_user_id       INT8               NULL,
        donation_id        INT8               UNIQUE  NULL,
        subject            TEXT               NOT NULL,
-       raw_content        TEXT               NOT NULL,
+       email_object       BYTEA              NOT NULL,
        account_id         INT8               NULL,
        email_datetime     TIMESTAMP WITHOUT TIME ZONE  NOT NULL DEFAULT CURRENT_TIMESTAMP,
        CONSTRAINT valid_subject CHECK ( subject != '' ),
-       CONSTRAINT valid_raw_content CHECK ( raw_content != '' )
+       CONSTRAINT valid_email_object CHECK ( email_object != '' )
 );
 
 CREATE INDEX "Email_from_contact_id" ON "Email" ("from_contact_id");

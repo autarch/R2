@@ -5,15 +5,10 @@ use namespace::autoclean;
 use Moose;
 use MooseX::ClassAttribute;
 
-with 'R2::Role::HasEmailMIME';
-
+use Courriel;
 use DateTime;
 use DateTime::Format::Mail;
 use DateTime::TimeZone;
-use Email::Address;
-use Email::Date;
-use Email::MIME;
-use Email::MIME::Attachment::Stripper;
 use Fey::Placeholder;
 use List::AllUtils qw( first sum uniq );
 use MooseX::Params::Validate qw( validated_list );
@@ -24,14 +19,18 @@ use R2::Schema::ContactEmail;
 use R2::Schema::Email;
 use R2::Types qw( ArrayRef DatabaseId HashRef NonEmptyStr );
 use R2::Util qw( string_is_empty );
+use Storable qw( nfreeze );
+
+has courriel => (
+    is       => 'rw',
+    writer   => '_set_email',
+    isa      => 'Courriel',
+    required => 1,
+);
 
 has account => (
     is       => 'ro',
     isa      => 'R2::Schema::Account',
-    required => 1,
-);
-
-has '+mime_object' => (
     required => 1,
 );
 
@@ -42,25 +41,11 @@ has _subject => (
     builder => '_build_subject',
 );
 
-has _email_datetime => (
-    is      => 'ro',
-    isa     => 'DateTime',
-    lazy    => 1,
-    builder => '_build_email_datetime',
-);
-
 has _sender_params => (
     is      => 'ro',
     isa     => HashRef [DatabaseId],
     lazy    => 1,
     builder => '_build_sender_params',
-);
-
-has _participant_email_addresses => (
-    is      => 'ro',
-    isa     => ArrayRef [NonEmptyStr],
-    lazy    => 1,
-    builder => '_build_participant_email_addresses',
 );
 
 class_has _SenderSelect => (
@@ -75,12 +60,16 @@ class_has _ParticipantSelect => (
     builder => '_BuildParticipantSelect',
 );
 
-sub process {
+sub BUILD {
     my $self = shift;
 
-    my $email = Email::MIME::Attachment::Stripper->new( $self->mime_object() )
-        ->message();
+    $self->_set_email( $self->courriel()->clone_without_attachments() );
 
+    return;
+}
+
+sub process {
+    my $self = shift;
     $self->_insert_email();
 }
 
@@ -90,8 +79,8 @@ sub _insert_email {
     my %p = (
         %{ $self->_sender_params() },
         subject        => $self->_subject(),
-        raw_content    => $self->mime_object()->as_string(),
-        email_datetime => $self->_email_datetime,
+        email_object   => nfreeze( $self->courriel() ),
+        email_datetime => $self->courriel()->datetime(),
         account_id     => $self->account()->account_id(),
     );
 
@@ -143,7 +132,7 @@ sub _nfg_custom_data {
 
     return unless $self->_subject() =~ /Online donation via Network for Good/;
 
-    my $text = $self->_plain_body_part()
+    my $text = $self->courriel()->plain_body_part()
         or return;
 
     my $content = $text->body();
@@ -154,7 +143,7 @@ sub _nfg_custom_data {
 
     my %donation;
 
-    $donation{donation_date} = $self->_email_datetime();
+    $donation{donation_date} = $self->courriel()->datetime();
 
     ( $donation{amount} ) = $content =~ m{Donation Amount: \$([\d\.]+)};
     ( $donation{recurrence_frequency} ) = $content =~ m{Frequency: (.+)};
@@ -199,7 +188,7 @@ sub _nfg_custom_data {
 sub _build_sender_params {
     my $self = shift;
 
-    my $from = $self->mime_object()->header('From');
+    my ($from) = $self->courriel()->headers->get('From');
 
     return if string_is_empty($from);
 
@@ -266,15 +255,15 @@ sub _BuildSenderSelect {
 sub _contacts_in_email {
     my $self = shift;
 
-    my $addresses = $self->_participant_email_addresses();
-    return [] unless @{$addresses};
+    my @addresses = map { $_->address() } $self->courriel()->participants();
+    return [] unless @addresses;
 
     my $schema = R2::Schema->Schema();
     my $select = $self->_ParticipantSelect()->clone();
 
     $select->and(
         $schema->table('EmailAddress')->column('email_address'), 'IN',
-        ( Fey::Placeholder->new() ) x @{$addresses}
+        ( Fey::Placeholder->new() ) x @addresses
     );
 
     my $dbh = R2::Schema->DBIManager()->source_for_sql($select)->dbh();
@@ -283,7 +272,7 @@ sub _contacts_in_email {
         $select->sql($dbh),
         { Slice => {} },
         $self->account()->account_id(),
-        @{$addresses},
+        @addresses,
     );
 
     return $rows || [];
@@ -307,35 +296,10 @@ sub _BuildParticipantSelect {
 sub _build_subject {
     my $self = shift;
 
-    my $subject = $self->mime_object()->header('Subject');
+    my $subject = $self->courriel()->subject();
     $subject = '(No Subject)' if string_is_empty($subject);
 
     return $subject;
-}
-
-{
-    my $parser = DateTime::Format::Mail->new( loose => 1 );
-
-    sub _build_email_datetime {
-        my $self = shift;
-
-        # Stolen from Email::Date
-        my $raw_date 
-            = $self->mime_object()->header('Date')
-            || _find_date_received( $self->mime_object()->header('Received') )
-            || $self->mime_object()->header('Resent-Date');
-
-        if ( !string_is_empty($raw_date) ) {
-            my $dt = eval { $parser->parse_datetime($raw_date) };
-
-            if ($dt) {
-                $dt->set_time_zone('UTC');
-                return $dt;
-            }
-        }
-
-        return DateTime->now( time_zone => 'UTC' );
-    }
 }
 
 # Stolen from Email::Date
@@ -344,18 +308,6 @@ sub _find_date_received {
     my $date = pop;
     $date =~ s/.+;//;
     $date;
-}
-
-sub _build_participant_email_addresses {
-    my $self = shift;
-
-    return [
-        uniq(
-            map { $_->address() }
-            map { Email::Address->parse($_) }
-            map { $self->mime_object()->header($_) } qw( From To CC )
-        )
-    ];
 }
 
 __PACKAGE__->meta()->make_immutable();

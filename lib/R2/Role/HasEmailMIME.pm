@@ -6,11 +6,11 @@ use Moose::Role;
 
 use R2::Types qw( Maybe );
 
-has mime_object => (
+has courriel => (
     is      => 'ro',
     isa     => 'Email::MIME',
     lazy    => 1,
-    default => sub { Email::MIME->new( $_[0]->raw_content() ) },
+    default => sub { Courriel->parse( text => \$_[0]->raw_content() ) },
 );
 
 has _plain_body_part => (
@@ -60,32 +60,6 @@ sub _first_part_with_type {
     };
 
     return $first;
-}
-
-{
-    package Email::MIME;
-
-    no warnings 'redefine';
-
-    # The version in Email::MIME resets the subparts after every walk, which
-    # is hugely inefficient.
-    sub walk_parts {
-        my ( $self, $callback ) = @_;
-
-        my $walk;
-        $walk = sub {
-            my ($part) = @_;
-            $callback->($part);
-
-            $walk->($_) for $part->subparts;
-        };
-
-        my $rv = $walk->($self);
-
-        undef $walk;
-
-        return $rv;
-    }
 }
 
 1;

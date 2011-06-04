@@ -4,18 +4,17 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Email::MIME;
+use Courriel;;
 use Fey::Object::Iterator::FromSelect;
 use HTML::FormatText;
 use List::AllUtils qw( first );
 use R2::Schema;
 use R2::Types qw( Maybe Str );
 use R2::Util qw( string_is_empty );
+use Storable qw( thaw );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
-
-with 'R2::Role::HasEmailMIME';
 
 with 'R2::Role::URIMaker';
 
@@ -45,6 +44,14 @@ with 'R2::Role::URIMaker';
         builder => '_build_contacts',
     );
 }
+
+has courriel => (
+    is       => 'ro',
+    isa      => 'Courriel',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub { thaw( $_[0]->email_object() ) },
+);
 
 has body_summary => (
     is      => 'ro',
