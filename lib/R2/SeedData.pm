@@ -836,6 +836,8 @@ sub _random_years {
         return
             if $contact->isa('R2::Schema::Organization') && _percent() <= 40;
 
+        return unless keys %{$person_ids};
+
         my @positions;
         if ( $contact->isa('R2::Schema::Household') ) {
             @positions = shuffle @HouseholdPositions;
@@ -853,6 +855,8 @@ sub _random_years {
                 : ();
 
             my @ids = keys %{$person_ids};
+            return unless @ids;
+
             my $id  = delete $person_ids->{ $ids[ int( rand(@ids) ) ] };
 
             $contact->add_member(
@@ -866,9 +870,8 @@ sub _random_years {
 
 sub _seed_random_emails {
     require R2::EmailProcessor;
-    require DateTime::Format::Mail;
-    require Email::MIME;
-    require Email::MessageID;
+    require Courriel::Builder;
+    Courriel::Builder->import();
 
     my $account
         = R2::Schema::Account->new( name => q{People's Front of Judea} );
@@ -911,11 +914,11 @@ sub _seed_one_email {
         ? $addresses->[ rand @{$addresses} ]
         : 'not.in.the.database@example.com';
 
-    my $email = _email_mime( \@to, $from );
+    my $email = _courriel( \@to, $from );
 
     R2::EmailProcessor->new(
-        account => $account,
-        email   => $email,
+        account  => $account,
+        courriel => $email,
     )->process();
 
     return scalar @to;
@@ -938,86 +941,56 @@ sub _email_recipients {
     return map { $addresses->[ rand @{$addresses} ] } 1 .. $recipients;
 }
 
-sub _email_mime {
+sub _courriel {
     my $to   = shift;
     my $from = shift;
 
     my $percent = _percent();
 
-    my $text_body;
+    my $plain_body;
     my $html_body;
 
     my $paras = _random_paragraphs( int( rand 8 ) + 1 );
 
     if ( $percent <= 80 ) {
-        $text_body = $paras;
+        $plain_body = $paras;
         $html_body = _html_email_body($paras);
     }
     elsif ( $percent <= 90 ) {
-        $text_body = $paras
+        $plain_body = $paras
     }
     else {
         $html_body = _html_email_body($paras);
     }
 
-    my @bodies;
+    my @p;
 
-    # XXX - it would be good to vary the body charset
-    if ($text_body) {
-        push @bodies,
-            Email::MIME->create(
-            attributes => {
-                content_type => 'text/plain',
-                charset      => 'utf-8',
-                encoding     => 'quoted-printable',
-            },
-            body => $text_body,
-            );
-    }
+    push @p, from($from);
+    push @p, to(@{$to});
+    push @p, subject( join q{ }, _random_words( int( rand(15) ) + 1 ) );
 
-    if ($html_body) {
-        push @bodies,
-            Email::MIME->create(
-            attributes => {
-                content_type => 'text/html',
-                charset      => 'utf-8',
-                encoding     => 'quoted-printable',
-            },
-            body => $html_body,
-            );
-    }
+    my $delete_date;
 
-    my %headers = (
-        From    => $from,
-        To      => ( join q{,}, @{$to} ),
-        Subject => ( join q{ }, _random_words( int( rand(15) ) + 1 ) ),
-        (
-            _percent() <= 98
-            ? ( 'Message-ID' => Email::MessageID->new()->in_brackets() )
-            : ()
-        ),
-        (
-            _percent() <= 98
-            ? (
-                'Date' => DateTime::Format::Mail->format_datetime(
+    if( _percent() <= 98 ) {
+        push @p, header(Date => DateTime::Format::Mail->format_datetime(
                     _random_datetime()
                 )
-                )
-            : ()
-        ),
-    );
-
-    if ( @bodies == 2 ) {
-        return Email::MIME->create(
-            header     => [%headers],
-            attributes => { content_type => 'multipart/alternative' },
-            parts      => \@bodies,
-        );
+                );
     }
     else {
-        $bodies[0]->header_set( $_ => $headers{$_} ) for keys %headers;
-        return $bodies[0];
+        $delete_date = 1;
     }
+
+    # XXX - it would be good to vary the body charset
+    push @p, plain_body($plain_body) if $plain_body;
+    push @p, html_body($html_body) if $html_body;
+
+    my $email = build_email(@p);
+
+    $email->headers()->remove('Date') if $delete_date;
+    $email->headers()->remove('Message-ID') if _percent() > 98;
+
+    return $email;
 }
 
 # XXX - need to add other markup, especially tables, images, inline styles,
