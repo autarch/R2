@@ -41,7 +41,11 @@ get authentication
     }
     else {
         $c->redirect_and_detach(
-            $c->domain()->application_uri( path => '/user/login_form' ) );
+            $c->domain()->application_uri(
+                path      => '/user/login_form',
+                with_host => 1,
+            )
+        );
     }
 };
 
@@ -73,7 +77,9 @@ sub _authentication_delete {
     $c->session_object()->add_message('You have been logged out.');
 
     my $redirect = $c->request()->parameters()->{return_to}
-        || $c->domain()->application_uri( path => q{} );
+        || $c->domain()->application_uri(
+        path => q{}, with_host => 1,
+        );
     $c->redirect_and_detach($redirect);
 };
 
@@ -94,7 +100,10 @@ sub _login_user {
         ->add_message( 'Welcome to the site, ' . $user->first_name() );
 
     my $redirect_to = $results->{return_to}
-        || $c->domain()->application_uri( path => q{} );
+        || $c->domain()->application_uri(
+        path      => q{},
+        with_host => 1,
+        );
 
     $c->redirect_and_detach($redirect_to);
 }
@@ -109,8 +118,12 @@ chain_point _set_user
 
     my $user = R2::Schema::User->new( user_id => $user_id );
 
-    $c->redirect_and_detach( $c->domain()->application_uri( path => q{} ) )
-        unless $user;
+    $c->redirect_and_detach(
+        $c->domain()->application_uri(
+            path      => q{},
+            with_host => 1,
+        )
+    ) unless $user;
 
     unless ( uc $c->request()->method() eq 'GET' ) {
         $self->_check_authz(
@@ -168,7 +181,12 @@ put q{}
 
     $c->session_object()->add_message( $whos . ' account has been updated' );
 
-    $c->redirect_and_detach( $user->account()->uri( view => 'users' ) );
+    $c->redirect_and_detach(
+        $user->account()->uri(
+            view      => 'users',
+            with_host => 1,
+        )
+    );
 };
 
 get_html edit_form
