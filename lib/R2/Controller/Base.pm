@@ -128,8 +128,9 @@ sub _require_authen {
     return if $user;
 
     my $uri = $c->domain()->application_uri(
-        path  => '/user/login_form',
-        query => { return_to => $c->request()->uri() },
+        path      => '/user/login_form',
+        query     => { return_to => $c->request()->uri() },
+        with_host => 1,
     );
 
     $c->redirect_and_detach($uri);
