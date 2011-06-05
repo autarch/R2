@@ -51,7 +51,7 @@ my $emails = $contact->emails();
 % } elsif ( my $contact = $email->from_contact() ) {
         <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
 % } else {
-        <% $mime->header('From') %>
+        <% $courriel->headers()->get('From') %>
 % }
       </td>
       <td>
@@ -78,7 +78,7 @@ $can_edit_emails
 </%args>
 
 <%init>
-my $mime = $email->mime_object();
+my $courriel = $email->courriel();
 my $contacts = $email->contacts();
 </%init>
 </%def>

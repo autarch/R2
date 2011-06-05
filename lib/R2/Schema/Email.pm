@@ -108,25 +108,26 @@ sub _build_body_summary {
 sub _plain_body_summary {
     my $self = shift;
 
-    return unless defined $self->_plain_body_part();
+    return unless defined $self->courriel()->plain_body_part();
 
-    my $text = $self->_plain_body_part()->body_str();
+    my $text = $self->courriel()->plain_body_part()->content();
 
-    return if string_is_empty($text);
+    return if string_is_empty( ${$text} );
 
-    return $self->_text_summary($text);
+    return $self->_text_summary( ${$text} );
 }
 
 sub _html_body_summary {
     my $self = shift;
 
-    return unless defined $self->_html_body_part();
+    return unless defined $self->courriel()->html_body_part();
 
-    my $text = $self->_html_body_part()->body_str();
+    my $text = $self->courriel()->html_body_part()->content();
 
-    return if string_is_empty($text);
+    return if string_is_empty( ${$text} );
 
-    return $self->_text_summary( HTML::FormatText->format_string($text) );
+    return $self->_text_summary(
+        HTML::FormatText->format_string( ${$text} ) );
 }
 
 sub _text_summary {
@@ -135,6 +136,8 @@ sub _text_summary {
 
     my @paras = split /[\r\n]{1,}/, $text;
 
+    return $paras[0] if @paras == 1;
+
     my $summary = join "\n\n", @paras[ 0, 1 ];
 
     $summary .= "\n\n..." if @paras > 2;
@@ -142,18 +145,6 @@ sub _text_summary {
 
 sub _no_body_text_message {
     return '(This email does not have any text in its body.)';
-}
-
-sub _build_plain_body {
-    my $self = shift;
-
-    return $self->_first_part_with_type('text/plain');
-}
-
-sub _build_html_body {
-    my $self = shift;
-
-    return $self->_first_part_with_type('text/html');
 }
 
 sub _base_uri_path {
