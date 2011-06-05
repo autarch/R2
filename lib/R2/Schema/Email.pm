@@ -134,7 +134,7 @@ sub _text_summary {
     my $self = shift;
     my $text = shift;
 
-    my @paras = split /[\r\n]{1,}/, $text;
+    my @paras = split /(?:\r\n|\n\r|\n|\r){1,}/, $text;
 
     return $paras[0] if @paras == 1;
 
