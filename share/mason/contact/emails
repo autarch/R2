@@ -39,7 +39,7 @@ my $emails = $contact->emails();
 <%def .email>
   <tbody>
     <tr class="<% $index % 2 ? 'odd' : 'even' %>">
-      <td>
+      <td class="date">
         <% $c->user()->format_datetime( $email->email_datetime() ) %>
       </td>
       <td>

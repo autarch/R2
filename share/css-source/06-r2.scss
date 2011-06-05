@@ -435,6 +435,12 @@ table.search-results {
     }
 }
 
+table {
+    td.date {
+        white-space: nowrap;
+    }
+}
+
 /* === Forms === */
 
 form {
