@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Courriel;;
+use Courriel 0.08;
 use Fey::Object::Iterator::FromSelect;
 use HTML::FormatText;
 use List::AllUtils qw( first );
@@ -112,9 +112,9 @@ sub _plain_body_summary {
 
     my $text = $self->courriel()->plain_body_part()->content();
 
-    return if string_is_empty( ${$text} );
+    return if string_is_empty($text);
 
-    return $self->_text_summary( ${$text} );
+    return $self->_text_summary($text);
 }
 
 sub _html_body_summary {
@@ -124,10 +124,9 @@ sub _html_body_summary {
 
     my $text = $self->courriel()->html_body_part()->content();
 
-    return if string_is_empty( ${$text} );
+    return if string_is_empty($text);
 
-    return $self->_text_summary(
-        HTML::FormatText->format_string( ${$text} ) );
+    return $self->_text_summary( HTML::FormatText->format_string($text) );
 }
 
 sub _text_summary {
