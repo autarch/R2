@@ -66,9 +66,10 @@ my $emails = $contact->emails();
       </td>
     </tr>
     <tr class="<% $index % 2 ? 'odd' : 'even' %>">
-      <td colspan="<% $can_edit_emails ? 5 : 4 %>">
+      <td colspan="<% $can_edit_emails ? 4 : 4 %>">
         <% format_note( $email->body_summary() ) | n %>
       </td>
+      <td></td>
     </tr>
   </tbody>
 <%args>
