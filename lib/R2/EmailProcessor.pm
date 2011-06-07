@@ -80,7 +80,7 @@ sub _insert_email {
     my %p = (
         %{ $self->_sender_params() },
         subject        => $self->_subject(),
-        email_object   => nfreeze( $self->courriel() ),
+        raw_email      => $self->courriel()->as_string(),
         email_datetime => $self->courriel()->datetime(),
         account_id     => $self->account()->account_id(),
     );

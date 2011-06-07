@@ -11,7 +11,6 @@ use List::AllUtils qw( first );
 use R2::Schema;
 use R2::Types qw( Maybe Str );
 use R2::Util qw( string_is_empty );
-use Storable qw( thaw );
 
 use Fey::ORM::Table;
 use MooseX::ClassAttribute;
@@ -50,7 +49,7 @@ has courriel => (
     isa      => 'Courriel',
     init_arg => undef,
     lazy     => 1,
-    default  => sub { thaw( $_[0]->email_object() ) },
+    builder  => '_build_courriel',
 );
 
 has body_summary => (
@@ -144,6 +143,14 @@ sub _text_summary {
 
 sub _no_body_text_message {
     return '(This email does not have any text in its body.)';
+}
+
+sub _build_courriel {
+    my $self = shift;
+
+    my $raw = $self->raw_email();
+
+    return Courriel->parse( text => \$raw );
 }
 
 sub _base_uri_path {
