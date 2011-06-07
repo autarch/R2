@@ -24,7 +24,7 @@ use Storable qw( nfreeze );
 
 has courriel => (
     is       => 'rw',
-    writer   => '_set_email',
+    writer   => '_set_courriel',
     isa      => 'Courriel',
     required => 1,
 );
@@ -64,7 +64,7 @@ class_has _ParticipantSelect => (
 sub BUILD {
     my $self = shift;
 
-    $self->_set_email( $self->courriel()->clone_without_attachments() );
+    $self->_set_courriel( $self->courriel()->clone_without_attachments() );
 
     return;
 }
@@ -208,7 +208,7 @@ sub _build_sender_params {
         $self->account()->account_id(),
     );
 
-    return {} unless $rows && @{$rows} == 1;
+    return {} unless $rows && @{$rows} == 1 && $rows->[0]->{contact_id};
 
     return $rows->[0]{user_id}
         ? {
