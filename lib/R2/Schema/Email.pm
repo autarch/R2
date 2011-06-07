@@ -98,10 +98,13 @@ sub _BuildContactsSelect {
 sub _build_body_summary {
     my $self = shift;
 
-    return first { !string_is_empty($_) }
-        $self->_plain_body_summary(),
-        $self->_html_body_summary(),
-        $self->_no_body_text_message();
+    my $summary = $self->_plain_body_summary();
+    return $summary unless string_is_empty($summary);
+
+    $summary = $self->_html_body_summary();
+    return $summary unless string_is_empty($summary);
+
+    return $self->_no_body_text_message();
 }
 
 sub _plain_body_summary {
@@ -132,13 +135,16 @@ sub _text_summary {
     my $self = shift;
     my $text = shift;
 
-    my @paras = split /(?:\r\n|\n\r|\n|\r){2,}/, $text;
+    my @paras = grep { !string_is_empty($_) }
+        split /(?:\r\n|\n\r|\n|\r){2,}/, $text;
 
     return $paras[0] if @paras == 1;
 
     my $summary = join "\n\n", @paras[ 0, 1 ];
 
     $summary .= "\n\n..." if @paras > 2;
+
+    return $summary;
 }
 
 sub _no_body_text_message {
