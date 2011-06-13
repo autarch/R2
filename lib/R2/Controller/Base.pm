@@ -20,6 +20,12 @@ sub begin : Private {
     my $self = shift;
     my $c    = shift;
 
+    my $config = R2::Config->instance();
+
+    unless ( $config->is_production() || $ENV{R2_ALLOW_REMOTE_REQUEST} ) {
+        $self->_require_local_request($c);
+    }
+
     # Catalyst used to set this directly, now it's only available via the PSGI
     # env.
     $ENV{SERVER_PORT} = $c->engine()->env()->{SERVER_PORT};
@@ -31,8 +37,6 @@ sub begin : Private {
 
     return unless $c->request()->looks_like_browser();
 
-    my $config = R2::Config->instance();
-
     unless ( $config->is_production() || $config->is_profiling() ) {
         $_->new()->create_single_file()
             for qw( R2::Web::CSS R2::Web::Javascript );
@@ -41,6 +45,23 @@ sub begin : Private {
     $self->_add_global_tabs($c);
 
     return 1;
+}
+
+sub _require_local_request {
+    my $self = shift;
+    my $c    = shift;
+
+    my $domain = $c->domain()->web_hostname();
+
+    return if $c->req->hostname() =~ /^(?:localhost|\Q$domain\E)$/;
+
+    warn
+        "Request from non-local domain ($domain) is not allowed for dev server unless \$ENV{R2_ALLOW_REMOTE_REQUEST} is true\n";
+
+    $self->status_forbidden($c);
+    $c->response()->body('This request is not allowed.');
+
+    $c->detach();
 }
 
 sub _uri_requires_authen {
