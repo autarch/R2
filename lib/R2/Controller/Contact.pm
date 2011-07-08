@@ -278,16 +278,19 @@ sub _add_contact_view_nav {
             label   => $contact->real_contact()->display_name(),
             tooltip => 'Name, email, address, phone, etc.',
         }, {
-            uri   => $contact->uri( view => 'donations' ),
-            label => 'donations',
+            uri => $contact->uri( view => 'donations' ),
+            id  => 'donations',
+            label   => 'donations (' . $contact->donation_count() . ')',
             tooltip => 'Donations from this ' . lc $contact->contact_type(),
         }, {
             uri     => $contact->uri( view => 'notes' ),
-            label   => 'notes',
+            id      => 'notes',
+            label   => 'notes (' . $contact->note_count() . ')',
             tooltip => 'Notes of meetings, phone calls, etc.',
         }, {
             uri     => $contact->uri( view => 'emails' ),
-            label   => 'emails',
+            id      => 'emails',
+            label   => 'emails (' . $contact->email_count() . ')',
             tooltip => 'Email to and from this '
                 . lc $contact->contact_type(),
         }, {
