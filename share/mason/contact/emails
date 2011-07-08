@@ -55,8 +55,8 @@ my $emails = $contact->emails();
 % }
       </td>
       <td>
-% while ( my $contact = $contacts->next() ) {
-        <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a>
+% for my $contact (@contacts) {
+        <a href="<% $contact->uri() %>"><% $contact->real_contact()->display_name() %></a><% $contact == $contacts[-1] ? q{} : ',' %>
 % }
       </td>
       <td>
@@ -80,7 +80,7 @@ $can_edit_emails
 
 <%init>
 my $courriel = $email->courriel();
-my $contacts = $email->contacts();
+my @contacts = $email->contacts()->all();;
 </%init>
 </%def>
 
