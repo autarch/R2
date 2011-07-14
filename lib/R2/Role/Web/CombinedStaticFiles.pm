@@ -46,7 +46,8 @@ sub _build_header {
 }
 
 sub create_single_file {
-    my $self = shift;
+    my $self   = shift;
+    my $squish = shift;
 
     my $target = $self->target_file();
 
@@ -58,7 +59,7 @@ sub create_single_file {
 
     my ( $fh, $tempfile ) = tempfile( UNLINK => 0 );
 
-    print {$fh} $self->create_content();
+    print {$fh} $self->_create_content($squish);
 
     close $fh;
 
@@ -66,8 +67,9 @@ sub create_single_file {
         or die "Cannot move $tempfile => $target: $!";
 }
 
-sub create_content {
+sub _create_content {
     my $self = shift;
+    my $squish = shift;
 
     my $now = DateTime->now(
         time_zone => 'local',
@@ -81,9 +83,16 @@ sub create_content {
 
     for my $file ( @{ $self->files() } ) {
         $content .= "\n\n/* $file */\n\n";
-        $content .= eval { $self->_squish( $self->_process($file) ) } || q{};
-        if ( my $e = $@ ) {
-            die "Error squishing $file: $e\n";
+
+        if ($squish) {
+            $content
+                .= eval { $self->_squish( $self->_process($file) ) } || q{};
+            if ( my $e = $@ ) {
+                die "Error squishing $file: $e\n";
+            }
+        }
+        else {
+            $content .= $self->_process($file);
         }
     }
 
