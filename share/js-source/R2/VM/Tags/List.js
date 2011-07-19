@@ -72,7 +72,7 @@ Class(
                 );
             },
             _deleteTag: function (e) {
-                this.collection().deleteTag( $(e.currentTarget).attr("href") );
+                this.collection().deleteTag( $( e.currentTarget ).attr("href") );
             }
         }
     }
