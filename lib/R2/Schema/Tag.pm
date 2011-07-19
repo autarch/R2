@@ -5,6 +5,7 @@ use warnings;
 use namespace::autoclean;
 
 use R2::Schema;
+use R2::Types qw( Bool );
 use URI::Escape qw( uri_escape_utf8 );
 
 use Fey::ORM::Table;
@@ -24,9 +25,17 @@ with 'R2::Role::URIMaker';
         table => $schema->table('EmailList'),
         undef => 1,
     );
+
+    has is_email_list => (
+        is       => 'ro',
+        isa      => Bool,
+        init_arg => undef,
+        lazy     => 1,
+        default  => sub { $_[0]->email_list() ? 1 : 0 },
+    );
 }
 
-with 'R2::Role::Schema::Serializes';
+with 'R2::Role::Schema::Serializes' => { add => ['is_email_list'] };
 
 sub _base_uri_path {
     my $self = shift;

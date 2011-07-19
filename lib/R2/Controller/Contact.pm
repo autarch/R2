@@ -745,6 +745,16 @@ get_html history
         $c->stash()->{template} = '/contact/history';
     };
 
+get tags
+    => chained '_set_contact'
+    => args 0
+    => sub {
+        my $self = shift;
+        my $c    = shift;
+
+        $self->_tags_as_entity_response( $c, 'ok' );
+    };
+
 post tags
     => chained '_set_contact'
     => args 0
@@ -807,8 +817,11 @@ sub _tags_as_entity_response {
     my $contact = $c->stash()->{contact};
 
     my @tags = map { $_->serialize() } $contact->tags()->all();
-    $_->{'delete_uri'} = $contact->uri( view => 'tag/' . $_->{tag_id} )
-        for @tags;
+
+    if ( $c->user()->can_edit_contact( contact => $contact ) ) {
+        $_->{'delete_uri'} = $contact->uri( view => 'tag/' . $_->{tag_id} )
+            for @tags;
+    }
 
     my $meth = 'status_' . $status;
 

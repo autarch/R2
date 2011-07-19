@@ -1,25 +1,42 @@
 <div id="tags">
   <h2>Tags</h2>
 
-  <ul class="tags-list" id="tags-list">
-% while ( my $tag = $tags->next() ) {
+  <div id="tags-list"></div>
+<script id="tagsListTemplate" type="text/x-jquery-tmpl">
+  {{if tags.length}}
+  <ul>
+    {{each tags}}
     <li>
-      <a class="tag-link" href="<% $tag->uri() %>"><% $tag->tag() %></a>\
-%   if ($can_edit) {
-      <a href="<% $contact->uri( view => 'tag/' . $tag->tag_id() ) %>"
+      <a class="tag-link" href="${this.uri()}">${this.tag()}</a>\
+      {{if this.delete_uri()}}
+      <a href="${this.delete_uri()}"
          class="delete-tag ui-button ui-icon ui-icon-circle-close" title="Remove this tag">x</a>
-%   }
+      {{/if}}
     </li>
-% }
+    {{/each}}
   </ul>
+  {{else}}
+  <p>
+    This contact has no tags.
+  </p>
+  {{/if}}
+</script>
 
+<script id="tagsListErrorTemplate" type="text/x-jquery-tmpl">
+  <p>
+    There was an error updating the tags list.
+  </p>
+</script>
+
+% if ($can_edit) {
   <form id="tags-form" action="<% $contact->uri( view => 'tags' ) %>" method="post">
     <p>
       Enter new tags separated by commas ("Board, Big Donor, ...")
     </p>
     <input class="text" type="text" name="tags" />
-    <input type="submit" class="action-button" value="Tag" />
+    <input class="action-button" type="submit" value="Tag" />
   </form>
+% }
 </div>
 
 <%args>

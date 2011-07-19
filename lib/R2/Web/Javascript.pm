@@ -6,7 +6,6 @@ use namespace::autoclean;
 
 use JavaScript::Minifier::XS qw( minify );
 use JSAN::ServerSide 0.04;
-use List::AllUtils qw( first );
 use Path::Class;
 use R2::Config;
 use R2::Types qw( Bool );
@@ -35,11 +34,11 @@ sub _build_files {
 
     $js->add('R2');
 
-    my @non_r2_files = grep { $_->basename() ne 'R2.js' } $dir->children();
+    my @non_r2_files = grep { !$_->is_dir() }
+        grep { $_->basename() ne 'R2.js' } $dir->children();
 
     return [
-        ( first { $_->basename() =~ /^jquery-\d/ } @non_r2_files ),
-        ( first { $_->basename() =~ /^jquery-ui-/ } @non_r2_files ),
+        ( sort { $a->basename() cmp $b->basename() } @non_r2_files ),
         map { file($_) } $js->files()
     ];
 }

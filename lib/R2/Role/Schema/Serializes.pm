@@ -51,7 +51,7 @@ role {
 
         my %ser = (
             map {
-                my $meth = $map{$_};
+                my $meth = $map{$_} || $_;
                 $_ => $self->$meth();
                 } @add,
             keys %map
