@@ -3,31 +3,40 @@ Class(
         has: {
             uri: {
                 is:       'roc',
-                required: true
+                isPrivate: true,
+                required:  true
             },
             is_email_list: {
                 is:       'roc',
-                required: true
+                isPrivate: true,
+                required:  true
             },
             tag: {
                 is:       'roc',
-                required: true
+                isPrivate: true,
+                required:  true
+            },
+            tag_id: {
+                is:       'roc',
+                isPrivate: true,
+                required:  true
             },
             delete_uri: {
-                is: 'roc',
+                is:       'roc',
+                isPrivate: true
             },
-            icon: {
+            css_class: {
                 is:        'roc',
                 isPrivate: true,
                 lazy:      true,
-                builder:   '_build_icon'
+                builder:   '_build_css_class'
             }
         },
         methods: {
-            _build_icon: function () {
-                return this.is_email_list
-                    ? "/images/icons/mail-tag.png"
-                    : "/images/icons/tag.png";
+            _build_css_class: function () {
+                return this.is_email_list()
+                    ? "email-tag-link"
+                    : "tag-link";
             }
         }
     }

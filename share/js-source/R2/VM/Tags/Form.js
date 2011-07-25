@@ -48,8 +48,15 @@ Class(
 
                 this.form_input().val("");
 
-                this.collection().addTags(new_tags);
-            },
+                var tags = $.map(
+                    new_tags.split( /\s*,\s*/ ),
+                    function (tag) {
+                       return tag.replace( /^\s+/, "" ).replace( /\s+$/, "" );
+                    }
+                );
+
+                this.collection().addTags(tags);
+            }
         }
     }
 );

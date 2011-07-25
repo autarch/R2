@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
+use JSON ();
 use R2::Types qw( ArrayRef Str );
 
 use MooseX::Role::Parameterized;
@@ -25,11 +26,16 @@ role {
     my %skip = map { $_ => 1 } @{ $p->skip() };
 
     my %map;
+    my %bools;
 
     for my $attr ( $extra{consumer}->get_all_attributes() ) {
 
         next if $skip{ $attr->name() };
         next if $attr->name() =~ /_raw$/;
+
+        if ( $attr->name() =~ /^(?:is|can)_/ ) {
+            $bools{ $attr->name() } = 1;
+        }
 
         # We only want to serialize data from the class's the associated table
         if (   $attr->name() =~ /_date(?:time)?$/
@@ -52,7 +58,11 @@ role {
         my %ser = (
             map {
                 my $meth = $map{$_} || $_;
-                $_ => $self->$meth();
+                my $val
+                    = $bools{$_}
+                    ? ( $self->$meth() ? JSON::true() : JSON::false() )
+                    : $self->$meth();
+                ( $_ => $val );
                 } @add,
             keys %map
         );

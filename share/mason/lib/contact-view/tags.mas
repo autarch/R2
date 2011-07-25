@@ -5,21 +5,25 @@
 <script id="tagsListTemplate" type="text/x-jquery-tmpl">
   {{if tags.length}}
   <ul>
-    {{each tags}}
-    <li>
-      <a class="tag-link" href="${this.uri()}">${this.tag()}</a>\
-      {{if this.delete_uri()}}
-      <a href="${this.delete_uri()}"
-         class="delete-tag ui-button ui-icon ui-icon-circle-close" title="Remove this tag">x</a>
-      {{/if}}
-    </li>
-    {{/each}}
+    {{tmpl(tags) "#tagListItem"}}
   </ul>
   {{else}}
   <p>
     This contact has no tags.
   </p>
   {{/if}}
+</script>
+
+<script id="tagListItem" type="text/x-jquery-tmpl">
+    <li id="JS-tag-${$data.tag_id()}">
+      <span>
+        <a class="${$data.css_class()}" href="${$data.uri()}">${$data.tag()}</a>\
+        {{if $data.delete_uri()}}
+        <a href="${$data.delete_uri()}"
+           class="delete-tag ui-button ui-icon ui-icon-circle-close" title="Remove this tag">x</a>
+        {{/if}}
+      </span>
+    </li>
 </script>
 
 <script id="tagsListErrorTemplate" type="text/x-jquery-tmpl">

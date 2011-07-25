@@ -755,7 +755,7 @@ get tags
         $self->_tags_as_entity_response( $c, 'ok' );
     };
 
-post tags
+put tags
     => chained '_set_contact'
     => args 0
     => sub {
@@ -772,12 +772,12 @@ post tags
             $c->domain()->application_uri( path => q{} ),
         );
 
-        my @tags = map { s/^\s+|\s+$//; $_ } split /\s*,\s*/,
-            ( $c->request()->params()->{tags} || q{} );
+        my $entity = $self->_json_body($c);
+        my @tags = map { s/^\s+|\s+$//; $_ } @{ $entity->{tags} };
 
         $contact->add_tags( tags => \@tags ) if @tags;
 
-        $self->_tags_as_entity_response( $c, 'created' );
+        $self->_tags_as_entity_response($c);
     };
 
 del tag
@@ -810,20 +810,17 @@ del tag
     };
 
 sub _tags_as_entity_response {
-    my $self   = shift;
-    my $c      = shift;
-    my $status = shift || 'ok';
+    my $self = shift;
+    my $c    = shift;
 
     my $contact = $c->stash()->{contact};
 
     my @tags = map { $_->serialize() } $contact->tags()->all();
 
     if ( $c->user()->can_edit_contact( contact => $contact ) ) {
-        $_->{'delete_uri'} = $contact->uri( view => 'tag/' . $_->{tag_id} )
+        $_->{delete_uri} = $contact->uri( view => 'tag/' . $_->{tag_id} )
             for @tags;
     }
-
-    my $meth = 'status_' . $status;
 
     my %p = (
         entity => {
@@ -832,10 +829,7 @@ sub _tags_as_entity_response {
         },
     );
 
-    $p{location} = $contact->uri( view => 'tags' )
-        if $status ne 'ok';
-
-    $self->$meth( $c, %p );
+    $self->status_ok( $c, %p );
 }
 
 sub _custom_fields {

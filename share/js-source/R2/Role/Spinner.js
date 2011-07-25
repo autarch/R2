@@ -28,7 +28,7 @@ Role(
             }
         },       
         has: {
-            timer_id: {
+            spinner: {
                 is:        'rwc',
                 isPrivate: true,
             }
@@ -44,6 +44,8 @@ Role(
 
                 elt.children().detach();
                 elt.append( this.my.Spinner() );
+
+                this.spinner( this.my.Spinner() );
             },
             _showSpinnerOver: function (elt) {
                 if ( ! elt.length ) {
@@ -68,6 +70,15 @@ Role(
 
                 container.append(spinner);
                 elt.children().first().before(container);
+
+                this.spinner(container);
+            },
+            _removeSpinner: function () {
+                if ( ! this.spinner() ) {
+                    return;
+                }
+
+                this.spinner().detach();
             }
         }
     }

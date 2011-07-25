@@ -15,6 +15,10 @@ Class(
                 is:        "roc",
                 isPrivate: true,
                 builder:   "_build_container"
+            },
+            last_tags: {
+                is:        "rwc",
+                isPrivate: true,
             }
         },
         methods: {
@@ -49,6 +53,80 @@ Class(
                 return this.container().find('li').length ? true : false;
             },
             _updateTagDisplay: function (tags) {
+                this._removeSpinner();
+
+                if ( this.last_tags() ) {
+                    this._addNewTags(tags);
+                }
+                else {
+                    this._showAllTags(tags);
+                }
+
+                var last_tags = {};
+                for ( var i = 0; i < tags.length; i++ ) {
+                    last_tags[ tags[i].tag_id() ] = true;
+                }
+
+                this._removeDeletedTags( last_tags, tags );
+
+                this.last_tags( tags.length ? last_tags : null );
+            },
+            _addNewTags: function (new_tags) {
+                for ( var i = 0; i < new_tags.length; i++ ) {
+                    this._maybeInsertTag(
+                        new_tags[i],
+                        i > 0 ? new_tags[ i - 1 ] : null
+                    );
+                }
+            },
+            _maybeInsertTag: function ( tag, prev_tag ) {
+                if ( this.last_tags()[ tag.tag_id() ] ) {
+                    return;
+                }
+                else {
+                    var new_html = $("#tagListItem").tmpl(tag);
+                    new_html.hide();
+
+                    if (prev_tag) {
+                        new_html.insertAfter( $( "#JS-tag-" + prev_tag.tag_id() ) );
+                    }
+                    else {
+                        new_html.prependTo( this.container().find("ul") );
+                    }
+
+                    new_html.fadeIn();
+                }
+
+                this._instrumentDeleteLinks();
+            },
+            _removeDeletedTags: function ( new_tag_ids, new_tags ) {
+                var last_tags = this.last_tags();
+                if ( ! last_tags ) {
+                    return;
+                }
+
+                var self = this;
+
+                $.each(
+                    last_tags,
+                    function (id) {
+                        if ( ! new_tag_ids[id] ) {
+                            var elt = $( "#JS-tag-" + id );
+                            elt.fadeOut(
+                                400,
+                                function () {
+                                    elt.detach();
+
+                                    if ( ! new_tags.length ) {
+                                        self._showAllTags(new_tags);
+                                    }
+                                }
+                            );
+                        }
+                    }
+                );
+            },
+            _showAllTags: function (tags) {
                 this.container().children().detach();
                 $("#tagsListTemplate").tmpl( { tags: tags } ).appendTo( this.container() );
                 this._instrumentDeleteLinks();

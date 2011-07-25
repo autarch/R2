@@ -288,21 +288,24 @@ body {
         li {
             display: inline;
             margin-right: 0.2em;
-            white-space: nowrap;
-        }
 
-        a.tag-link {
-            padding-left: 20px;
-            background-image: url(/images/icons/tag.png);
-            background-position: 1px center;
-            background-repeat: no-repeat;
-        }
+            span {
+                white-space: nowrap;
+            }
 
-        a.email-tag-link {
-            padding-left: 20px;
-            background-image: url(/images/icons/email.png);
-            background-position: 1px center;
-            background-repeat: no-repeat;
+            a.tag-link {
+                padding-left: 20px;
+                background-image: url(/images/icons/tag.png);
+                background-position: 1px center;
+                background-repeat: no-repeat;
+            }
+
+            a.email-tag-link {
+                padding-left: 20px;
+                background-image: url(/images/icons/email.png);
+                background-position: 1px center;
+                background-repeat: no-repeat;
+            }
         }
     }
 }

@@ -724,7 +724,7 @@ sub add_tags {
         tags => ArrayRef [Str],
     );
 
-    my @tag_ids;
+    my @tags;
     for my $tag_name ( @{$tags} ) {
         my %tag_p = (
             tag        => $tag_name,
@@ -739,19 +739,20 @@ sub add_tags {
                 tag_id     => $tag->tag_id(),
                 );
 
-            push @tag_ids, $tag->tag_id();
+            push @tags, $tag;
         }
         else {
-            $tag = R2::Schema::Tag->insert(%tag_p);
-
-            push @tag_ids, $tag->tag_id();
+            push @tags, R2::Schema::Tag->insert(%tag_p);
         }
     }
 
-    R2::Schema::ContactTag->insert_many(
-        map { { contact_id => $self->contact_id(), tag_id => $_, } }
-            @tag_ids )
-        if @tag_ids;
+    if (@tags) {
+        R2::Schema::ContactTag->insert_many(
+            map {
+                { contact_id => $self->contact_id(), tag_id => $_->tag_id(), }
+                } @tags
+        );
+    }
 
     return;
 }

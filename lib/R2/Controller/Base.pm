@@ -140,6 +140,19 @@ sub _set_entity {
     return 1;
 }
 
+sub _json_body {
+    my $self = shift;
+    my $c    = shift;
+
+    return R2::JSON->Decode(
+        do {
+            local $/;
+            my $body = $c->request()->body();
+            <$body>;
+        }
+    );
+}
+
 sub _require_authen {
     my $self = shift;
     my $c    = shift;
