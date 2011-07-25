@@ -94,6 +94,11 @@ Class(
                         new_html.prependTo( this.container().find("ul") );
                     }
 
+                    /* Without this the element can end up with
+                       "display: block" as a style in some browsers
+                       (saw this in Firefox 5) */
+                    new_html.removeAttr("style");
+
                     new_html.fadeIn();
                 }
 
@@ -111,12 +116,9 @@ Class(
                     last_tags,
                     function (id) {
                         if ( ! new_tag_ids[id] ) {
-                            var elt = $( "#JS-tag-" + id );
-                            elt.fadeOut(
+                            $( "#JS-tag-" + id ).fadeOut(
                                 400,
                                 function () {
-                                    elt.detach();
-
                                     if ( ! new_tags.length ) {
                                         self._showAllTags(new_tags);
                                     }
