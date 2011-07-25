@@ -143,9 +143,11 @@ Class(
 
                 this.container().find("a.delete-tag").each(
                     function () {
+                        $(this).unbind("click.R2-delete-tag");
+
                         self._handlerFor(
                             $(this),
-                            "click",
+                            "click.R2-delete-tag",
                             handler
                         );
                     }
