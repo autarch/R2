@@ -725,7 +725,7 @@ sub add_tags {
     );
 
     my @tags;
-    for my $tag_name ( @{$tags} ) {
+    for my $tag_name ( uniq @{$tags} ) {
         my %tag_p = (
             tag        => $tag_name,
             account_id => $self->account_id(),
