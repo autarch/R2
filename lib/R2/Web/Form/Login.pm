@@ -47,8 +47,6 @@ sub _validate_form {
         unless $user
             && $user->check_password( $results->{password}->value() );
 
-    return 'This account has been disabled.' if $user->is_disabled();
-
     return;
 }
 
