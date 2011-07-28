@@ -523,7 +523,9 @@ get_html confirm_deletion
     );
 
     my $count = $search->count();
-    $c->stash()->{extra} = "This tag is currently in use by $count "
+    my $tag_val = $tag->tag();
+
+    $c->stash()->{extra} = qq{This tag, "$tag_val", is currently in use by $count }
         . PL_N( 'contact', $count ) . q{.};
 
     $c->stash()->{template} = '/shared/confirm_deletion';
