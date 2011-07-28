@@ -80,6 +80,7 @@ sub _authentication_delete {
         || $c->domain()->application_uri(
         path => q{}, with_host => 1,
         );
+
     $c->redirect_and_detach($redirect);
 };
 
