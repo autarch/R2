@@ -357,6 +357,7 @@ CREATE TABLE "Tag" (
        tag_id           SERIAL8         PRIMARY KEY,
        tag              citext          NOT NULL,
        account_id       INT8            NOT NULL,
+       CONSTRAINT valid_tag CHECK ( tag != '' ),
        CONSTRAINT "Tag_tag_account_id_unique" UNIQUE ( tag, account_id )
 );
 
