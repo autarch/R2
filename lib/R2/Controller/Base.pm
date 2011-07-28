@@ -42,7 +42,8 @@ sub begin : Private {
             for qw( R2::Web::CSS R2::Web::Javascript );
     }
 
-    $self->_add_global_tabs($c);
+    $self->_add_global_tabs($c)
+        if $self->_uri_requires_authen( $c->request()->uri() );
 
     return 1;
 }
