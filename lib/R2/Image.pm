@@ -8,7 +8,7 @@ use Image::Magick;
 use List::AllUtils qw( min );
 use Path::Class ();
 use R2::Schema::File;
-use R2::Types qw( FileIsImage PosInt Int );
+use R2::Types qw( FileIsImage PositiveInt Int );
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -34,7 +34,7 @@ has '_magick' => (
 
 has 'height' => (
     is       => 'ro',
-    isa      => PosInt,
+    isa      => PositiveInt,
     lazy     => 1,
     default  => sub { $_[0]->_magick()->get('height') },
     init_arg => undef,
@@ -42,7 +42,7 @@ has 'height' => (
 
 has 'width' => (
     is       => 'ro',
-    isa      => PosInt,
+    isa      => PositiveInt,
     lazy     => 1,
     default  => sub { $_[0]->_magick()->get('width') },
     init_arg => undef,

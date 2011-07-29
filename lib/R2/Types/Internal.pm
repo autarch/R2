@@ -14,7 +14,6 @@ use MooseX::Types -declare => [
         ErrorForSession
         FileIsImage
         MonthAsNumber
-        PosInt
         PosOrZeroInt
         SearchPlugin
         URIStr
@@ -71,9 +70,6 @@ subtype NonEmptyStr,
     as Str,
     where { length $_ >= 0 },
     message {'This string must not be empty'};
-
-# XXX - compat shim - need to just use PositiveInt everywhere
-subtype PosInt, as PositiveInt;
 
 subtype PosOrZeroInt,
     as Int,

@@ -18,7 +18,7 @@ use R2::Types qw(
     HashRef
     Maybe
     NonEmptyStr
-    PosInt
+    PositiveInt
     PosOrZeroInt
     SearchPlugin
 );
@@ -60,7 +60,7 @@ has limit => (
 
 has page => (
     is      => 'ro',
-    isa     => PosInt,
+    isa     => PositiveInt,
     default => 1,
 );
 
@@ -321,7 +321,7 @@ sub new_uri {
     my $self = shift;
     my %p    = validated_hash(
         \@_,
-        page          => { isa => PosInt,       optional => 1 },
+        page          => { isa => PositiveInt,  optional => 1 },
         limit         => { isa => PosOrZeroInt, optional => 1 },
         order_by      => { isa => NonEmptyStr,  optional => 1 },
         reverse_order => { isa => Bool,         optional => 1 },
