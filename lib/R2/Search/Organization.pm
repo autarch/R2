@@ -10,12 +10,6 @@ use Fey::Object::Iterator::FromSelect;
 use R2::Schema;
 use R2::Types qw( ArrayRef );
 
-has account => (
-    is       => 'ro',
-    isa      => 'R2::Schema::Account',
-    required => 1,
-);
-
 with 'R2::Role::Search::Contact';
 
 has '+order_by' => ( default => 'name' );

@@ -34,6 +34,12 @@ requires qw(
 
 with 'R2::Role::URIMaker';
 
+has account => (
+    is       => 'ro',
+    isa      => 'R2::Schema::Account',
+    required => 1,
+);
+
 has order_by => (
     is        => 'ro',
     isa       => NonEmptyStr,

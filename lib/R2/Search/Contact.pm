@@ -14,12 +14,6 @@ use R2::Schema;
 use R2::Search::Iterator::RealContact;
 use R2::Types qw( NonEmptyStr PosOrZeroInt );
 
-has account => (
-    is       => 'ro',
-    isa      => 'R2::Schema::Account',
-    required => 1,
-);
-
 with 'R2::Role::Search::Contact';
 
 has '+order_by' => ( default => 'name' );
