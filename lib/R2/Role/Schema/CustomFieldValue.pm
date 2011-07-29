@@ -42,14 +42,16 @@ role {
         ->and  ( $table->column('contact_id'),
                  '=', Fey::Placeholder->new() );
     #>>>
+
+    my %rpv_spec = (
+        field   => { isa => 'R2::Schema::CustomField' },
+        contact => { isa => 'R2::Schema::Contact' },
+        value   => { isa => Defined },
+    );
+
     method replace_value_for_contact => sub {
         my $class = shift;
-        my ( $field, $contact, $value ) = validated_list(
-            \@_,
-            field   => { isa => 'R2::Schema::CustomField' },
-            contact => { isa => 'R2::Schema::Contact' },
-            value   => { isa => Defined },
-        );
+        my ( $field, $contact, $value ) = validated_list( \@_, %rpv_spec );
 
         my %p = (
             value           => $value,
@@ -71,13 +73,14 @@ role {
         );
     };
 
+    my %dv_spec = (
+        field   => { isa => 'R2::Schema::CustomField' },
+        contact => { isa => 'R2::Schema::Contact' },
+    );
+
     method delete_value_for_contact => sub {
         my $class = shift;
-        my ( $field, $contact, $value ) = validated_list(
-            \@_,
-            field   => { isa => 'R2::Schema::CustomField' },
-            contact => { isa => 'R2::Schema::Contact' },
-        );
+        my ( $field, $contact, $value ) = validated_list( \@_, %dv_spec );
 
         my $dbh = $class->_dbh($delete);
 

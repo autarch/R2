@@ -47,23 +47,29 @@ around add_error => sub {
     return $self->$orig( map { $self->_error_text($_) } @_ );
 };
 
-sub _error_text {
-    my $self = shift;
-    my ($e) = pos_validated_list( \@_, { isa => ErrorForSession } );
+{
+    my @spec = (
+        { isa => ErrorForSession },
+    );
 
-    if ( eval { $e->can('messages') } && $e->messages() ) {
-        return $e->messages();
-    }
-    elsif ( eval { $e->can('message') } ) {
-        return $e->message();
-    }
-    elsif ( ref $e ) {
-        return @{$e};
-    }
-    else {
+    sub _error_text {
+        my $self = shift;
+        my ($e) = pos_validated_list( \@_, @spec );
 
-        # force stringification
-        return $e . q{};
+        if ( eval { $e->can('messages') } && $e->messages() ) {
+            return $e->messages();
+        }
+        elsif ( eval { $e->can('message') } ) {
+            return $e->message();
+        }
+        elsif ( ref $e ) {
+            return @{$e};
+        }
+        else {
+
+            # force stringification
+            return $e . q{};
+        }
     }
 }
 

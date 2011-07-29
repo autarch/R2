@@ -504,12 +504,14 @@ sub add_note {
         ->where ( $schema->table('Donation')->column('contact_id'), '=',
                   Fey::Placeholder->new() );
     #>>>
+
+    my %spec = (
+        since => { isa => 'DateTime', optional => 1 },
+    );
+
     sub donation_total {
         my $self = shift;
-        my ($date) = validated_list(
-            \@_,
-            since => { isa => 'DateTime', optional => 1 },
-        );
+        my ($date) = validated_list( \@_, %spec );
 
         my $select = $select_base->clone();
 
@@ -534,15 +536,18 @@ sub add_note {
     }
 }
 
-sub has_custom_field_values_for_group {
-    my $self = shift;
-    my ($group) = pos_validated_list(
-        \@_,
-        { isa => 'R2::Schema::CustomFieldGroup' }
+{
+    my @spec = (
+        { isa => 'R2::Schema::CustomFieldGroup' },
     );
 
-    return any { $self->custom_field_value( $_->custom_field_id() ) }
-    $group->custom_fields()->all();
+    sub has_custom_field_values_for_group {
+        my $self = shift;
+        my ($group) = pos_validated_list( \@_, @spec );
+
+        return any { $self->custom_field_value( $_->custom_field_id() ) }
+        $group->custom_fields()->all();
+    }
 }
 
 {
@@ -717,44 +722,48 @@ sub _BuildTagsSelect {
     return $select;
 }
 
-sub add_tags {
-    my $self = shift;
-    my ($tags) = validated_list(
-        \@_,
+{
+    my %spec = (
         tags => ArrayRef [Str],
     );
 
-    my @tags;
-    for my $tag_name ( grep { length } uniq @{$tags} ) {
-        my %tag_p = (
-            tag        => $tag_name,
-            account_id => $self->account_id(),
-        );
+    sub add_tags {
+        my $self = shift;
+        my ($tags) = validated_list( \@_, %spec );
 
-        my $tag;
-        if ( $tag = R2::Schema::Tag->new(%tag_p) ) {
-            next
-                if R2::Schema::ContactTag->new(
-                contact_id => $self->contact_id(),
-                tag_id     => $tag->tag_id(),
-                );
+        my @tags;
+        for my $tag_name ( grep {length} uniq @{$tags} ) {
+            my %tag_p = (
+                tag        => $tag_name,
+                account_id => $self->account_id(),
+            );
 
-            push @tags, $tag;
+            my $tag;
+            if ( $tag = R2::Schema::Tag->new(%tag_p) ) {
+                next
+                    if R2::Schema::ContactTag->new(
+                    contact_id => $self->contact_id(),
+                    tag_id     => $tag->tag_id(),
+                    );
+
+                push @tags, $tag;
+            }
+            else {
+                push @tags, R2::Schema::Tag->insert(%tag_p);
+            }
         }
-        else {
-            push @tags, R2::Schema::Tag->insert(%tag_p);
+
+        if (@tags) {
+            R2::Schema::ContactTag->insert_many(
+                map {
+                    { contact_id => $self->contact_id(),
+                        tag_id => $_->tag_id(), }
+                    } @tags
+            );
         }
-    }
 
-    if (@tags) {
-        R2::Schema::ContactTag->insert_many(
-            map {
-                { contact_id => $self->contact_id(), tag_id => $_->tag_id(), }
-                } @tags
-        );
+        return;
     }
-
-    return;
 }
 
 sub _build_emails {

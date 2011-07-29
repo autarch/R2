@@ -317,10 +317,8 @@ sub _build_pager {
     return $pager;
 }
 
-sub new_uri {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
+{
+    my %spec = (
         page          => { isa => PositiveInt,  optional => 1 },
         limit         => { isa => PosOrZeroInt, optional => 1 },
         order_by      => { isa => NonEmptyStr,  optional => 1 },
@@ -328,19 +326,24 @@ sub new_uri {
         MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1,
     );
 
-    my %query = map { $_ => delete $p{$_} }
-        grep { defined $p{$_} } qw( page limit order_by reverse_order );
+    sub new_uri {
+        my $self = shift;
+        my %p = validated_hash( \@_, %spec );
 
-    delete $query{page} if $query{page} && $query{page} == 1;
+        my %query = map { $_ => delete $p{$_} }
+            grep { defined $p{$_} } qw( page limit order_by reverse_order );
 
-    delete $query{order_by}
-        if defined $query{order_by}
-            && $query{order_by} eq
-            $self->meta()->get_attribute('order_by')->default();
+        delete $query{page} if $query{page} && $query{page} == 1;
 
-    delete $query{reverse_order} unless $query{reverse_order};
+        delete $query{order_by}
+            if defined $query{order_by}
+                && $query{order_by} eq
+                $self->meta()->get_attribute('order_by')->default();
 
-    return $self->uri( query => \%query, %p );
+        delete $query{reverse_order} unless $query{reverse_order};
+
+        return $self->uri( query => \%query, %p );
+    }
 }
 
 sub current_uri {

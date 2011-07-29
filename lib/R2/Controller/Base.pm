@@ -188,23 +188,26 @@ sub _check_authz {
     );
 }
 
-sub status_no_content {
-    my $self       = shift;
-    my $c          = shift;
-    my ($location) = validated_list(
-        \@_,
+{
+    my %spec = (
         location => { isa => Str | Object },
     );
 
-    if ( $c->request()->looks_like_browser() ) {
-        $c->response()->status(302);
-        $c->response()->header( Location => $location );
-    }
-    else {
-        $c->response()->status(204);
-    }
+    sub status_no_content {
+        my $self = shift;
+        my $c    = shift;
+        my ($location) = validated_list( \@_, %spec );
 
-    return;
+        if ( $c->request()->looks_like_browser() ) {
+            $c->response()->status(302);
+            $c->response()->header( Location => $location );
+        }
+        else {
+            $c->response()->status(204);
+        }
+
+        return;
+    }
 }
 
 sub status_forbidden {

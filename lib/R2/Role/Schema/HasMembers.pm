@@ -33,85 +33,95 @@ has 'member_count' => (
     builder => '_build_member_count',
 );
 
-sub add_member {
-    my $self = shift;
-    my ( $person_id, $position, $user ) = validated_list(
-        \@_,
+{
+    my %spec = (
         person_id => { isa => Int },
         position  => { isa => Str, default => q{} },
         user      => { isa => 'R2::Schema::User' },
     );
 
-    my $person = R2::Schema::Person->new( person_id => $person_id );
+    sub add_member {
+        my $self = shift;
+        my ( $person_id, $position, $user ) = validated_list( \@_, %spec );
 
-    if ( $person->account_id() != $self->account_id() ) {
-        data_validation_error 'Cannot add a person from a different account.';
+        my $person = R2::Schema::Person->new( person_id => $person_id );
+
+        if ( $person->account_id() != $self->account_id() ) {
+            data_validation_error
+                'Cannot add a person from a different account.';
+        }
+
+        my $class = ( ref $self ) . 'Member';
+
+        $class->insert(
+            $self->pk_values_hash(),
+            person_id => $person_id,
+            position  => $position,
+            user      => $user,
+        );
     }
-
-    my $class = ( ref $self ) . 'Member';
-
-    $class->insert(
-        $self->pk_values_hash(),
-        person_id => $person_id,
-        position  => $position,
-        user      => $user,
-    );
 }
 
-sub remove_member {
-    my $self = shift;
-    my ( $person_id, $user ) = validated_list(
-        \@_,
+{
+    my %spec = (
         person_id => { isa => Int },
         user      => { isa => 'R2::Schema::User' },
     );
 
-    my $class = ( ref $self ) . 'Member';
+    sub remove_member {
+        my $self = shift;
+        my ( $person_id, $user ) = validated_list( \@_, %spec );
 
-    my $member = $class->new(
-        $self->pk_values_hash(),
-        person_id => $person_id,
-    );
+        my $class = ( ref $self ) . 'Member';
 
-    return unless $member;
+        my $member = $class->new(
+            $self->pk_values_hash(),
+            person_id => $person_id,
+        );
 
-    $member->delete( user => $user );
+        return unless $member;
 
-    return;
+        $member->delete( user => $user );
+
+        return;
+    }
 }
 
-sub update_members {
-    my $self = shift;
-    my ( $members, $user ) = validated_list(
-        \@_,
+{
+    my %spec = (
         members => { isa => ArrayRef [HashRef] },
         user => { isa => 'R2::Schema::User' },
     );
 
-    my %new_members = map { $_->{person_id} => $_ } @{$members};
+    sub update_members {
+        my $self = shift;
+        my ( $members, $user ) = validated_list( \@_, %spec );
 
-    my $current_members = $self->members();
+        my %new_members = map { $_->{person_id} => $_ } @{$members};
 
-    while ( my ( undef, $membership ) = $current_members->next() ) {
-        my $id = $membership->person_id();
+        my $current_members = $self->members();
 
-        unless ( $new_members{$id} ) {
-            $membership->delete( user => $user );
+        while ( my ( undef, $membership ) = $current_members->next() ) {
+            my $id = $membership->person_id();
+
+            unless ( $new_members{$id} ) {
+                $membership->delete( user => $user );
+            }
+            else {
+                $membership->update(
+                    position => $new_members{$id}->{position} // q{},
+                );
+
+                delete $new_members{$id};
+            }
         }
-        else {
-            $membership->update(
-                position => $new_members{$id}->{position} // q{},
+
+        for my $new_member ( values %new_members ) {
+            $self->add_member(
+                %{$new_member},
+                user => $user,
             );
-
-            delete $new_members{$id};
         }
-    }
-
-    for my $new_member ( values %new_members ) {
-        $self->add_member(
-            %{$new_member},
-            user => $user,
-        );
     }
 }
 

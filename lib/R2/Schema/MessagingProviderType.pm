@@ -104,37 +104,41 @@ use MooseX::Params::Validate qw( validated_list );
     }
 }
 
-sub _fill_uri {
-    my $self = shift;
-    my $type = shift;
+{
+    my %spec = (
+        screen_name => { isa => Str },
+    );
 
-    my ($screen_name)
-        = validated_list( \@_, screen_name => { isa => Str } );
+    sub _fill_uri {
+        my $self = shift;
+        my $type = shift;
+        my ($screen_name) = validated_list( \@_, %spec );
 
-    my $meth = $type . '_template';
-    my $template = $self->$meth();
+        my $meth     = $type . '_template';
+        my $template = $self->$meth();
 
-    return unless $template;
+        return unless $template;
 
-    my %vars = ( screen_name => $screen_name );
+        my %vars = ( screen_name => $screen_name );
 
-    for my $var ( $template->variables() ) {
-        if ( $var =~ /^Config\.(\w+)/ ) {
-            my $key = $1;
+        for my $var ( $template->variables() ) {
+            if ( $var =~ /^Config\.(\w+)/ ) {
+                my $key = $1;
 
-            die "Invalid config key: $key"
-                unless R2::Config->can($key);
+                die "Invalid config key: $key"
+                    unless R2::Config->can($key);
 
-            $vars{$var} = R2::Config->instance()->$key();
+                $vars{$var} = R2::Config->instance()->$key();
 
-            return if string_is_empty( $vars{$var} );
+                return if string_is_empty( $vars{$var} );
+            }
+            elsif ( $var ne 'screen_name' ) {
+                die "Invalid URI template variable for messaging URI: $var";
+            }
         }
-        elsif ( $var ne 'screen_name' ) {
-            die "Invalid URI template variable for messaging URI: $var";
-        }
+
+        $template->process_to_string(%vars);
     }
-
-    $template->process_to_string(%vars);
 }
 
 sub All {

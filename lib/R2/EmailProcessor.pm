@@ -12,7 +12,6 @@ use DateTime::TimeZone;
 use Email::Address;
 use Fey::Placeholder;
 use List::AllUtils qw( first sum uniq );
-use MooseX::Params::Validate qw( validated_list );
 use Number::Format qw( format_bytes );
 use R2::Config;
 use R2::Schema;

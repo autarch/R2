@@ -48,28 +48,32 @@ has 'width' => (
     init_arg => undef,
 );
 
-sub resize {
-    my $self = shift;
-    my ( $height, $width ) = validated_list(
-        \@_,
+{
+    my %spec = (
         height => { isa => Int },
         width  => { isa => Int },
     );
 
-    ( $height, $width ) = $self->_new_dimensions( $height, $width );
+    sub resize {
+        my $self = shift;
+        my ( $height, $width ) = validated_list( \@_, %spec );
 
-    my $dimensions  = $width . q{x} . $height;
-    my $unique_name = $self->file()->file_id() . q{-} . $dimensions;
+        ( $height, $width ) = $self->_new_dimensions( $height, $width );
 
-    my $file = eval { R2::Schema::File->new( unique_name => $unique_name ) };
+        my $dimensions  = $width . q{x} . $height;
+        my $unique_name = $self->file()->file_id() . q{-} . $dimensions;
 
-    return R2::Image->new( file => $file )
-        if $file;
+        my $file
+            = eval { R2::Schema::File->new( unique_name => $unique_name ) };
 
-    $file = $self->_make_resized_image(
-        $height, $width, $dimensions,
-        $unique_name
-    );
+        return R2::Image->new( file => $file )
+            if $file;
+
+        $file = $self->_make_resized_image(
+            $height, $width, $dimensions,
+            $unique_name
+        );
+    }
 }
 
 sub _new_dimensions {

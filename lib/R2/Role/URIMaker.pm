@@ -14,26 +14,29 @@ use Moose::Role;
 
 requires '_base_uri_path';
 
-sub uri {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
+{
+    my %spec = (
         view      => { isa => 'Str',     optional => 1 },
         fragment  => { isa => 'Str',     optional => 1 },
         query     => { isa => 'HashRef', default  => {} },
         with_host => { isa => 'Bool',    default  => 0 },
     );
 
-    my $path = $self->_base_uri_path();
-    $path .= q{/} . $p{view}
-        unless string_is_empty( $p{view} );
+    sub uri {
+        my $self = shift;
+        my %p = validated_hash( \@_, %spec );
 
-    $self->_make_uri(
-        path      => $path,
-        fragment  => $p{fragment},
-        query     => $p{query},
-        with_host => $p{with_host},
-    );
+        my $path = $self->_base_uri_path();
+        $path .= q{/} . $p{view}
+            unless string_is_empty( $p{view} );
+
+        $self->_make_uri(
+            path      => $path,
+            fragment  => $p{fragment},
+            query     => $p{query},
+            with_host => $p{with_host},
+        );
+    }
 }
 
 sub _make_uri {

@@ -249,34 +249,37 @@ sub _build_fiscal_year_start_date {
     return $today;
 }
 
-sub users_with_roles {
-    my $self = shift;
-    my ($include_disabled) = validated_list(
-        \@_,
+{
+    my %spec = (
         include_disabled => { isa => Bool, default => 0 },
     );
 
-    my $select = $self->_UsersWithRolesSelect();
+    sub users_with_roles {
+        my $self = shift;
+        my ($include_disabled) = validated_list( \@_, %spec );
 
-    unless ($include_disabled) {
-        $select = $select->clone();
+        my $select = $self->_UsersWithRolesSelect();
 
-        my $schema = R2::Schema->Schema();
+        unless ($include_disabled) {
+            $select = $select->clone();
 
-        $select->where(
-            $schema->table('User')->column('is_disabled'),
-            '=', 0
+            my $schema = R2::Schema->Schema();
+
+            $select->where(
+                $schema->table('User')->column('is_disabled'),
+                '=', 0
+            );
+        }
+
+        my $dbh = $self->_dbh($select);
+
+        return Fey::Object::Iterator::FromSelect->new(
+            classes     => [qw( R2::Schema::User R2::Schema::Role )],
+            dbh         => $dbh,
+            select      => $select,
+            bind_params => [ $self->account_id(), $select->bind_params() ],
         );
     }
-
-    my $dbh = $self->_dbh($select);
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes     => [qw( R2::Schema::User R2::Schema::Role )],
-        dbh         => $dbh,
-        select      => $select,
-        bind_params => [ $self->account_id(), $select->bind_params() ],
-    );
 }
 
 sub _BuildUsersWithRolesSelect {
@@ -422,32 +425,35 @@ sub _BuildTagsSelect {
     return $select;
 }
 
-sub activity_count {
-    my $self = shift;
-    my ($include_archived) = validated_list(
-        \@_,
+{
+    my %spec = (
         include_archived => { isa => Bool, default => 0 },
     );
 
-    my $select = $self->_ActivityCountSelect()->clone();
+    sub activity_count {
+        my $self = shift;
+        my ($include_archived) = validated_list( \@_, %spec );
 
-    unless ($include_archived) {
-        my $schema = R2::Schema->Schema();
+        my $select = $self->_ActivityCountSelect()->clone();
 
-        $select->where(
-            $schema->table('Activity')->column('is_archived'),
-            '=', 0
+        unless ($include_archived) {
+            my $schema = R2::Schema->Schema();
+
+            $select->where(
+                $schema->table('Activity')->column('is_archived'),
+                '=', 0
+            );
+        }
+
+        my $dbh = $self->_dbh($select);
+
+        my $row = $dbh->selectrow_arrayref(
+            $select->sql($dbh), {},
+            $self->account_id(), $select->bind_params()
         );
+
+        return $row && $row->[0] ? $row->[0] : 0;
     }
-
-    my $dbh = $self->_dbh($select);
-
-    my $row = $dbh->selectrow_arrayref(
-        $select->sql($dbh), {},
-        $self->account_id(), $select->bind_params()
-    );
-
-    return $row && $row->[0] ? $row->[0] : 0;
 }
 
 sub _BuildActivityCountSelect {
@@ -472,30 +478,33 @@ sub _BuildActivityCountSelect {
     return $select;
 }
 
-sub activities {
-    my $self = shift;
-    my ($include_archived) = validated_list(
-        \@_,
+{
+    my %spec = (
         include_archived => { isa => Bool, default => 0 },
     );
 
-    my $select = $self->_ActivitySelect()->clone();
+    sub activities {
+        my $self = shift;
+        my ($include_archived) = validated_list( \@_, %spec );
 
-    unless ($include_archived) {
-        my $schema = R2::Schema->Schema();
+        my $select = $self->_ActivitySelect()->clone();
 
-        $select->where(
-            $schema->table('Activity')->column('is_archived'),
-            '=', 0
+        unless ($include_archived) {
+            my $schema = R2::Schema->Schema();
+
+            $select->where(
+                $schema->table('Activity')->column('is_archived'),
+                '=', 0
+            );
+        }
+
+        return Fey::Object::Iterator::FromSelect->new(
+            classes     => [qw( R2::Schema::Activity )],
+            dbh         => $self->_dbh($select),
+            select      => $select,
+            bind_params => [ $self->account_id(), $select->bind_params() ],
         );
     }
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes     => [qw( R2::Schema::Activity )],
-        dbh         => $self->_dbh($select),
-        select      => $select,
-        bind_params => [ $self->account_id(), $select->bind_params() ],
-    );
 }
 
 sub _BuildActivitySelect {
@@ -517,43 +526,46 @@ sub _BuildActivitySelect {
     return $select;
 }
 
-sub top_donors {
-    my $self = shift;
-    my ( $start_date, $end_date, $limit ) = validated_list(
-        \@_,
+{
+    my %spec = (
         start_date => { isa => 'DateTime', optional => 1 },
         end_date   => { isa => 'DateTime', optional => 1 },
         limit      => { isa => Int,        default  => 20 },
     );
 
-    my $select = $self->_TopDonorSelectBase()->clone();
+    sub top_donors {
+        my $self = shift;
+        my ( $start_date, $end_date, $limit ) = validated_list( \@_, %spec );
 
-    my $schema = R2::Schema->Schema();
+        my $select = $self->_TopDonorSelectBase()->clone();
 
-    if ($start_date) {
-        $select->where(
-            $schema->table('Donation')->column('donation_date'),
-            '>=', DateTime::Format::Pg->format_date($start_date)
+        my $schema = R2::Schema->Schema();
+
+        if ($start_date) {
+            $select->where(
+                $schema->table('Donation')->column('donation_date'),
+                '>=', DateTime::Format::Pg->format_date($start_date)
+            );
+        }
+
+        if ($end_date) {
+            $select->where(
+                $schema->table('Donation')->column('donation_date'),
+                '<=', DateTime::Format::Pg->format_date($end_date)
+            );
+        }
+
+        $select->limit($limit);
+
+        my $dbh = $self->_dbh($select);
+
+        return Fey::Object::Iterator::FromSelect->new(
+            classes     => [qw( R2::Schema::Contact )],
+            dbh         => $dbh,
+            select      => $select,
+            bind_params => [ $self->account_id(), $select->bind_params() ],
         );
     }
-
-    if ($end_date) {
-        $select->where(
-            $schema->table('Donation')->column('donation_date'),
-            '<=', DateTime::Format::Pg->format_date($end_date)
-        );
-    }
-
-    $select->limit($limit);
-
-    my $dbh = $self->_dbh($select);
-
-    return Fey::Object::Iterator::FromSelect->new(
-        classes     => [qw( R2::Schema::Contact )],
-        dbh         => $dbh,
-        select      => $select,
-        bind_params => [ $self->account_id(), $select->bind_params() ],
-    );
 }
 
 sub _BuildTopDonorSelectBase {

@@ -13,7 +13,6 @@ use R2::Util qw( string_is_empty );
 
 use Moose;
 use MooseX::Configuration;
-use MooseX::Params::Validate qw( validated_list );
 
 has is_production => (
     is      => 'rw',

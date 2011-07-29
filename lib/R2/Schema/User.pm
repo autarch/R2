@@ -303,12 +303,13 @@ sub _FindOrCreateSystemUser {
 {
     my $MostRecentName = '___most recent search___';
 
+    my %spec = (
+        search => { does => 'R2::Role::Search' },
+    );
+
     sub save_most_recent_search {
         my $self = shift;
-        my ($search) = validated_list(
-            \@_,
-            search => { does => 'R2::Role::Search' },
-        );
+        my ($search) = validated_list( \@_, %spec );
 
         my $saved = $self->most_recent_saved_search();
 
@@ -441,97 +442,94 @@ sub _base_uri_path {
     return '/user/' . $self->user_id();
 }
 
-sub can_view_account {
-    my $self = shift;
-    my ($account) = validated_list(
-        \@_,
+{
+    my %spec = (
         account => { isa => 'R2::Schema::Account' },
     );
 
-    return $self->_require_at_least(
-        $account->account_id(),
-        'Member'
-    );
+    sub can_view_account {
+        my $self = shift;
+        my ($account) = validated_list( \@_, %spec );
+
+        return $self->_require_at_least(
+            $account->account_id(),
+            'Member'
+        );
+    }
+
+    sub can_edit_account {
+        my $self = shift;
+        my ($account) = validated_list( \@_, %spec );
+
+        return $self->_require_at_least(
+            $account->account_id(),
+            'Admin'
+        );
+    }
+
+    sub can_edit_account_content {
+        my $self = shift;
+        my ($account) = validated_list( \@_, %spec );
+
+        return $self->_require_at_least(
+            $account->account_id(),
+            'Editor'
+        );
+    }
+
+    sub can_add_contact {
+        my $self = shift;
+        my ($account) = validated_list( \@_, %spec );
+
+        return $self->_require_at_least(
+            $account->account_id(),
+            'Editor'
+        );
+    }
 }
 
-sub can_edit_account {
-    my $self = shift;
-    my ($account) = validated_list(
-        \@_,
-        account => { isa => 'R2::Schema::Account' },
-    );
-
-    return $self->_require_at_least(
-        $account->account_id(),
-        'Admin'
-    );
-}
-
-sub can_edit_account_content {
-    my $self = shift;
-    my ($account) = validated_list(
-        \@_,
-        account => { isa => 'R2::Schema::Account' },
-    );
-
-    return $self->_require_at_least(
-        $account->account_id(),
-        'Editor'
-    );
-}
-
-sub can_edit_user {
-    my $self = shift;
-    my ($user) = validated_list(
-        \@_,
+{
+    my %spec = (
         user => { isa => 'R2::Schema::User' },
     );
 
-    return 1 if $self->user_id() == $user->user_id();
+    sub can_edit_user {
+        my $self = shift;
+        my ($user) = validated_list( \@_, %spec );
 
-    return $self->_require_at_least(
-        $user->account_id(),
-        'Admin'
-    );
+        return 1 if $self->user_id() == $user->user_id();
+
+        return $self->_require_at_least(
+            $user->account_id(),
+            'Admin'
+        );
+    }
 }
 
-sub can_view_contact {
-    my $self = shift;
-    my ($contact) = validated_list(
-        \@_,
+{
+    my %spec = (
         contact => { isa => ContactLike },
     );
 
-    return $self->_require_at_least(
-        $contact->account_id(),
-        'Member'
-    );
-}
+    sub can_view_contact {
+        my $self = shift;
+        my ($contact) = validated_list( \@_, %spec );
 
-sub can_edit_contact {
-    my $self = shift;
-    my ($contact) = validated_list(
-        \@_,
-        contact => { isa => ContactLike },
-    );
+        return $self->_require_at_least(
+            $contact->account_id(),
+            'Member'
+        );
+    }
 
-    return $self->_require_at_least(
-        $contact->account_id(),
-        'Editor'
-    );
-}
+    sub can_edit_contact {
+        my $self = shift;
+        my ($contact) = validated_list( \@_, %spec );
 
-sub can_add_contact {
-    my $self = shift;
-    my ($account) = validated_list(
-        \@_,
-        account => { isa => 'R2::Schema::Account' },
-    );
-
-    return $self->_require_at_least(
-        $account->account_id(),
-        'Editor'
-    );
+        return $self->_require_at_least(
+            $contact->account_id(),
+            'Editor'
+        );
+    }
 }
 
 {

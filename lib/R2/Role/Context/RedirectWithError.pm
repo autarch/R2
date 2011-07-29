@@ -34,14 +34,14 @@ use R2::Types qw( ErrorForSession URIStr );
 }
 
 {
-    my @spec = (
+    my %spec = (
         uri       => { isa => URIStr, coerce => 1 },
         resultset => { isa => 'Chloro::ResultSet' },
     );
 
     sub redirect_with_resultset {
         my $self = shift;
-        my ( $uri, $resultset ) = validated_list( \@_, @spec );
+        my ( $uri, $resultset ) = validated_list( \@_, %spec );
 
         $self->session_object()->set_resultset($resultset);
 
