@@ -50,7 +50,7 @@ Role(
                 var spinner = this.my.Spinner().clone();
                 spinner.attr( "id", this.spinner_id() );
 
-                elt.children().detach();
+                elt.children().remove();
                 elt.append(spinner);
 
                 this.spinner(spinner);
@@ -98,7 +98,7 @@ Role(
                     return;
                 }
 
-                this.spinner().detach();
+                this.spinner().remove();
                 this.spinner(null);
             }
         }

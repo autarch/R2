@@ -129,12 +129,12 @@ Class(
                 );
             },
             _showAllTags: function (tags) {
-                this.container().children().detach();
+                this.container().children().remove();
                 $("#tagsListTemplate").tmpl( { tags: tags } ).appendTo( this.container() );
                 this._instrumentDeleteLinks();
             },
             _showError: function () {
-                this.container().children().detach();
+                this.container().children().remove();
                 $("#tagsListErrorTemplate").tmpl().appendTo( this.container() );
             },
             _instrumentDeleteLinks: function () {
