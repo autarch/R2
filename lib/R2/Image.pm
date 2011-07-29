@@ -122,7 +122,7 @@ sub _make_resized_image {
     $new->write(
         filename => $resized_file->stringify(),
         quality  => $orig->get('quality'),
-        type     => 'Palette',
+        type     => 'TrueColor',
     );
 
     my $file = R2::Schema::File->insert(
