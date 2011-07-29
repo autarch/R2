@@ -37,7 +37,7 @@ role {
             $bools{ $attr->name() } = 1;
         }
 
-        # We only want to serialize data from the class's the associated table
+        # We only want to serialize data from the class's associated table
         if (   $attr->name() =~ /_date(?:time)?$/
             && $attr->isa('Fey::Meta::Attribute::FromInflator') ) {
 
