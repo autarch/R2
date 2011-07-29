@@ -103,7 +103,7 @@ use MooseX::Params::Validate qw( validated_list );
         }
     }
 }
-R2::Config->instance->_set_aim_key('lu1hCo1oqLyZhR0m');
+
 sub _fill_uri {
     my $self = shift;
     my $type = shift;
