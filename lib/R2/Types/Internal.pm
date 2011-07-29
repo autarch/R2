@@ -19,6 +19,7 @@ use MooseX::Types -declare => [
         URIStr
         )
 ];
+use MooseX::Types::Common 0.001003;
 use MooseX::Types::Common::Numeric qw( PositiveInt );
 use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw(  Defined Int Object Str );
@@ -36,13 +37,23 @@ subtype ContactLike,
     message {
         ( ref $_[0] )
             . ' is not a R2::Schema::Contact, nor does it do R2::Role::Schema::ActsAsContact';
+    },
+    inline_as {
+        $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+            . qq{( $_[1]->isa('R2::Schema::Contact')}
+            . qq{ || ( $_[1]->can('does') }
+            . qq { && $_[1]->does('R2::Role::Schema::ActsAsContact') ) )};
     };
 
 subtype DatabaseId, as PositiveInt;
 
 subtype Date,
     as class_type 'DateTime',
-    where { all { $_ == 0 } $_->hour(), $_->minute(), $_->day() };
+    where { all { $_ == 0 } $_->hour(), $_->minute(), $_->second() },
+    inline_as {
+        $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+            . qq{ ( all { \$_ == 0 } $_[1]->hour(), $_[1]->minute(), $_[1]->second() ) };
+    };
 
 subtype ErrorForSession,
     as Defined,
@@ -59,17 +70,20 @@ subtype ErrorForSession,
 subtype FileIsImage,
     as class_type('R2::Schema::File'),
     where { $_->is_image() },
-    message { 'This file (' . $_->filename() . ') is not an image' };
+    message { 'This file (' . $_->filename() . ') is not an image' },
+    inline_as {
+        $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+            . qq{ ( $_[1]->is_image() ) };
+    };
 
 subtype MonthAsNumber,
     as PositiveInt,
     where { $_ >= 1 && $_ <= 12 },
-    message {'Must be a number from 1-12'};
-
-subtype NonEmptyStr,
-    as Str,
-    where { length $_ >= 0 },
-    message {'This string must not be empty'};
+    message {'Must be a number from 1-12'},
+    inline_as {
+        $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+            . qq{ ( $_[1] >= 1 && $_[1] <= 12 ) };
+    };
 
 subtype PosOrZeroInt,
     as Int,
