@@ -44,11 +44,6 @@
 </body>
 </html>
 
-<%attr>
-show_sidebar => 0
-sidebar => []
-</%attr>
-
 <%init>
 my $show_sidebar = $c->sidebar()->has_items();
 </%Init>
