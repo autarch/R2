@@ -30,6 +30,17 @@ sub begin : Private {
     # env.
     $ENV{SERVER_PORT} = $c->engine()->env()->{SERVER_PORT};
 
+    my $domain = $c->domain();
+    if ( $domain->web_hostname() ne $c->request()->uri()->host() ) {
+        $c->redirect_and_detach(
+            $domain->application_uri(
+                path      => $c->request()->path(),
+                query     => $c->request()->query_parameters(),
+                with_host => 1,
+            )
+        );
+    }
+
     R2::Schema->ClearObjectCaches();
 
     $self->_require_authen($c)
