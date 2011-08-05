@@ -85,7 +85,9 @@ sub _set_dbh_attributes {
 
     $dbh->do('SET TIME ZONE UTC');
 
-    $dbh->{HandleError} = sub { Carp::confess(shift) };
+    $dbh->{HandleError} = sub {
+        Carp::confess( grep {defined} @_ );
+    };
 
     return;
 }
