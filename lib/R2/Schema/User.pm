@@ -303,13 +303,13 @@ sub _FindOrCreateSystemUser {
 {
     my $MostRecentName = '___most recent search___';
 
-    my %spec = (
+    my @spec = (
         search => { does => 'R2::Role::Search' },
     );
 
     sub save_most_recent_search {
         my $self = shift;
-        my ($search) = validated_list( \@_, %spec );
+        my ($search) = validated_list( \@_, @spec );
 
         my $saved = $self->most_recent_saved_search();
 
@@ -443,13 +443,13 @@ sub _base_uri_path {
 }
 
 {
-    my %spec = (
+    my @spec = (
         account => { isa => 'R2::Schema::Account' },
     );
 
     sub can_view_account {
         my $self = shift;
-        my ($account) = validated_list( \@_, %spec );
+        my ($account) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $account->account_id(),
@@ -459,7 +459,7 @@ sub _base_uri_path {
 
     sub can_edit_account {
         my $self = shift;
-        my ($account) = validated_list( \@_, %spec );
+        my ($account) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $account->account_id(),
@@ -469,7 +469,7 @@ sub _base_uri_path {
 
     sub can_edit_account_content {
         my $self = shift;
-        my ($account) = validated_list( \@_, %spec );
+        my ($account) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $account->account_id(),
@@ -479,7 +479,7 @@ sub _base_uri_path {
 
     sub can_add_contact {
         my $self = shift;
-        my ($account) = validated_list( \@_, %spec );
+        my ($account) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $account->account_id(),
@@ -489,13 +489,13 @@ sub _base_uri_path {
 }
 
 {
-    my %spec = (
+    my @spec = (
         user => { isa => 'R2::Schema::User' },
     );
 
     sub can_edit_user {
         my $self = shift;
-        my ($user) = validated_list( \@_, %spec );
+        my ($user) = validated_list( \@_, @spec );
 
         return 1 if $self->user_id() == $user->user_id();
 
@@ -507,13 +507,13 @@ sub _base_uri_path {
 }
 
 {
-    my %spec = (
+    my @spec = (
         contact => { isa => ContactLike },
     );
 
     sub can_view_contact {
         my $self = shift;
-        my ($contact) = validated_list( \@_, %spec );
+        my ($contact) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $contact->account_id(),
@@ -523,7 +523,7 @@ sub _base_uri_path {
 
     sub can_edit_contact {
         my $self = shift;
-        my ($contact) = validated_list( \@_, %spec );
+        my ($contact) = validated_list( \@_, @spec );
 
         return $self->_require_at_least(
             $contact->account_id(),

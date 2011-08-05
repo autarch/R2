@@ -254,13 +254,6 @@ with 'R2::Role::URIMaker';
         builder => '_BuildEmailsSelect',
     );
 
-    has emails => (
-        is      => 'ro',
-        isa     => 'Fey::Object::Iterator::FromSelect',
-        lazy    => 1,
-        builder => '_build_emails',
-    );
-
     class_has '_ActivitiesWithParticipationsSelect' => (
         is      => 'ro',
         isa     => 'Fey::SQL::Select',
@@ -505,13 +498,13 @@ sub add_note {
                   Fey::Placeholder->new() );
     #>>>
 
-    my %spec = (
+    my @spec = (
         since => { isa => 'DateTime', optional => 1 },
     );
 
     sub donation_total {
         my $self = shift;
-        my ($date) = validated_list( \@_, %spec );
+        my ($date) = validated_list( \@_, @spec );
 
         my $select = $select_base->clone();
 
@@ -723,13 +716,13 @@ sub _BuildTagsSelect {
 }
 
 {
-    my %spec = (
+    my @spec = (
         tags => ArrayRef [Str],
     );
 
     sub add_tags {
         my $self = shift;
-        my ($tags) = validated_list( \@_, %spec );
+        my ($tags) = validated_list( \@_, @spec );
 
         my @tags;
         for my $tag_name ( grep {length} uniq @{$tags} ) {
@@ -766,7 +759,7 @@ sub _BuildTagsSelect {
     }
 }
 
-sub _build_emails {
+sub emails {
     my $self = shift;
 
     my $select = $self->_EmailsSelect();

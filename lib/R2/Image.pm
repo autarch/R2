@@ -49,14 +49,14 @@ has 'width' => (
 );
 
 {
-    my %spec = (
+    my @spec = (
         height => { isa => Int },
         width  => { isa => Int },
     );
 
     sub resize {
         my $self = shift;
-        my ( $height, $width ) = validated_list( \@_, %spec );
+        my ( $height, $width ) = validated_list( \@_, @spec );
 
         ( $height, $width ) = $self->_new_dimensions( $height, $width );
 

@@ -15,14 +15,14 @@ use R2::Types qw( ErrorForSession URIStr );
 #requires qw( redirect_and_detach session_object );
 
 {
-    my %spec = (
+    my @spec = (
         uri   => { isa => URIStr,          coerce   => 1 },
         error => { isa => ErrorForSession, optional => 1 },
     );
 
     sub redirect_with_error {
         my $self = shift;
-        my %p = validated_hash( \@_, %spec );
+        my %p = validated_hash( \@_, @spec );
 
         die "Must provide a form or error" unless $p{error} || $p{form};
 
@@ -34,14 +34,14 @@ use R2::Types qw( ErrorForSession URIStr );
 }
 
 {
-    my %spec = (
+    my @spec = (
         uri       => { isa => URIStr, coerce => 1 },
         resultset => { isa => 'Chloro::ResultSet' },
     );
 
     sub redirect_with_resultset {
         my $self = shift;
-        my ( $uri, $resultset ) = validated_list( \@_, %spec );
+        my ( $uri, $resultset ) = validated_list( \@_, @spec );
 
         $self->session_object()->set_resultset($resultset);
 

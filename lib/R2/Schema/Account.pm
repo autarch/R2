@@ -250,13 +250,13 @@ sub _build_fiscal_year_start_date {
 }
 
 {
-    my %spec = (
+    my @spec = (
         include_disabled => { isa => Bool, default => 0 },
     );
 
     sub users_with_roles {
         my $self = shift;
-        my ($include_disabled) = validated_list( \@_, %spec );
+        my ($include_disabled) = validated_list( \@_, @spec );
 
         my $select = $self->_UsersWithRolesSelect();
 
@@ -426,13 +426,13 @@ sub _BuildTagsSelect {
 }
 
 {
-    my %spec = (
+    my @spec = (
         include_archived => { isa => Bool, default => 0 },
     );
 
     sub activity_count {
         my $self = shift;
-        my ($include_archived) = validated_list( \@_, %spec );
+        my ($include_archived) = validated_list( \@_, @spec );
 
         my $select = $self->_ActivityCountSelect()->clone();
 
@@ -479,13 +479,13 @@ sub _BuildActivityCountSelect {
 }
 
 {
-    my %spec = (
+    my @spec = (
         include_archived => { isa => Bool, default => 0 },
     );
 
     sub activities {
         my $self = shift;
-        my ($include_archived) = validated_list( \@_, %spec );
+        my ($include_archived) = validated_list( \@_, @spec );
 
         my $select = $self->_ActivitySelect()->clone();
 
@@ -527,7 +527,7 @@ sub _BuildActivitySelect {
 }
 
 {
-    my %spec = (
+    my @spec = (
         start_date => { isa => 'DateTime', optional => 1 },
         end_date   => { isa => 'DateTime', optional => 1 },
         limit      => { isa => Int,        default  => 20 },
@@ -535,7 +535,7 @@ sub _BuildActivitySelect {
 
     sub top_donors {
         my $self = shift;
-        my ( $start_date, $end_date, $limit ) = validated_list( \@_, %spec );
+        my ( $start_date, $end_date, $limit ) = validated_list( \@_, @spec );
 
         my $select = $self->_TopDonorSelectBase()->clone();
 

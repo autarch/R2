@@ -34,7 +34,7 @@ has 'member_count' => (
 );
 
 {
-    my %spec = (
+    my @spec = (
         person_id => { isa => Int },
         position  => { isa => Str, default => q{} },
         user      => { isa => 'R2::Schema::User' },
@@ -42,7 +42,7 @@ has 'member_count' => (
 
     sub add_member {
         my $self = shift;
-        my ( $person_id, $position, $user ) = validated_list( \@_, %spec );
+        my ( $person_id, $position, $user ) = validated_list( \@_, @spec );
 
         my $person = R2::Schema::Person->new( person_id => $person_id );
 
@@ -63,14 +63,14 @@ has 'member_count' => (
 }
 
 {
-    my %spec = (
+    my @spec = (
         person_id => { isa => Int },
         user      => { isa => 'R2::Schema::User' },
     );
 
     sub remove_member {
         my $self = shift;
-        my ( $person_id, $user ) = validated_list( \@_, %spec );
+        my ( $person_id, $user ) = validated_list( \@_, @spec );
 
         my $class = ( ref $self ) . 'Member';
 
@@ -88,14 +88,14 @@ has 'member_count' => (
 }
 
 {
-    my %spec = (
+    my @spec = (
         members => { isa => ArrayRef [HashRef] },
         user => { isa => 'R2::Schema::User' },
     );
 
     sub update_members {
         my $self = shift;
-        my ( $members, $user ) = validated_list( \@_, %spec );
+        my ( $members, $user ) = validated_list( \@_, @spec );
 
         my %new_members = map { $_->{person_id} => $_ } @{$members};
 

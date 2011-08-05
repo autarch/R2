@@ -105,14 +105,14 @@ use MooseX::Params::Validate qw( validated_list );
 }
 
 {
-    my %spec = (
+    my @spec = (
         screen_name => { isa => Str },
     );
 
     sub _fill_uri {
         my $self = shift;
         my $type = shift;
-        my ($screen_name) = validated_list( \@_, %spec );
+        my ($screen_name) = validated_list( \@_, @spec );
 
         my $meth     = $type . '_template';
         my $template = $self->$meth();

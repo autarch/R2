@@ -200,14 +200,14 @@ sub _check_authz {
 }
 
 {
-    my %spec = (
+    my @spec = (
         location => { isa => Str | Object },
     );
 
     sub status_no_content {
         my $self = shift;
         my $c    = shift;
-        my ($location) = validated_list( \@_, %spec );
+        my ($location) = validated_list( \@_, @spec );
 
         if ( $c->request()->looks_like_browser() ) {
             $c->response()->status(302);
