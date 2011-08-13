@@ -1,6 +1,7 @@
 package R2::Search::Plugin::Contact::ByName;
 
 use Moose;
+
 # intentionally not StrictConstructor
 
 use namespace::autoclean;
@@ -40,7 +41,7 @@ sub apply_where_clauses {
     my $self   = shift;
     my $select = shift;
 
-    my @names = uniq map { lc } $self->_names();
+    my @names = uniq map {lc} $self->_names();
 
     for my $name (@names) {
         $select->where('or') if $name ne $names[0];
@@ -53,7 +54,7 @@ sub apply_where_clauses {
 sub _apply_where_clauses {
     my $self   = shift;
     my $select = shift;
-    my $name = shift;
+    my $name   = shift;
 
     $select->where('(');
 
@@ -82,9 +83,9 @@ sub _apply_where_clauses {
 }
 
 sub _person_where_clause {
-    my $self = shift;
+    my $self   = shift;
     my $select = shift;
-    my $name = shift;
+    my $name   = shift;
 
     # The theory is that if there's more than 2 parts then it's
     # probably a last name with a space in it, as opposed to someone
@@ -134,7 +135,7 @@ sub _build_description {
     $desc .=
           $self->_name_count() == 2 ? 'either '
         : $self->_name_count() == 3 ? 'any one of '
-        :                            q{};
+        :                             q{};
 
     $desc .= WORDLIST(
         ( map {qq{"$_"}} $self->_names() ),
