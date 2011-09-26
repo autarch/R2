@@ -30,6 +30,7 @@ requires qw(
     _BuildObjectSelectBase
     _iterator_class
     _classes_returned_by_iterator
+    _build_result_type_string
 );
 
 with 'R2::Role::URIMaker';
@@ -89,13 +90,6 @@ has _descriptions => (
         description_count => 'count',
         has_descriptions  => 'count',
     },
-);
-
-has includes_multiple_contact_types => (
-    is      => 'ro',
-    isa     => Bool,
-    lazy    => 1,
-    builder => '_build_includes_multiple_contact_types',
 );
 
 has result_type_string => (
@@ -273,30 +267,10 @@ sub searches_class {
     map { /^R2::Schema::/ ? $_ : 'R2::Schema::' . $_ } @_;
 }
 
-sub _build_includes_multiple_contact_types {
-    my $self = shift;
-
-    return $self->_SearchedClassCount() > 1;
-}
-
 sub _BuildSearchedClasses {
     my $self = shift;
 
     return { map { $_ => 1 } @{ $self->_classes_returned_by_iterator() } };
-}
-
-sub _build_result_type_string {
-    my $self = shift;
-
-    return 'contact' if $self->includes_multiple_contact_types();
-
-    for my $type (qw( person household organization )) {
-        my $class = 'R2::Schema::' . ucfirst $type;
-
-        return $type if $self->_SearchIncludesClass($class);
-    }
-
-    die 'wtf';
 }
 
 sub _build_pager {
@@ -318,7 +292,7 @@ sub _build_pager {
 }
 
 {
-    my %spec = (
+    my @spec = (
         page          => { isa => PositiveInt,  optional => 1 },
         limit         => { isa => PosOrZeroInt, optional => 1 },
         order_by      => { isa => NonEmptyStr,  optional => 1 },
@@ -328,7 +302,7 @@ sub _build_pager {
 
     sub new_uri {
         my $self = shift;
-        my %p = validated_hash( \@_, %spec );
+        my %p = validated_hash( \@_, @spec );
 
         my %query = map { $_ => delete $p{$_} }
             grep { defined $p{$_} } qw( page limit order_by reverse_order );

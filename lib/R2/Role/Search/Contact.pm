@@ -5,9 +5,18 @@ use MooseX::ClassAttribute;
 
 use namespace::autoclean;
 
+use R2::Types qw( Bool );
+
 requires '_BuildOrderByNameClause';
 
 with 'R2::Role::Search';
+
+has includes_multiple_contact_types => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    builder => '_build_includes_multiple_contact_types',
+);
 
 class_has _OrderByNameClause => (
     is      => 'ro',
@@ -152,6 +161,26 @@ sub _order_by_created {
     );
 
     return;
+}
+
+sub _build_includes_multiple_contact_types {
+    my $self = shift;
+
+    return $self->_SearchedClassCount() > 1;
+}
+
+sub _build_result_type_string {
+    my $self = shift;
+
+    return 'contact' if $self->includes_multiple_contact_types();
+
+    for my $type (qw( person household organization )) {
+        my $class = 'R2::Schema::' . ucfirst $type;
+
+        return $type if $self->_SearchIncludesClass($class);
+    }
+
+    die 'wtf';
 }
 
 1;

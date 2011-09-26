@@ -59,7 +59,7 @@ has body_summary => (
     builder => '_build_body_summary',
 );
 
-with 'R2::Role::Schema::Serializes';
+with 'R2::Role::Schema::Serializes' => { add => ['body_summary'] };
 
 sub _build_contacts {
     my $self = shift;
@@ -167,6 +167,19 @@ sub _base_uri_path {
         . '/email/'
         . $self->email_id();
 }
+
+around serialize => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $ser = $self->$orig(@_);
+
+    $ser->{from} = $self->from_contact()->serialize();
+    $ser->{contact} = [ map { $_->real_contact()->serialize() }
+            $self->contacts()->all() ];
+
+    return $ser;
+};
 
 __PACKAGE__->meta()->make_immutable();
 

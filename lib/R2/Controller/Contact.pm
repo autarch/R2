@@ -14,6 +14,7 @@ use R2::Schema::File;
 use R2::Schema::Person;
 use R2::Schema::PhoneNumber;
 use R2::Search::Contact;
+use R2::Search::Email;
 use R2::Search::Household;
 use R2::Search::Organization;
 use R2::Search::Person;
@@ -29,6 +30,8 @@ use Moose;
 use CatalystX::Routes;
 
 BEGIN { extends 'R2::Controller::Base' }
+
+with 'R2::Role::Controller::Search';
 
 for my $type (qw( contact person household organization )) {
 
@@ -160,14 +163,10 @@ sub _contact_search {
 
     $c->tabs()->by_id('Contacts')->set_is_selected(1);
 
-    my %p;
-    if ( defined $path ) {
-        for my $pair ( split /;/, $path ) {
-            my ( $k, $v ) = split /=/, $pair;
-
-            push @{ $p{$k} }, $v;
-        }
-    }
+    my %p = (
+        $self->_search_params_from_path($path),
+        $self->_paging_params( $c->request()->params(), 50 ),
+    );
 
     my @restrictions;
     push @restrictions, 'Contact::ByName'
@@ -176,14 +175,6 @@ sub _contact_search {
         if $p{tag};
 
     $p{restrictions} = \@restrictions;
-
-    my $params = $c->request()->params();
-    for my $key ( qw( page limit order_by reverse_order ) ) {
-        $p{$key} = $params->{$key}
-            if exists $params->{$key};
-    }
-
-    $p{limit} //= 50;
 
     my $search = $search_class->new(
         account => $c->account(),
@@ -478,10 +469,41 @@ for my $type ( qw( donation email note ) ) {
 
             $c->local_nav()->by_id($plural)->set_is_selected(1);
 
-            $c->stash()->{$edit_perm}
-                = $c->user()->can_edit_contact( contact => $c->stash()->{contact} );
-
             $c->stash()->{template} = $collection_template;
+        };
+
+    my $search_meth = "_${type}_search";
+    my $item_meth = $plural;
+
+    get $plural
+        => chained '_set_contact'
+        => args 0
+        => sub {
+            my $self = shift;
+            my $c    = shift;
+
+            my $search = $self->$search_meth($c);
+
+            my @items = map { $_->serialize() } $search->$item_meth()->all();
+
+            my $contact = $c->stash()->{contact};
+
+            if ( $c->user()->can_edit_contact( contact => $contact ) ) {
+                for my $item (@items) {
+                    $item->{edit_form_uri}
+                        = $item->uri( view => 'edit_form' );
+                    $item->{delete_uri}
+                        = $item->uri( view => 'confirm_deletion' );
+                }
+            }
+
+            $self->status_ok(
+                $c,
+                entity => {
+                    contact_id => $contact->contact_id(),
+                    $plural    => \@items,
+                },
+            );
         };
 
     my $new_form = "new_${type}_form";
@@ -728,6 +750,24 @@ for my $type ( qw( donation email note ) ) {
 
             $c->stash()->{template} = '/shared/confirm_deletion';
         };
+}
+
+sub _email_search {
+    my $self = shift;
+    my $c    = shift;
+    my $path = shift;
+
+    my %p = (
+        $self->_search_params_from_path($path),
+        $self->_paging_params( $c->request()->params(), 10 ),
+    );
+
+    return R2::Search::Email->new(
+        account      => $c->stash()->{account},
+        contact_id   => $c->stash()->{contact}->contact_id(),
+        restrictions => 'Email::ByContactId',
+        %p,
+    );
 }
 
 get_html history
