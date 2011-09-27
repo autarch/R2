@@ -126,13 +126,13 @@ sub _clean_tables {
         return @DDL if @DDL;
 
         my $file = file(
-            $INC{'R2/Test/RealSchema.pm'},
-            '..', '..', '..', '..', '..',
+            file( $INC{'R2/Test/RealSchema.pm'} )->dir(),
+            '..', '..', '..', '..',
             'schema',
             'R2.sql'
-        );
+        )->resolve();
 
-        my $ddl = read_file( $file->resolve()->stringify() );
+        my $ddl = read_file( $file->stringify() );
 
         for my $stmt ( split /\n\n+(?=^\S)/m, $ddl ) {
             $stmt =~ s/^--.+\n//gm;
