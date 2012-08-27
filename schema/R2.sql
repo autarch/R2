@@ -3,7 +3,6 @@ SET CLIENT_MIN_MESSAGES = ERROR;
 CREATE DOMAIN email_address AS citext
        CONSTRAINT valid_email_address CHECK ( VALUE ~ E'^.+@.+(?:\\..+)+' );
 
--- Is there a way to ensure that this table only ever has one row?
 CREATE TABLE "Version" (
        version                  INTEGER         PRIMARY KEY
 );
